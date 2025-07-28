@@ -1,0 +1,72 @@
+﻿@model ConexionSql.Models.IbPer.IbPerDto
+
+@{
+    ViewData["Title"] = "Agregar nuevo personal";
+}
+
+<h2>Agregar nuevo personal</h2>
+
+<form asp-action="InsertIbPer" method="post">
+    <div class="form-group">
+        <label asp-for="IbPerNom" class="control-label">Nombre</label>
+        <input asp-for="IbPerNom" class="form-control" />
+        <span asp-validation-for="IbPerNom" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="IbPerApe" class="control-label">Apellido</label>
+        <input asp-for="IbPerApe" class="form-control" />
+        <span asp-validation-for="IbPerApe" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="IbPerLeg" class="control-label">Legajo</label>
+        <input asp-for="IbPerLeg" class="form-control" />
+        <span asp-validation-for="IbPerLeg" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="IbPerPas" class="control-label">Contraseña</label>
+        <input asp-for="IbPerPas" class="form-control" />
+        <span asp-validation-for="IbPerPas" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="IbPsw" class="control-label">Repita Contraseña</label>
+        <input asp-for="IbPsw" class="form-control" />
+        <span asp-validation-for="IbPsw" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="IbPerUniId">Unidad</label>
+        <select asp-for="IbPerUniId" asp-items="ViewBag.Unidades" class="form-control">
+            <option value="">-- Selecciona una unidad --</option>
+        </select>
+        <span asp-validation-for="IbPerUniId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="IbPerCarId">Cargo</label>
+        <select asp-for="IbPerCarId" asp-items="ViewBag.Cargos" class="form-control">
+            <option value="">-- Selecciona un cargo --</option>
+        </select>
+        <span asp-validation-for="IbPerCarId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="IbSecId">Sección</label>
+        <select asp-for="IbSecId" asp-items="ViewBag.Secciones" class="form-control">
+            <option value="">-- Selecciona una sección --</option>
+        </select>
+        <span asp-validation-for="IbSecId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
+
+

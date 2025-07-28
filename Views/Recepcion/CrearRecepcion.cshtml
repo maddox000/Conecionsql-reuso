@@ -1,0 +1,101 @@
+﻿@model ConexionSql.Models.Recepciones.TbRec
+@using ConexionSql.Models.IbPer
+@using ConexionSql.Models.Sectores
+@using ConexionSql.Models.Recepciones
+
+@{
+    ViewData["Title"] = "Nueva Recepción";
+    var listaPersonal = ViewBag.ListaPersonal as List<IbPerDto>;
+    var listaSectores = ViewBag.ListaSectores as List<IbSec>;
+
+    // Intenta obtener el ViewModel del subformulario desde ViewBag
+    var subFormModel = ViewBag.SubFormularioDetalle as TbRecDetFormDto;
+}
+
+<h2>Nueva Recepción</h2>
+
+<!-- 📝 Formulario principal para la cabecera de recepción -->
+<form asp-action="CrearRecepcion" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="form-fila">
+        <!-- 👤 Combo de Personal -->
+        <div class="combo-form">
+            <label for="TbRecPerId">Personal:</label>
+            <select asp-for="TbRecPerId" class="form-control">
+                <option value="">-- Seleccione --</option>
+                @foreach (var p in listaPersonal)
+                {
+                    <option value="@p.IbPerId">@p.IbPerApe @p.IbPerNom</option>
+                }
+            </select>
+        </div>
+
+        <!-- 🏭 Combos de Sector Origen y Destino -->
+        <div class="combo-form" style="margin-left: auto;">
+            <label for="TbRecSecOriId">Sector Origen:</label>
+            <select asp-for="TbRecSecOriId" class="form-control mb-2">
+                <option value="">-- Seleccione --</option>
+                @foreach (var s in listaSectores)
+                {
+                    <option value="@s.IbSecId">@s.IbSecDen</option>
+                }
+            </select>
+
+            <label for="TbRecSecDesId">Sector Destino:</label>
+            <select asp-for="TbRecSecDesId" class="form-control">
+                <option value="">-- Seleccione --</option>
+                @foreach (var s in listaSectores)
+                {
+                    <option value="@s.IbSecId">@s.IbSecDen</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <!-- 💾 Botón para guardar la cabecera -->
+    <button type="submit" class="btn btn-primary mt-4">Guardar Recepción</button>
+</form>
+
+<!-- 🧾 Subformulario para agregar detalles (solo si hay ID generado) -->
+@if (Model.TbRecId > 0 && subFormModel != null)
+{
+    // 🛡️ Asegura que Detalle esté instanciado
+    subFormModel.Detalle ??= new TbRecDetDto();
+
+    // 🔗 Refuerza que el subformulario esté vinculado al ID actual de cabecera
+    subFormModel.Detalle.TB_REC_ID = Model.TbRecId;
+
+    <div class="mt-4">
+        <h4>Agregar Material</h4>
+
+        <!-- 🔁 Renderiza el subformulario parcial y le pasa el ViewModel completo -->
+        @await Html.PartialAsync("_SubFormRecDet", subFormModel)
+    </div>
+}
+
+<!-- 🧠 Scripts adicionales -->
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const sectorDestino = document.getElementById("TbRecSecDesId");
+
+            if (sectorDestino) {
+                // ⌨️ Permitir enviar con Enter
+                sectorDestino.addEventListener("keydown", function (e) {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        this.form.submit();
+                    }
+                });
+
+                // 🖱️ Enviar al perder foco
+                sectorDestino.addEventListener("blur", function () {
+                    if (this.value) {
+                        this.form.submit();
+                    }
+                });
+            }
+        });
+    </script>
+}

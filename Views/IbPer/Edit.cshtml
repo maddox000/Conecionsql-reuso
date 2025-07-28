@@ -1,0 +1,36 @@
+﻿@model ConexionSql.Models.IbPer.IbPerDto
+
+@{
+    ViewData["Title"] = "Editar Persona";
+}
+
+<h2>Editar Persona</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="IbPerId" />
+
+    <div class="form-group">
+        <label asp-for="IbPerNom" class="control-label"></label>
+        <input asp-for="IbPerNom" class="form-control" />
+        <span asp-validation-for="IbPerNom" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="IbPerApe" class="control-label"></label>
+        <input asp-for="IbPerApe" class="form-control" />
+        <span asp-validation-for="IbPerApe" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Guardar" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+

@@ -1,0 +1,19 @@
+﻿@model ConexionSql.Models.IbPer.IbPerEditDto
+
+@using (Html.BeginForm())
+{
+    <button type="submit">Guardar cambios</button>
+    @Html.AntiForgeryToken()
+    for (int i = 0; i < Model.Personas.Count; i++)
+    {
+        <div>
+            @Html.HiddenFor(m => m.Personas[i].IbPerId)
+            <label>Nombre:</label>
+            @Html.TextBoxFor(m => m.Personas[i].IbPerNom)
+            <label>Apellido:</label>
+            @Html.TextBoxFor(m => m.Personas[i].IbPerApe)
+        </div>
+    }
+    
+}
+

@@ -1,0 +1,164 @@
+﻿@model ConexionSql.Models.Procesos.TbProDetFormDto
+
+@{
+    ViewData["Title"] = $"Proceso #{Model.Cabecera?.TbProId ?? 0}";
+}
+
+@if (Model.Cabecera == null)
+{
+    <div class="alert alert-danger mt-4">
+        ❌ No se pudo cargar la cabecera del proceso.
+    </div>
+    return;
+}
+
+<h4 class="mb-4">Proceso creado exitosamente ✅</h4>
+
+<!-- 🔹 Cabecera del proceso -->
+<table class="table table-bordered tabla-cabecera">
+    <tr><th>ID</th><td>@Model.Cabecera.TbProId</td></tr>
+    <tr><th>Tipo de Proceso</th><td>@Model.Cabecera.TbProPtiDen</td></tr>
+    <tr><th>Equipo</th><td>@Model.Cabecera.TbProEquDen</td></tr>
+    <tr><th>Tipo de Ciclo</th><td>@Model.Cabecera.TbProTciDen</td></tr>
+    <tr><th>Fecha</th><td>@Model.Cabecera.TbProFec?.ToString("dd/MM/yyyy")</td></tr>
+    <tr><th>Hora</th><td>@Model.Cabecera.TbProHorIni?.ToString("HH:mm")</td></tr>
+</table>
+
+<!-- 🔸 Subformulario de carga de detalles -->
+<div class="subform-proceso mt-4">
+    <h5 class="mb-3">➕ Agregar Detalle desde Etiqueta</h5>
+
+    <form id="formDetallePro">
+        <input type="hidden" id="tbProId" value="@Model.Cabecera.TbProId" />
+
+        <div class="form-group">
+            <label for="tbRecDetId">Etiqueta</label>
+            <input type="number" class="form-control" id="tbRecDetId" placeholder="Ingrese o escanee una etiqueta" autocomplete="off" required />
+        </div>
+
+        <div class="form-group mt-2">
+            <label>Material</label>
+            <input type="text" class="form-control" id="materialDen" readonly />
+        </div>
+
+        <div class="form-group mt-2">
+            <label for="cantidad">Cantidad a procesar</label>
+            <input type="number" class="form-control" id="cantidad" value="1" min="1" required />
+        </div>
+
+        <div id="mensajeConfirmacion" class="text-success mt-2" style="display: none;"></div>
+        <div id="mensajeError" class="text-danger mt-2" style="display: none;"></div>
+
+        <button type="submit" class="btn btn-success mt-3">Guardar</button>
+    </form>
+</div>
+
+<!-- 🔸 Tabla de detalles cargados -->
+<div id="contenedorDetalleTabla" class="mt-4">
+    @await Html.PartialAsync("~/Views/Procesos/_DetalleTabla.cshtml", Model.Detalles)
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const inputEtiqueta = document.getElementById("tbRecDetId");
+            const inputMaterial = document.getElementById("materialDen");
+            const inputCantidad = document.getElementById("cantidad");
+            const inputProId = document.getElementById("tbProId");
+            const form = document.getElementById("formDetallePro");
+            const msgOk = document.getElementById("mensajeConfirmacion");
+            const msgErr = document.getElementById("mensajeError");
+            let bloqueado = false;
+
+            inputEtiqueta.focus();
+
+            inputEtiqueta.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    procesarCarga();
+                }
+            });
+
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+                procesarCarga();
+            });
+
+            function procesarCarga() {
+                if (bloqueado) return;
+                bloqueado = true;
+
+                msgOk.style.display = "none";
+                msgErr.style.display = "none";
+
+                const tbRecDetId = parseInt(inputEtiqueta.value);
+                const cantidad = parseInt(inputCantidad.value);
+                const tbProId = parseInt(inputProId.value);
+
+                if (isNaN(tbRecDetId) || isNaN(cantidad) || cantidad <= 0 || isNaN(tbProId) || tbProId <= 0) {
+                    msgErr.textContent = "⚠️ Complete correctamente todos los campos.";
+                    msgErr.style.display = "block";
+                    bloqueado = false;
+                    return;
+                }
+
+                fetch(`/TbProDet/BuscarRecDet?id=${tbRecDetId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data.success) {
+                            inputMaterial.value = "";
+                            msgErr.textContent = data.mensaje || "❌ Etiqueta no encontrada.";
+                            msgErr.style.display = "block";
+                            bloqueado = false;
+                            return;
+                        }
+
+                        inputMaterial.value = data.nombre || "[Sin nombre]";
+
+                        const datos = {
+                            tbRecDetId: tbRecDetId,
+                            cantidad: cantidad,
+                            tbProId: tbProId
+                        };
+
+                        fetch("/TbProDet/Insertar", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(datos)
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                msgOk.textContent = data.mensaje || "✅ Detalle agregado correctamente.";
+                                msgOk.style.display = "block";
+                                form.reset();
+                                inputMaterial.value = "";
+                                inputEtiqueta.focus();
+
+                                fetch(`/TbProDet/DetalleTabla/${tbProId}`)
+                                    .then(res => res.text())
+                                    .then(html => {
+                                        document.getElementById("contenedorDetalleTabla").innerHTML = html;
+                                        bloqueado = false;
+                                    });
+                            } else {
+                                msgErr.textContent = data.mensaje || "❌ Error al insertar detalle.";
+                                msgErr.style.display = "block";
+                                bloqueado = false;
+                            }
+                        })
+                        .catch(() => {
+                            msgErr.textContent = "❌ Error en la inserción del detalle.";
+                            msgErr.style.display = "block";
+                            bloqueado = false;
+                        });
+                    })
+                    .catch(() => {
+                        msgErr.textContent = "❌ Error al buscar la etiqueta.";
+                        msgErr.style.display = "block";
+                        bloqueado = false;
+                    });
+            }
+        });
+    </script>
+}

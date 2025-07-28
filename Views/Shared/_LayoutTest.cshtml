@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - DAT</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="~/css/estilos.css" asp-append-version="true" />
+</head>
+<body>
+
+    <!-- MENÚ LATERAL IZQUIERDO -->
+    <aside class="menu-lateral">
+        <ul class="menu-lista">
+            <!-- BOTÓN "Búsqueda" con submenú a la derecha -->
+            <li class="menu-item">
+                <button type="button" class="menu-titulo toggle-submenu">Búsqueda</button>
+                <ul class="submenu">
+                    <li><a asp-controller="IbPer" asp-action="Index">Ver Personal</a></li>
+                    <li><a asp-controller="Procesos" asp-action="BuscarProcesos">Buscar Procesos</a></li>
+                </ul>
+            </li>
+
+            <!-- BOTÓN "Tareas" con submenú a la derecha -->
+            <li class="menu-item">
+                <button type="button" class="menu-titulo toggle-submenu">Tareas</button>
+                <ul class="submenu">
+                    <li><a asp-controller="Recepcion" asp-action="TbRecIndex">Recepciones</a></li>
+                    <li><a asp-controller="Lavado" asp-action="CrearLavado">Lavado</a></li> <!-- ✅ NUEVO -->
+                    <li><a asp-controller="Acondicionado" asp-action="CrearAcondicionado">Acondicionado</a></li>
+                    <li><a asp-controller="Proceso" asp-action="CrearProceso">Procesos</a></li>
+                    <li><a asp-controller="Entrega" asp-action="CrearEntrega">Entregas</a></li>
+                </ul>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- NAVBAR SUPERIOR -->
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3" style="margin-left: 200px;">
+            <div class="container-fluid">
+                <!-- Logo -->
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <img src="~/img/logo.png" alt="DAT" style="height: 60px; margin-right: 10px;" />
+                </a>
+
+                <!-- Botón de menú hamburguesa para pantallas chicas -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Menú superior -->
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Privacy">Privacidad</a>
+                        </li>
+                    </ul>
+                    <!-- Login / Logout -->
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- CUERPO PRINCIPAL DE LA PÁGINA -->
+    <main class="contenido">
+        @RenderBody()
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - DAT - <a asp-controller="Home" asp-action="Privacy">Privacidad</a>
+        </div>
+    </footer>
+
+    <!-- LIBRERÍAS JS -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- SCRIPT: Controla los submenús -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const botones = document.querySelectorAll(".toggle-submenu");
+
+            botones.forEach(boton => {
+                boton.addEventListener("click", function () {
+                    const submenu = this.nextElementSibling;
+
+                    // Cierra cualquier otro submenú abierto
+                    document.querySelectorAll(".submenu").forEach(sm => {
+                        if (sm !== submenu) sm.classList.remove("visible");
+                    });
+
+                    // Alterna visibilidad del submenú actual
+                    submenu.classList.toggle("visible");
+                });
+            });
+
+            // Cierra todos los submenús si se hace clic fuera del menú lateral
+            document.addEventListener("click", function (e) {
+                if (!e.target.closest(".menu-lateral")) {
+                    document.querySelectorAll(".submenu").forEach(sm => sm.classList.remove("visible"));
+                }
+            });
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

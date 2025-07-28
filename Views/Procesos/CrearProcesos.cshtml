@@ -1,0 +1,124 @@
+﻿@model ConexionSql.Models.Procesos.TbProFormDto
+
+@{
+    ViewData["Title"] = "Crear Proceso";
+    var fechaHoy = DateTime.Now.ToString("yyyy-MM-dd");
+    var horaInicio = DateTime.Now.ToString("HH:mm");
+}
+
+<h4 class="mt-4">⚙️ Crear Nuevo Proceso</h4>
+
+<form id="formCrearProceso" onsubmit="return false;" class="mt-4">
+    <div class="form-group">
+        <label>Fecha</label>
+        <input type="text" class="form-control" id="fechaProceso" value="@fechaHoy" readonly />
+    </div>
+
+    <div class="form-group mt-3">
+        <label>Hora Inicio</label>
+        <input type="text" class="form-control" id="horaInicio" value="@horaInicio" readonly />
+    </div>
+
+    <div class="form-group mt-4">
+        <label for="TipoProcesoId">Tipo de Proceso</label>
+        <select class="form-control" asp-for="TipoProcesoId" asp-items="Model.TiposProceso" id="TipoProcesoId" required>
+            <option value="">-- Seleccionar tipo --</option>
+        </select>
+    </div>
+
+    <div class="form-group mt-3">
+        <label for="EquipoId">Equipo</label>
+        <select class="form-control" asp-for="EquipoId" asp-items="Model.Equipos" id="EquipoId" required>
+            <option value="">-- Seleccionar equipo --</option>
+        </select>
+    </div>
+
+    <div class="form-group mt-3">
+        <label for="TipoCicloId">Tipo de Ciclo</label>
+        <select class="form-control" asp-for="TipoCicloId" asp-items="Model.TiposCiclo" id="TipoCicloId" required>
+            <option value="">-- Seleccionar ciclo --</option>
+        </select>
+    </div>
+
+    <div class="form-group mt-4">
+        <button type="button" class="btn btn-success" onclick="guardarProceso()">💾 Guardar Proceso</button>
+    </div>
+
+    <div id="mensajeProceso" class="mt-3 text-danger"></div>
+</form>
+
+<div id="contenedorSubform" class="mt-5"></div>
+
+@section Scripts {
+    <script>
+        async function guardarProceso() {
+            const data = {
+                TbProFec: document.getElementById("fechaProceso").value,
+                TbProHorIni: document.getElementById("horaInicio").value,
+                TipoProcesoId: parseInt(document.getElementById("TipoProcesoId").value),
+                EquipoId: parseInt(document.getElementById("EquipoId").value),
+                TipoCicloId: parseInt(document.getElementById("TipoCicloId").value),
+                TipoProcesoDen: document.getElementById("TipoProcesoId").selectedOptions[0]?.text,
+                EquipoDen: document.getElementById("EquipoId").selectedOptions[0]?.text,
+                TipoCicloDen: document.getElementById("TipoCicloId").selectedOptions[0]?.text
+            };
+
+            if (!data.TipoProcesoId || !data.EquipoId || !data.TipoCicloId) {
+                document.getElementById("mensajeProceso").innerText = "⚠️ Complete todos los campos.";
+                return;
+            }
+
+            const resp = await fetch('/Proceso/Insertar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const json = await resp.json();
+
+            if (json.success) {
+                window.location.href = `/TbProDet/SubFormulario/${json.tbProId}`;
+            } else {
+                document.getElementById("mensajeProceso").innerText = json.mensaje || "❌ Error al guardar el proceso.";
+            }
+        }
+
+        document.getElementById("TipoProcesoId").addEventListener("change", async function () {
+            const ptiId = this.value;
+
+            const combo = document.getElementById("EquipoId");
+            combo.innerHTML = '<option value="">-- Cargando equipos... --</option>';
+
+            if (!ptiId) {
+                combo.innerHTML = '<option value="">-- Seleccionar equipo --</option>';
+                document.getElementById("TipoCicloId").innerHTML = '<option value="">-- Seleccionar ciclo --</option>';
+                return;
+            }
+
+            const resp = await fetch(`/Proceso/ObtenerEquiposPorTipo?ptiId=${ptiId}`);
+            const data = await resp.json();
+
+            combo.innerHTML = '<option value="">-- Seleccionar equipo --</option>';
+            data.forEach(e => {
+                const opt = document.createElement("option");
+                opt.value = e.id;
+                opt.text = e.nombre;
+                combo.appendChild(opt);
+            });
+
+            const cicloSelect = document.getElementById("TipoCicloId");
+            cicloSelect.innerHTML = '<option value="">-- Cargando ciclos... --</option>';
+
+            const respCiclos = await fetch(`/Proceso/ObtenerTiposCicloPorProceso?ptiId=${ptiId}`);
+            const dataCiclos = await respCiclos.json();
+
+            cicloSelect.innerHTML = '<option value="">-- Seleccionar ciclo --</option>';
+            dataCiclos.forEach(c => {
+                const opt = document.createElement("option");
+                opt.value = c.id;
+                opt.text = c.nombre;
+                cicloSelect.appendChild(opt);
+            });
+        });
+    </script>
+}

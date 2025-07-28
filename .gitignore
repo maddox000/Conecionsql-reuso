@@ -1,0 +1,32 @@
+## Carpetas de compilación y VS
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+## Archivos temporales
+*.log
+*.tmp
+
+## Archivos de configuración local
+*.dbmdl
+*.sqlite
+*.mdf
+.env
+appsettings.Development.json
+appsettings.Local.json
+
+## Publicación
+publish/
+wwwroot/dist/
+wwwroot/node_modules/
+
+## Node y paquetes
+node_modules/
+npm-debug.log*
+
+## Otros
+.DS_Store
+Thumbs.db
+

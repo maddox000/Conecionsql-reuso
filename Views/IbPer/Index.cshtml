@@ -1,0 +1,56 @@
+﻿@model IEnumerable<ConexionSql.Models.IbPer.IbPerDto>
+
+<h2>Listado de Personal</h2>
+
+@if (TempData["MensajeExito"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["MensajeExito"]
+    </div>
+}
+
+<!-- Botones de acciones principales -->
+<div class="contenedor-boton">
+    <a asp-controller="IbPer" asp-action="IbPerEdit" class="boton-editar">Editar lista</a>
+    <a asp-action="InsertIbPer" class="btn btn-success mb-3">Crear Personal</a>
+</div>
+
+<!-- Tabla de personal -->
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var persona in Model)
+            {
+                <tr>
+                    <td>@persona.IbPerId</td>
+                    <td>@persona.IbPerNom</td>
+                    <td>@persona.IbPerApe</td>
+                    <td>
+                        <a asp-controller="IbPer" asp-action="Edit" asp-route-id="@persona.IbPerId" class="btn btn-primary btn-sm">Editar</a>
+
+                        <form asp-controller="Impresion" asp-action="ImprimirPersonal" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@persona.IbPerId" />
+                            <button type="submit" class="btn btn-secondary btn-sm">Imprimir</button>
+                        </form>
+
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4">No hay registros disponibles.</td>
+            </tr>
+        }
+    </tbody>
+</table>

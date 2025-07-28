@@ -1,0 +1,22 @@
+﻿@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const sectorDestino = document.getElementById("TbEntSecId");
+
+            // Enviar con Enter desde el combo de sector destino
+            sectorDestino.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault(); // Evita comportamiento por defecto
+                    this.form.submit(); // Enviar formulario
+                }
+            });
+
+            // Enviar al perder foco
+            sectorDestino.addEventListener("blur", function () {
+                if (this.value) {
+                    this.form.submit();
+                }
+            });
+        });
+    </script>
+}

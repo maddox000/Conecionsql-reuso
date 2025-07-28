@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "Página de Inicio";
+}
+
+<!-- Contenido principal -->
+<div class="text-center" style="margin-left: 200px;">
+    <h1 class="display-4">Bienvenido</h1>
+    <p>Aprende sobre <a href="https://learn.microsoft.com/aspnet/core">cómo construir aplicaciones web con ASP.NET Core</a>.</p>
+</div>
+
+<div style="padding: 20px;">
+    <form asp-action="ImprimirEtiqueta" method="post">
+        <button type="submit" class="btn btn-primary">Imprimir Etiqueta</button>
+    </form>
+</div>

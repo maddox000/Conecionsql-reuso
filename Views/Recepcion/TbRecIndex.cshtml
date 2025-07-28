@@ -1,0 +1,75 @@
+﻿@model ConexionSql.Models.Recepciones.TbRec
+@using ConexionSql.Models.IbPer
+@using ConexionSql.Models.Sectores
+@{
+    ViewData["Title"] = "Nueva Recepción";
+    var listaPersonal = ViewBag.ListaPersonal as List<IbPerDto>;
+    var listaSectores = ViewBag.ListaSectores as List<IbSec>;
+}
+
+<h2>Nueva Recepción</h2>
+
+<form asp-action="CrearRecepcion" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="form-fila">
+        <!-- Combo Personal -->
+        <div class="combo-form">
+            <label for="TbRecPerId">Personal:</label>
+            <select asp-for="TbRecPerId" class="form-control">
+                <option value="">-- Seleccione --</option>
+                @foreach (var p in listaPersonal)
+                {
+                    <option value="@p.IbPerId">@p.IbPerApe @p.IbPerNom</option>
+                }
+            </select>
+        </div>
+
+        <!-- Sector Origen y Destino juntos -->
+        <div class="combo-form" style="margin-left: auto;">
+            <label for="TbRecSecOriId">Sector Origen:</label>
+            <select asp-for="TbRecSecOriId" class="form-control mb-2">
+                <option value="">-- Seleccione --</option>
+                @foreach (var s in listaSectores)
+                {
+                    <option value="@s.IbSecId">@s.IbSecDen</option>
+                }
+            </select>
+
+            <label for="TbRecSecDesId">Sector Destino:</label>
+            <select asp-for="TbRecSecDesId" class="form-control">
+                <option value="">-- Seleccione --</option>
+                @foreach (var s in listaSectores)
+                {
+                    <option value="@s.IbSecId">@s.IbSecDen</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-4">Guardar Recepción</button>
+</form>
+
+<!-- ✅ Scripts que reaccionan a Enter o perder foco en el combo -->
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const sectorDestino = document.getElementById("TbRecSecDesId");
+
+            // Al presionar Enter
+            sectorDestino.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault(); // Evita el comportamiento por defecto
+                    this.form.submit(); // Envía el formulario
+                }
+            });
+
+            // Al salir del campo (opcional)
+            sectorDestino.addEventListener("blur", function () {
+                if (this.value) {
+                    this.form.submit();
+                }
+            });
+        });
+    </script>
+}

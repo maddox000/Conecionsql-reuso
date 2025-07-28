@@ -1,0 +1,168 @@
+﻿@model ConexionSql.Models.Procesos.TbProDetFormDto
+
+<div class="subform-proceso mt-4">
+    <h4>➕ Agregar Detalle desde Etiqueta</h4>
+
+    <!-- Cabecera del proceso -->
+    <!-- Cabecera del proceso -->
+    <table class="table table-bordered mt-3">
+        <tr><th>🆔 ID</th><td>@Model.Cabecera.TbProId</td></tr>
+        <tr><th>👤 Personal</th><td>@Model.Cabecera.TbProPerNom</td></tr>
+        <tr><th>⚙️ Tipo de Proceso</th><td>@Model.Cabecera.TbProPtiDen</td></tr>
+        <tr><th>🔧 Equipo</th><td>@Model.Cabecera.TbProEquDen</td></tr>
+        <tr><th>🔁 Tipo de Ciclo</th><td>@Model.Cabecera.TbProTciDen</td></tr>
+        <tr><th>📅 Fecha</th><td>@Model.Cabecera.TbProFec?.ToString("yyyy-MM-dd")</td></tr>
+        <tr><th>🕐 Hora Inicio</th><td>@Model.Cabecera.TbProHorIni?.ToString(@"hh\:mm")</td></tr>
+    </table>
+
+
+    <form id="formProDetalle" onsubmit="return false;">
+        <input type="hidden" id="tbProId" value="@Model.Detalle?.TB_PRO_ID ?? 0" />
+
+        <div class="form-group">
+            <label for="tbRecDetId">Código de etiqueta</label>
+            <input type="number" class="form-control" id="tbRecDetId" autocomplete="off" required />
+        </div>
+
+        <div class="form-group mt-2">
+            <label>Material</label>
+            <input type="text" class="form-control" id="materialNombre" readonly />
+        </div>
+
+        <div class="form-group mt-2">
+            <label for="cantidad">Cantidad a procesar</label>
+            <input type="number" class="form-control" id="cantidad" min="1" required />
+        </div>
+
+        <div id="mensajeOk" class="text-success mt-2" style="display:none;"></div>
+        <div id="mensajeError" class="text-danger mt-2" style="display:none;"></div>
+
+        <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+    </form>
+</div>
+
+<!-- 📋 Tabla de detalles -->
+<div id="detalleTabla" class="mt-4">
+    @await Html.PartialAsync("~/Views/Procesos/_DetalleTabla.cshtml", Model.Detalles)
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const inputEtiqueta = document.getElementById("tbRecDetId");
+        const inputMaterial = document.getElementById("materialNombre");
+        const inputCantidad = document.getElementById("cantidad");
+        const inputCabecera = document.getElementById("tbProId");
+        const msgOk = document.getElementById("mensajeOk");
+        const msgErr = document.getElementById("mensajeError");
+
+        let etiquetaId = 0;
+        let materialId = 0;
+        let materialNombre = "";
+        let stockDisponible = 0;
+
+        inputEtiqueta.focus();
+
+        inputEtiqueta.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                buscarEtiqueta();
+            }
+        });
+
+        document.getElementById("formProDetalle").addEventListener("submit", function (e) {
+            e.preventDefault();
+            guardarDetalle();
+        });
+
+        function buscarEtiqueta() {
+            etiquetaId = parseInt(inputEtiqueta.value);
+            if (!etiquetaId || etiquetaId <= 0) {
+                mostrarError("⚠️ Código inválido.");
+                return;
+            }
+
+            ocultarMensajes();
+
+            fetch(`/TbProDet/BuscarPorId?id=${etiquetaId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        materialId = data.materialId;
+                        materialNombre = data.materialDen;
+                        stockDisponible = data.stockDisponible ?? 0;
+
+                        inputMaterial.value = materialNombre;
+                        inputCantidad.value = "1";
+                        inputCantidad.focus();
+                    } else {
+                        mostrarError(data.mensaje || "❌ No se encontró la etiqueta.");
+                    }
+                })
+                .catch(() => mostrarError("❌ Error al buscar la etiqueta."));
+        }
+
+        function guardarDetalle() {
+            ocultarMensajes();
+
+            const cantidad = parseInt(inputCantidad.value);
+            const proId = parseInt(inputCabecera.value);
+
+            if (!etiquetaId || !materialId || !cantidad || cantidad < 1 || !proId) {
+                mostrarError("⚠️ Todos los campos son obligatorios.");
+                return;
+            }
+
+            if (cantidad > stockDisponible) {
+                mostrarError(`❌ Stock insuficiente. Disponible: ${stockDisponible}`);
+                return;
+            }
+
+            const datos = {
+                TB_PRO_ID: proId,
+                TB_PRO_DET_REC_DET_ID: etiquetaId,
+                TB_PRO_DET_REC_DET_MAT_ID: materialId,
+                TB_PRO_DET_REC_DET_MAT_DEN: materialNombre,
+                TB_PRO_DET_CANT: cantidad
+            };
+
+            fetch("/TbProDet/Insertar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(datos)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        mostrarOk(data.mensaje || "✅ Detalle agregado correctamente.");
+                        inputEtiqueta.value = "";
+                        inputMaterial.value = "";
+                        inputCantidad.value = "1";
+                        etiquetaId = 0;
+                        materialId = 0;
+                        document.getElementById("detalleTabla").innerHTML = data.html;
+                        inputEtiqueta.focus();
+                    } else {
+                        mostrarError(data.mensaje || "❌ Error al guardar.");
+                    }
+                })
+                .catch(() => mostrarError("❌ Error inesperado."));
+        }
+
+        function mostrarOk(texto) {
+            msgOk.innerText = texto;
+            msgOk.style.display = "block";
+            msgErr.style.display = "none";
+        }
+
+        function mostrarError(texto) {
+            msgErr.innerText = texto;
+            msgErr.style.display = "block";
+            msgOk.style.display = "none";
+        }
+
+        function ocultarMensajes() {
+            msgOk.style.display = "none";
+            msgErr.style.display = "none";
+        }
+    });
+</script>

@@ -1,0 +1,199 @@
+﻿@model ConexionSql.Models.Recepciones.TbRecDetFormDto
+
+<!-- 📦 Subformulario de carga de detalle de materiales -->
+<div class="subform-recepcion">
+    <h4>Agregar Detalle de Material</h4>
+
+    <!-- 📝 Formulario de ingreso de detalle -->
+    <form id="formDetalle">
+        <!-- 🔽 Combo de selección de material -->
+        <div class="form-group">
+            <label for="IB_MAT_ID">Material</label>
+            <select asp-for="Detalle.IB_MAT_ID"
+                    asp-items="@(new SelectList(Model.Materiales, "IbMatId", "IbMatDen"))"
+                    class="form-control">
+                <option value="">Seleccione un material</option>
+            </select>
+        </div>
+
+        <!-- 🔽 Combo de estado -->
+        <div class="form-group mt-2">
+            <label for="IB_EST_ID">Estado</label>
+            <select asp-for="Detalle.IB_EST_ID"
+                    asp-items="@(new SelectList(Model.Estados, "IbEstId", "IbEstDen"))"
+                    class="form-control"
+                    id="IB_EST_ID">
+                <option value="">Seleccione un estado</option>
+            </select>
+        </div>
+
+        <!-- 🔢 Campo para ingresar la cantidad -->
+        <div class="form-group mt-2">
+            <label for="TB_REC_DET_CANT">Cantidad</label>
+            <input asp-for="Detalle.TB_REC_DET_CANT" id="TB_REC_DET_CANT" class="form-control" min="1" type="number" />
+        </div>
+
+        <!-- 🆔 Campo oculto con el ID de la cabecera de recepción -->
+        <input asp-for="Detalle.TB_REC_ID" type="hidden" />
+
+        <!-- 📦 Campos ocultos para los diferentes tipos de stock -->
+        <input asp-for="Detalle.TB_REC_DET_EMP_STOCK" id="TB_REC_DET_EMP_STOCK" type="hidden" />
+        <input asp-for="Detalle.TB_REC_DET_PRO_STOCK" id="TB_REC_DET_PRO_STOCK" type="hidden" />
+        <input asp-for="Detalle.TB_REC_DET_LAV_STOCK" id="TB_REC_DET_LAV_STOCK" type="hidden" />
+        <input asp-for="Detalle.TB_REC_DET_ENT_STOCK" id="TB_REC_DET_ENT_STOCK" type="hidden" />
+        <input asp-for="Detalle.TB_REC_DET_DEC_STOCK" id="TB_REC_DET_DEC_STOCK" type="hidden" />
+        <input asp-for="Detalle.TB_REC_DET_ENT_CANT" id="TB_REC_DET_ENT_CANT" type="hidden" />
+
+        <!-- 💾 Botón para guardar el detalle -->
+        <div class="form-group mt-3">
+            <button type="button" id="btnGuardar" class="btn btn-primary">Guardar</button>
+        </div>
+    </form>
+
+    <!-- 💬 Área de mensajes de estado -->
+    <div id="mensaje" class="mt-3 text-success"></div>
+</div>
+
+<!-- 📋 Tabla de detalles ya cargados -->
+<div id="contenedor-detalles" class="mt-4">
+    @await Html.PartialAsync("_DetalleTabla", ViewBag.Detalles as List<ConexionSql.Models.Recepciones.TbRecDetDto>)
+</div>
+
+
+
+<!-- 📡 Script para copiar cantidad si el estado es 'Esterilizado' -->
+<!-- 📡 Script para copiar cantidad si el estado es 'Esterilizado' -->
+<!-- 📡 Script para copiar cantidad a stock según estado y enviar correctamente -->
+<!-- 📡 Script para copiar cantidad según estado -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const estadoSelect = document.getElementById("IB_EST_ID");
+        const cantidadInput = document.getElementById("TB_REC_DET_CANT");
+
+        const stockEmpInput = document.getElementById("TB_REC_DET_EMP_STOCK");
+        const stockProInput = document.getElementById("TB_REC_DET_PRO_STOCK");
+        const stockLavInput = document.getElementById("TB_REC_DET_LAV_STOCK");
+        const stockEntInput = document.getElementById("TB_REC_DET_ENT_STOCK");
+        const stockDecInput = document.getElementById("TB_REC_DET_DEC_STOCK"); // ⬅️ nuevo
+
+        function aplicarSwitchDeStock() {
+            const estadoId = parseInt(estadoSelect.value);
+            const cantidad = parseInt(cantidadInput.value) || 0;
+
+            console.log("Estado seleccionado (ID):", estadoId);
+            console.log("Cantidad ingresada:", cantidad);
+
+            // Resetear todos los stocks a 0
+            stockEmpInput.value = 0;
+            stockProInput.value = 0;
+            stockLavInput.value = 0;
+            stockEntInput.value = 0;
+            stockDecInput.value = 0;
+
+            // Asignar cantidad al stock correspondiente según el estado
+            switch (estadoId) {
+                case 1:  // LAVADO
+                case 11: // LAVADO + DECONTAMINADO
+                case 16: // LAVADO/ENTREGA
+                    stockLavInput.value = cantidad;
+                    break;
+
+                case 2:  // DECONTAMINADO
+                case 13: // DESINFECCION
+                    stockDecInput.value = cantidad;
+                    break;
+
+                case 3:  // ACONDICIONADO
+                case 15: // CORTE DE GASA
+                    stockEmpInput.value = cantidad;
+                    break;
+
+                case 4:  // ESTERILIZADO
+                case 9:  // ENVOLTORIO VERIFICADO
+                    stockProInput.value = cantidad;
+                    break;
+
+                case 5:  // ESTERIL
+                case 6:  // ENTREGADO
+                case 7:  // SIN ESTERILIZAR
+                case 14: // PREPARACIONES ASEPTICAS
+                    stockEntInput.value = cantidad;
+                    break;
+
+                default:
+                    console.log("Estado no contemplado en el switch.");
+                    break;
+            }
+        }
+
+        // Aplicar lógica al cambiar cantidad o estado
+        cantidadInput.addEventListener("input", aplicarSwitchDeStock);
+        estadoSelect.addEventListener("change", aplicarSwitchDeStock);
+
+        // Guardar
+        document.getElementById("btnGuardar").addEventListener("click", function () {
+            const form = document.getElementById("formDetalle");
+            const formData = new FormData(form);
+
+            const data = {
+                TB_REC_ID: parseInt(formData.get("Detalle.TB_REC_ID")),
+                IB_MAT_ID: parseInt(formData.get("Detalle.IB_MAT_ID")),
+                TB_REC_DET_CANT: parseInt(formData.get("Detalle.TB_REC_DET_CANT")),
+                IB_EST_ID: parseInt(formData.get("Detalle.IB_EST_ID")),
+
+                TB_REC_DET_EMP_STOCK: parseInt(stockEmpInput.value) || 0,
+                TB_REC_DET_PRO_STOCK: parseInt(stockProInput.value) || 0,
+                TB_REC_DET_LAV_STOCK: parseInt(stockLavInput.value) || 0,
+                TB_REC_DET_ENT_STOCK: parseInt(stockEntInput.value) || 0,
+                TB_REC_DET_DEC_STOCK: parseInt(stockDecInput.value) || 0  // ⬅️ nuevo
+            };
+
+            console.log("Datos enviados:", data);
+
+            const msj = document.getElementById("mensaje");
+
+            if (!data.TB_REC_ID || !data.IB_MAT_ID || !data.TB_REC_DET_CANT || data.TB_REC_DET_CANT < 1 || !data.IB_EST_ID) {
+                msj.innerText = "❌ Todos los campos son obligatorios.";
+                msj.classList.remove("text-success");
+                msj.classList.add("text-danger");
+                return;
+            }
+
+            fetch("/TbRecDet/Insertar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    msj.innerText = result.mensaje;
+                    msj.classList.remove("text-danger");
+                    msj.classList.add("text-success");
+
+                    form.reset();
+
+                    const contenedor = document.getElementById("contenedor-detalles");
+                    if (contenedor) {
+                        contenedor.innerHTML = result.html;
+                    }
+                } else {
+                    msj.innerText = "❌ " + result.mensaje;
+                    msj.classList.remove("text-success");
+                    msj.classList.add("text-danger");
+                }
+            })
+            .catch(err => {
+                msj.innerText = "❌ Error al guardar: " + err.message;
+                msj.classList.remove("text-success");
+                msj.classList.add("text-danger");
+            });
+        });
+    });
+</script>
+
+
+
+

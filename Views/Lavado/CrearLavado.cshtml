@@ -1,0 +1,125 @@
+﻿@model ConexionSql.Models.Lavado.TbProLavFormDto
+
+@{
+    ViewData["Title"] = "Crear Lavado";
+    var fechaHoy = DateTime.Now.ToString("yyyy-MM-dd");
+    var horaInicio = DateTime.Now.ToString("HH:mm");
+}
+
+<h4 class="mt-4">🧼 Crear Nuevo Lavado</h4>
+
+<form id="formCrearLavado" onsubmit="return false;" class="mt-4">
+    <!-- 📅 Fecha -->
+    <div class="form-group">
+        <label>Fecha</label>
+        <input type="text" class="form-control" id="fechaLavado" value="@fechaHoy" readonly />
+    </div>
+
+    <!-- 🕐 Hora Inicio -->
+    <div class="form-group mt-3">
+        <label>Hora Inicio</label>
+        <input type="text" class="form-control" id="horaInicio" value="@horaInicio" readonly />
+    </div>
+
+    <!-- 🧼 Tipo de Lavado -->
+    <div class="form-group mt-4">
+        <label for="TipoLavadoId">Tipo de Lavado</label>
+        <select class="form-control" asp-for="TipoLavadoId" asp-items="Model.TiposLavado" id="TipoLavadoId" required>
+            <option value="">-- Seleccionar tipo --</option>
+        </select>
+    </div>
+
+    <!-- ⚙️ Equipo -->
+    <div class="form-group mt-3">
+        <label for="EquipoId">Equipo</label>
+        <select class="form-control" asp-for="EquipoId" asp-items="Model.Equipos" id="EquipoId" required>
+            <option value="">-- Seleccionar equipo --</option>
+        </select>
+    </div>
+
+    <!-- 🔁 Tipo de Ciclo -->
+    <div class="form-group mt-3">
+        <label for="TipoCicloId">Tipo de Ciclo</label>
+        <select class="form-control" asp-for="TipoCicloId" asp-items="Model.TiposCiclo" id="TipoCicloId" required>
+            <option value="">-- Seleccionar ciclo --</option>
+        </select>
+    </div>
+
+    <!-- 💾 Botón Guardar -->
+    <div class="form-group mt-4">
+        <button type="button" class="btn btn-success" onclick="guardarLavado()">💾 Guardar Lavado</button>
+    </div>
+
+    <div id="mensajeLavado" class="mt-3 text-danger"></div>
+</form>
+
+<div id="contenedorSubform" class="mt-5"></div>
+
+@section Scripts {
+    <script>
+        async function guardarLavado() {
+            const data = {
+                TbProLavFec: document.getElementById("fechaLavado").value,
+                TbProLavHorIni: document.getElementById("horaInicio").value,
+                TipoLavadoId: parseInt(document.getElementById("TipoLavadoId").value),
+                EquipoId: parseInt(document.getElementById("EquipoId").value),
+                TipoCicloId: parseInt(document.getElementById("TipoCicloId").value),
+                TipoLavadoDen: document.getElementById("TipoLavadoId").selectedOptions[0]?.text,
+                EquipoDen: document.getElementById("EquipoId").selectedOptions[0]?.text,
+                TipoCicloDen: document.getElementById("TipoCicloId").selectedOptions[0]?.text
+            };
+
+            if (!data.TipoLavadoId || !data.EquipoId || !data.TipoCicloId) {
+                document.getElementById("mensajeLavado").innerText = "⚠️ Complete todos los campos.";
+                return;
+            }
+
+            const resp = await fetch('/Lavado/Insertar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const json = await resp.json();
+
+            if (json.success) {
+                // 🔧 Redirección corregida usando parámetro query `id=`
+                window.location.href = `/TbProLavDet/SubFormulario?id=${json.tbProLavId}`;
+            } else {
+                document.getElementById("mensajeLavado").innerText = json.mensaje || "❌ Error al guardar.";
+            }
+        }
+
+        document.getElementById("TipoLavadoId").addEventListener("change", async function () {
+            const comboEquipo = document.getElementById("EquipoId");
+            const comboCiclo = document.getElementById("TipoCicloId");
+
+            comboEquipo.innerHTML = '<option value="">-- Cargando equipos... --</option>';
+            comboCiclo.innerHTML = '<option value="">-- Cargando ciclos... --</option>';
+
+            // 🔄 Equipos
+            const resp = await fetch(`/Lavado/ObtenerEquiposPorTipo`);
+            const data = await resp.json();
+
+            comboEquipo.innerHTML = '<option value="">-- Seleccionar equipo --</option>';
+            data.forEach(e => {
+                const opt = document.createElement("option");
+                opt.value = e.id;
+                opt.text = e.nombre;
+                comboEquipo.appendChild(opt);
+            });
+
+            // 🔄 Ciclos
+            const respCiclos = await fetch(`/Lavado/ObtenerTiposCiclo`);
+            const dataCiclos = await respCiclos.json();
+
+            comboCiclo.innerHTML = '<option value="">-- Seleccionar ciclo --</option>';
+            dataCiclos.forEach(c => {
+                const opt = document.createElement("option");
+                opt.value = c.id;
+                opt.text = c.nombre;
+                comboCiclo.appendChild(opt);
+            });
+        });
+    </script>
+}

@@ -1,0 +1,33 @@
+﻿@model ConexionSql.Models.Acondicionado.TbProAco
+
+@{
+    ViewData["Title"] = "Nuevo Acondicionado";
+}
+
+<h2 class="mb-4">➕ Nuevo Acondicionado</h2>
+
+@if (TempData["MensajeExito"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["MensajeExito"]
+    </div>
+}
+
+<form asp-action="CrearAcondicionado" method="post">
+    <div class="form-group mb-3">
+        <label asp-for="TbProAcoPerId">👤 Personal</label>
+        <select asp-for="TbProAcoPerId" class="form-control"
+                asp-items="@(new SelectList(ViewBag.ListaPersonal, "IbPerId", "IbPerNom"))">
+            <option value="">Seleccione un personal</option>
+        </select>
+        <span asp-validation-for="TbProAcoPerId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">💾 Guardar Cabecera</button>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

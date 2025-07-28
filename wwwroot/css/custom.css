@@ -1,0 +1,46 @@
+﻿body {
+    .btn-izquierda
+
+    {
+        float: left;
+        margin-top: 20px;
+    }
+
+    .flex-container {
+        display: flex;
+        justify-content: flex-start; /* Alinea los elementos al inicio (izquierda) */
+        margin-top: 20px;
+    }
+
+    .contenedor-boton {
+        display: flex;
+        justify-content: flex-start;
+        margin-bottom: 20px; /* Espacio debajo del botón */
+    }
+
+    .boton-editar {
+        background-color: #4CAF50; /* Color de fondo verde */
+        color: white; /* Color del texto */
+        padding: 10px 20px; /* Espaciado interno */
+        border: none; /* Sin borde */
+        border-radius: 5px; /* Bordes redondeados */
+        cursor: pointer; /* Cursor en forma de mano al pasar el mouse */
+        text-decoration: none; /* Sin subrayado */
+        display: inline-block; /* Para que se comporte como un botón */
+        font-size: 16px; /* Tamaño de fuente */
+        transition: background-color 0.3s ease; /* Transición suave */
+    }
+
+    .boton-editar:hover {
+        background-color: #45a049; /* Color de fondo al pasar el mouse */
+    }
+
+    .boton-editar {
+        background-color: #4CAF50;
+        color: white;
+        padding: 5px 10px;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+
+}

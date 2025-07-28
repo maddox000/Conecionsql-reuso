@@ -1,0 +1,114 @@
+﻿@model ConexionSql.Models.Entrega.TbEntFormDto
+@using ConexionSql.Models.IbPer
+@using ConexionSql.Models.Sectores
+@using ConexionSql.Models.Entrega
+
+@{
+    ViewData["Title"] = "Crear Entrega";
+    var listaPersonal = ViewBag.ListaPersonal as List<IbPerDto>;
+    var listaSectores = ViewBag.ListaSectores as List<IbSec>;
+    var subFormModel = ViewBag.SubFormularioDetalle as TbEntDetFormDto;
+}
+
+<h4 class="mt-4">🚚 Crear Nueva Entrega</h4>
+
+<!-- 📋 Formulario principal -->
+<form id="formCrearEntrega" onsubmit="return false;" class="mt-4">
+    <!-- 📅 Fecha -->
+    <div class="form-group">
+        <label>Fecha</label>
+        <input type="text" class="form-control" id="fechaEntrega" value="@DateTime.Today.ToString("yyyy-MM-dd")" readonly />
+    </div>
+
+    <!-- 🕐 Hora Inicio -->
+    <div class="form-group mt-3">
+        <label>Hora Inicio</label>
+        <input type="text" class="form-control" id="horaInicio" value="@DateTime.Now.ToString("HH:mm")" readonly />
+    </div>
+
+    <!-- 👤 Combo de Personal -->
+    <div class="form-group mt-4">
+        <label for="TB_ENT_PER_ID">Personal</label>
+        <select class="form-control" id="TB_ENT_PER_ID" required>
+            <option value="">Seleccione un personal</option>
+            @foreach (var per in listaPersonal)
+            {
+                <option value="@per.IbPerId">@per.IbPerApe, @per.IbPerNom</option>
+            }
+        </select>
+    </div>
+
+    <!-- 🏢 Combo de Sector -->
+    <div class="form-group mt-3">
+        <label for="TB_ENT_SEC_ID">Sector Destino</label>
+        <select class="form-control" id="TB_ENT_SEC_ID" required>
+            <option value="">Seleccione un sector</option>
+            @foreach (var sec in listaSectores)
+            {
+                <option value="@sec.IbSecId">@sec.IbSecDen</option>
+            }
+        </select>
+    </div>
+
+    <!-- 🔘 Botón -->
+    <div class="form-group mt-4">
+        <button class="btn btn-success" onclick="guardarEntrega()">💾 Guardar Entrega</button>
+    </div>
+
+    <!-- ⚠️ Área de mensajes -->
+    <div id="mensajeEntrega" class="mt-3 text-danger"></div>
+</form>
+
+<!-- 🧾 Subformulario si hay cabecera generada -->
+@if (subFormModel?.Cabecera?.TbEntId > 0)
+{
+    subFormModel.Detalle ??= new TbEntDetDto();
+    subFormModel.Detalle.TB_ENT_ID = subFormModel.Cabecera.TbEntId;
+
+    <div class="mt-4">
+        <h4>➕ Agregar Detalle</h4>
+        @await Html.PartialAsync("_SubFormEntDet", subFormModel)
+    </div>
+}
+
+@section Scripts {
+    <script>
+        async function guardarEntrega() {
+            const fecha = document.getElementById("fechaEntrega").value;
+            const horaIni = document.getElementById("horaInicio").value;
+            const perId = document.getElementById("TB_ENT_PER_ID").value;
+            const secId = document.getElementById("TB_ENT_SEC_ID").value;
+
+            if (!perId || !secId) {
+                document.getElementById("mensajeEntrega").innerText = "⚠️ Debe seleccionar personal y sector.";
+                return;
+            }
+
+            const data = {
+                TB_ENT_FEC: fecha,
+                TB_ENT_HOR_INI: horaIni,
+                TB_ENT_HOR_FIN: null,
+                TB_ENT_PER_ID: parseInt(perId),
+                TB_ENT_PER_NOM: "",
+                TB_ENT_SEC_ID: parseInt(secId),
+                TB_ENT_SEC_DEN: "",
+                TB_ENT_CANT_TOT: 0
+            };
+
+            const resp = await fetch('/Entrega/Insertar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const json = await resp.json();
+
+            if (json.success) {
+                debugger;
+                window.location.href = `/TbEntDet/SubFormulario/${json.tbEntId}`;
+            } else {
+                document.getElementById("mensajeEntrega").innerText = json.mensaje || "❌ Error al guardar la entrega.";
+            }
+        }
+    </script>
+}

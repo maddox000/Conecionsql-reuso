@@ -1,0 +1,40 @@
+﻿@model List<ConexionSql.Models.Procesos.TbProDetDto>
+
+<table class="table table-sm table-bordered table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>Etiqueta</th>
+            <th>Material</th>
+            <th>Cantidad</th>
+            <th>Usuario</th>
+            <th>Fecha</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.TB_PRO_DET_ID</td>
+                    <td>@item.TB_PRO_DET_REC_DET_ID</td>
+                    <td>@item.TB_PRO_DET_REC_DET_MAT_DEN</td>
+                    <td>@item.TB_PRO_DET_CANT</td>
+                    <td>@item.TB_PRO_DET_PC_USR</td>
+                    <td>@item.TB_PRO_FEC?.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="eliminarDetalle(@item.TB_PRO_DET_ID)">🗑️</button>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="7" class="text-center text-muted">⚠️ No hay detalles cargados.</td>
+            </tr>
+        }
+    </tbody>
+</table>
