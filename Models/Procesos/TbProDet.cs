@@ -195,7 +195,5 @@ namespace ConexionSql.Models.Procesos
         [Column("TB_PRO_DET_CANT_ELIM")]
         public int? TbProDetCantElim { get; set; }
 
-        [Column("TB_PRO_DET_IMG")]
-        public string? TbProDetImg { get; set; }
     }
 }

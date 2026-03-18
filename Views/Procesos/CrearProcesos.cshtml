@@ -52,15 +52,16 @@
 @section Scripts {
     <script>
         async function guardarProceso() {
+
             const data = {
                 TbProFec: document.getElementById("fechaProceso").value,
                 TbProHorIni: document.getElementById("horaInicio").value,
                 TipoProcesoId: parseInt(document.getElementById("TipoProcesoId").value),
                 EquipoId: parseInt(document.getElementById("EquipoId").value),
                 TipoCicloId: parseInt(document.getElementById("TipoCicloId").value),
-                TipoProcesoDen: document.getElementById("TipoProcesoId").selectedOptions[0]?.text,
-                EquipoDen: document.getElementById("EquipoId").selectedOptions[0]?.text,
-                TipoCicloDen: document.getElementById("TipoCicloId").selectedOptions[0]?.text
+                TipoProcesoDen: document.getElementById("TipoProcesoId").selectedOptions[0]?.text || "",
+                EquipoDen: document.getElementById("EquipoId").selectedOptions[0]?.text || "",
+                TipoCicloDen: document.getElementById("TipoCicloId").selectedOptions[0]?.text || ""
             };
 
             if (!data.TipoProcesoId || !data.EquipoId || !data.TipoCicloId) {
@@ -68,56 +69,71 @@
                 return;
             }
 
-            const resp = await fetch('/Proceso/Insertar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
+            try {
+                const resp = await fetch('/Proceso/Insertar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
 
-            const json = await resp.json();
+                const json = await resp.json();
+                console.log("JSON recibido:", json);
 
-            if (json.success) {
-                window.location.href = `/TbProDet/SubFormulario/${json.tbProId}`;
-            } else {
-                document.getElementById("mensajeProceso").innerText = json.mensaje || "❌ Error al guardar el proceso.";
+                if (json.success) {
+                    if (!json.redirectUrl) {
+                        document.getElementById("mensajeProceso").innerText =
+                            "❌ No vino redirectUrl desde el controller.";
+                        return;
+                    }
+
+                    window.location.href = json.redirectUrl;
+                } else {
+                    document.getElementById("mensajeProceso").innerText =
+                        json.mensaje || "❌ Error al guardar el proceso.";
+                }
+
+            } catch (error) {
+                console.error("Error en guardarProceso:", error);
+                document.getElementById("mensajeProceso").innerText =
+                    "❌ Error de conexión con el servidor.";
             }
         }
 
         document.getElementById("TipoProcesoId").addEventListener("change", async function () {
             const ptiId = this.value;
 
-            const combo = document.getElementById("EquipoId");
-            combo.innerHTML = '<option value="">-- Cargando equipos... --</option>';
+            const comboEquipo = document.getElementById("EquipoId");
+            comboEquipo.innerHTML = '<option value="">-- Cargando equipos... --</option>';
 
             if (!ptiId) {
-                combo.innerHTML = '<option value="">-- Seleccionar equipo --</option>';
+                comboEquipo.innerHTML = '<option value="">-- Seleccionar equipo --</option>';
                 document.getElementById("TipoCicloId").innerHTML = '<option value="">-- Seleccionar ciclo --</option>';
                 return;
             }
 
-            const resp = await fetch(`/Proceso/ObtenerEquiposPorTipo?ptiId=${ptiId}`);
-            const data = await resp.json();
+            const respEquipos = await fetch(`/Proceso/ObtenerEquiposPorTipo?ptiId=${ptiId}`);
+            const equipos = await respEquipos.json();
 
-            combo.innerHTML = '<option value="">-- Seleccionar equipo --</option>';
-            data.forEach(e => {
+            comboEquipo.innerHTML = '<option value="">-- Seleccionar equipo --</option>';
+            equipos.forEach(e => {
                 const opt = document.createElement("option");
                 opt.value = e.id;
                 opt.text = e.nombre;
-                combo.appendChild(opt);
+                comboEquipo.appendChild(opt);
             });
 
-            const cicloSelect = document.getElementById("TipoCicloId");
-            cicloSelect.innerHTML = '<option value="">-- Cargando ciclos... --</option>';
+            const comboCiclo = document.getElementById("TipoCicloId");
+            comboCiclo.innerHTML = '<option value="">-- Cargando ciclos... --</option>';
 
             const respCiclos = await fetch(`/Proceso/ObtenerTiposCicloPorProceso?ptiId=${ptiId}`);
-            const dataCiclos = await respCiclos.json();
+            const ciclos = await respCiclos.json();
 
-            cicloSelect.innerHTML = '<option value="">-- Seleccionar ciclo --</option>';
-            dataCiclos.forEach(c => {
+            comboCiclo.innerHTML = '<option value="">-- Seleccionar ciclo --</option>';
+            ciclos.forEach(c => {
                 const opt = document.createElement("option");
                 opt.value = c.id;
                 opt.text = c.nombre;
-                cicloSelect.appendChild(opt);
+                comboCiclo.appendChild(opt);
             });
         });
     </script>

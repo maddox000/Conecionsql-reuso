@@ -3,7 +3,7 @@ using ConexionSql.Data;
 using ConexionSql.Models.Recepciones;
 using ConexionSql.Models.IbPer;
 using ConexionSql.Models.Materiales;
-using ConexionSql.Models.Estados; // 👈 necesario para IbEstDto
+using ConexionSql.Models.Estados;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -19,9 +19,10 @@ namespace ConexionSql.Controllers.Recepcion
             _context = context;
         }
 
-        // 📄 Vista que lista todas las recepciones
+        // 📄 Vista principal de recepción (la que estás usando ahora: /Recepcion/TbRecIndex)
         public IActionResult TbRecIndex()
         {
+            // 🔽 Trae recepciones por si las usás después en la vista
             var listaRecepciones = _context.TbRec.ToList();
 
             // 🔽 Lista de personal
@@ -43,8 +44,25 @@ namespace ConexionSql.Controllers.Recepcion
 
             ViewBag.ListaPersonal = personal;
             ViewBag.ListaSectores = sectores;
+            ViewBag.ListaRecepciones = listaRecepciones;
 
-            return View();
+            // 👤 Traer usuario validado desde sesión
+            var usuarioIdSesion = HttpContext.Session.GetString("UsuarioId");
+
+            if (!string.IsNullOrEmpty(usuarioIdSesion))
+            {
+                var usuario = _context.IbPers
+                    .FirstOrDefault(p => p.IbPerId == int.Parse(usuarioIdSesion));
+
+                if (usuario != null)
+                {
+                    ViewBag.UsuarioId = usuario.IbPerId;
+                    ViewBag.UsuarioLogueado = $"{usuario.IbPerApe}, {usuario.IbPerNom}";
+                }
+            }
+
+            // ⚠️ Esta vista espera un TbRec, no una lista
+            return View(new TbRec());
         }
 
         // ➕ GET: Nueva recepción
@@ -73,7 +91,22 @@ namespace ConexionSql.Controllers.Recepcion
             ViewBag.ListaPersonal = personal;
             ViewBag.ListaSectores = sectores;
 
-            return View();
+            // 👤 Traer usuario validado desde sesión
+            var usuarioIdSesion = HttpContext.Session.GetString("UsuarioId");
+
+            if (!string.IsNullOrEmpty(usuarioIdSesion))
+            {
+                var usuario = _context.IbPers
+                    .FirstOrDefault(p => p.IbPerId == int.Parse(usuarioIdSesion));
+
+                if (usuario != null)
+                {
+                    ViewBag.UsuarioId = usuario.IbPerId;
+                    ViewBag.UsuarioLogueado = $"{usuario.IbPerApe}, {usuario.IbPerNom}";
+                }
+            }
+
+            return View(new TbRec());
         }
 
         // 💾 POST: Guardar nueva recepción
@@ -83,57 +116,77 @@ namespace ConexionSql.Controllers.Recepcion
         {
             if (ModelState.IsValid)
             {
-                // 🔄 Trae datos relacionados
-                var personal = _context.IbPers.FirstOrDefault(p => p.IbPerId == nuevaRecepcion.TbRecPerId);
-                var sectorOrigen = _context.IbSectores.FirstOrDefault(s => s.IbSecId == nuevaRecepcion.TbRecSecOriId);
-                var sectorDestino = _context.IbSectores.FirstOrDefault(s => s.IbSecId == nuevaRecepcion.TbRecSecDesId);
+                // 👤 Traer usuario desde sesión
+                var usuarioIdSesion = HttpContext.Session.GetString("UsuarioId");
 
-                // 🕒 Fecha y datos automáticos
+                // 👉 Si existe en sesión, lo asignamos a la cabecera
+                if (!string.IsNullOrEmpty(usuarioIdSesion))
+                {
+                    nuevaRecepcion.TbRecPerId = int.Parse(usuarioIdSesion);
+                }
+
+                // 🔄 Buscar datos completos del personal desde DB
+                var personal = !string.IsNullOrEmpty(usuarioIdSesion)
+                    ? _context.IbPers.FirstOrDefault(p => p.IbPerId == int.Parse(usuarioIdSesion))
+                    : null;
+
+                // 🔄 Buscar sectores seleccionados
+                var sectorOrigen = _context.IbSectores
+                    .FirstOrDefault(s => s.IbSecId == nuevaRecepcion.TbRecSecOriId);
+
+                var sectorDestino = _context.IbSectores
+                    .FirstOrDefault(s => s.IbSecId == nuevaRecepcion.TbRecSecDesId);
+
+                // 🕒 Datos automáticos
                 nuevaRecepcion.TbRecFec = DateTime.Today;
                 nuevaRecepcion.TbRecPcLog = Environment.MachineName;
                 nuevaRecepcion.TbRecPcUsr = User.Identity?.Name ?? "Usuario";
 
-                // 👤 Datos del personal
+                // 👤 Completar datos del usuario logueado en TB_REC
                 if (personal != null)
                 {
                     nuevaRecepcion.TbRecPerNom = $"{personal.IbPerApe}, {personal.IbPerNom}";
                     nuevaRecepcion.TbRecPerCarId = personal.IbPerCarId;
                     nuevaRecepcion.TbRecPerCarDen = personal.IbPerCarDen;
+
+                    // 🔁 También lo devolvemos a la vista
+                    ViewBag.UsuarioId = personal.IbPerId;
+                    ViewBag.UsuarioLogueado = $"{personal.IbPerApe}, {personal.IbPerNom}";
                 }
 
-                // 🏭 Nombres de sectores
+                // 🏭 Completar nombres de sectores
                 if (sectorOrigen != null)
                     nuevaRecepcion.TbRecSecOriDen = sectorOrigen.IbSecDen;
 
                 if (sectorDestino != null)
                     nuevaRecepcion.TbRecSecDesDen = sectorDestino.IbSecDen;
 
-                // 💾 Guarda cabecera de recepción
+                // 💾 Guardar cabecera en TB_REC
                 _context.TbRec.Add(nuevaRecepcion);
                 _context.SaveChanges();
 
                 TempData["MensajeExito"] = "Recepción guardada correctamente.";
 
-                // 🔽 Cargar materiales
+                // 🔽 Cargar materiales para el subformulario
                 var materiales = _context.IbMat
                     .Select(m => new IbMatDto
                     {
                         IbMatId = m.IB_MAT_ID,
                         IbMatDen = m.IB_MAT_DEN
-                    }).ToList();
+                    })
+                    .ToList();
 
-                // 🔽 Cargar estados (nuevo combo después de material)
+                // 🔽 Cargar estados
                 var estados = _context.IbEst
                     .OrderBy(e => e.IbEstDen)
-                .Select(e => new IbEstDto
-                {
-                    IbEstId = e.IbEstId,
-                    IbEstDen = e.IbEstDen
-                })
-                .ToList(); // 👈 necesario para convertir a List<IbEstDto>
+                    .Select(e => new IbEstDto
+                    {
+                        IbEstId = e.IbEstId,
+                        IbEstDen = e.IbEstDen
+                    })
+                    .ToList();
 
-
-                // 🧾 Preparar ViewModel para subformulario
+                // 🧾 Preparar subformulario de detalle
                 ViewBag.SubFormularioDetalle = new TbRecDetFormDto
                 {
                     Detalle = new TbRecDetDto
@@ -141,15 +194,16 @@ namespace ConexionSql.Controllers.Recepcion
                         TB_REC_ID = nuevaRecepcion.TbRecId
                     },
                     Materiales = materiales,
-                    Estados = estados // ✅ ahora se pasan los estados
+                    Estados = estados
                 };
 
                 ViewBag.Detalles = new List<TbRecDetDto>();
             }
 
-            // 🔁 Re-carga combos para redibujar vista principal
+            // 🔁 Recargar listas para redibujar la vista
             ViewBag.ListaPersonal = _context.IbPers
-                .OrderBy(p => p.IbPerApe).ThenBy(p => p.IbPerNom)
+                .OrderBy(p => p.IbPerApe)
+                .ThenBy(p => p.IbPerNom)
                 .Select(p => new IbPerDto
                 {
                     IbPerId = p.IbPerId,
@@ -157,11 +211,30 @@ namespace ConexionSql.Controllers.Recepcion
                     IbPerApe = p.IbPerApe,
                     IbPerCarId = p.IbPerCarId,
                     IbPerCarDen = p.IbPerCarDen
-                }).ToList();
+                })
+                .ToList();
 
             ViewBag.ListaSectores = _context.IbSectores
                 .OrderBy(s => s.IbSecDen)
                 .ToList();
+
+            // 👤 Si todavía no se cargó el nombre, volver a traerlo
+            if (ViewBag.UsuarioLogueado == null)
+            {
+                var usuarioIdSesion = HttpContext.Session.GetString("UsuarioId");
+
+                if (!string.IsNullOrEmpty(usuarioIdSesion))
+                {
+                    var usuario = _context.IbPers
+                        .FirstOrDefault(p => p.IbPerId == int.Parse(usuarioIdSesion));
+
+                    if (usuario != null)
+                    {
+                        ViewBag.UsuarioId = usuario.IbPerId;
+                        ViewBag.UsuarioLogueado = $"{usuario.IbPerApe}, {usuario.IbPerNom}";
+                    }
+                }
+            }
 
             return View(nuevaRecepcion);
         }

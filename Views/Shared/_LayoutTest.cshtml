@@ -16,105 +16,97 @@
     <!-- MENÚ LATERAL IZQUIERDO -->
     <aside class="menu-lateral">
         <ul class="menu-lista">
-            <!-- BOTÓN "Búsqueda" con submenú a la derecha -->
+
+            <!-- BÚSQUEDA -->
             <li class="menu-item">
                 <button type="button" class="menu-titulo toggle-submenu">Búsqueda</button>
                 <ul class="submenu">
                     <li><a asp-controller="IbPer" asp-action="Index">Ver Personal</a></li>
                     <li><a asp-controller="Procesos" asp-action="BuscarProcesos">Buscar Procesos</a></li>
+                    <li><a asp-controller="Busquedas" asp-action="BusquedasFecha">Buscar Recepciones</a></li>
                 </ul>
             </li>
 
-            <!-- BOTÓN "Tareas" con submenú a la derecha -->
+            <!-- TAREAS -->
             <li class="menu-item">
                 <button type="button" class="menu-titulo toggle-submenu">Tareas</button>
                 <ul class="submenu">
-                    <li><a asp-controller="Recepcion" asp-action="TbRecIndex">Recepciones</a></li>
-                    <li><a asp-controller="Lavado" asp-action="CrearLavado">Lavado</a></li> <!-- ✅ NUEVO -->
-                    <li><a asp-controller="Acondicionado" asp-action="CrearAcondicionado">Acondicionado</a></li>
-                    <li><a asp-controller="Proceso" asp-action="CrearProceso">Procesos</a></li>
-                    <li><a asp-controller="Entrega" asp-action="CrearEntrega">Entregas</a></li>
+
+                    <!-- 🔥 ESTE ABRE EL LOGIN -->
+                    <li><a href="#" id="btnRecepcion">Recepciones</a></li>
+
+                    <li><a href="#" id="btnLavado">Lavado</a></li>
+                    <li><a href="#" id="btnAcondicionado">Acondicionado</a></li>
+                    <li><a href="#" id="btnProcesos">Procesos</a></li>
+                    <li><a href="#" id="btnEntrega">Entregas</a></li>
                 </ul>
             </li>
         </ul>
     </aside>
 
-    <!-- NAVBAR SUPERIOR -->
+    <!-- NAVBAR -->
     <header>
         <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3" style="margin-left: 200px;">
             <div class="container-fluid">
-                <!-- Logo -->
                 <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                    <img src="~/img/logo.png" alt="DAT" style="height: 60px; margin-right: 10px;" />
+                    <img src="~/img/logo.png" style="height: 60px;" />
                 </a>
 
-                <!-- Botón de menú hamburguesa para pantallas chicas -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <!-- Menú superior -->
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Inicio</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Privacy">Privacidad</a>
-                        </li>
                     </ul>
-                    <!-- Login / Logout -->
+
                     <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
 
-    <!-- CUERPO PRINCIPAL DE LA PÁGINA -->
+    <!-- CONTENIDO -->
     <main class="contenido">
         @RenderBody()
     </main>
 
-    <!-- PIE DE PÁGINA -->
+    <!-- FOOTER -->
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - DAT - <a asp-controller="Home" asp-action="Privacy">Privacidad</a>
+            &copy; 2025 - DAT
         </div>
     </footer>
 
-    <!-- LIBRERÍAS JS -->
+    <!-- LIBRERÍAS -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
 
-    <!-- SCRIPT: Controla los submenús -->
+    <!-- MENÚ LATERAL -->
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const botones = document.querySelectorAll(".toggle-submenu");
+            document.addEventListener("DOMContentLoaded", function () {
+                const botones = document.querySelectorAll(".toggle-submenu");
 
-            botones.forEach(boton => {
-                boton.addEventListener("click", function () {
-                    const submenu = this.nextElementSibling;
+                botones.forEach(boton => {
+                    boton.addEventListener("click", function () {
+                        const submenu = this.nextElementSibling;
 
-                    // Cierra cualquier otro submenú abierto
-                    document.querySelectorAll(".submenu").forEach(sm => {
-                        if (sm !== submenu) sm.classList.remove("visible");
+                        document.querySelectorAll(".submenu").forEach(sm => {
+                            if (sm !== submenu) sm.classList.remove("visible");
+                        });
+
+                        submenu.classList.toggle("visible");
                     });
-
-                    // Alterna visibilidad del submenú actual
-                    submenu.classList.toggle("visible");
                 });
             });
-
-            // Cierra todos los submenús si se hace clic fuera del menú lateral
-            document.addEventListener("click", function (e) {
-                if (!e.target.closest(".menu-lateral")) {
-                    document.querySelectorAll(".submenu").forEach(sm => sm.classList.remove("visible"));
-                }
-            });
-        });
     </script>
 
+    <!-- 🔥 MODAL LOGIN -->
+    <partial name="_LoginModal" />
+
+    <!-- 🔥 TU LOGIN CENTRALIZADO -->
+    <script src="~/js/login.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

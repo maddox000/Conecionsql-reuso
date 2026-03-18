@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ConexionSql.Data;
+﻿using ConexionSql.Data;
 using ConexionSql.Models.Entrega;
-using ConexionSql.Models.IbPer;
-using ConexionSql.Models.Sectores;
-using ConexionSql.Models.Materiales;
 using ConexionSql.Models.Estados;
+using ConexionSql.Models.IbPer;
+using ConexionSql.Models.Materiales;
+using ConexionSql.Models.Sectores;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace ConexionSql.Controllers
 {
@@ -34,7 +34,7 @@ namespace ConexionSql.Controllers
                 TB_ENT_CANT_TOT = 0
             };
 
-            // 🔽 Lista de personal (DTO)
+            // 🔽 Lista de personal
             var personal = await _context.IbPers
                 .OrderBy(p => p.IbPerApe)
                 .ThenBy(p => p.IbPerNom)
@@ -56,71 +56,90 @@ namespace ConexionSql.Controllers
             ViewBag.ListaPersonal = personal;
             ViewBag.ListaSectores = sectores;
 
+            // 👤 Traer usuario validado desde sesión
+            var usuarioIdSesion = HttpContext.Session.GetString("UsuarioId");
+
+            if (!string.IsNullOrEmpty(usuarioIdSesion))
+            {
+                var usuario = await _context.IbPers
+                    .FirstOrDefaultAsync(p => p.IbPerId == int.Parse(usuarioIdSesion));
+
+                if (usuario != null)
+                {
+                    ViewBag.UsuarioId = usuario.IbPerId;
+                    ViewBag.UsuarioLogueado = $"{usuario.IbPerApe}, {usuario.IbPerNom}";
+                }
+            }
+
             return View(model);
         }
 
-        // 🔹 POST: Guarda la cabecera de entrega (vía JSON)
+        // 🔹 POST: Guarda la cabecera de entrega
         [HttpPost]
         public async Task<IActionResult> Insertar([FromBody] TbEntFormDto dto)
         {
             try
             {
-                // 🔍 Buscar datos reales desde base
-                var personal = await _context.IbPers.FirstOrDefaultAsync(p => p.IbPerId == dto.TB_ENT_PER_ID);
-                var sector = await _context.IbSectores.FirstOrDefaultAsync(s => s.IbSecId == dto.TB_ENT_SEC_ID);
+                // 🔍 Buscar datos reales
+                var personal = await _context.IbPers
+                    .FirstOrDefaultAsync(p => p.IbPerId == dto.TB_ENT_PER_ID);
+
+                var sector = await _context.IbSectores
+                    .FirstOrDefaultAsync(s => s.IbSecId == dto.TB_ENT_SEC_ID);
+
+                // 🔥 CAMBIO: usar UsuarioId como en Recepción
+                var usuarioIdSesion = HttpContext.Session.GetString("UsuarioId");
+
+                if (string.IsNullOrEmpty(usuarioIdSesion))
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        mensaje = "❌ No hay usuario en sesión."
+                    });
+                }
+
+                var usuario = await _context.IbPers
+                    .FirstOrDefaultAsync(p => p.IbPerId == int.Parse(usuarioIdSesion));
 
                 var nueva = new TbEnt
                 {
                     TbEntFec = DateTime.Today,
                     TbEntHorFin = null,
-                    TbEntPerId = dto.TB_ENT_PER_ID,
-                    TbEntPerNom = personal != null ? $"{personal.IbPerApe}, {personal.IbPerNom}" : dto.TB_ENT_PER_NOM,
+
+                    // 👤 USUARIO (igual que Recepción)
+                    TbEntPerId = int.Parse(usuarioIdSesion),
+                    TbEntPerNom = usuario != null
+                        ? $"{usuario.IbPerApe}, {usuario.IbPerNom}"
+                        : dto.TB_ENT_PER_NOM,
+
+                    // 🏢 Sector
                     TbEntSecId = dto.TB_ENT_SEC_ID,
                     TbEntSecDen = sector?.IbSecDen ?? dto.TB_ENT_SEC_DEN,
+
                     TbEntCantTot = 0,
                     TbEntPcLog = Environment.MachineName,
+
+                    // 👤 Usuario sistema (NO tocar)
                     TbEntPcUsr = User.Identity?.Name ?? "Usuario"
                 };
 
                 _context.TbEnt.Add(nueva);
                 await _context.SaveChangesAsync();
 
-                // 🔽 Lista de materiales
-                var materiales = await _context.IbMat
-                    .Select(m => new IbMatDto
-                    {
-                        IbMatId = m.IB_MAT_ID,
-                        IbMatDen = m.IB_MAT_DEN
-                    })
-                    .ToListAsync();
-
-                // 🔽 Lista de estados
-                var estados = await _context.IbEst
-                    .OrderBy(e => e.IbEstDen)
-                    .Select(e => new IbEstDto
-                    {
-                        IbEstId = e.IbEstId,
-                        IbEstDen = e.IbEstDen
-                    })
-                    .ToListAsync();
-
-                // ✅ Preparar DTO para subformulario
-                ViewBag.SubFormularioDetalle = new TbEntDetFormDto
+                return Json(new
                 {
-                    Detalle = new TbEntDetDto
-                    {
-                        TB_ENT_ID = nueva.TbEntId
-                    }
-                    // Si después necesitás pasar `Materiales` o `Estados`, agregalos al DTO
-                };
-
-                ViewBag.Detalles = new List<TbEntDetDto>();
-
-                return Json(new { success = true, tbEntId = nueva.TbEntId });
+                    success = true,
+                    tbEntId = nueva.TbEntId
+                });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, mensaje = "ERROR: " + ex.Message });
+                return Json(new
+                {
+                    success = false,
+                    mensaje = "ERROR: " + ex.Message
+                });
             }
         }
     }

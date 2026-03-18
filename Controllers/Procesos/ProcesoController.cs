@@ -41,20 +41,21 @@ namespace ConexionSql.Controllers
                 .OrderBy(p => p.Text)
                 .ToListAsync();
 
-
-
-            // 🔸 Equipos: se cargan dinámicamente según el tipo seleccionado
+            // 🔸 Equipos dinámicos
             model.Equipos = new List<SelectListItem>();
-            // 🔸 Tipos de Ciclo: se cargan dinámicamente según el tipo seleccionado
+
+            // 🔸 Tipos de Ciclo dinámicos
             model.TiposCiclo = new List<SelectListItem>();
+
             return View("~/Views/Procesos/CrearProcesos.cshtml", model);
         }
 
-        // 🔸 Tipos de Ciclo
+        // 🔸 Tipos de Ciclo por tipo de proceso
         [HttpGet]
         public async Task<IActionResult> ObtenerTiposCicloPorProceso(int ptiId)
         {
             Console.WriteLine($"🎯 ObtenerTiposCicloPorProceso ejecutado con ptiId = {ptiId}");
+
             var ciclos = await _context.IbProTci
                 .Where(tc => !tc.TbProPtiOcu && tc.TbProPtiId == ptiId)
                 .Select(tc => new
@@ -67,7 +68,6 @@ namespace ConexionSql.Controllers
 
             return Json(ciclos);
         }
-
 
         // 🔹 POST: Insertar nueva cabecera de proceso
         [HttpPost]
@@ -93,15 +93,30 @@ namespace ConexionSql.Controllers
                 _context.TbPro.Add(nuevo);
                 await _context.SaveChangesAsync();
 
-                // ✅ Respuesta esperada por el frontend (igual que Entrega)
-                return Json(new { success = true, tbProId = nuevo.TbProId });
+                Console.WriteLine($"✅ TB_PRO guardado. ID generado = {nuevo.TbProId}");
+
+                string? url = Url.Action("SubFormulario", "TbProDet", new { id = nuevo.TbProId });
+
+                Console.WriteLine($"✅ URL generada = {url}");
+
+                return Json(new
+                {
+                    success = true,
+                    tbProId = nuevo.TbProId,
+                    redirectUrl = url
+                });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, mensaje = "❌ ERROR: " + ex.Message });
+                Console.WriteLine("❌ Error en Insertar: " + ex.Message);
+
+                return Json(new
+                {
+                    success = false,
+                    mensaje = "❌ ERROR: " + ex.Message
+                });
             }
         }
-
 
         // 🔹 GET: Obtener lista de equipos según tipo de proceso
         [HttpGet]
@@ -112,7 +127,7 @@ namespace ConexionSql.Controllers
                 .Select(e => new
                 {
                     id = e.IbEquId,
-                    nombre = e.IbEquTeqDen // ✅ Denominación correcta
+                    nombre = e.IbEquTeqDen
                 })
                 .OrderBy(e => e.nombre)
                 .ToListAsync();

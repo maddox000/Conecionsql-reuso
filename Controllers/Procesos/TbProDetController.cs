@@ -23,7 +23,9 @@ namespace ConexionSql.Controllers.Procesos
         {
             Console.WriteLine($"📥 SubFormulario INVOCADO con tbProId = {id}");
 
-            var cabecera = await _context.TbPro.FirstOrDefaultAsync(p => p.TbProId == id);
+            var cabecera = await _context.TbPro
+                .FirstOrDefaultAsync(p => p.TbProId == id);
+
             if (cabecera == null)
                 return NotFound("❌ No se encontró la cabecera del proceso.");
 
@@ -51,10 +53,8 @@ namespace ConexionSql.Controllers.Procesos
             };
 
             return View("~/Views/Procesos/_SubFormProDet.cshtml", dto);
-
         }
 
-        // 🔽 POST: Inserta un nuevo detalle de proceso
         [HttpPost]
         public async Task<IActionResult> Insertar([FromBody] TbProDetDto dto)
         {
@@ -66,6 +66,12 @@ namespace ConexionSql.Controllers.Procesos
             if (dto.TB_PRO_DET_REC_DET_ID == 0)
                 return Json(new { success = false, mensaje = "❌ Debe ingresar una etiqueta válida." });
 
+            var cabecera = await _context.TbPro
+                .FirstOrDefaultAsync(p => p.TbProId == dto.TB_PRO_ID);
+
+            if (cabecera == null)
+                return Json(new { success = false, mensaje = "❌ No se encontró la cabecera del proceso." });
+
             var recDet = await _context.TbRecDet
                 .FirstOrDefaultAsync(r => r.TbRecDetId == dto.TB_PRO_DET_REC_DET_ID);
 
@@ -75,16 +81,18 @@ namespace ConexionSql.Controllers.Procesos
             int stock = recDet.TbRecDetProStock ?? 0;
             int cantidad = dto.TB_PRO_DET_CANT ?? 0;
 
-            if (cantidad <= 0 || cantidad > stock)
-            {
-                return Json(new { success = false, mensaje = $"❌ Stock insuficiente. Disponible: {stock}" });
-            }
+            if (cantidad <= 0)
+                return Json(new { success = false, mensaje = "❌ Debe ingresar una cantidad mayor a 0." });
 
-            // ✅ Descontar stock y acumular
+            if (cantidad > stock)
+                return Json(new { success = false, mensaje = $"❌ Stock insuficiente. Disponible: {stock}" });
+
+            // ✅ Actualizar stock en TB_REC_DET
             recDet.TbRecDetProStock = stock - cantidad;
             recDet.TbRecDetProTot = (recDet.TbRecDetProTot ?? 0) + cantidad;
             recDet.TbRecDetEntCant = (recDet.TbRecDetEntCant ?? 0) + cantidad;
 
+            // ✅ Insertar detalle en TB_PRO_DET
             var nuevo = new TbProDet
             {
                 TbProId = dto.TB_PRO_ID,
@@ -107,8 +115,11 @@ namespace ConexionSql.Controllers.Procesos
                 {
                     TB_PRO_DET_ID = d.TbProDetId,
                     TB_PRO_ID = d.TbProId,
+                    TB_PRO_DET_REC_DET_ID = d.TbProDetRecDetId ?? 0,
+                    TB_PRO_DET_REC_DET_MAT_DEN = d.TbProDetRecDetMatDen,
                     TB_PRO_DET_CANT = d.TbProDetCant,
-                    TB_PRO_DET_REC_DET_MAT_DEN = d.TbProDetRecDetMatDen
+                    TB_PRO_DET_PC_USR = d.TbProDetPcUsr,
+                    TB_PRO_FEC = d.TbProFec
                 })
                 .ToListAsync();
 
@@ -125,19 +136,16 @@ namespace ConexionSql.Controllers.Procesos
                 mensaje = "✅ Detalle agregado correctamente.",
                 tbProId = dto.TB_PRO_ID
             });
-
         }
 
-
-
-
-        // 🔍 GET: Devuelve datos del material desde la etiqueta
         [HttpGet]
         public async Task<IActionResult> BuscarPorId(int id)
         {
-            var recDet = await _context.TbRecDet.FindAsync(id);
+            var recDet = await _context.TbRecDet
+                .FirstOrDefaultAsync(r => r.TbRecDetId == id);
+
             if (recDet == null)
-                return Json(new { success = false, mensaje = "Etiqueta no encontrada." });
+                return Json(new { success = false, mensaje = "❌ Etiqueta no encontrada." });
 
             return Json(new
             {

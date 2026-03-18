@@ -9,8 +9,14 @@
 <h4 class="mt-4">🧼 Crear Nuevo Lavado</h4>
 
 <form id="formCrearLavado" onsubmit="return false;" class="mt-4">
-    <!-- 📅 Fecha -->
+    <!-- 👤 Usuario logueado -->
     <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" class="form-control" value="@ViewBag.UsuarioLogueado" readonly />
+    </div>
+
+    <!-- 📅 Fecha -->
+    <div class="form-group mt-3">
         <label>Fecha</label>
         <input type="text" class="form-control" id="fechaLavado" value="@fechaHoy" readonly />
     </div>
@@ -83,7 +89,6 @@
             const json = await resp.json();
 
             if (json.success) {
-                // 🔧 Redirección corregida usando parámetro query `id=`
                 window.location.href = `/TbProLavDet/SubFormulario?id=${json.tbProLavId}`;
             } else {
                 document.getElementById("mensajeLavado").innerText = json.mensaje || "❌ Error al guardar.";
@@ -97,7 +102,6 @@
             comboEquipo.innerHTML = '<option value="">-- Cargando equipos... --</option>';
             comboCiclo.innerHTML = '<option value="">-- Cargando ciclos... --</option>';
 
-            // 🔄 Equipos
             const resp = await fetch(`/Lavado/ObtenerEquiposPorTipo`);
             const data = await resp.json();
 
@@ -109,7 +113,6 @@
                 comboEquipo.appendChild(opt);
             });
 
-            // 🔄 Ciclos
             const respCiclos = await fetch(`/Lavado/ObtenerTiposCiclo`);
             const dataCiclos = await respCiclos.json();
 

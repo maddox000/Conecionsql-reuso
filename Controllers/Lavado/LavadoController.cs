@@ -41,14 +41,29 @@ namespace ConexionSql.Controllers
                 .OrderBy(t => t.Text)
                 .ToListAsync();
 
-            // 🔸 Equipos y Tipos de Ciclo: vacíos inicialmente (carga dinámica)
+            // 🔸 Equipos y Tipos de Ciclo vacíos inicialmente
             model.Equipos = new List<SelectListItem>();
             model.TiposCiclo = new List<SelectListItem>();
+
+            // 👤 Usuario logueado
+            var usuarioIdSesion = HttpContext.Session.GetString("UsuarioId");
+
+            if (!string.IsNullOrEmpty(usuarioIdSesion))
+            {
+                var usuario = await _context.IbPers
+                    .FirstOrDefaultAsync(p => p.IbPerId == int.Parse(usuarioIdSesion));
+
+                if (usuario != null)
+                {
+                    ViewBag.UsuarioId = usuario.IbPerId;
+                    ViewBag.UsuarioLogueado = $"{usuario.IbPerApe}, {usuario.IbPerNom}";
+                }
+            }
 
             return View("~/Views/Lavado/CrearLavado.cshtml", model);
         }
 
-        // 🔹 GET: Obtener lista de equipos (solo equipos con TEQ_ID = 6)
+        // 🔹 GET: Obtener lista de equipos
         [HttpGet]
         public async Task<IActionResult> ObtenerEquiposPorTipo()
         {
@@ -65,7 +80,7 @@ namespace ConexionSql.Controllers
             return Json(equipos);
         }
 
-        // 🔹 GET: Obtener tipos de ciclo (visibles desde IB_LAV_TCI)
+        // 🔹 GET: Obtener tipos de ciclo
         [HttpGet]
         public async Task<IActionResult> ObtenerTiposCiclo()
         {
@@ -88,9 +103,20 @@ namespace ConexionSql.Controllers
         {
             try
             {
-                // Validación mínima
                 if (dto.TipoLavadoId == 0)
                     return Json(new { success = false, mensaje = "Debe seleccionar el tipo de lavado." });
+
+                // 👤 Usuario desde sesión
+                var usuarioIdSesion = HttpContext.Session.GetString("UsuarioId");
+
+                if (string.IsNullOrEmpty(usuarioIdSesion))
+                    return Json(new { success = false, mensaje = "No se encontró el usuario logueado." });
+
+                var personal = await _context.IbPers
+                    .FirstOrDefaultAsync(p => p.IbPerId == int.Parse(usuarioIdSesion));
+
+                if (personal == null)
+                    return Json(new { success = false, mensaje = "No se encontró el personal logueado." });
 
                 // 📄 Instancia del modelo
                 var entidad = new TbProLav
@@ -98,12 +124,20 @@ namespace ConexionSql.Controllers
                     TbProLavFec = dto.Fecha ?? DateTime.Now.Date,
                     TbProLavHorIni = dto.HoraIni.HasValue ? DateTime.Today.Add(dto.HoraIni.Value) : null,
                     TbProLavHorFin = dto.HoraFin.HasValue ? DateTime.Today.Add(dto.HoraFin.Value) : null,
+
                     TbProLavPtiId = dto.TipoLavadoId,
                     TbProLavPtiDen = dto.TipoLavadoDen,
                     TbProLavEquId = dto.EquipoId,
                     TbProLavEquDen = dto.EquipoDen,
                     TbProLavTciId = dto.TipoCicloId,
                     TbProLavTciDen = dto.TipoCicloDen,
+
+                    TbProLavPerId = personal.IbPerId,
+                    TbProLavPerApe = personal.IbPerApe,
+                    TbProLavPerNom = personal.IbPerNom,
+                    TbProLavPerCarId = personal.IbPerCarId,
+                    TbProLavPerCarDen = personal.IbPerCarDen,
+
                     TbProLavPcLog = Environment.MachineName,
                     TbProLavPcUsr = Environment.UserName
                 };
@@ -118,7 +152,5 @@ namespace ConexionSql.Controllers
                 return Json(new { success = false, mensaje = "❌ Error al guardar el lavado: " + ex.Message });
             }
         }
-
-
     }
 }

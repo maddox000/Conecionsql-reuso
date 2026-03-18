@@ -1,0 +1,52 @@
+﻿@model List<ConexionSql.Models.Recepciones.Busquedas.BusquedaRecepcionesDto>
+
+@{
+    ViewData["Title"] = "Búsqueda de Materiales";
+}
+
+<h2>Búsqueda de Materiales (últimos 10 días)</h2>
+
+<!-- Botón para actualizar resultados -->
+<form method="get" action="~/Busquedas/BusquedasFecha">
+    <button type="submit" class="btn btn-primary mb-3">🔄 Actualizar</button>
+</form>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Código Etiqueta</th>
+            <th>Recepción</th>
+            <th>Fecha</th>
+            <th>Sector</th>
+            <th>Denominación</th>
+            <th>Cantidad</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Count > 0)
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.CodigoEtiqueta</td>
+                    <td>@item.Recepcion</td>
+                    <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                    <td>@item.Sector</td>
+                    <td>@item.Denominacion</td>
+                    <td>@item.Cantidad</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" class="text-center">No se encontraron registros</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- 🔗 Enlace directo para pruebas manuales -->
+<div class="mt-3">
+    <a href="~/Busquedas/BusquedasFecha" class="btn btn-secondary">Ir a la búsqueda</a>
+</div>

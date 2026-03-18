@@ -48,22 +48,23 @@ namespace ConexionSql.Controllers.Acondicionado
         [HttpGet]
         public IActionResult CrearAcondicionado()
         {
+            // 🔐 Obtener usuario logueado
+            var usuarioId = HttpContext.Session.GetString("UsuarioId");
+
+            if (string.IsNullOrEmpty(usuarioId))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 🔎 Buscar datos del usuario
             var personal = _context.IbPers
-                .OrderBy(p => p.IbPerApe)
-                .ThenBy(p => p.IbPerNom)
-                .Select(p => new IbPerDto
-                {
-                    IbPerId = p.IbPerId,
-                    IbPerNom = p.IbPerNom,
-                    IbPerApe = p.IbPerApe,
-                    IbPerCarId = p.IbPerCarId,
-                    IbPerCarDen = p.IbPerCarDen
-                })
-                .ToList();
+                .FirstOrDefault(x => x.IbPerId.ToString() == usuarioId);
 
-            ViewBag.ListaPersonal = personal;
+            ViewBag.UsuarioLogueado = personal != null
+                ? $"{personal.IbPerApe}, {personal.IbPerNom}"
+                : "";
 
-            return View();
+            return View("~/Views/Acondicionado/CrearAcondicionado.cshtml");
         }
 
         /// <summary>
@@ -71,52 +72,47 @@ namespace ConexionSql.Controllers.Acondicionado
         /// Luego redirige al subformulario para cargar los detalles.
         /// </summary>
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult CrearAcondicionado(TbProAco nuevaCabecera)
+        public async Task<IActionResult> CrearAcondicionado(TbProAco model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var personal = _context.IbPers.FirstOrDefault(p => p.IbPerId == nuevaCabecera.TbProAcoPerId);
+                var usuarioId = HttpContext.Session.GetString("UsuarioId");
 
-                // Datos de sistema
-                nuevaCabecera.TbProAcoFec = DateTime.Today;
-                nuevaCabecera.TbProAcoHorIni = DateTime.Now;
-                nuevaCabecera.TbProAcoPcLog = Environment.MachineName;
-                nuevaCabecera.TbProAcoPcUsr = User.Identity?.Name ?? "Usuario";
-
-                // Copiar nombre y cargo del personal si existe
-                if (personal != null)
+                if (string.IsNullOrEmpty(usuarioId))
                 {
-                    nuevaCabecera.TbProAcoPerNom = $"{personal.IbPerApe}, {personal.IbPerNom}";
-                    nuevaCabecera.TbProAcoPerCarId = personal.IbPerCarId;
-                    nuevaCabecera.TbProAcoPerCarDen = personal.IbPerCarDen;
+                    return RedirectToAction("Index", "Home");
                 }
 
-                // Guardar cabecera
-                _context.TbProAco.Add(nuevaCabecera);
-                _context.SaveChanges();
+                var personal = _context.IbPers
+                    .FirstOrDefault(x => x.IbPerId.ToString() == usuarioId);
 
-                TempData["MensajeExito"] = "✅ Acondicionado guardado correctamente.";
-
-                // ✅ Redirigir al subformulario con el ID generado
-                return RedirectToAction("SubFormAcoDet", "TbProAcoDet", new { id = nuevaCabecera.TbProAcoId });
-            }
-
-            // Si falla, volver a cargar la lista de personal
-            ViewBag.ListaPersonal = _context.IbPers
-                .OrderBy(p => p.IbPerApe)
-                .ThenBy(p => p.IbPerNom)
-                .Select(p => new IbPerDto
+                var entidad = new TbProAco
                 {
-                    IbPerId = p.IbPerId,
-                    IbPerNom = p.IbPerNom,
-                    IbPerApe = p.IbPerApe,
-                    IbPerCarId = p.IbPerCarId,
-                    IbPerCarDen = p.IbPerCarDen
-                })
-                .ToList();
+                    TbProAcoFec = DateTime.Now.Date,
+                    TbProAcoHorIni = DateTime.Now,
 
-            return View(nuevaCabecera);
+                    // 👤 Usuario logueado
+                    TbProAcoPerId = personal?.IbPerId,
+                    TbProAcoPerNom = $"{personal?.IbPerApe}, {personal?.IbPerNom}",
+                    TbProAcoPerCarId = personal?.IbPerCarId,
+                    TbProAcoPerCarDen = personal?.IbPerCarDen,
+
+                    TbProAcoPcLog = Environment.MachineName,
+                    TbProAcoPcUsr = Environment.UserName
+                };
+
+                _context.TbProAco.Add(entidad);
+                await _context.SaveChangesAsync();
+
+                TempData["MensajeExito"] = "✅ Acondicionado creado correctamente";
+
+                return RedirectToAction("SubFormAcoDet", "TbProAcoDet", new { id = entidad.TbProAcoId });
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeExito"] = "❌ Error: " + ex.Message;
+                return RedirectToAction("CrearAcondicionado");
+            }
         }
     }
 }

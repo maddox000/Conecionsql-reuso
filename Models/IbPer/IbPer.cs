@@ -67,7 +67,7 @@ namespace ConexionSql.Models.IbPer
         public string? IbSecDen { get; set; }
 
         [Column("IB_PER_OCU")]
-        public bool? IbPerOcu { get; set; }
+        public bool IbPerOcu { get; set; }
 
         [Column("IB_PER_PC_LOG")]
         public string? IbPerPcLog { get; set; }

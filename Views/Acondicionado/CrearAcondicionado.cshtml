@@ -15,12 +15,8 @@
 
 <form asp-action="CrearAcondicionado" method="post">
     <div class="form-group mb-3">
-        <label asp-for="TbProAcoPerId">👤 Personal</label>
-        <select asp-for="TbProAcoPerId" class="form-control"
-                asp-items="@(new SelectList(ViewBag.ListaPersonal, "IbPerId", "IbPerNom"))">
-            <option value="">Seleccione un personal</option>
-        </select>
-        <span asp-validation-for="TbProAcoPerId" class="text-danger"></span>
+        <label>👤 Usuario</label>
+        <input type="text" class="form-control" value="@ViewBag.UsuarioLogueado" readonly />
     </div>
 
     <button type="submit" class="btn btn-success">💾 Guardar Cabecera</button>
@@ -28,6 +24,7 @@
 
 @section Scripts {
     @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }

@@ -1,13 +1,12 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ConexionSql.Data;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurar la cadena de conexi�n
+// Configurar la cadena de conexión
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("La cadena de conexi�n 'DefaultConnection' no se encontr�.");
+    ?? throw new InvalidOperationException("La cadena de conexión 'DefaultConnection' no se encontró.");
 
 // Registrar ApplicationDbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -17,10 +16,20 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDbContext<ConexionSqlContext>(options =>
     options.UseSqlServer(connectionString));
 
+// ✅ Agregar Session
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 // Otros servicios
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -41,11 +50,15 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// ✅ Usar Session antes de Authorization
+app.UseSession();
+
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
 app.MapRazorPages();
 
 app.Run();
