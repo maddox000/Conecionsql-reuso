@@ -567,7 +567,22 @@ namespace ConexionSql.Models.Materiales
         [Column("IB_MAT_ETI1_CAN")]
         public int? IB_MAT_ETI1_CAN { get; set; }
 
+        [Column("IB_MAT_LMAT")]
+        public int? IB_MAT_LMAT { get; set; }
 
+        [Column("IB_MAT_CANT_MULT")]
+        public int? IB_MAT_CANT_MULT { get; set; }
+
+        [Column("IB_MAT_UE")]
+        public int? IB_MAT_UE { get; set; }
+
+        [Column("IB_MAT_ETI_ID")]
+        public int? IB_MAT_ETI_ID { get; set; }
+
+        [Column("IB_MAT_ETI_DEN")]
+        public string? IB_MAT_ETI_DEN { get; set; }
+
+        
 
     }
 }

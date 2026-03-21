@@ -396,6 +396,12 @@ namespace ConexionSql.Models.Recepciones
 
         // Relación con IB_MAT (material)
         [ForeignKey("TbRecDetMatId")]
+
+        [Column("TB_REC_DET_TRA_OPC")]
+        public bool TbRecDetTraOpc { get; set; }
+
+
+        [ForeignKey("TbRecDetMatId")]
         public IbMat? IbMat { get; set; }
 
 

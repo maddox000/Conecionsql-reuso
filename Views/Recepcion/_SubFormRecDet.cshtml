@@ -140,6 +140,18 @@
         const hiddenTxt3 = document.getElementById("TB_REC_DET_TXT_3");
         const hiddenDti1 = document.getElementById("TB_REC_DET_DTI_1");
 
+        // 🔹 Limpiar el 0 inicial de cantidad
+        if (cantidadInput && cantidadInput.value === "0") {
+            cantidadInput.value = "";
+        }
+
+        // 🔹 Si al entrar al campo hay 0, lo limpia
+        cantidadInput.addEventListener("focus", function () {
+            if (this.value === "0") {
+                this.value = "";
+            }
+        });
+
         function limpiarModalRevision() {
             modalCantidad.value = "";
             modalFaltantes.value = "";
@@ -173,39 +185,39 @@
         });
 
         // 🔹 Guardar datos del modal en hidden
-            btnAceptarModal.addEventListener("click", function () {
-        const revisionId = parseInt(revisionSelect.value) || 0;
-        const revisionTexto = revisionSelect.options[revisionSelect.selectedIndex]?.text || "";
-        const cantidadModal = parseInt(modalCantidad.value) || 0;
-        const faltantes = modalFaltantes.value || "";
+        btnAceptarModal.addEventListener("click", function () {
+            const revisionId = parseInt(revisionSelect.value) || 0;
+            const revisionTexto = revisionSelect.options[revisionSelect.selectedIndex]?.text || "";
+            const cantidadModal = parseInt(modalCantidad.value) || 0;
+            const faltantes = modalFaltantes.value || "";
 
-        mensajeModalRevision.innerText = "";
+            mensajeModalRevision.innerText = "";
 
-        if (!cantidadModal || cantidadModal < 1) {
-            mensajeModalRevision.innerText = "Ingresá una cantidad válida.";
-            return;
-        }
+            if (!cantidadModal || cantidadModal < 1) {
+                mensajeModalRevision.innerText = "Ingresá una cantidad válida.";
+                return;
+            }
 
-        // 👇 VALIDACIÓN SOLO PARA INCOMPLETO
-        if (revisionId === 3 && faltantes.trim() === "") {
-            mensajeModalRevision.innerText = "Ingresá los faltantes.";
-            return;
-        }
+            // 👇 VALIDACIÓN SOLO PARA INCOMPLETO
+            if (revisionId === 3 && faltantes.trim() === "") {
+                mensajeModalRevision.innerText = "Ingresá los faltantes.";
+                return;
+            }
 
-        hiddenNum2.value = cantidadModal;
-        hiddenNum3.value = revisionId;
+            hiddenNum2.value = cantidadModal;
+            hiddenNum3.value = revisionId;
 
-        // 👇 CLAVE
-        if (revisionId === 3) {
-            hiddenTxt3.value = faltantes; // INCOMPLETO
-        } else {
-            hiddenTxt3.value = revisionTexto; // COMPLETO u otros
-        }
+            // 👇 CLAVE
+            if (revisionId === 3) {
+                hiddenTxt3.value = faltantes; // INCOMPLETO
+            } else {
+                hiddenTxt3.value = revisionTexto; // COMPLETO u otros
+            }
 
-        hiddenDti1.value = new Date().toISOString();
+            hiddenDti1.value = new Date().toISOString();
 
-        modalRevision.hide();
-    });
+            modalRevision.hide();
+        });
 
         // 🔹 Función para asignar stock según estado
         function aplicarSwitchDeStock() {
@@ -305,6 +317,11 @@
                     stockLavInput.value = 0;
                     stockEntInput.value = 0;
                     stockDecInput.value = 0;
+
+                    // 🔹 Volver a dejar cantidad vacía después del reset
+                    if (cantidadInput) {
+                        cantidadInput.value = "";
+                    }
 
                     limpiarModalRevision();
 

@@ -1,14 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ConexionSql.Models.IbPer;
-using ConexionSql.Models.Procesos;
-using ConexionSql.Models.Sectores;
-using ConexionSql.Models.Recepciones;
-using ConexionSql.Models.Materiales;
-using ConexionSql.Models.Estados;
-using ConexionSql.Models.Acondicionado;
-using ConexionSql.Models.Equipos;
+﻿using ConexionSql.Models.Acondicionado;
 using ConexionSql.Models.Entrega;
+using ConexionSql.Models.Equipos;
+using ConexionSql.Models.Estados;
+using ConexionSql.Models.IbPer;
 using ConexionSql.Models.Lavado;
+using ConexionSql.Models.Materiales;
+using ConexionSql.Models.Procesos;
+using ConexionSql.Models.Recepciones;
+using ConexionSql.Models.Reuso;
+using ConexionSql.Models.Sectores;
+using Microsoft.EntityFrameworkCore;
+using ConexionSql.Models.Reuso;
 
 
 namespace ConexionSql.Data
@@ -44,6 +46,9 @@ namespace ConexionSql.Data
         public DbSet<IbLavTci> IbLavTci { get; set; }
 
         public DbSet<IbMatRev> IbMatRevisiones { get; set; }
+        public DbSet<IbMatEti> IbMatEti { get; set; }
+
+        public DbSet<TbReu> TbReu { get; set; }
 
 
 

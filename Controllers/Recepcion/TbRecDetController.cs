@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ConexionSql.Data;
+﻿using ConexionSql.Data;
+using ConexionSql.Models.Materiales;
 using ConexionSql.Models.Recepciones;
+using ConexionSql.Models.Reuso;
 using ConexionSql.Utilidades;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -326,6 +328,129 @@ namespace ConexionSql.Controllers
                 Console.WriteLine($"❌ Error: {ex.Message}");
                 return Json(new { success = false, mensaje = "Error interno." });
             }
+        }
+
+        private string? ValidarIngresoRecepcion(TbRecDetDto detalle)
+        {
+            /*abre A_PAN_OPCverifica circuito cerrado
+             * hec profesionales
+             * me.tb_rec_pro.enabled = false
+             * hace algo si no es jde
+            
+            
+                    if (etiUniOpc)
+                    {
+                        // código único = TRUE
+                        
+                    }
+                    else
+                    {
+                        // código único = FALSE
+                        if (limiteEtiquetas =0)
+                        {
+                            // botAutClick
+                        }
+                        else
+                        {
+                            limiteEtiquetas > 0
+                            "Ud quiere impirmir.....? = si
+                            // botAutClick
+                        }
+                    }
+                return "Debe seleccionar un material.";*/
+
+            if (detalle.TB_REC_DET_CANT <= 0)
+                return "Cantidad inválida.";
+
+            if (detalle.IB_EST_ID <= 0)
+                return "Debe seleccionar un estado.";
+
+            // 🔥 TUS IF VAN ACÁ
+            // ejemplo:
+            if (detalle.IB_EST_ID == 4 && detalle.TB_REC_DET_CANT > 1000)
+                return "Cantidad demasiado alta para esterilizado.";
+
+            return null; 
+        }
+
+        private async Task<IbMat?> AfmrIbMat(int matId)
+        {
+            return await _context.IbMat
+                .FirstOrDefaultAsync(x => x.IB_MAT_ID == matId);
+        }
+
+        private async Task<IbMatEti?> AfmrIbMatEti(int etiId)
+        {
+            return await _context.IbMatEti
+                .FirstOrDefaultAsync(x => x.IB_MAT_ETI_ID == etiId);
+        }
+
+        private async Task<TbReu?> AfmrTbReu(int id)
+        {
+            return await _context.TbReu
+                .FirstOrDefaultAsync(x => x.TbReuId == id);
+        }
+
+        private async Task<TbRecDet?> AfmrTbRecDet(int id)
+        {
+            return await _context.TbRecDet
+                .FirstOrDefaultAsync(x => x.TbRecDetId == id);
+        }
+
+        //private async Task<APanOpc?> AfmrAPanOpc()
+        //{
+        //    return await _context.APanOpc
+        //        .FirstOrDefaultAsync();
+        //}
+
+
+
+        private string? BotAutClick(TbRecDetDto detalle)
+        {
+
+            /*abre A_PAN_OPC verifica circuito cerrado
+             * circuito JDE
+             * si es reu verifica q cantidad sea 1
+             * if (detalle.IB_MAT_ID <= 0)
+                return "Debe seleccionar un material.";
+            debe verificar si es 1 id le dice q no seleciono material y vualve al campo den
+            elseif(detalle.IB_MAT_ID > 1)
+            abre afmrIbmat, buscando x id
+            abre afmr ib_matEti where eti_id lo saca de afmrIbmat
+
+             */
+            // 1. validar material
+            if (detalle.IB_MAT_ID <= 0)
+            {
+                var material = AfmrIbMat(detalle.IB_MAT_ID.Value).Result;
+                return "Debe seleccionar un material.";
+            }
+            else
+            {
+                // 2. traer material (AFMR_IB_MAT)
+                var material = AfmrIbMat(detalle.IB_MAT_ID.Value).Result;
+
+                if (material == null)
+                    return "Material no encontrado.";
+
+                // 3. si es reutilizable → cantidad debe ser 1
+                if (material.IB_MAT_REU_OPC == true && detalle.TB_REC_DET_CANT > 1)
+                {
+                    return "Para materiales de reuso la cantidad debe ser 1.";
+                }
+
+                // 4. traer envoltorio desde material
+                if (material.IB_MAT_ETI_ID != null)
+                {
+                    var etiqueta = AfmrIbMatEti(material.IB_MAT_ETI_ID.Value).Result;
+
+                    // acá después metés lógica de etiqueta
+                }
+            }
+
+            // más lógica tuya acá...
+
+            return null;
         }
     }
 }
