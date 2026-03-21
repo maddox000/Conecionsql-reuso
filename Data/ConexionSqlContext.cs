@@ -10,6 +10,7 @@ using ConexionSql.Models.Equipos;
 using ConexionSql.Models.Entrega;
 using ConexionSql.Models.Lavado;
 
+
 namespace ConexionSql.Data
 {
     public class ConexionSqlContext : DbContext
@@ -42,7 +43,7 @@ namespace ConexionSql.Data
         public DbSet<IbLavLti> IbLavLti { get; set; }
         public DbSet<IbLavTci> IbLavTci { get; set; }
 
-
+        public DbSet<IbMatRev> IbMatRevisiones { get; set; }
 
 
 

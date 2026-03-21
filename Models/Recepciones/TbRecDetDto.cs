@@ -33,6 +33,12 @@
         // 📦 Cantidad entregada (campo para ENTREGADO)
         public int TB_REC_DET_ENT_CANT { get; set; }
 
+
+        public int? TB_REC_DET_NUM_2 { get; set; }
+        public int? TB_REC_DET_NUM_3 { get; set; }
+        public string? TB_REC_DET_TXT_3 { get; set; }
+        public DateTime? TB_REC_DET_DTI_1 { get; set; }
+
         // Los siguientes campos se comentan hasta que se usen activamente:
 
         //// 🏢 ID del sector de origen (referencia a IB_SEC)
@@ -46,5 +52,14 @@
 
         //// 🏢 Nombre del sector de destino
         //public string TB_REC_SEC_DES_DEN { get; set; }
+
+        // TB_REC_DET_MAT_PR (Código producto)
+        public string? TB_REC_DET_MAT_PR { get; set; }
+
+        // TB_REC_DET_REU_ID (Código reuso)
+        public string? TB_REC_DET_REU_ID { get; set; }
+
+        // TB_REC_DET_REP_ID (Revisión)
+        public int? TB_REC_DET_REP_ID { get; set; }
     }
 }

@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
-using ConexionSql.Models.Estados;
+﻿using ConexionSql.Models.Estados;
+using ConexionSql.Models.IbPer;
 using ConexionSql.Models.Materiales;
+using System.Collections.Generic;
 
 namespace ConexionSql.Models.Recepciones
 {
@@ -14,6 +15,9 @@ namespace ConexionSql.Models.Recepciones
 
         // Lista de estados para el combobox
         public List<IbEstDto> Estados { get; set; } = new List<IbEstDto>();
+
+        // Lista de revision para el combobox
+        public List<IbMatRevDto> Revisiones { get; set; } = new List<IbMatRevDto>();
 
     }
 }

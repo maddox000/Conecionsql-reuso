@@ -18,9 +18,6 @@ namespace ConexionSql.Controllers
             _context = context;
         }
 
-        /// <summary>
-        /// Inserta un nuevo detalle de recepción (TB_REC_DET) y genera la etiqueta ZPL.
-        /// </summary>
         [HttpPost]
         public async Task<IActionResult> Insertar([FromBody] TbRecDetDto detalle)
         {
@@ -35,35 +32,224 @@ namespace ConexionSql.Controllers
 
             try
             {
-                // Paso 1: Verificar que la cabecera TB_REC exista
-                var tbRec = await _context.TbRec.FirstOrDefaultAsync(r => r.TbRecId == detalle.TB_REC_ID);
+                // =========================================================
+                // PASO 1: BUSCAR CABECERA
+                // =========================================================
+                var tbRec = await _context.TbRec
+                    .FirstOrDefaultAsync(r => r.TbRecId == detalle.TB_REC_ID);
+
                 if (tbRec == null)
                 {
-                    Console.WriteLine("❌ No se encontró la cabecera TB_REC.");
-                    return Json(new { success = false, mensaje = "Cabecera de recepción no encontrada." });
+                    return Json(new { success = false, mensaje = "Cabecera no encontrada." });
                 }
 
-                // Paso 2: Obtener nombre del material desde IB_MAT
-                string? nombreMaterial = await _context.IbMat
-                    .Where(m => m.IB_MAT_ID == detalle.IB_MAT_ID)
-                    .Select(m => m.IB_MAT_DEN)
-                    .FirstOrDefaultAsync() ?? "SIN MATERIAL";
+                // =========================================================
+                // PASO 2: BUSCAR MATERIAL
+                // =========================================================
+                var material = await _context.IbMat
+                    .FirstOrDefaultAsync(m => m.IB_MAT_ID == detalle.IB_MAT_ID);
 
-                // Paso 2.1: Obtener nombre del estado desde IB_EST
-                string? nombreEstado = await _context.IbEst
+                if (material == null)
+                {
+                    return Json(new { success = false, mensaje = "Material no encontrado." });
+                }
+
+                string nombreMaterial = material.IB_MAT_DEN ?? "SIN MATERIAL";
+
+                // =========================================================
+                // PASO 3: BUSCAR ESTADO
+                // =========================================================
+                string nombreEstado = await _context.IbEst
                     .Where(e => e.IbEstId == detalle.IB_EST_ID)
                     .Select(e => e.IbEstDen)
                     .FirstOrDefaultAsync() ?? "SIN ESTADO";
 
-                // Paso 3: Crear e insertar el detalle
+                // =========================================================
+                // PASO 4: DEFINIR UDE SEGÚN ESTADO ELEGIDO
+                // =========================================================
+                int udeLav = 0;
+                int udeDec = 0;
+                int udeTra = 0;
+                int udeEmp = 0;
+                int udePro = 0;
+                int udeEnt = 0;
+
+                switch (detalle.IB_EST_ID)
+                {
+                    case 1:
+                        udeLav = detalle.TB_REC_DET_CANT;
+                        break;
+
+                    case 3:
+                        udeEmp = detalle.TB_REC_DET_CANT;
+                        break;
+
+                    case 4:
+                        udePro = detalle.TB_REC_DET_CANT;
+                        break;
+
+                    case 5:
+                        udeEnt = detalle.TB_REC_DET_CANT;
+                        break;
+
+                    case 6:
+                        udeDec = detalle.TB_REC_DET_CANT;
+                        break;
+
+                    case 7:
+                        udeTra = detalle.TB_REC_DET_CANT;
+                        break;
+                }
+
+                // =========================================================
+                // PASO 5: ARMAR DETALLE
+                // =========================================================
                 var entidad = new TbRecDet
                 {
+                    // -----------------------------------------------------
+                    // RELACIÓN CON CABECERA
+                    // -----------------------------------------------------
                     TbRecId = detalle.TB_REC_ID,
-                    TbRecDetMatId = detalle.IB_MAT_ID,
-                    TbRecDetMatDen = nombreMaterial,
+
+                    // -----------------------------------------------------
+                    // DATOS DE CABECERA
+                    // -----------------------------------------------------
+                    TbRecFec = tbRec.TbRecFec,
+                    TbRecHor = tbRec.TbRecHorIni,
+                    TbRecPerId = tbRec.TbRecPerId,
+                    TbRecPerNom = tbRec.TbRecPerNom,
+                    TbRecPerApe = tbRec.TbRecPerApe,
+                    TbRecPerCarId = tbRec.TbRecPerCarId,
+                    TbRecPerCarDen = tbRec.TbRecPerCarDen,
+                    TbRecSecOriId = tbRec.TbRecSecOriId,
+                    TbRecSecOriDen = tbRec.TbRecSecOriDen,
+                    TbRecSecDesId = tbRec.TbRecSecDesId,
+                    TbRecSecDesDen = tbRec.TbRecSecDesDen,
+                    TbRecOrtId = tbRec.TbRecOrtId,
+                    TbRecOrtDen = tbRec.TbRecOrtDen,
+                    TbRecSecPer = tbRec.TbRecSecPer,
+
+                    // -----------------------------------------------------
+                    // DATOS DEL MATERIAL
+                    // -----------------------------------------------------
+                    TbRecDetMatId = material.IB_MAT_ID,
+                    TbRecDetMatDen = material.IB_MAT_DEN,
+                    TbRecDetMatPr = material.IB_MAT_PR,
+                    TbRecDetMatMtiId = material.IB_MAT_MTI_ID,
+                    TbRecDetMatMtiDen = material.IB_MAT_MTI_DEN,
+
+                    // -----------------------------------------------------
+                    // DATOS DEL ESTADO
+                    // -----------------------------------------------------
+                    TbRecDetEstId = detalle.IB_EST_ID,
+                    TbRecDetEstDen = nombreEstado,
+                    TbRecDetEstIngId = 22,
+                    TbRecDetEstIngDen = "CE Recepcionado",
+
+                    // -----------------------------------------------------
+                    // CANTIDAD
+                    // -----------------------------------------------------
                     TbRecDetCant = detalle.TB_REC_DET_CANT,
 
-                    // 🔹 Stock según el estado recibido (los otros llegan en 0)
+                    // -----------------------------------------------------
+                    // DEFAULTS IGUALADOS A ACCESS
+                    // -----------------------------------------------------
+                    TbRecDetVopOpc = false,
+                    TbRecDetRepId = detalle.TB_REC_DET_REP_ID ?? 1,
+                    TbRecDetReuOpc = false,
+                    TbRecDetReuId = "1",
+                    TbRecDetReuDen = "NO REGISTRADO",
+                    TbRecDetOrtId = 0,
+                    TbRecDetOrtDen = "NO REGISTRA",
+                    TbRecDetReuCant = 0,
+
+                    // -----------------------------------------------------
+                    // CAMPOS QUE EN ACCESS VENÍAN CARGADOS
+                    // -----------------------------------------------------
+                    TbRecDetProId = 1,
+                    TbRecDetProNom = "NO REGISTRA",
+                    TbRecDetProApe = "NO REGISTRA",
+                    TbRecDetPac = "NO REGISTRA",
+                    TbRecDetRem = "0",
+                    TbRecDetObs = null,
+                    TbRecDetMde = false,
+
+                    // -----------------------------------------------------
+                    // STOCKS DE RECEPCIÓN
+                    // -----------------------------------------------------
+                    TbRecDetRecCant = 0,
+                    TbRecDetRecStock = detalle.TB_REC_DET_CANT,
+                    TbRecDetRecTot = 0,
+                    TbRecDetRecUde = 1,
+                    TbRecDetStock = 0,
+                    TbRecDetTot = 0,
+
+                    // -----------------------------------------------------
+                    // LAVADO
+                    // -----------------------------------------------------
+                    TbRecDetLavCant = 0,
+                    TbRecDetLavTot = 0,
+                    TbRecDetLavUde = udeLav,
+
+                    // -----------------------------------------------------
+                    // DECONTAMINADO
+                    // -----------------------------------------------------
+                    TbRecDetDecCant = 0,
+                    TbRecDetDecTot = 0,
+                    TbRecDetDecUde = udeDec,
+
+                    // -----------------------------------------------------
+                    // TRASLADO
+                    // -----------------------------------------------------
+                    TbRecDetTraCant = 0,
+                    TbRecDetTraUde = udeTra,
+
+                    // -----------------------------------------------------
+                    // EMPAQUE / ACONDICIONADO
+                    // -----------------------------------------------------
+                    TbRecDetEmpCant = 0,
+                    TbRecDetEmpTot = 0,
+                    TbRecDetEmpUde = udeEmp,
+
+                    // -----------------------------------------------------
+                    // PROCESO
+                    // -----------------------------------------------------
+                    TbRecDetProAbo = 0,
+                    TbRecDetProCant = 0,
+                    TbRecDetProTot = 0,
+                    TbRecDetProUde = udePro,
+
+                    // -----------------------------------------------------
+                    // ENTREGA
+                    // -----------------------------------------------------
+                    TbRecDetEntTot = 0,
+                    TbRecDetEntUde = udeEnt,
+
+                    // -----------------------------------------------------
+                    // SECTOR
+                    // -----------------------------------------------------
+                    TbRecDetSecCant = 0,
+                    TbRecDetSecStock = 0,
+                    TbRecDetSecTot = 0,
+
+                    // -----------------------------------------------------
+                    // DEVOLUCIÓN
+                    // -----------------------------------------------------
+                    TbRecDetDevCant = 0,
+
+                    // -----------------------------------------------------
+                    // OTROS
+                    // -----------------------------------------------------
+                    IbMatVol = 1,
+                    TbRecDetNum1 = 0,
+                    TbRecDetNum2 = detalle.TB_REC_DET_NUM_2,
+                    TbRecDetNum3 = detalle.TB_REC_DET_NUM_3,
+                    TbRecDetTxt3 = detalle.TB_REC_DET_TXT_3,
+                    TbRecDetDti1 = detalle.TB_REC_DET_DTI_1,
+
+                    // -----------------------------------------------------
+                    // STOCKS EXISTENTES
+                    // -----------------------------------------------------
                     TbRecDetEmpStock = detalle.TB_REC_DET_EMP_STOCK,
                     TbRecDetProStock = detalle.TB_REC_DET_PRO_STOCK,
                     TbRecDetLavStock = detalle.TB_REC_DET_LAV_STOCK,
@@ -71,23 +257,22 @@ namespace ConexionSql.Controllers
                     TbRecDetDecStock = detalle.TB_REC_DET_DEC_STOCK,
                     TbRecDetEntCant = detalle.TB_REC_DET_ENT_CANT,
 
-                    // 🔹 Estado (ID + Den)
-                    TbRecDetEstId = detalle.IB_EST_ID,
-                    TbRecDetEstDen = nombreEstado,
-
+                    // -----------------------------------------------------
+                    // DATOS DE SISTEMA
+                    // -----------------------------------------------------
                     TbRecDetPcLog = Environment.MachineName,
-                    TbRecDetPcUsr = Environment.UserName,
-                    TbRecFec = DateTime.Now,
-                    TbRecSecOriId = tbRec.TbRecSecOriId,
-                    TbRecSecOriDen = tbRec.TbRecSecOriDen,
-                    TbRecSecDesId = tbRec.TbRecSecDesId,
-                    TbRecSecDesDen = tbRec.TbRecSecDesDen
+                    TbRecDetPcUsr = Environment.UserName
                 };
 
+                // =========================================================
+                // PASO 6: GUARDAR
+                // =========================================================
                 _context.TbRecDet.Add(entidad);
                 await _context.SaveChangesAsync();
 
-                // Paso 4: Generar etiqueta ZPL
+                // =========================================================
+                // PASO 7: GENERAR ETIQUETA
+                // =========================================================
                 string zpl = Etiquetas.RecepcionDetalle(
                     material: nombreMaterial,
                     cantidad: detalle.TB_REC_DET_CANT,
@@ -99,7 +284,9 @@ namespace ConexionSql.Controllers
 
                 ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zpl);
 
-                // Paso 5: Obtener lista actualizada
+                // =========================================================
+                // PASO 8: RECARGAR LISTA
+                // =========================================================
                 var lista = await _context.TbRecDet
                     .Where(d => d.TbRecId == detalle.TB_REC_ID)
                     .Select(d => new TbRecDetDto
@@ -110,23 +297,35 @@ namespace ConexionSql.Controllers
                         TbRecDetMatDen = d.TbRecDetMatDen,
                         IB_EST_ID = d.TbRecDetEstId,
                         IB_EST_DEN = d.TbRecDetEstDen,
-                        TB_REC_DET_CANT = d.TbRecDetCant
+                        TB_REC_DET_CANT = d.TbRecDetCant,
+                        TB_REC_DET_NUM_2 = d.TbRecDetNum2,
+                        TB_REC_DET_NUM_3 = d.TbRecDetNum3,
+                        TB_REC_DET_TXT_3 = d.TbRecDetTxt3,
+                        TB_REC_DET_DTI_1 = d.TbRecDetDti1
                     })
                     .ToListAsync();
 
-                // Paso 6: Renderizar vista parcial
-                string html = await this.RenderViewToStringAsync("~/Views/Recepcion/_DetalleTabla.cshtml", lista, true);
+                // =========================================================
+                // PASO 9: RENDERIZAR TABLA
+                // =========================================================
+                string html = await this.RenderViewToStringAsync(
+                    "~/Views/Recepcion/_DetalleTabla.cshtml",
+                    lista,
+                    true
+                );
 
-                return Json(new { success = true, mensaje = "✅ Detalle agregado correctamente.", html });
+                return Json(new
+                {
+                    success = true,
+                    mensaje = "✅ Detalle agregado correctamente.",
+                    html
+                });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error al insertar detalle: {ex.Message}");
-                return Json(new { success = false, mensaje = "Error interno al insertar." });
+                Console.WriteLine($"❌ Error: {ex.Message}");
+                return Json(new { success = false, mensaje = "Error interno." });
             }
         }
-
-
-
     }
 }

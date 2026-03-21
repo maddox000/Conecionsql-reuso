@@ -1,0 +1,64 @@
+﻿/* 🔹 Subformulario detalle recepción */
+
+.rec-det-form {
+    margin-top: 16px !important;
+    margin-bottom: 16px !important;
+}
+
+.rec-det-fila {
+    display: flex !important;
+    gap: 14px !important;
+    align-items: flex-end !important;
+    flex-wrap: wrap !important;
+}
+
+.rec-det-campo {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+    .rec-det-campo label {
+        font-size: 14px !important;
+        margin-bottom: 6px !important;
+        font-weight: 600 !important;
+        line-height: 1.2 !important;
+    }
+
+    .rec-det-campo input,
+    .rec-det-campo select {
+        height: 42px !important;
+        min-height: 42px !important;
+        font-size: 15px !important;
+        padding: 8px 10px !important;
+    }
+
+.rec-det-codigo {
+    width: 180px !important;
+}
+
+.rec-det-material {
+    width: 320px !important;
+}
+
+.rec-det-reuso {
+    width: 200px !important;
+}
+
+.rec-det-revision {
+    width: 240px !important;
+}
+
+.rec-det-estado {
+    width: 240px !important;
+}
+
+.rec-det-cantidad {
+    width: 120px !important;
+}
+
+.rec-det-boton button {
+    height: 42px !important;
+    padding: 0 18px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+}

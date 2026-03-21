@@ -6,7 +6,6 @@
 @{
     ViewData["Title"] = "Nueva Recepción";
     var listaSectores = ViewBag.ListaSectores as List<IbSec>;
-
     var subFormModel = ViewBag.SubFormularioDetalle as TbRecDetFormDto;
 }
 
@@ -15,17 +14,34 @@
 <form asp-action="CrearRecepcion" method="post">
     @Html.AntiForgeryToken()
 
-    <div class="form-fila">
-        <!-- 👤 Usuario logueado -->
-        <div class="combo-form">
-            <label>Usuario:</label>
-            <input type="text" class="form-control" value="@ViewBag.UsuarioLogueado" readonly />
+    <!-- 🔹 FILA SUPERIOR: NÚMERO + FECHA + HORA -->
+    <div class="row mb-3">
+
+        <div class="col-md-2">
+            <label>Número recepción</label>
+            <input type="text" class="form-control"
+                   value="@(Model != null && Model.TbRecId > 0 ? Model.TbRecId.ToString() : "")"
+                   readonly />
         </div>
 
-        <!-- 🏭 Sector Origen / Destino -->
-        <div class="combo-form" style="margin-left: auto;">
-            <label for="TbRecSecOriId">Sector Origen:</label>
-            <select asp-for="TbRecSecOriId" class="form-control mb-2">
+        <div class="col-md-2">
+            <label>Fecha</label>
+            <input type="text" class="form-control"
+                   value="@(Model?.TbRecFec?.ToString("dd/MM/yyyy") ?? "")"
+                   readonly />
+        </div>
+
+        <div class="col-md-2">
+            <label>Hora</label>
+            <input type="text" class="form-control"
+                   value="@(Model?.TbRecHorIni?.ToString("HH:mm") ?? "")"
+                   readonly />
+        </div>
+
+        <!-- 🏭 Sectores a la derecha -->
+        <div class="col-md-3">
+            <label for="TbRecSecOriId">Sector Origen</label>
+            <select asp-for="TbRecSecOriId" class="form-control">
                 <option value="">-- Seleccione --</option>
                 @if (listaSectores != null)
                 {
@@ -35,8 +51,10 @@
                     }
                 }
             </select>
+        </div>
 
-            <label for="TbRecSecDesId">Sector Destino:</label>
+        <div class="col-md-3">
+            <label for="TbRecSecDesId">Sector Destino</label>
             <select asp-for="TbRecSecDesId" class="form-control">
                 <option value="">-- Seleccione --</option>
                 @if (listaSectores != null)
@@ -50,7 +68,26 @@
         </div>
     </div>
 
-    <button type="submit" class="btn btn-primary mt-4">Guardar Recepción</button>
+    <!-- 🔹 FILA 2: USUARIO + TOTAL -->
+    <div class="row mb-3">
+
+        <div class="col-md-4">
+            <label>Usuario</label>
+            <input type="text" class="form-control"
+                   value="@ViewBag.UsuarioLogueado"
+                   readonly />
+        </div>
+
+        <div class="col-md-2">
+            <label>Total recibido</label>
+            <input type="text" class="form-control"
+                   value="@(Model?.TbRecCantTot ?? 0)"
+                   readonly />
+        </div>
+
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Guardar Recepción</button>
 </form>
 
 @if (Model != null && Model.TbRecId > 0 && subFormModel != null)

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using ConexionSql.Data;
 using ConexionSql.Models.Recepciones;
 using ConexionSql.Models.IbPer;
@@ -49,10 +50,10 @@ namespace ConexionSql.Controllers.Recepcion
             // 👤 Traer usuario validado desde sesión
             var usuarioIdSesion = HttpContext.Session.GetString("UsuarioId");
 
-            if (!string.IsNullOrEmpty(usuarioIdSesion))
+            if (!string.IsNullOrEmpty(usuarioIdSesion) && int.TryParse(usuarioIdSesion, out int usuarioId))
             {
                 var usuario = _context.IbPers
-                    .FirstOrDefault(p => p.IbPerId == int.Parse(usuarioIdSesion));
+                    .FirstOrDefault(p => p.IbPerId == usuarioId);
 
                 if (usuario != null)
                 {
@@ -62,7 +63,7 @@ namespace ConexionSql.Controllers.Recepcion
             }
 
             // ⚠️ Esta vista espera un TbRec, no una lista
-            return View(new TbRec());
+            return View("~/Views/Recepcion/TbRecIndex.cshtml", new TbRec());
         }
 
         // ➕ GET: Nueva recepción
@@ -94,10 +95,10 @@ namespace ConexionSql.Controllers.Recepcion
             // 👤 Traer usuario validado desde sesión
             var usuarioIdSesion = HttpContext.Session.GetString("UsuarioId");
 
-            if (!string.IsNullOrEmpty(usuarioIdSesion))
+            if (!string.IsNullOrEmpty(usuarioIdSesion) && int.TryParse(usuarioIdSesion, out int usuarioId))
             {
                 var usuario = _context.IbPers
-                    .FirstOrDefault(p => p.IbPerId == int.Parse(usuarioIdSesion));
+                    .FirstOrDefault(p => p.IbPerId == usuarioId);
 
                 if (usuario != null)
                 {
@@ -106,7 +107,7 @@ namespace ConexionSql.Controllers.Recepcion
                 }
             }
 
-            return View(new TbRec());
+            return View("~/Views/Recepcion/CrearRecepcion.cshtml", new TbRec());
         }
 
         // 💾 POST: Guardar nueva recepción
@@ -116,67 +117,129 @@ namespace ConexionSql.Controllers.Recepcion
         {
             if (ModelState.IsValid)
             {
-                // 👤 Traer usuario desde sesión
+                // 👤 ==============================
+                // USUARIO DESDE SESIÓN
+                // ==============================
                 var usuarioIdSesion = HttpContext.Session.GetString("UsuarioId");
 
-                // 👉 Si existe en sesión, lo asignamos a la cabecera
-                if (!string.IsNullOrEmpty(usuarioIdSesion))
+                if (!string.IsNullOrEmpty(usuarioIdSesion) && int.TryParse(usuarioIdSesion, out int usuarioId))
                 {
-                    nuevaRecepcion.TbRecPerId = int.Parse(usuarioIdSesion);
+                    nuevaRecepcion.TbRecPerId = usuarioId;
                 }
 
-                // 🔄 Buscar datos completos del personal desde DB
-                var personal = !string.IsNullOrEmpty(usuarioIdSesion)
-                    ? _context.IbPers.FirstOrDefault(p => p.IbPerId == int.Parse(usuarioIdSesion))
+                // 🔄 Traer datos completos del personal
+                var personal = (!string.IsNullOrEmpty(usuarioIdSesion) && int.TryParse(usuarioIdSesion, out int usuarioIdPersonal))
+                    ? _context.IbPers.FirstOrDefault(p => p.IbPerId == usuarioIdPersonal)
                     : null;
 
-                // 🔄 Buscar sectores seleccionados
+                // 🔄 Traer sectores
                 var sectorOrigen = _context.IbSectores
                     .FirstOrDefault(s => s.IbSecId == nuevaRecepcion.TbRecSecOriId);
 
                 var sectorDestino = _context.IbSectores
                     .FirstOrDefault(s => s.IbSecId == nuevaRecepcion.TbRecSecDesId);
 
-                // 🕒 Datos automáticos
+                // 🕒 ==============================
+                // FECHA Y HORA
+                // ==============================
+                var ahora = DateTime.Now;
+
+                // Fecha real
                 nuevaRecepcion.TbRecFec = DateTime.Today;
+
+                // Hora tipo Access (base 1899)
+                nuevaRecepcion.TbRecHorIni = new DateTime(1899, 12, 30, ahora.Hour, ahora.Minute, ahora.Second);
+
+                // Horario fin se completa después
+                nuevaRecepcion.TbRecHorFin = null;
+
+                // 💻 Datos de máquina
                 nuevaRecepcion.TbRecPcLog = Environment.MachineName;
                 nuevaRecepcion.TbRecPcUsr = User.Identity?.Name ?? "Usuario";
 
-                // 👤 Completar datos del usuario logueado en TB_REC
+                // 👤 ==============================
+                // DATOS DEL PERSONAL
+                // ==============================
                 if (personal != null)
                 {
                     nuevaRecepcion.TbRecPerNom = $"{personal.IbPerApe}, {personal.IbPerNom}";
                     nuevaRecepcion.TbRecPerCarId = personal.IbPerCarId;
                     nuevaRecepcion.TbRecPerCarDen = personal.IbPerCarDen;
 
-                    // 🔁 También lo devolvemos a la vista
                     ViewBag.UsuarioId = personal.IbPerId;
                     ViewBag.UsuarioLogueado = $"{personal.IbPerApe}, {personal.IbPerNom}";
                 }
 
-                // 🏭 Completar nombres de sectores
+                // 🏭 ==============================
+                // SECTORES
+                // ==============================
                 if (sectorOrigen != null)
                     nuevaRecepcion.TbRecSecOriDen = sectorOrigen.IbSecDen;
 
                 if (sectorDestino != null)
                     nuevaRecepcion.TbRecSecDesDen = sectorDestino.IbSecDen;
 
-                // 💾 Guardar cabecera en TB_REC
+                // 🔴 ==============================
+                // CAMPOS FIJOS / DEFAULT SISTEMA
+                // ==============================
+
+                nuevaRecepcion.TbRecOrtId = 1;
+                nuevaRecepcion.TbRecOrtDen = "NO REGISTRA";
+
+                nuevaRecepcion.TbRecSecPer = "NO REGISTRADO";
+
+                if (string.IsNullOrEmpty(nuevaRecepcion.TbRecObs))
+                    nuevaRecepcion.TbRecObs = "";
+
+                nuevaRecepcion.TbRecCantTot = 0;
+
+                nuevaRecepcion.TbRecNum1 = 1;
+                nuevaRecepcion.TbRecNum2 = 2;
+                nuevaRecepcion.TbRecNum3 = 3;
+
+                nuevaRecepcion.TbRecTxt1 = "NO REGISTRADO";
+                nuevaRecepcion.TbRecTxt2 = "TXT";
+                nuevaRecepcion.TbRecTxt3 = "TXT";
+
+                nuevaRecepcion.TbRecMem1 = "MEM";
+                nuevaRecepcion.TbRecMem2 = "MEM";
+                nuevaRecepcion.TbRecMem3 = "MEM";
+
+                nuevaRecepcion.TbRecCliId = 0;
+                nuevaRecepcion.TbRecCliDen = "NO REGISTRADO";
+
+                // 💾 ==============================
+                // GUARDAR CABECERA
+                // ==============================
                 _context.TbRec.Add(nuevaRecepcion);
                 _context.SaveChanges();
 
                 TempData["MensajeExito"] = "Recepción guardada correctamente.";
 
-                // 🔽 Cargar materiales para el subformulario
+                // 📦 ==============================
+                // CARGAR SUBFORMULARIO DETALLE
+                // ==============================
                 var materiales = _context.IbMat
                     .Select(m => new IbMatDto
                     {
                         IbMatId = m.IB_MAT_ID,
-                        IbMatDen = m.IB_MAT_DEN
+                        IbMatDen = m.IB_MAT_DEN,
+                        IbMatMarDen = m.IB_MAT_MAR_DEN,
+                        IbMatProDen = m.IB_MAT_PRO_DEN,
+                        IbMatMtiDen = m.IB_MAT_MTI_DEN
                     })
                     .ToList();
 
-                // 🔽 Cargar estados
+                var revisiones = _context.IbMatRevisiones
+                    .Where(r => !r.IbMatRevOcu)
+                    .OrderBy(r => r.IbMatRevDen)
+                    .Select(r => new IbMatRevDto
+                    {
+                        IbMatRevId = r.IbMatRevId,
+                        IbMatRevDen = r.IbMatRevDen
+                    })
+                    .ToList();
+
                 var estados = _context.IbEst
                     .OrderBy(e => e.IbEstDen)
                     .Select(e => new IbEstDto
@@ -186,7 +249,6 @@ namespace ConexionSql.Controllers.Recepcion
                     })
                     .ToList();
 
-                // 🧾 Preparar subformulario de detalle
                 ViewBag.SubFormularioDetalle = new TbRecDetFormDto
                 {
                     Detalle = new TbRecDetDto
@@ -194,13 +256,16 @@ namespace ConexionSql.Controllers.Recepcion
                         TB_REC_ID = nuevaRecepcion.TbRecId
                     },
                     Materiales = materiales,
+                    Revisiones = revisiones,
                     Estados = estados
                 };
 
                 ViewBag.Detalles = new List<TbRecDetDto>();
             }
 
-            // 🔁 Recargar listas para redibujar la vista
+            // 🔁 ==============================
+            // RECARGA DE LISTAS
+            // ==============================
             ViewBag.ListaPersonal = _context.IbPers
                 .OrderBy(p => p.IbPerApe)
                 .ThenBy(p => p.IbPerNom)
@@ -218,15 +283,17 @@ namespace ConexionSql.Controllers.Recepcion
                 .OrderBy(s => s.IbSecDen)
                 .ToList();
 
-            // 👤 Si todavía no se cargó el nombre, volver a traerlo
+            // 👤 ==============================
+            // RECUPERAR USUARIO SI NO VIENE
+            // ==============================
             if (ViewBag.UsuarioLogueado == null)
             {
                 var usuarioIdSesion = HttpContext.Session.GetString("UsuarioId");
 
-                if (!string.IsNullOrEmpty(usuarioIdSesion))
+                if (!string.IsNullOrEmpty(usuarioIdSesion) && int.TryParse(usuarioIdSesion, out int usuarioId))
                 {
                     var usuario = _context.IbPers
-                        .FirstOrDefault(p => p.IbPerId == int.Parse(usuarioIdSesion));
+                        .FirstOrDefault(p => p.IbPerId == usuarioId);
 
                     if (usuario != null)
                     {
@@ -236,7 +303,7 @@ namespace ConexionSql.Controllers.Recepcion
                 }
             }
 
-            return View(nuevaRecepcion);
+            return View("~/Views/Recepcion/CrearRecepcion.cshtml", nuevaRecepcion);
         }
     }
 }

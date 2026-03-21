@@ -4,39 +4,83 @@
 <div class="subform-recepcion">
     <h4>Agregar Detalle de Material</h4>
 
-    <!-- 📝 Formulario de ingreso de detalle -->
-    <form id="formDetalle">
-        <!-- 🔽 Combo de selección de material -->
-        <div class="form-group">
-            <label for="IB_MAT_ID">Material</label>
-            <select asp-for="Detalle.IB_MAT_ID"
-                    asp-items="@(new SelectList(Model.Materiales, "IbMatId", "IbMatDen"))"
-                    class="form-control">
-                <option value="">Seleccione un material</option>
-            </select>
+    <!-- 📝 Formulario principal del detalle -->
+    <form id="formDetalle" class="rec-det-form">
+
+        <!-- 🔹 Fila compacta del detalle -->
+        <div class="rec-det-fila">
+
+            <!-- 🔢 Código de producto -->
+            <div class="rec-det-campo rec-det-codigo">
+                <label for="TB_REC_DET_MAT_PR">Código Producto</label>
+                <input asp-for="Detalle.TB_REC_DET_MAT_PR"
+                       id="TB_REC_DET_MAT_PR"
+                       class="form-control" />
+            </div>
+
+            <!-- 🔽 Material -->
+            <div class="rec-det-campo rec-det-material">
+                <label for="IB_MAT_ID">Material</label>
+                <select asp-for="Detalle.IB_MAT_ID"
+                        asp-items="@(new SelectList(Model.Materiales, "IbMatId", "IbMatDen"))"
+                        class="form-control"
+                        id="IB_MAT_ID">
+                    <option value="">Seleccione un material</option>
+                </select>
+            </div>
+
+            <!-- 🔁 Código de reuso -->
+            <div class="rec-det-campo rec-det-reuso">
+                <label for="TB_REC_DET_REU_ID">Código Reuso</label>
+                <input asp-for="Detalle.TB_REC_DET_REU_ID"
+                       id="TB_REC_DET_REU_ID"
+                       class="form-control"
+                       readonly />
+            </div>
+
+            <!-- 🔽 Revisión -->
+            <div class="rec-det-campo rec-det-revision">
+                <label for="TB_REC_DET_REP_ID">Revisión</label>
+                <select asp-for="Detalle.TB_REC_DET_REP_ID"
+                        asp-items="@(new SelectList(Model.Revisiones, "IbMatRevId", "IbMatRevDen"))"
+                        class="form-control"
+                        id="TB_REC_DET_REP_ID">
+                    <option value="">Seleccione</option>
+                </select>
+            </div>
+
+            <!-- 🔽 Estado -->
+            <div class="rec-det-campo rec-det-estado">
+                <label for="IB_EST_ID">Estado</label>
+                <select asp-for="Detalle.IB_EST_ID"
+                        asp-items="@(new SelectList(Model.Estados, "IbEstId", "IbEstDen"))"
+                        class="form-control"
+                        id="IB_EST_ID">
+                    <option value="">Seleccione un estado</option>
+                </select>
+            </div>
+
+            <!-- 🔢 Cantidad -->
+            <div class="rec-det-campo rec-det-cantidad">
+                <label for="TB_REC_DET_CANT">Cantidad</label>
+                <input asp-for="Detalle.TB_REC_DET_CANT"
+                       id="TB_REC_DET_CANT"
+                       class="form-control"
+                       min="1"
+                       type="number" />
+            </div>
+
+            <!-- 💾 Botón Guardar -->
+            <div class="rec-det-campo rec-det-boton">
+                <label>&nbsp;</label>
+                <button type="button" id="btnGuardar" class="btn btn-primary">Guardar</button>
+            </div>
         </div>
 
-        <!-- 🔽 Combo de estado -->
-        <div class="form-group mt-2">
-            <label for="IB_EST_ID">Estado</label>
-            <select asp-for="Detalle.IB_EST_ID"
-                    asp-items="@(new SelectList(Model.Estados, "IbEstId", "IbEstDen"))"
-                    class="form-control"
-                    id="IB_EST_ID">
-                <option value="">Seleccione un estado</option>
-            </select>
-        </div>
-
-        <!-- 🔢 Campo para ingresar la cantidad -->
-        <div class="form-group mt-2">
-            <label for="TB_REC_DET_CANT">Cantidad</label>
-            <input asp-for="Detalle.TB_REC_DET_CANT" id="TB_REC_DET_CANT" class="form-control" min="1" type="number" />
-        </div>
-
-        <!-- 🆔 Campo oculto con el ID de la cabecera de recepción -->
+        <!-- 🆔 ID de la cabecera -->
         <input asp-for="Detalle.TB_REC_ID" type="hidden" />
 
-        <!-- 📦 Campos ocultos para los diferentes tipos de stock -->
+        <!-- 📦 Campos ocultos de stock -->
         <input asp-for="Detalle.TB_REC_DET_EMP_STOCK" id="TB_REC_DET_EMP_STOCK" type="hidden" />
         <input asp-for="Detalle.TB_REC_DET_PRO_STOCK" id="TB_REC_DET_PRO_STOCK" type="hidden" />
         <input asp-for="Detalle.TB_REC_DET_LAV_STOCK" id="TB_REC_DET_LAV_STOCK" type="hidden" />
@@ -44,53 +88,136 @@
         <input asp-for="Detalle.TB_REC_DET_DEC_STOCK" id="TB_REC_DET_DEC_STOCK" type="hidden" />
         <input asp-for="Detalle.TB_REC_DET_ENT_CANT" id="TB_REC_DET_ENT_CANT" type="hidden" />
 
-        <!-- 💾 Botón para guardar el detalle -->
-        <div class="form-group mt-3">
-            <button type="button" id="btnGuardar" class="btn btn-primary">Guardar</button>
-        </div>
+        <!-- 📦 Campos ocultos de revisión/modal -->
+        <input asp-for="Detalle.TB_REC_DET_NUM_2" id="TB_REC_DET_NUM_2" type="hidden" />
+        <input asp-for="Detalle.TB_REC_DET_NUM_3" id="TB_REC_DET_NUM_3" type="hidden" />
+        <input asp-for="Detalle.TB_REC_DET_TXT_3" id="TB_REC_DET_TXT_3" type="hidden" />
+        <input asp-for="Detalle.TB_REC_DET_DTI_1" id="TB_REC_DET_DTI_1" type="hidden" />
     </form>
 
-    <!-- 💬 Área de mensajes de estado -->
+    <!-- 💬 Mensaje de estado -->
     <div id="mensaje" class="mt-3 text-success"></div>
 </div>
 
-<!-- 📋 Tabla de detalles ya cargados -->
+<!-- 📋 Tabla de detalles cargados -->
 <div id="contenedor-detalles" class="mt-4">
     @await Html.PartialAsync("_DetalleTabla", ViewBag.Detalles as List<ConexionSql.Models.Recepciones.TbRecDetDto>)
 </div>
 
+@await Html.PartialAsync("Modals/_ModalRevision")
 
-
-<!-- 📡 Script para copiar cantidad si el estado es 'Esterilizado' -->
-<!-- 📡 Script para copiar cantidad si el estado es 'Esterilizado' -->
-<!-- 📡 Script para copiar cantidad a stock según estado y enviar correctamente -->
-<!-- 📡 Script para copiar cantidad según estado -->
+<!-- 📡 Script del subformulario -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        // 🔹 Referencias a controles
+        const form = document.getElementById("formDetalle");
+        const msj = document.getElementById("mensaje");
+
         const estadoSelect = document.getElementById("IB_EST_ID");
         const cantidadInput = document.getElementById("TB_REC_DET_CANT");
+        const revisionSelect = document.getElementById("TB_REC_DET_REP_ID");
+        const btnGuardar = document.getElementById("btnGuardar");
 
         const stockEmpInput = document.getElementById("TB_REC_DET_EMP_STOCK");
         const stockProInput = document.getElementById("TB_REC_DET_PRO_STOCK");
         const stockLavInput = document.getElementById("TB_REC_DET_LAV_STOCK");
         const stockEntInput = document.getElementById("TB_REC_DET_ENT_STOCK");
-        const stockDecInput = document.getElementById("TB_REC_DET_DEC_STOCK"); // ⬅️ nuevo
+        const stockDecInput = document.getElementById("TB_REC_DET_DEC_STOCK");
 
+        // 🔹 Referencias del modal
+        const modalElement = document.getElementById("modalRevision");
+        const modalCantidad = document.getElementById("modalCantidad");
+        const modalFaltantes = document.getElementById("modalFaltantes");
+        const grupoFaltantes = document.getElementById("grupoFaltantes");
+        const btnAceptarModal = document.getElementById("btnAceptarModal");
+        const mensajeModalRevision = document.getElementById("mensajeModalRevision");
+
+        const modalRevision = new bootstrap.Modal(modalElement);
+
+        // 🔹 Hidden de revisión/modal
+        const hiddenNum2 = document.getElementById("TB_REC_DET_NUM_2");
+        const hiddenNum3 = document.getElementById("TB_REC_DET_NUM_3");
+        const hiddenTxt3 = document.getElementById("TB_REC_DET_TXT_3");
+        const hiddenDti1 = document.getElementById("TB_REC_DET_DTI_1");
+
+        function limpiarModalRevision() {
+            modalCantidad.value = "";
+            modalFaltantes.value = "";
+            grupoFaltantes.style.display = "none";
+            mensajeModalRevision.innerText = "";
+
+            hiddenNum2.value = "";
+            hiddenNum3.value = "";
+            hiddenTxt3.value = "";
+            hiddenDti1.value = "";
+        }
+
+        // 🔹 Abrir/cerrar modal según revisión
+        revisionSelect.addEventListener("change", function () {
+            const revisionId = parseInt(this.value) || 0;
+
+            if (revisionId === 2) {
+                limpiarModalRevision();
+                grupoFaltantes.style.display = "none";
+                modalRevision.show();
+            }
+            else if (revisionId === 3) {
+                limpiarModalRevision();
+                grupoFaltantes.style.display = "block";
+                modalRevision.show();
+            }
+            else {
+                limpiarModalRevision();
+                modalRevision.hide();
+            }
+        });
+
+        // 🔹 Guardar datos del modal en hidden
+            btnAceptarModal.addEventListener("click", function () {
+        const revisionId = parseInt(revisionSelect.value) || 0;
+        const revisionTexto = revisionSelect.options[revisionSelect.selectedIndex]?.text || "";
+        const cantidadModal = parseInt(modalCantidad.value) || 0;
+        const faltantes = modalFaltantes.value || "";
+
+        mensajeModalRevision.innerText = "";
+
+        if (!cantidadModal || cantidadModal < 1) {
+            mensajeModalRevision.innerText = "Ingresá una cantidad válida.";
+            return;
+        }
+
+        // 👇 VALIDACIÓN SOLO PARA INCOMPLETO
+        if (revisionId === 3 && faltantes.trim() === "") {
+            mensajeModalRevision.innerText = "Ingresá los faltantes.";
+            return;
+        }
+
+        hiddenNum2.value = cantidadModal;
+        hiddenNum3.value = revisionId;
+
+        // 👇 CLAVE
+        if (revisionId === 3) {
+            hiddenTxt3.value = faltantes; // INCOMPLETO
+        } else {
+            hiddenTxt3.value = revisionTexto; // COMPLETO u otros
+        }
+
+        hiddenDti1.value = new Date().toISOString();
+
+        modalRevision.hide();
+    });
+
+        // 🔹 Función para asignar stock según estado
         function aplicarSwitchDeStock() {
-            const estadoId = parseInt(estadoSelect.value);
+            const estadoId = parseInt(estadoSelect.value) || 0;
             const cantidad = parseInt(cantidadInput.value) || 0;
 
-            console.log("Estado seleccionado (ID):", estadoId);
-            console.log("Cantidad ingresada:", cantidad);
-
-            // Resetear todos los stocks a 0
             stockEmpInput.value = 0;
             stockProInput.value = 0;
             stockLavInput.value = 0;
             stockEntInput.value = 0;
             stockDecInput.value = 0;
 
-            // Asignar cantidad al stock correspondiente según el estado
             switch (estadoId) {
                 case 1:  // LAVADO
                 case 11: // LAVADO + DECONTAMINADO
@@ -119,38 +246,36 @@
                 case 14: // PREPARACIONES ASEPTICAS
                     stockEntInput.value = cantidad;
                     break;
-
-                default:
-                    console.log("Estado no contemplado en el switch.");
-                    break;
             }
         }
 
-        // Aplicar lógica al cambiar cantidad o estado
         cantidadInput.addEventListener("input", aplicarSwitchDeStock);
         estadoSelect.addEventListener("change", aplicarSwitchDeStock);
 
-        // Guardar
-        document.getElementById("btnGuardar").addEventListener("click", function () {
-            const form = document.getElementById("formDetalle");
+        // 🔹 Botón Guardar
+        btnGuardar.addEventListener("click", function () {
             const formData = new FormData(form);
 
             const data = {
-                TB_REC_ID: parseInt(formData.get("Detalle.TB_REC_ID")),
-                IB_MAT_ID: parseInt(formData.get("Detalle.IB_MAT_ID")),
-                TB_REC_DET_CANT: parseInt(formData.get("Detalle.TB_REC_DET_CANT")),
-                IB_EST_ID: parseInt(formData.get("Detalle.IB_EST_ID")),
+                TB_REC_ID: parseInt(formData.get("Detalle.TB_REC_ID")) || 0,
+                IB_MAT_ID: parseInt(formData.get("Detalle.IB_MAT_ID")) || 0,
+                TB_REC_DET_MAT_PR: formData.get("Detalle.TB_REC_DET_MAT_PR"),
+                TB_REC_DET_REU_ID: formData.get("Detalle.TB_REC_DET_REU_ID"),
+                TB_REC_DET_REP_ID: parseInt(formData.get("Detalle.TB_REC_DET_REP_ID")) || 0,
+                TB_REC_DET_CANT: parseInt(formData.get("Detalle.TB_REC_DET_CANT")) || 0,
+                IB_EST_ID: parseInt(formData.get("Detalle.IB_EST_ID")) || 0,
+
+                TB_REC_DET_NUM_2: parseInt(formData.get("Detalle.TB_REC_DET_NUM_2")) || 0,
+                TB_REC_DET_NUM_3: parseInt(formData.get("Detalle.TB_REC_DET_NUM_3")) || 0,
+                TB_REC_DET_TXT_3: formData.get("Detalle.TB_REC_DET_TXT_3"),
+                TB_REC_DET_DTI_1: formData.get("Detalle.TB_REC_DET_DTI_1"),
 
                 TB_REC_DET_EMP_STOCK: parseInt(stockEmpInput.value) || 0,
                 TB_REC_DET_PRO_STOCK: parseInt(stockProInput.value) || 0,
                 TB_REC_DET_LAV_STOCK: parseInt(stockLavInput.value) || 0,
                 TB_REC_DET_ENT_STOCK: parseInt(stockEntInput.value) || 0,
-                TB_REC_DET_DEC_STOCK: parseInt(stockDecInput.value) || 0  // ⬅️ nuevo
+                TB_REC_DET_DEC_STOCK: parseInt(stockDecInput.value) || 0
             };
-
-            console.log("Datos enviados:", data);
-
-            const msj = document.getElementById("mensaje");
 
             if (!data.TB_REC_ID || !data.IB_MAT_ID || !data.TB_REC_DET_CANT || data.TB_REC_DET_CANT < 1 || !data.IB_EST_ID) {
                 msj.innerText = "❌ Todos los campos son obligatorios.";
@@ -175,6 +300,14 @@
 
                     form.reset();
 
+                    stockEmpInput.value = 0;
+                    stockProInput.value = 0;
+                    stockLavInput.value = 0;
+                    stockEntInput.value = 0;
+                    stockDecInput.value = 0;
+
+                    limpiarModalRevision();
+
                     const contenedor = document.getElementById("contenedor-detalles");
                     if (contenedor) {
                         contenedor.innerHTML = result.html;
@@ -193,7 +326,3 @@
         });
     });
 </script>
-
-
-
-
