@@ -1,4 +1,5 @@
-﻿using ConexionSql.Models.Acondicionado;
+﻿using ConexionSql.Models.A_PAN_OPC;
+using ConexionSql.Models.Acondicionado;
 using ConexionSql.Models.Entrega;
 using ConexionSql.Models.Equipos;
 using ConexionSql.Models.Estados;
@@ -10,7 +11,6 @@ using ConexionSql.Models.Recepciones;
 using ConexionSql.Models.Reuso;
 using ConexionSql.Models.Sectores;
 using Microsoft.EntityFrameworkCore;
-using ConexionSql.Models.Reuso;
 
 
 namespace ConexionSql.Data
@@ -49,6 +49,7 @@ namespace ConexionSql.Data
         public DbSet<IbMatEti> IbMatEti { get; set; }
 
         public DbSet<TbReu> TbReu { get; set; }
+        public DbSet<APanOpc> APanOpc { get; set; }
 
 
 

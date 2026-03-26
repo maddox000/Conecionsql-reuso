@@ -1,16 +1,11 @@
 ﻿@model ConexionSql.Models.Recepciones.TbRecDetFormDto
 
-<!-- 📦 Subformulario de carga de detalle de materiales -->
 <div class="subform-recepcion">
     <h4>Agregar Detalle de Material</h4>
 
-    <!-- 📝 Formulario principal del detalle -->
     <form id="formDetalle" class="rec-det-form">
-
-        <!-- 🔹 Fila compacta del detalle -->
         <div class="rec-det-fila">
 
-            <!-- 🔢 Código de producto -->
             <div class="rec-det-campo rec-det-codigo">
                 <label for="TB_REC_DET_MAT_PR">Código Producto</label>
                 <input asp-for="Detalle.TB_REC_DET_MAT_PR"
@@ -18,7 +13,6 @@
                        class="form-control" />
             </div>
 
-            <!-- 🔽 Material -->
             <div class="rec-det-campo rec-det-material">
                 <label for="IB_MAT_ID">Material</label>
                 <select asp-for="Detalle.IB_MAT_ID"
@@ -29,16 +23,13 @@
                 </select>
             </div>
 
-            <!-- 🔁 Código de reuso -->
             <div class="rec-det-campo rec-det-reuso">
-                <label for="TB_REC_DET_REU_ID">Código Reuso</label>
-                <input asp-for="Detalle.TB_REC_DET_REU_ID"
-                       id="TB_REC_DET_REU_ID"
+                <label for="TB_REC_DET_REU_ID_VISIBLE">Código Reuso</label>
+                <input id="TB_REC_DET_REU_ID_VISIBLE"
                        class="form-control"
-                       readonly />
+                       value="1" />
             </div>
 
-            <!-- 🔽 Revisión -->
             <div class="rec-det-campo rec-det-revision">
                 <label for="TB_REC_DET_REP_ID">Revisión</label>
                 <select asp-for="Detalle.TB_REC_DET_REP_ID"
@@ -49,7 +40,6 @@
                 </select>
             </div>
 
-            <!-- 🔽 Estado -->
             <div class="rec-det-campo rec-det-estado">
                 <label for="IB_EST_ID">Estado</label>
                 <select asp-for="Detalle.IB_EST_ID"
@@ -60,7 +50,6 @@
                 </select>
             </div>
 
-            <!-- 🔢 Cantidad -->
             <div class="rec-det-campo rec-det-cantidad">
                 <label for="TB_REC_DET_CANT">Cantidad</label>
                 <input asp-for="Detalle.TB_REC_DET_CANT"
@@ -70,17 +59,22 @@
                        type="number" />
             </div>
 
-            <!-- 💾 Botón Guardar -->
+            <div class="rec-det-campo" style="display:none;">
+                <label for="TB_REC_DET_VOL">Volumen</label>
+                <input asp-for="Detalle.TB_REC_DET_VOL"
+                       id="TB_REC_DET_VOL"
+                       class="form-control"
+                       readonly />
+            </div>
+
             <div class="rec-det-campo rec-det-boton">
                 <label>&nbsp;</label>
                 <button type="button" id="btnGuardar" class="btn btn-primary">Guardar</button>
             </div>
         </div>
 
-        <!-- 🆔 ID de la cabecera -->
         <input asp-for="Detalle.TB_REC_ID" type="hidden" />
 
-        <!-- 📦 Campos ocultos de stock -->
         <input asp-for="Detalle.TB_REC_DET_EMP_STOCK" id="TB_REC_DET_EMP_STOCK" type="hidden" />
         <input asp-for="Detalle.TB_REC_DET_PRO_STOCK" id="TB_REC_DET_PRO_STOCK" type="hidden" />
         <input asp-for="Detalle.TB_REC_DET_LAV_STOCK" id="TB_REC_DET_LAV_STOCK" type="hidden" />
@@ -88,28 +82,30 @@
         <input asp-for="Detalle.TB_REC_DET_DEC_STOCK" id="TB_REC_DET_DEC_STOCK" type="hidden" />
         <input asp-for="Detalle.TB_REC_DET_ENT_CANT" id="TB_REC_DET_ENT_CANT" type="hidden" />
 
-        <!-- 📦 Campos ocultos de revisión/modal -->
         <input asp-for="Detalle.TB_REC_DET_NUM_2" id="TB_REC_DET_NUM_2" type="hidden" />
         <input asp-for="Detalle.TB_REC_DET_NUM_3" id="TB_REC_DET_NUM_3" type="hidden" />
         <input asp-for="Detalle.TB_REC_DET_TXT_3" id="TB_REC_DET_TXT_3" type="hidden" />
         <input asp-for="Detalle.TB_REC_DET_DTI_1" id="TB_REC_DET_DTI_1" type="hidden" />
+        <input asp-for="Detalle.TB_REC_DET_MEM_1" id="TB_REC_DET_MEM_1" type="hidden" />
+
+        <input asp-for="Detalle.TbRecDetMatId" id="TB_REC_DET_MAT_ID" type="hidden" />
+        <input asp-for="Detalle.TB_REC_DET_REU_ID" id="TB_REC_DET_REU_ID" type="hidden" />
     </form>
 
-    <!-- 💬 Mensaje de estado -->
     <div id="mensaje" class="mt-3 text-success"></div>
 </div>
 
-<!-- 📋 Tabla de detalles cargados -->
 <div id="contenedor-detalles" class="mt-4">
     @await Html.PartialAsync("_DetalleTabla", ViewBag.Detalles as List<ConexionSql.Models.Recepciones.TbRecDetDto>)
 </div>
 
 @await Html.PartialAsync("Modals/_ModalRevision")
+@await Html.PartialAsync("Modals/_ModalRegistroControlArmado")
+@await Html.PartialAsync("~/Views/Recepcion/Modals/_modalPrioridadProceso.cshtml")
+@await Html.PartialAsync("Modals/_modalControlReuso")
 
-<!-- 📡 Script del subformulario -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // 🔹 Referencias a controles
         const form = document.getElementById("formDetalle");
         const msj = document.getElementById("mensaje");
 
@@ -124,7 +120,6 @@
         const stockEntInput = document.getElementById("TB_REC_DET_ENT_STOCK");
         const stockDecInput = document.getElementById("TB_REC_DET_DEC_STOCK");
 
-        // 🔹 Referencias del modal
         const modalElement = document.getElementById("modalRevision");
         const modalCantidad = document.getElementById("modalCantidad");
         const modalFaltantes = document.getElementById("modalFaltantes");
@@ -132,214 +127,824 @@
         const btnAceptarModal = document.getElementById("btnAceptarModal");
         const mensajeModalRevision = document.getElementById("mensajeModalRevision");
 
-        const modalRevision = new bootstrap.Modal(modalElement);
+        const modalRevision = modalElement ? new bootstrap.Modal(modalElement) : null;
 
-        // 🔹 Hidden de revisión/modal
         const hiddenNum2 = document.getElementById("TB_REC_DET_NUM_2");
         const hiddenNum3 = document.getElementById("TB_REC_DET_NUM_3");
         const hiddenTxt3 = document.getElementById("TB_REC_DET_TXT_3");
+        const hiddenMem1 = document.getElementById("TB_REC_DET_MEM_1");
         const hiddenDti1 = document.getElementById("TB_REC_DET_DTI_1");
 
-        // 🔹 Limpiar el 0 inicial de cantidad
-        if (cantidadInput && cantidadInput.value === "0") {
-            cantidadInput.value = "";
-        }
+        const codigoProductoInput = document.getElementById("TB_REC_DET_MAT_PR");
+        const comboMaterial = document.getElementById("IB_MAT_ID");
+        const hiddenMatId = document.getElementById("TB_REC_DET_MAT_ID");
+        const hiddenReuId = document.getElementById("TB_REC_DET_REU_ID");
+        const inputVol = document.getElementById("TB_REC_DET_VOL");
+        const inputReuVisible = document.getElementById("TB_REC_DET_REU_ID_VISIBLE");
+        const entCantInput = document.getElementById("TB_REC_DET_ENT_CANT");
 
-        // 🔹 Si al entrar al campo hay 0, lo limpia
-        cantidadInput.addEventListener("focus", function () {
-            if (this.value === "0") {
-                this.value = "";
+        const modalRegistroControlArmadoElement = document.getElementById("modalRegistroControlArmado");
+        const modalRegistroControlArmado = modalRegistroControlArmadoElement
+            ? bootstrap.Modal.getOrCreateInstance(modalRegistroControlArmadoElement)
+            : null;
+
+        const btnAceptarRegistroControlArmado = document.getElementById("btnAceptarRegistroControlArmado");
+        const btnContenidoRegistroControlArmado = document.getElementById("btnContenidoRegistroControlArmado");
+
+        const rcaIvisOpc = document.getElementById("RCA_IVIS_OPC");
+        const rcaIvisOpcNom = document.getElementById("RCA_IVIS_OPC_NOM");
+
+        const rcaAcajOpc = document.getElementById("RCA_ACAJ_OPC");
+        const rcaAcajOpcNom = document.getElementById("RCA_ACAJ_OPC_NOM");
+
+        const rcaAcajRev = document.getElementById("RCA_ACAJ_REV");
+        const rcaAcajCant = document.getElementById("RCA_ACAJ_CANT");
+        const rcaAcajFalt = document.getElementById("RCA_ACAJ_FALT");
+
+        const modalPrioridadProcesoElement = document.getElementById("modalPrioridadProceso");
+        const modalPrioridadProceso = modalPrioridadProcesoElement
+            ? new bootstrap.Modal(modalPrioridadProcesoElement)
+            : null;
+
+        const btnPrioridadSi = document.getElementById("btnPrioridadSi");
+        const btnPrioridadNo = document.getElementById("btnPrioridadNo");
+
+        let ejecutandoGuardado = false;
+        let vieneDeReuso = false;
+        let requiereControlAdicional = false;
+        let modalControlCompleto = false;
+        let datosControlAdicional = null;
+        let resolverPrioridadProceso = null;
+
+                if (inputReuVisible) {
+        inputReuVisible.addEventListener("keydown", async function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+
+                const codigo = this.value.trim();
+                if (!codigo) return;
+
+                if (hiddenReuId) {
+                    hiddenReuId.value = codigo;
+                }
+
+                try {
+                    const response = await fetch("/TbRecDet/ValidarCodigoReuso", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            TB_REC_ID: parseInt(document.getElementById("Detalle_TB_REC_ID")?.value) || 0,
+                            TB_REC_DET_REU_ID: codigo,
+                            TbRecDetEstId: parseInt(estadoSelect?.value) || 0
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (!result.ok) {
+                        mostrarError(result.mensaje || "Error al validar reuso");
+                        return;
+                    }
+
+                    if (comboMaterial) {
+                        comboMaterial.value = String(result.ibMatId);
+                        comboMaterial.dispatchEvent(new Event("change", { bubbles: true }));
+                        console.log("valor combo después:", comboMaterial.value);
+                    }
+
+                    if (hiddenMatId) {
+                        hiddenMatId.value = result.ibMatId ?? "";
+                    }
+
+                    if (codigoProductoInput) {
+                        codigoProductoInput.value = result.ibMatId ?? "";
+                    }
+
+
+                    mostrarOk(result.mensaje || "Reuso encontrado correctamente.");
+                    console.log("Respuesta reuso:", result);
+
+                } catch (error) {
+                    console.error("Error al validar reuso:", error);
+                }
             }
         });
+    }
+
+
+        function limpiarMensaje() {
+            if (!msj) return;
+            msj.innerText = "";
+        }
+
+        function mostrarError(texto) {
+            if (!msj) return;
+            msj.innerText = texto;
+            msj.classList.remove("text-success");
+            msj.classList.add("text-danger");
+        }
+
+        function mostrarOk(texto) {
+            if (!msj) return;
+            msj.innerText = texto;
+            msj.classList.remove("text-danger");
+            msj.classList.add("text-success");
+        }
 
         function limpiarModalRevision() {
-            modalCantidad.value = "";
-            modalFaltantes.value = "";
-            grupoFaltantes.style.display = "none";
-            mensajeModalRevision.innerText = "";
+            if (modalCantidad) modalCantidad.value = "";
+            if (modalFaltantes) modalFaltantes.value = "";
+            if (grupoFaltantes) grupoFaltantes.style.display = "none";
+            if (mensajeModalRevision) mensajeModalRevision.innerText = "";
 
-            hiddenNum2.value = "";
-            hiddenNum3.value = "";
-            hiddenTxt3.value = "";
-            hiddenDti1.value = "";
+            if (hiddenNum2) hiddenNum2.value = "";
+            if (hiddenNum3) hiddenNum3.value = "";
+            if (hiddenTxt3) hiddenTxt3.value = "";
+            if (hiddenMem1) hiddenMem1.value = "";
+            if (hiddenDti1) hiddenDti1.value = "";
         }
 
-        // 🔹 Abrir/cerrar modal según revisión
-        revisionSelect.addEventListener("change", function () {
-            const revisionId = parseInt(this.value) || 0;
+        function limpiarModalRegistroControlArmado() {
+            if (rcaIvisOpc) rcaIvisOpc.checked = false;
 
-            if (revisionId === 2) {
-                limpiarModalRevision();
-                grupoFaltantes.style.display = "none";
-                modalRevision.show();
-            }
-            else if (revisionId === 3) {
-                limpiarModalRevision();
-                grupoFaltantes.style.display = "block";
-                modalRevision.show();
-            }
-            else {
-                limpiarModalRevision();
-                modalRevision.hide();
-            }
-        });
-
-        // 🔹 Guardar datos del modal en hidden
-        btnAceptarModal.addEventListener("click", function () {
-            const revisionId = parseInt(revisionSelect.value) || 0;
-            const revisionTexto = revisionSelect.options[revisionSelect.selectedIndex]?.text || "";
-            const cantidadModal = parseInt(modalCantidad.value) || 0;
-            const faltantes = modalFaltantes.value || "";
-
-            mensajeModalRevision.innerText = "";
-
-            if (!cantidadModal || cantidadModal < 1) {
-                mensajeModalRevision.innerText = "Ingresá una cantidad válida.";
-                return;
+            if (rcaIvisOpcNom) {
+                rcaIvisOpcNom.value = "NO REGISTRADO";
+                rcaIvisOpcNom.disabled = true;
             }
 
-            // 👇 VALIDACIÓN SOLO PARA INCOMPLETO
-            if (revisionId === 3 && faltantes.trim() === "") {
-                mensajeModalRevision.innerText = "Ingresá los faltantes.";
-                return;
+            if (rcaAcajOpc) rcaAcajOpc.checked = false;
+
+            if (rcaAcajOpcNom) {
+                rcaAcajOpcNom.value = "NO REGISTRADO";
+                rcaAcajOpcNom.disabled = true;
             }
 
-            hiddenNum2.value = cantidadModal;
-            hiddenNum3.value = revisionId;
+            if (rcaAcajRev) rcaAcajRev.value = "1";
+            if (rcaAcajCant) rcaAcajCant.value = 0;
 
-            // 👇 CLAVE
-            if (revisionId === 3) {
-                hiddenTxt3.value = faltantes; // INCOMPLETO
-            } else {
-                hiddenTxt3.value = revisionTexto; // COMPLETO u otros
+            if (rcaAcajFalt) {
+                rcaAcajFalt.value = "NO REGISTRADO";
+                rcaAcajFalt.disabled = true;
+            }
+        }
+
+        function actualizarEstadoModalRegistroControlArmado() {
+            if (rcaIvisOpc && rcaIvisOpcNom) {
+                if (rcaIvisOpc.checked) {
+                    rcaIvisOpcNom.disabled = false;
+                    if (rcaIvisOpcNom.value === "NO REGISTRADO") {
+                        rcaIvisOpcNom.value = "";
+                    }
+                } else {
+                    rcaIvisOpcNom.disabled = true;
+                    rcaIvisOpcNom.value = "NO REGISTRADO";
+                }
             }
 
-            hiddenDti1.value = new Date().toISOString();
+            if (rcaAcajOpc && rcaAcajOpcNom) {
+                if (rcaAcajOpc.checked) {
+                    rcaAcajOpcNom.disabled = false;
+                    if (rcaAcajOpcNom.value === "NO REGISTRADO") {
+                        rcaAcajOpcNom.value = "";
+                    }
+                } else {
+                    rcaAcajOpcNom.disabled = true;
+                    rcaAcajOpcNom.value = "NO REGISTRADO";
+                }
+            }
 
-            modalRevision.hide();
-        });
+            if (rcaAcajRev && rcaAcajFalt) {
+                if (parseInt(rcaAcajRev.value) === 3) {
+                    rcaAcajFalt.disabled = false;
+                    if (rcaAcajFalt.value === "NO REGISTRADO") {
+                        rcaAcajFalt.value = "";
+                    }
+                } else {
+                    rcaAcajFalt.disabled = true;
+                    rcaAcajFalt.value = "NO REGISTRADO";
+                }
+            }
+        }
 
-        // 🔹 Función para asignar stock según estado
+        function limpiarDatosBusqueda() {
+            if (comboMaterial) comboMaterial.value = "";
+            if (hiddenMatId) hiddenMatId.value = "";
+            if (hiddenReuId) hiddenReuId.value = "";
+            if (inputReuVisible) {
+                inputReuVisible.value = "";
+                inputReuVisible.setAttribute("readonly", "readonly");
+            }
+            if (inputVol) inputVol.value = "";
+
+            vieneDeReuso = false;
+            requiereControlAdicional = false;
+            modalControlCompleto = false;
+            datosControlAdicional = null;
+        }
+
         function aplicarSwitchDeStock() {
-            const estadoId = parseInt(estadoSelect.value) || 0;
-            const cantidad = parseInt(cantidadInput.value) || 0;
+            const estadoId = parseInt(estadoSelect?.value) || 0;
+            const cantidad = parseInt(cantidadInput?.value) || 0;
 
-            stockEmpInput.value = 0;
-            stockProInput.value = 0;
-            stockLavInput.value = 0;
-            stockEntInput.value = 0;
-            stockDecInput.value = 0;
+            if (stockEmpInput) stockEmpInput.value = 0;
+            if (stockProInput) stockProInput.value = 0;
+            if (stockLavInput) stockLavInput.value = 0;
+            if (stockEntInput) stockEntInput.value = 0;
+            if (stockDecInput) stockDecInput.value = 0;
 
             switch (estadoId) {
-                case 1:  // LAVADO
-                case 11: // LAVADO + DECONTAMINADO
-                case 16: // LAVADO/ENTREGA
-                    stockLavInput.value = cantidad;
+                case 1:
+                case 11:
+                case 16:
+                    if (stockLavInput) stockLavInput.value = cantidad;
                     break;
 
-                case 2:  // DECONTAMINADO
-                case 13: // DESINFECCION
-                    stockDecInput.value = cantidad;
+                case 2:
+                case 13:
+                    if (stockDecInput) stockDecInput.value = cantidad;
                     break;
 
-                case 3:  // ACONDICIONADO
-                case 15: // CORTE DE GASA
-                    stockEmpInput.value = cantidad;
+                case 3:
+                case 15:
+                    if (stockEmpInput) stockEmpInput.value = cantidad;
                     break;
 
-                case 4:  // ESTERILIZADO
-                case 9:  // ENVOLTORIO VERIFICADO
-                    stockProInput.value = cantidad;
+                case 4:
+                case 9:
+                    if (stockProInput) stockProInput.value = cantidad;
                     break;
 
-                case 5:  // ESTERIL
-                case 6:  // ENTREGADO
-                case 7:  // SIN ESTERILIZAR
-                case 14: // PREPARACIONES ASEPTICAS
-                    stockEntInput.value = cantidad;
+                case 5:
+                case 6:
+                case 7:
+                case 14:
+                    if (stockEntInput) stockEntInput.value = cantidad;
                     break;
             }
         }
 
-        cantidadInput.addEventListener("input", aplicarSwitchDeStock);
-        estadoSelect.addEventListener("change", aplicarSwitchDeStock);
+            function fijarRevisionYBloquear(revisionId, textoRevision) {
+        if (revisionSelect) {
+            revisionSelect.value = revisionId.toString();
+            revisionSelect.disabled = true;
+        }
 
-        // 🔹 Botón Guardar
-        btnGuardar.addEventListener("click", function () {
-            const formData = new FormData(form);
+        if (hiddenNum3) {
+            hiddenNum3.value = revisionId.toString();
+        }
 
-            const data = {
-                TB_REC_ID: parseInt(formData.get("Detalle.TB_REC_ID")) || 0,
-                IB_MAT_ID: parseInt(formData.get("Detalle.IB_MAT_ID")) || 0,
-                TB_REC_DET_MAT_PR: formData.get("Detalle.TB_REC_DET_MAT_PR"),
-                TB_REC_DET_REU_ID: formData.get("Detalle.TB_REC_DET_REU_ID"),
-                TB_REC_DET_REP_ID: parseInt(formData.get("Detalle.TB_REC_DET_REP_ID")) || 0,
-                TB_REC_DET_CANT: parseInt(formData.get("Detalle.TB_REC_DET_CANT")) || 0,
-                IB_EST_ID: parseInt(formData.get("Detalle.IB_EST_ID")) || 0,
+        if (hiddenDti1) {
+            hiddenDti1.value = new Date().toISOString();
+        }
+    }
+            function aplicarRevisionSinModal(revisionId) {
+        if (hiddenNum2) hiddenNum2.value = "0";
+        if (hiddenNum3) hiddenNum3.value = revisionId.toString();
 
-                TB_REC_DET_NUM_2: parseInt(formData.get("Detalle.TB_REC_DET_NUM_2")) || 0,
-                TB_REC_DET_NUM_3: parseInt(formData.get("Detalle.TB_REC_DET_NUM_3")) || 0,
-                TB_REC_DET_TXT_3: formData.get("Detalle.TB_REC_DET_TXT_3"),
-                TB_REC_DET_DTI_1: formData.get("Detalle.TB_REC_DET_DTI_1"),
+        if (revisionId === 1) {
+            if (hiddenTxt3) hiddenTxt3.value = "NO REGISTRA";
+            if (hiddenMem1) hiddenMem1.value = "NO REGISTRADO";
+        }
 
-                TB_REC_DET_EMP_STOCK: parseInt(stockEmpInput.value) || 0,
-                TB_REC_DET_PRO_STOCK: parseInt(stockProInput.value) || 0,
-                TB_REC_DET_LAV_STOCK: parseInt(stockLavInput.value) || 0,
-                TB_REC_DET_ENT_STOCK: parseInt(stockEntInput.value) || 0,
-                TB_REC_DET_DEC_STOCK: parseInt(stockDecInput.value) || 0
-            };
+        if (hiddenDti1) hiddenDti1.value = new Date().toISOString();
 
-            if (!data.TB_REC_ID || !data.IB_MAT_ID || !data.TB_REC_DET_CANT || data.TB_REC_DET_CANT < 1 || !data.IB_EST_ID) {
-                msj.innerText = "❌ Todos los campos son obligatorios.";
-                msj.classList.remove("text-success");
-                msj.classList.add("text-danger");
-                return;
+        fijarRevisionYBloquear(revisionId);
+    }
+        
+
+        function preguntarPrioridadProceso() {
+            return new Promise((resolve) => {
+                resolverPrioridadProceso = resolve;
+
+                if (modalPrioridadProceso) {
+                    modalPrioridadProceso.show();
+                } else {
+                    mostrarError("❌ No se encontró el modal de prioridad en la vista.");
+                    resolve(false);
+                }
+            });
+        }
+
+        function restaurarRevision() {
+            if (!revisionSelect) return;
+
+            revisionSelect.disabled = false;
+            revisionSelect.value = "1";
+
+            for (let i = 0; i < revisionSelect.options.length; i++) {
+                const opt = revisionSelect.options[i];
+                if (opt.value === "2") opt.text = "Completo";
+                if (opt.value === "3") opt.text = "Incompleto";
+            }
+        }
+
+        async function postJson(url, data) {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+
+            const texto = await response.text();
+
+            if (!texto) {
+                throw new Error("Respuesta vacía desde " + url);
             }
 
-            fetch("/TbRecDet/Insertar", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    msj.innerText = result.mensaje;
-                    msj.classList.remove("text-danger");
-                    msj.classList.add("text-success");
+            try {
+                return JSON.parse(texto);
+            } catch {
+                throw new Error("Respuesta no válida desde " + url + ": " + texto);
+            }
+        }
+
+        async function controlarReusoMaterial(matId) {
+            try {
+                const response = await fetch('/TbRecDet/ControlarReuso', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        IB_MAT_ID: matId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!data.ok) {
+                    alert(data.mensaje || 'Error.');
+                    return;
+                }
+
+                if (data.requiereControlReuso) {
+                    const modalElement = document.getElementById('modalControlReuso');
+                    const mensaje1 = document.getElementById('mensajeReuso1');
+                    const mensaje2 = document.getElementById('mensajeReuso2');
+                    const btnAceptar = document.getElementById('btnAceptarControlReuso');
+
+                    if (mensaje1) mensaje1.innerText = data.mensaje1 || "";
+                    if (mensaje2) mensaje2.innerText = data.mensaje2 || "";
+
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+
+                    const alCerrar = function () {
+                        modalElement.removeEventListener('hidden.bs.modal', alCerrar);
+
+                        const input = document.getElementById('TB_REC_DET_REU_ID_VISIBLE');
+                        if (input) {
+                            input.removeAttribute('readonly');
+                            input.removeAttribute('disabled');
+                            input.focus();
+                        }
+                    };
+
+                    modalElement.addEventListener('hidden.bs.modal', alCerrar);
+
+                    if (btnAceptar) {
+                        btnAceptar.onclick = function () {
+                            modal.hide();
+                        };
+                    }
+
+                    modal.show();
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Error en control de reuso');
+            }
+        }
+
+        async function buscarMaterialPorCodigo() {
+            const codigoOriginal = (codigoProductoInput?.value || "").trim();
+
+            if (!codigoOriginal) {
+                limpiarDatosBusqueda();
+                return false;
+            }
+
+            try {
+                mostrarError("🔍 Buscando material...");
+
+                const response = await fetch(`/TbRecDet/BuscarMaterialPorCodigo?codigo=${encodeURIComponent(codigoOriginal)}`);
+                const texto = await response.text();
+
+                if (!texto) {
+                    throw new Error("Respuesta vacía en la búsqueda.");
+                }
+
+                let result;
+                try {
+                    result = JSON.parse(texto);
+                } catch {
+                    throw new Error("Respuesta no válida en la búsqueda: " + texto);
+                }
+
+                if (!result.ok) {
+                    limpiarDatosBusqueda();
+                    mostrarError("❌ " + result.mensaje);
+                    return false;
+                }
+
+                if (comboMaterial) {
+                    comboMaterial.value = String(result.ibMatId);
+                    comboMaterial.dispatchEvent(new Event("change", { bubbles: true }));
+                    console.log("valor combo después:", comboMaterial.value);
+                }
+
+                if (hiddenMatId) {
+                    hiddenMatId.value = result.ibMatId ?? "";
+                }
+
+                if (inputVol) {
+                    inputVol.value = result.volumen ?? 0;
+                }
+
+                if (result.ibMatId && parseInt(result.ibMatId) > 0) {
+                    await controlarReusoMaterial(parseInt(result.ibMatId));
+                }
+
+                const tienePrioridad =
+                    result.ibMatPriOpc === true ||
+                    result.ibMatPriOpc === 1 ||
+                    result.ibMatPriOpc === "1";
+
+                let mensajePrioridadMostrado = false;
+
+                if (tienePrioridad) {
+                    const respuesta = await preguntarPrioridadProceso();
+
+                    if (respuesta) {
+                        fijarRevisionYBloquear(5, "PRIORIDAD DE PROCESO");
+                        mostrarOk("✅ Se asignó prioridad de proceso.");
+                    } else {
+                        fijarRevisionYBloquear(1, "NO REGISTRADO");
+                        mostrarOk("ℹ️ Se dejó sin prioridad de proceso.");
+                    }
+
+                    mensajePrioridadMostrado = true;
+                }
+
+                if (result.origen === "TB_REU") {
+                    if (hiddenReuId) hiddenReuId.value = codigoOriginal;
+                    if (inputReuVisible) inputReuVisible.value = codigoOriginal;
+                    vieneDeReuso = true;
+                } else {
+                    if (hiddenReuId) hiddenReuId.value = "1";
+                    if (inputReuVisible) inputReuVisible.value = "1";
+                    vieneDeReuso = false;
+                }
+
+                if (parseInt(result.ibMatMtiId) === 16) {
+                    requiereControlAdicional = true;
+                    modalControlCompleto = false;
+                    datosControlAdicional = null;
+
+                    mostrarError("⚠️ Este material requiere control adicional. Complete el formulario correspondiente.");
+
+                    limpiarModalRegistroControlArmado();
+                    actualizarEstadoModalRegistroControlArmado();
+
+                    if (modalRegistroControlArmado) {
+                        modalRegistroControlArmado.show();
+                    }
+                } else {
+                    requiereControlAdicional = false;
+                    modalControlCompleto = false;
+                    datosControlAdicional = null;
+
+                    if (!mensajePrioridadMostrado) {
+                        mostrarOk("✅ " + result.mensaje);
+                    }
+                }
+
+                return true;
+            } catch (err) {
+                limpiarDatosBusqueda();
+                mostrarError("❌ Error al buscar material: " + err.message);
+                return false;
+            }
+        }
+
+        async function ejecutarBotAutEInsertar() {
+            if (ejecutandoGuardado) return;
+            ejecutandoGuardado = true;
+
+            try {
+                const codigoIngresado = (codigoProductoInput?.value || "").trim();
+                const materialSeleccionado = parseInt(comboMaterial?.value) || 0;
+
+                if (codigoIngresado && !materialSeleccionado) {
+                    const okBusqueda = await buscarMaterialPorCodigo();
+                    if (!okBusqueda) {
+                        return;
+                    }
+                }
+
+                if (requiereControlAdicional && !modalControlCompleto) {
+                    mostrarError("❌ Debe completar el Registro de Control de Armado antes de guardar.");
+                    return;
+                }
+
+                aplicarSwitchDeStock();
+
+                if (hiddenNum3 && revisionSelect) {
+                    hiddenNum3.value = revisionSelect.value || hiddenNum3.value;
+                }
+
+
+                if (hiddenNum3 && revisionSelect) {
+                    hiddenNum3.value = revisionSelect.value || hiddenNum3.value;
+                }
+
+                if (hiddenReuId && inputReuVisible) {
+                    hiddenReuId.value = inputReuVisible.value || "1";
+                }
+
+                                    const revisionId = parseInt(revisionSelect?.value) || 0;
+
+                    if (revisionId === 1) {
+                        if (hiddenNum2) hiddenNum2.value = "0";
+                        if (hiddenNum3) hiddenNum3.value = "1";
+                        if (hiddenTxt3) hiddenTxt3.value = "NO REGISTRA";
+                        if (hiddenMem1) hiddenMem1.value = "NO REGISTRADO";
+                        if (hiddenDti1) hiddenDti1.value = new Date().toISOString();
+                    }
+
+                const formData = new FormData(form);
+
+
+
+                const data = {
+                    TB_REC_ID: parseInt(formData.get("Detalle.TB_REC_ID")) || 0,
+                    IB_MAT_ID: parseInt(formData.get("Detalle.IB_MAT_ID")) || 0,
+                    TB_REC_DET_CANT: parseInt(formData.get("Detalle.TB_REC_DET_CANT")) || 0,
+                    IB_EST_ID: parseInt(formData.get("Detalle.IB_EST_ID")) || 0,
+
+                    TB_REC_DET_MAT_PR: formData.get("Detalle.TB_REC_DET_MAT_PR"),
+                    TB_REC_DET_REU_ID: formData.get("Detalle.TB_REC_DET_REU_ID"),
+                    TB_REC_DET_REP_ID: parseInt(revisionSelect?.value) || parseInt(hiddenNum3?.value) || 0,
+                    TB_REC_DET_NUM_2: parseInt(formData.get("Detalle.TB_REC_DET_NUM_2")) || 0,
+                    TB_REC_DET_NUM_3: parseInt(formData.get("Detalle.TB_REC_DET_NUM_3")) || 0,
+                    TB_REC_DET_TXT_3: formData.get("Detalle.TB_REC_DET_TXT_3"),
+                    TB_REC_DET_MEM_1: formData.get("Detalle.TB_REC_DET_MEM_1"),
+                    TB_REC_DET_DTI_1: formData.get("Detalle.TB_REC_DET_DTI_1"),
+
+                    TB_REC_DET_EMP_STOCK: parseInt(stockEmpInput?.value) || 0,
+                    TB_REC_DET_PRO_STOCK: parseInt(stockProInput?.value) || 0,
+                    TB_REC_DET_LAV_STOCK: parseInt(stockLavInput?.value) || 0,
+                    TB_REC_DET_ENT_STOCK: parseInt(stockEntInput?.value) || 0,
+                    TB_REC_DET_DEC_STOCK: parseInt(stockDecInput?.value) || 0,
+                    TB_REC_DET_ENT_CANT: parseInt(entCantInput?.value) || 0,
+
+                    RegistroControlArmado: datosControlAdicional
+                };
+
+                if (!data.TB_REC_ID || !data.IB_MAT_ID || !data.TB_REC_DET_CANT || data.TB_REC_DET_CANT < 1 || !data.IB_EST_ID) {
+                    mostrarError("❌ Todos los campos son obligatorios.");
+                    return;
+                }
+
+                const resultBotAut = await postJson("/TbRecDet/BotAut", data);
+
+                if (!resultBotAut.ok) {
+                    mostrarError("❌ " + resultBotAut.mensaje);
+                    return;
+                }
+
+                const resultInsertar = await postJson("/TbRecDet/Insertar", data);
+
+                if (resultInsertar.success) {
+                    mostrarOk(resultInsertar.mensaje);
 
                     form.reset();
 
-                    stockEmpInput.value = 0;
-                    stockProInput.value = 0;
-                    stockLavInput.value = 0;
-                    stockEntInput.value = 0;
-                    stockDecInput.value = 0;
+                    if (stockEmpInput) stockEmpInput.value = 0;
+                    if (stockProInput) stockProInput.value = 0;
+                    if (stockLavInput) stockLavInput.value = 0;
+                    if (stockEntInput) stockEntInput.value = 0;
+                    if (stockDecInput) stockDecInput.value = 0;
+                    if (entCantInput) entCantInput.value = 0;
 
-                    // 🔹 Volver a dejar cantidad vacía después del reset
-                    if (cantidadInput) {
-                        cantidadInput.value = "";
+                    if (cantidadInput) cantidadInput.value = "";
+                    if (inputVol) inputVol.value = "";
+                    if (hiddenMatId) hiddenMatId.value = "";
+                    if (hiddenReuId) hiddenReuId.value = "";
+                    if (inputReuVisible) {
+                        inputReuVisible.value = "";
+                        inputReuVisible.setAttribute("readonly", "readonly");
                     }
 
                     limpiarModalRevision();
+                    limpiarModalRegistroControlArmado();
+                    restaurarRevision();
+
+                    vieneDeReuso = false;
+                    requiereControlAdicional = false;
+                    modalControlCompleto = false;
+                    datosControlAdicional = null;
 
                     const contenedor = document.getElementById("contenedor-detalles");
-                    if (contenedor) {
-                        contenedor.innerHTML = result.html;
+                    if (contenedor && resultInsertar.html !== undefined) {
+                        contenedor.innerHTML = resultInsertar.html;
                     }
                 } else {
-                    msj.innerText = "❌ " + result.mensaje;
-                    msj.classList.remove("text-success");
-                    msj.classList.add("text-danger");
+                    mostrarError("❌ " + resultInsertar.mensaje);
                 }
-            })
-            .catch(err => {
-                msj.innerText = "❌ Error al guardar: " + err.message;
-                msj.classList.remove("text-success");
-                msj.classList.add("text-danger");
-            });
+            } catch (err) {
+                mostrarError("❌ Error al guardar: " + err.message);
+            } finally {
+                ejecutandoGuardado = false;
+            }
+        }
+
+                if (revisionSelect) {
+        revisionSelect.addEventListener("change", function () {
+            const revisionId = parseInt(this.value) || 0;
+
+            if (revisionId === 1) {
+                aplicarRevisionSinModal(1);
+
+                if (modalRevision) modalRevision.hide();
+            }
+            else if (revisionId === 2) {
+                limpiarModalRevision();
+                if (grupoFaltantes) grupoFaltantes.style.display = "none";
+                if (modalRevision) modalRevision.show();
+            }
+            else if (revisionId === 3) {
+                limpiarModalRevision();
+                if (grupoFaltantes) grupoFaltantes.style.display = "block";
+                if (modalRevision) modalRevision.show();
+            }
+            else {
+                limpiarModalRevision();
+                if (modalRevision) modalRevision.hide();
+            }
         });
+    }
+
+        if (btnAceptarModal) {
+            btnAceptarModal.addEventListener("click", function () {
+                const revisionId = parseInt(revisionSelect?.value) || 0;
+                const cantidadModal = parseInt(modalCantidad?.value) || 0;
+                const faltantes = (modalFaltantes?.value || "").trim();
+
+                if (mensajeModalRevision) mensajeModalRevision.innerText = "";
+
+                if (!cantidadModal || cantidadModal < 1) {
+                    if (mensajeModalRevision) mensajeModalRevision.innerText = "Ingresá una cantidad válida.";
+                    return;
+                }
+
+                if (revisionId === 3 && faltantes === "") {
+                    if (mensajeModalRevision) mensajeModalRevision.innerText = "Ingresá los faltantes.";
+                    return;
+                }
+
+                if (hiddenNum2) hiddenNum2.value = cantidadModal;
+                if (hiddenNum3) hiddenNum3.value = revisionId;
+                if (revisionId === 1) {
+                    hiddenTxt3.value = "NO REGISTRA";
+                    hiddenMem1.value = "NO REGISTRADO";
+                }
+                else if (revisionId === 2) {
+                    hiddenTxt3.value = "COMPLETO";
+                    hiddenMem1.value = "NO REGISTRADO";
+                }
+                else if (revisionId === 3) {
+                    hiddenTxt3.value = "INCOMPLETO";
+                    hiddenMem1.value = faltantes;
+                }
+                if (hiddenDti1) hiddenDti1.value = new Date().toISOString();
+
+                fijarRevisionYBloquear(revisionId);
+
+                if (modalRevision) modalRevision.hide();
+            });
+        }
+
+        if (rcaIvisOpc) {
+            rcaIvisOpc.addEventListener("change", actualizarEstadoModalRegistroControlArmado);
+        }
+
+        if (rcaAcajOpc) {
+            rcaAcajOpc.addEventListener("change", actualizarEstadoModalRegistroControlArmado);
+        }
+
+        if (rcaAcajRev) {
+            rcaAcajRev.addEventListener("change", actualizarEstadoModalRegistroControlArmado);
+        }
+
+        if (btnAceptarRegistroControlArmado) {
+            btnAceptarRegistroControlArmado.addEventListener("click", function () {
+                const revisionId = parseInt(rcaAcajRev?.value) || 1;
+                const revisionDen = rcaAcajRev?.options[rcaAcajRev.selectedIndex]?.text || "NO REGISTRADO";
+
+                const control = rcaIvisOpc?.checked || false;
+                const controladaPor = control
+                    ? ((rcaIvisOpcNom?.value || "").trim().toUpperCase() || "NO REGISTRADO")
+                    : "NO REGISTRADO";
+
+                const armadoCaja = rcaAcajOpc?.checked || false;
+                const armadaPor = armadoCaja
+                    ? ((rcaAcajOpcNom?.value || "").trim().toUpperCase() || "NO REGISTRADO")
+                    : "NO REGISTRADO";
+
+                const cantidadElementos = parseInt(rcaAcajCant?.value) || 0;
+                const faltantesObservaciones = revisionId === 3
+                    ? ((rcaAcajFalt?.value || "").trim() || "NO REGISTRADO")
+                    : "NO REGISTRADO";
+
+                datosControlAdicional = {
+                    control: control,
+                    controladaPor: controladaPor,
+                    armadoCaja: armadoCaja,
+                    armadaPor: armadaPor,
+                    estadoCajaId: revisionId,
+                    estadoCajaDen: revisionDen,
+                    cantidadElementos: cantidadElementos,
+                    faltantesObservaciones: faltantesObservaciones,
+                    tbRecDetRevId: revisionId,
+                    tbRecDetRev: revisionDen,
+                    tbRecDetMde: true,
+                    vop: true,
+                    tbRecMco: true
+                };
+
+                modalControlCompleto = true;
+
+                if (modalRegistroControlArmado) {
+                    modalRegistroControlArmado.hide();
+                }
+
+                mostrarOk("✅ Registro de control de armado completado.");
+            });
+        }
+
+        if (btnContenidoRegistroControlArmado) {
+            btnContenidoRegistroControlArmado.addEventListener("click", function () {
+                mostrarOk("ℹ️ El botón Contenido queda pendiente para la próxima etapa.");
+            });
+        }
+
+        if (cantidadInput) {
+            cantidadInput.addEventListener("input", aplicarSwitchDeStock);
+
+            cantidadInput.addEventListener("blur", function () {
+                if ((parseInt(cantidadInput.value) || 0) > 0) {
+                    ejecutarBotAutEInsertar();
+                }
+            });
+
+            cantidadInput.addEventListener("keyup", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    if ((parseInt(cantidadInput.value) || 0) > 0) {
+                        ejecutarBotAutEInsertar();
+                    }
+                }
+            });
+        }
+
+        if (estadoSelect) {
+            estadoSelect.addEventListener("change", aplicarSwitchDeStock);
+        }
+
+        if (codigoProductoInput) {
+            codigoProductoInput.addEventListener("blur", function () {
+                buscarMaterialPorCodigo();
+            });
+
+
+
+            codigoProductoInput.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    buscarMaterialPorCodigo();
+                }
+            });
+        }
+
+        if (btnGuardar) {
+            btnGuardar.addEventListener("click", function () {
+                ejecutarBotAutEInsertar();
+            });
+        }
+
+        limpiarMensaje();
+        actualizarEstadoModalRegistroControlArmado();
+        aplicarSwitchDeStock();
+        restaurarRevision();
+
+            if (inputReuVisible && !inputReuVisible.value) {
+        inputReuVisible.value = "1";
+    }
+
+    if (hiddenReuId && !hiddenReuId.value) {
+        hiddenReuId.value = "1";
+    }
     });
 </script>

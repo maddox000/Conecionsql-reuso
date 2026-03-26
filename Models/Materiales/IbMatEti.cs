@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+
 namespace ConexionSql.Models.Materiales
 {
     [Table("IB_MAT_ETI")]

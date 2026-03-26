@@ -1,0 +1,86 @@
+﻿<div class="modal fade" id="modalRegistroControlArmado" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content registro-control-armado-modal">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Check list de recepción</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="container-fluid">
+
+                    <div class="row mb-3 align-items-center">
+                        <div class="col-md-4">
+                            <label for="RCA_IVIS_OPC" class="form-label">Control</label>
+                        </div>
+                        <div class="col-md-1">
+                            <input type="checkbox" id="RCA_IVIS_OPC" class="form-check-input" />
+                        </div>
+                        <div class="col-md-3">
+                            <label for="RCA_IVIS_OPC_NOM" class="form-label">Controlada por:</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" id="RCA_IVIS_OPC_NOM" class="form-control" value="NO REGISTRADO" disabled />
+                        </div>
+                    </div>
+
+                    <div class="row mb-3 align-items-center">
+                        <div class="col-md-4">
+                            <label for="RCA_ACAJ_OPC" class="form-label">Armado de caja</label>
+                        </div>
+                        <div class="col-md-1">
+                            <input type="checkbox" id="RCA_ACAJ_OPC" class="form-check-input" />
+                        </div>
+                        <div class="col-md-3">
+                            <label for="RCA_ACAJ_OPC_NOM" class="form-label">Armada por:</label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" id="RCA_ACAJ_OPC_NOM" class="form-control" value="NO REGISTRADO" disabled />
+                        </div>
+                    </div>
+
+                    <div class="row mb-3 align-items-center">
+                        <div class="col-md-4">
+                            <label for="RCA_ACAJ_REV" class="form-label">Estado de la caja</label>
+                        </div>
+                        <div class="col-md-8">
+                            <select id="RCA_ACAJ_REV" class="form-select">
+                                <option value="">Seleccione</option>
+                                <option value="1">NO REGISTRADO</option>
+                                <option value="2">COMPLETO</option>
+                                <option value="3">INCOMPLETO</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3 align-items-center">
+                        <div class="col-md-4">
+                            <label for="RCA_ACAJ_CANT" class="form-label">Cantidad de elementos</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="number" id="RCA_ACAJ_CANT" class="form-control" min="0" value="0" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="RCA_ACAJ_FALT" class="form-label">Elementos faltantes / Observaciones</label>
+                        </div>
+                        <div class="col-md-8">
+                            <textarea id="RCA_ACAJ_FALT" class="form-control" rows="4" disabled>NO REGISTRADO</textarea>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="btnContenidoRegistroControlArmado" class="btn btn-outline-primary">Contenido</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" id="btnAceptarRegistroControlArmado" class="btn btn-primary">Aceptar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
