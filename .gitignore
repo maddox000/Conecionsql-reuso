@@ -30,3 +30,13 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
+# Visual Studio adicionales
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# Archivos generados IIS
+iisexpress/
+

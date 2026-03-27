@@ -7,7 +7,7 @@ document.getElementById('btnRecepcion')?.addEventListener('click', function (e) 
     const modal = new bootstrap.Modal(document.getElementById('loginTareasModal'));
     modal.show();
 
-    localStorage.setItem("loginDestino", "/Recepcion/TbRecIndex");
+    localStorage.setItem("loginDestino", "/Recepcion/CrearRecepcion");
 });
 
 // ==========================================

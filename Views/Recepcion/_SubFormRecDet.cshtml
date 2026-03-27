@@ -27,7 +27,7 @@
                 <label for="TB_REC_DET_REU_ID_VISIBLE">Código Reuso</label>
                 <input id="TB_REC_DET_REU_ID_VISIBLE"
                        class="form-control"
-                       value="1" />
+             />
             </div>
 
             <div class="rec-det-campo rec-det-revision">
@@ -59,7 +59,7 @@
                        type="number" />
             </div>
 
-            <div class="rec-det-campo" style="display:none;">
+            <div class="rec-det-campo" style="display:none !important;">
                 <label for="TB_REC_DET_VOL">Volumen</label>
                 <input asp-for="Detalle.TB_REC_DET_VOL"
                        id="TB_REC_DET_VOL"
@@ -103,6 +103,7 @@
 @await Html.PartialAsync("Modals/_ModalRegistroControlArmado")
 @await Html.PartialAsync("~/Views/Recepcion/Modals/_modalPrioridadProceso.cshtml")
 @await Html.PartialAsync("Modals/_modalControlReuso")
+@await Html.PartialAsync("Modals/_modalConfirmarReuso")
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -204,6 +205,18 @@
                     const result = await response.json();
 
                     if (!result.ok) {
+
+                        if (result.requiereConfirmacion) {
+
+                            const modalConfirmar = bootstrap.Modal.getOrCreateInstance(
+                                document.getElementById('modalConfirmarReuso')
+                            );
+
+                            modalConfirmar.show();
+
+                            return;
+                        }
+
                         mostrarError(result.mensaje || "Error al validar reuso");
                         return;
                     }
@@ -592,8 +605,8 @@
                     if (inputReuVisible) inputReuVisible.value = codigoOriginal;
                     vieneDeReuso = true;
                 } else {
-                    if (hiddenReuId) hiddenReuId.value = "1";
-                    if (inputReuVisible) inputReuVisible.value = "1";
+                    if (hiddenReuId) hiddenReuId.value = "";
+                    if (inputReuVisible) inputReuVisible.value = "";
                     vieneDeReuso = false;
                 }
 
@@ -660,7 +673,7 @@
                 }
 
                 if (hiddenReuId && inputReuVisible) {
-                    hiddenReuId.value = inputReuVisible.value || "1";
+                    hiddenReuId.value = inputReuVisible.value || "";
                 }
 
                                     const revisionId = parseInt(revisionSelect?.value) || 0;
@@ -940,11 +953,37 @@
         restaurarRevision();
 
             if (inputReuVisible && !inputReuVisible.value) {
-        inputReuVisible.value = "1";
+        inputReuVisible.value = "";
     }
 
     if (hiddenReuId && !hiddenReuId.value) {
-        hiddenReuId.value = "1";
+        hiddenReuId.value = "";
     }
+    });
+
+        document.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            const modal = document.getElementById("modalControlReuso");
+            if (modal && modal.classList.contains("show")) {
+                document.getElementById("btnAceptarControlReuso")?.click();
+            }
+        }
+    });
+
+        document.getElementById("btnSiReuso")?.addEventListener("click", async function () {
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalConfirmarReuso'));
+        if (modal) modal.hide();
+
+        if (!window.reusoPendiente) return;
+
+        // 👇 volvemos a ejecutar validación pero permitiendo continuar
+        const codigo = window.reusoPendiente.codigo;
+
+        document.getElementById("TB_REC_DET_REU_ID_VISIBLE").value = codigo;
+        document.getElementById("TB_REC_DET_REU_ID").value = codigo;
+
+        // 👇 seguís el flujo normal (esto ya lo tenés)
+        document.getElementById("TB_REC_DET_CANT").focus();
     });
 </script>
