@@ -1,113 +1,282 @@
-﻿<!DOCTYPE html>
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - DAT</title>
+    <title>Baxen® Trazabilidad</title>
 
-    <!-- Bootstrap -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
-    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/css/estilos.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/recepcion-detalle.css" asp-append-version="true" />
+    <link rel="icon" type="image/png" href="~/img/BAXEN - Logo.ico" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <style>
+            /* Alineación uniforme */
+            .menu-lista .menu-item button,
+            .menu-lista .menu-item a {
+                padding-left: 18px !important;
+            }
+
+            /* Submenú adicional */
+            .submenu-extra {
+                display: none;
+                flex-direction: column;
+                margin-left: 22px;
+                opacity: 0;
+                transform: translateX(-10px);
+                transition: all 0.25s ease;
+            }
+
+                .submenu-extra.visible {
+                    display: flex;
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+
+                /* CUADRADO ▪ más grande y centrado */
+                .submenu-extra a {
+                    display: block !important;
+                    position: relative;
+                    padding-left: 24px !important;
+                    line-height: 1.7;
+                    color: inherit !important;
+                }
+
+                    .submenu-extra a::before {
+                        content: "▪";
+                        position: absolute;
+                        left: 0;
+                        top: 1px;
+                        font-size: 25px;
+                        color: inherit;
+                    }
+
+                    /* Ítem activo dentro del submenú */
+                    .submenu a.active,
+                    .submenu-extra a.active {
+                        background-color: rgba(255,255,255,0.12);
+                        border-radius: 4px;
+                    }
+
+            /* Animación del submenú principal */
+            .submenu {
+                overflow: hidden;
+                max-height: 0;
+                transition: max-height 0.3s ease;
+            }
+
+                .submenu.visible {
+                    max-height: 800px;
+                }
+    </style>
 </head>
+
 <body>
 
-    <!-- MENÚ LATERAL IZQUIERDO -->
-    <aside class="menu-lateral">
-        <ul class="menu-lista">
-
-            <!-- BÚSQUEDA -->
-            <li class="menu-item">
-                <button type="button" class="menu-titulo toggle-submenu">Búsqueda</button>
-                <ul class="submenu">
-                    <li><a asp-controller="IbPer" asp-action="Index">Ver Personal</a></li>
-                    <li><a asp-controller="Procesos" asp-action="BuscarProcesos">Buscar Procesos</a></li>
-                    <li><a asp-controller="Busquedas" asp-action="BusquedasFecha">Buscar Recepciones</a></li>
-                </ul>
-            </li>
-
-            <!-- TAREAS -->
-            <li class="menu-item">
-                <button type="button" class="menu-titulo toggle-submenu">Tareas</button>
-                <ul class="submenu">
-
-                    <!-- 🔥 ESTE ABRE EL LOGIN -->
-                    <li><a href="#" id="btnRecepcion">Recepciones</a></li>
-
-                    <li><a href="#" id="btnLavado">Lavado</a></li>
-                    <li><a href="#" id="btnAcondicionado">Acondicionado</a></li>
-                    <li><a href="#" id="btnProcesos">Procesos</a></li>
-                    <li><a href="#" id="btnEntrega">Entregas</a></li>
-                </ul>
-            </li>
-        </ul>
-    </aside>
-
-    <!-- NAVBAR -->
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3" style="margin-left: 200px;">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                    <img src="~/img/logo.png" style="height: 60px;" />
-                </a>
-
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Inicio</a>
-                        </li>
-                    </ul>
-
-                    <partial name="_LoginPartial" />
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <!-- CONTENIDO -->
-    <main class="contenido">
-        @RenderBody()
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - DAT
-        </div>
-    </footer>
-
-    <!-- LIBRERÍAS -->
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- MENÚ LATERAL -->
     <script>
             document.addEventListener("DOMContentLoaded", function () {
+
+                /* --- SUBMENÚS PRINCIPALES --- */
                 const botones = document.querySelectorAll(".toggle-submenu");
+                const submenus = document.querySelectorAll(".submenu");
 
                 botones.forEach(boton => {
                     boton.addEventListener("click", function () {
                         const submenu = this.nextElementSibling;
 
-                        document.querySelectorAll(".submenu").forEach(sm => {
+                        submenus.forEach(sm => {
                             if (sm !== submenu) sm.classList.remove("visible");
                         });
 
                         submenu.classList.toggle("visible");
+
+                        /* Marcar título activo */
+                        document.querySelectorAll(".menu-item").forEach(mi => mi.classList.remove("active"));
+                        this.closest(".menu-item").classList.add("active");
+
+                        /* Quitar active de ítems internos */
+                        document.querySelectorAll(".submenu a, .submenu-extra a")
+                            .forEach(l => l.classList.remove("active"));
                     });
                 });
+
+                /* --- SUBMENÚS EXTENDIDOS (solo uno abierto a la vez) --- */
+                function activarSubmenuExtendido(selector) {
+                    document.querySelectorAll(selector).forEach(link => {
+                        link.addEventListener("click", function (e) {
+                            e.preventDefault();
+
+                            const extra = this.parentElement.nextElementSibling;
+
+                            if (!extra || !extra.classList.contains("submenu-extra")) return;
+
+                            document.querySelectorAll(".submenu-extra.visible").forEach(open => {
+                                if (open !== extra) open.classList.remove("visible");
+                            });
+
+                            extra.classList.toggle("visible");
+                        });
+                    });
+                }
+
+                activarSubmenuExtendido(".submenu a[href='/ProcesoMateriales']");
+                activarSubmenuExtendido(".submenu a[href='/Entregas']");
+
+                /* --- RESALTAR ÍTEMS INTERNOS --- */
+                const menuLinks = document.querySelectorAll(".submenu a, .submenu-extra a");
+
+                menuLinks.forEach(link => {
+                    link.addEventListener("click", function () {
+
+                        /* Quitar active de todos los enlaces */
+                        menuLinks.forEach(l => l.classList.remove("active"));
+
+                        /* Agregar active al clickeado */
+                        this.classList.add("active");
+
+                        /* Quitar active de los títulos principales */
+                        document.querySelectorAll(".menu-item").forEach(mi => mi.classList.remove("active"));
+                    });
+                });
+
+                /* --- SALIR DEL SISTEMA --- */
+                const btnSalir = document.getElementById("btnSalir");
+                if (btnSalir) btnSalir.addEventListener("click", () => window.close());
+
             });
     </script>
 
-    <!-- 🔥 MODAL LOGIN -->
-    <partial name="_LoginModal" />
+    <aside class="menu-lateral" id="menuLateral">
 
-    <!-- 🔥 TU LOGIN CENTRALIZADO -->
-    <script src="~/js/login.js" asp-append-version="true"></script>
+        <div class="menu-logo">
+            <img src="~/img/BAXEN - Logo.png" alt="Baxen® Trazabilidad">
+            </div>
 
-    @await RenderSectionAsync("Scripts", required: false)
+            <ul class="menu-lista">
 
-</body>
+                <li class="menu-item">
+                    <button type="button" class="menu-titulo toggle-submenu">
+                        <i class="bi bi-collection"></i> Información básica
+                    </button>
+                    <ul class="submenu">
+                        <li><a href="/Equipos">Equipos</a></li>
+                        <li><a href="/Productos">Productos médicos</a></li>
+                        <li><a href="/Productos">Instrumental</a></li>
+                        <li><a asp-controller="IbPer" asp-action="Index">Personal</a></li>
+                        <li><a href="/Proveedores">Proveedores</a></li>
+                        <li><a href="/Profesionales">Profesionales</a></li>
+                        <li><a href="/Sectores">Sectores</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-item">
+                    <button type="button" class="menu-titulo toggle-submenu">
+                        <i class="bi bi-list-check"></i> Tareas
+                    </button>
+                    <ul class="submenu">
+
+                        <li><a href="#" id="btnRecepcion">Recepción</a></li>
+
+                        <li><a href="/ProcesoMateriales">Proceso de materiales</a></li>
+                        <li class="submenu-extra">
+                            <a href="#" id="btnLavado">Proceso de lavado</a>
+                            <a href="/ControlInstrumental">Control de instrumental</a>
+                            <a href="#" id="btnAcondicionado">Registro acondicionado</a>
+                            <a href="/ProcesoEsterilizacion">Proceso esterilización</a>
+                            <a href="/RegistroDesinfeccion">Registro desinfección</a>
+                        </li>
+
+                        <li><a href="/Entregas">Entregas</a></li>
+                        <li class="submenu-extra">
+                            <a href="#" id="btnEntrega">Entregas a sectores</a>
+                            <a href="/CarroQuirurgico">Preparar carro</a>
+                            <a href="/PanelSalas">Panel salas quirúrgicas</a>
+                            <a href="/BuscarProcedimientos">Buscar procedimientos</a>
+                        </li>
+
+                        <li><a href="#" id="btnProcesos">Identificar materiales</a></li>
+                        <li><a href="/Transito">Instrumental en tránsito</a></li>
+                        <li><a href="/Stock">Transacciones de stock</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-item">
+                    <button type="button" class="menu-titulo toggle-submenu">
+                        <i class="bi bi-search"></i> Búsqueda de datos
+                    </button>
+                    <ul class="submenu">
+                        <li><a href="/Materiales">Materiales</a></li>
+                        <li><a asp-controller="Busquedas" asp-action="BusquedasFecha">Recepciones</a></li>
+                        <li><a asp-controller="Procesos" asp-action="BuscarProcesos">Proceso de materiales</a></li>
+                        <li><a href="/Entregas">Entregas</a></li>
+                        <li><a href="/ControlPM">Control productos médicos</a></li>
+                        <li><a href="/Transito">Instrumental en tránsito</a></li>
+                        <li><a href="/Stock">Stock</a></li>
+                        <li><a href="/Clientes">Búsqueda de datos cliente</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-item">
+                    <button type="button" class="menu-titulo toggle-submenu">
+                        <i class="bi bi-qr-code"></i> Trazabilidad
+                    </button>
+                    <ul class="submenu">
+                        <li><a href="#">(Opciones futuras)</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-item">
+                    <button type="button" class="menu-titulo toggle-submenu">
+                        <i class="bi bi-bar-chart"></i> Estadísticas
+                    </button>
+                    <ul class="submenu">
+                        <li><a href="#">(Opciones futuras)</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-item">
+                    <button type="button" class="menu-titulo toggle-submenu">
+                        <i class="bi bi-gear"></i> Área de sistemas
+                    </button>
+                    <ul class="submenu">
+                        <li><a href="#">(Opciones futuras)</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-item">
+                    <button type="button" class="menu-titulo" id="btnSalir">
+                        <i class="bi bi-box-arrow-right"></i> Salir del sistema
+                    </button>
+                </li>
+
+            </ul>
+        </aside>
+
+        <nav class="navbar-principal">
+            <div class="titulo-navbar">@ViewData["Title"]</div>
+        </nav>
+
+        <div class="breadcrumbs">
+            @RenderSection("Breadcrumbs", required: false)
+        </div>
+
+        <main class="contenido">
+            @RenderBody()
+        </main>
+
+        <partial name="_LoginModal" />
+
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="~/js/login.js" asp-append-version="true"></script>
+
+        @await RenderSectionAsync("Scripts", required: false)
+
+    </body>
 </html>

@@ -166,6 +166,7 @@ namespace ConexionSql.Models.Recepciones
         public int? TbRecDetEstId { get; set; }
         public DateTime? TB_REC_DET_VEN { get; set; }
         public int? TB_REC_DET_REU_CANT { get; set; }
+        public bool ConfirmarReusoExcedido { get; set; } = false;
 
         public RegistroControlArmadoDto? RegistroControlArmado { get; set; }
     }

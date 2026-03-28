@@ -216,6 +216,7 @@ namespace ConexionSql.Controllers
         [HttpPost]
         public async Task<IActionResult> ValidarCodigoReuso([FromBody] TbRecDetDto detalle)
         {
+            Console.WriteLine($"[ValidarCodigoReuso] Confirmar={detalle.ConfirmarReusoExcedido} | ReuId={detalle.TB_REC_DET_REU_ID} | Est={detalle.IB_EST_ID} | Rev={detalle.TB_REC_DET_REP_ID}");
             try
             {
                 var codigoReuso = (detalle.TB_REC_DET_REU_ID ?? "").Trim();
@@ -282,13 +283,9 @@ namespace ConexionSql.Controllers
 
                 // 6️⃣ VALIDACIÓN DE VENCIMIENTO
                 bool aPanReuVenOpc = ObtenerOpcionBool("A_PAN_REU_VEN_OPC", true);
-                bool jdeOpc = false; // TODO: JDE_OPC (no implementado)
+                bool jdeOpc = false; // pendiente
 
-                var resultadoVen = ValidarVencimientoReuso(
-                    reuso,
-                    aPanReuVenOpc,
-                    jdeOpc
-                );
+                var resultadoVen = ValidarVencimientoReuso(reuso, aPanReuVenOpc, jdeOpc);
 
                 if (!resultadoVen.Ok)
                 {
@@ -300,7 +297,7 @@ namespace ConexionSql.Controllers
                 }
 
                 // =========================================================
-                // 🔥 7️⃣ VALIDACIÓN DE LÍMITE DE REUSOS (LO NUEVO)
+                // 🔥 7️⃣ VALIDACIÓN DE LÍMITE DE REUSOS
                 // =========================================================
                 var resultadoReusos = ValidarReusos(detalle, reuso, material);
 
@@ -419,6 +416,15 @@ namespace ConexionSql.Controllers
                     };
                 }
 
+                // 🔥 SI YA CONFIRMÓ → DEJAR PASAR
+                if (detalle.ConfirmarReusoExcedido)
+                {
+                    return new ResultadoValidacionReuso
+                    {
+                        Ok = true
+                    };
+                }
+
                 // STOP = FALSE → pedir confirmación
                 return new ResultadoValidacionReuso
                 {
@@ -433,6 +439,42 @@ namespace ConexionSql.Controllers
             {
                 Ok = true
             };
+        }
+
+        //busca en denominacion
+        [HttpGet]
+        public IActionResult BuscarMaterial(string texto)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(texto))
+                {
+                    return Json(new List<object>());
+                }
+
+                texto = texto.Trim();
+
+                var materiales = _context.IbMat
+                    .Where(m => m.IB_MAT_DEN != null && m.IB_MAT_DEN.Contains(texto))
+                    .OrderBy(m => m.IB_MAT_DEN)
+                    .Take(20)
+                    .Select(m => new
+                    {
+                        id = m.IB_MAT_ID,
+                        denominacion = m.IB_MAT_DEN
+                    })
+                    .ToList();
+
+                return Json(materiales);
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    ok = false,
+                    mensaje = "Error al buscar materiales: " + ex.Message
+                });
+            }
         }
 
         [HttpGet]
@@ -469,7 +511,8 @@ namespace ConexionSql.Controllers
                 // =========================================================
                 var material = _context.IbMat.FirstOrDefault(m =>
                     (codigoNumerico > 0 && m.IB_MAT_ID == codigoNumerico)
-                    || m.IB_MAT_PR == codigo);
+                    || m.IB_MAT_PR == codigo
+                    || m.IB_MAT_DEN == codigo);
 
                 if (material != null)
                 {
@@ -1117,7 +1160,7 @@ namespace ConexionSql.Controllers
             // ==========================
             vencFab = null;
 
-            if (detalle.IB_EST_ID == 12) // SOLO si es tarea 12
+            if (detalle.IB_EST_ID == 12)
             {
                 if (!string.IsNullOrWhiteSpace(detalle.TB_REC_DET_REU_ID) && detalle.TB_REC_DET_REU_ID != "1")
                 {
@@ -1172,7 +1215,8 @@ namespace ConexionSql.Controllers
                 int reuMax = reu.TbReuMatOpcCant;
                 int reuFin = reuIni + 1;
 
-                if (reuFin > reuMax)
+                // 🔥 CORRECCIÓN CLAVE
+                if (reuFin > reuMax && !detalle.ConfirmarReusoExcedido)
                 {
                     return $"El reuso supera el máximo permitido ({reuMax}).";
                 }

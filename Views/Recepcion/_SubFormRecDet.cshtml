@@ -13,14 +13,15 @@
                        class="form-control" />
             </div>
 
+            <!-- combo denominacion -->
             <div class="rec-det-campo rec-det-material">
-                <label for="IB_MAT_ID">Material</label>
-                <select asp-for="Detalle.IB_MAT_ID"
-                        asp-items="@(new SelectList(Model.Materiales, "IbMatId", "IbMatDen"))"
-                        class="form-control"
-                        id="IB_MAT_ID">
-                    <option value="">Seleccione un material</option>
-                </select>
+                <label>Material</label>
+
+                <input type="text" id="materialBusqueda" class="form-control" autocomplete="off" />
+
+                <div id="listaMateriales" class="list-group mt-2"></div>
+
+                <input type="hidden" id="IB_MAT_ID" name="Detalle.IB_MAT_ID" />
             </div>
 
             <div class="rec-det-campo rec-det-reuso">
@@ -144,6 +145,116 @@
         const inputReuVisible = document.getElementById("TB_REC_DET_REU_ID_VISIBLE");
         const entCantInput = document.getElementById("TB_REC_DET_ENT_CANT");
 
+        const materialBusqueda = document.getElementById("materialBusqueda");
+        const listaMateriales = document.getElementById("listaMateriales");
+
+        let materialesBusqueda = [];
+        let indiceMaterial = -1;
+
+        async function seleccionarMaterial(mat) {
+            materialBusqueda.value = mat.denominacion;
+            listaMateriales.innerHTML = "";
+
+            document.getElementById("IB_MAT_ID").value = mat.id;
+            document.getElementById("TB_REC_DET_MAT_ID").value = mat.id;
+
+            materialesBusqueda = [];
+            indiceMaterial = -1;
+
+            if (mat.id && parseInt(mat.id) > 0) {
+                await controlarReusoMaterial(parseInt(mat.id));
+            }
+        }
+
+        function renderizarListaMateriales() {
+            if (!listaMateriales) return;
+
+            listaMateriales.innerHTML = "";
+
+            materialesBusqueda.forEach((mat, index) => {
+                const item = document.createElement("button");
+                item.type = "button";
+                item.className = "list-group-item list-group-item-action";
+                item.textContent = mat.denominacion;
+
+                if (index === indiceMaterial) {
+                    item.classList.add("active");
+                }
+
+                item.addEventListener("click", function () {
+                    seleccionarMaterial(mat);
+                });
+
+                listaMateriales.appendChild(item);
+            });
+        }
+
+        if (materialBusqueda && listaMateriales) {
+            materialBusqueda.addEventListener("input", function () {
+                const texto = this.value.trim();
+
+                listaMateriales.innerHTML = "";
+                document.getElementById("IB_MAT_ID").value = "";
+                document.getElementById("TB_REC_DET_MAT_ID").value = "";
+                materialesBusqueda = [];
+                indiceMaterial = -1;
+
+                if (texto.length < 2) return;
+
+                console.log("buscando texto:", texto);
+
+                fetch(`/TbRecDet/BuscarMaterial?texto=${encodeURIComponent(texto)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data || data.length === 0) return;
+
+                        materialesBusqueda = data;
+                        indiceMaterial = -1;
+
+                        renderizarListaMateriales();
+                    })
+                    .catch(error => {
+                        console.error("Error al buscar material:", error);
+                    });
+            });
+
+            materialBusqueda.addEventListener("keydown", function (e) {
+                if (!materialesBusqueda || materialesBusqueda.length === 0) return;
+
+                if (e.key === "ArrowDown") {
+                    e.preventDefault();
+
+                    if (indiceMaterial < materialesBusqueda.length - 1) {
+                        indiceMaterial++;
+                    } else {
+                        indiceMaterial = 0;
+                    }
+
+                    renderizarListaMateriales();
+                }
+
+                if (e.key === "ArrowUp") {
+                    e.preventDefault();
+
+                    if (indiceMaterial > 0) {
+                        indiceMaterial--;
+                    } else {
+                        indiceMaterial = materialesBusqueda.length - 1;
+                    }
+
+                    renderizarListaMateriales();
+                }
+
+                if (e.key === "Enter") {
+                    e.preventDefault();
+
+                    if (indiceMaterial >= 0 && indiceMaterial < materialesBusqueda.length) {
+                        seleccionarMaterial(materialesBusqueda[indiceMaterial]);
+                    }
+                }
+            });
+        }
+
         const modalRegistroControlArmadoElement = document.getElementById("modalRegistroControlArmado");
         const modalRegistroControlArmado = modalRegistroControlArmadoElement
             ? bootstrap.Modal.getOrCreateInstance(modalRegistroControlArmadoElement)
@@ -176,76 +287,81 @@
         let modalControlCompleto = false;
         let datosControlAdicional = null;
         let resolverPrioridadProceso = null;
+        let confirmarReusoExcedido = false;
 
-                if (inputReuVisible) {
-        inputReuVisible.addEventListener("keydown", async function (e) {
-            if (e.key === "Enter") {
-                e.preventDefault();
+        if (inputReuVisible) {
+            inputReuVisible.addEventListener("keydown", async function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
 
-                const codigo = this.value.trim();
-                if (!codigo) return;
+                    const codigo = this.value.trim();
+                    if (!codigo) return;
 
-                if (hiddenReuId) {
-                    hiddenReuId.value = codigo;
-                }
+                    if (hiddenReuId) {
+                        hiddenReuId.value = codigo;
+                    }
 
-                try {
-                    const response = await fetch("/TbRecDet/ValidarCodigoReuso", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            TB_REC_ID: parseInt(document.getElementById("Detalle_TB_REC_ID")?.value) || 0,
-                            TB_REC_DET_REU_ID: codigo,
-                            TbRecDetEstId: parseInt(estadoSelect?.value) || 0
-                        })
-                    });
+                    try {
+                        const response = await fetch("/TbRecDet/ValidarCodigoReuso", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                TB_REC_ID: parseInt(document.getElementById("Detalle_TB_REC_ID")?.value) || 0,
+                                IB_MAT_ID: parseInt(document.getElementById("IB_MAT_ID")?.value) || 0,
+                                TB_REC_DET_REU_ID: codigo,
+                                IB_EST_ID: parseInt(estadoSelect?.value) || 0,
+                                TB_REC_DET_REP_ID: parseInt(revisionSelect?.value) || 0,
+                                ConfirmarReusoExcedido: false
+                            })
+                        });
 
-                    const result = await response.json();
+                        const result = await response.json();
 
-                    if (!result.ok) {
+                        if (!result.ok) {
+                            if (result.requiereConfirmacion) {
+                                confirmarReusoExcedido = false;
 
-                        if (result.requiereConfirmacion) {
+                                const modalConfirmar = bootstrap.Modal.getOrCreateInstance(
+                                    document.getElementById("modalConfirmarReuso")
+                                );
 
-                            const modalConfirmar = bootstrap.Modal.getOrCreateInstance(
-                                document.getElementById('modalConfirmarReuso')
-                            );
+                                window.reusoPendiente = {
+                                    codigo: codigo
+                                };
 
-                            modalConfirmar.show();
+                                modalConfirmar.show();
+                                return;
+                            }
 
+                            mostrarError(result.mensaje || "Error al validar reuso");
                             return;
                         }
 
-                        mostrarError(result.mensaje || "Error al validar reuso");
-                        return;
+                        if (comboMaterial) {
+                            comboMaterial.value = String(result.ibMatId);
+                            comboMaterial.dispatchEvent(new Event("change", { bubbles: true }));
+                            console.log("valor combo después:", comboMaterial.value);
+                        }
+
+                        if (hiddenMatId) {
+                            hiddenMatId.value = result.ibMatId ?? "";
+                        }
+
+                        if (codigoProductoInput) {
+                            codigoProductoInput.value = result.ibMatId ?? "";
+                        }
+
+                        mostrarOk(result.mensaje || "Reuso encontrado correctamente.");
+                        console.log("Respuesta reuso:", result);
+
+                    } catch (error) {
+                        console.error("Error al validar reuso:", error);
                     }
-
-                    if (comboMaterial) {
-                        comboMaterial.value = String(result.ibMatId);
-                        comboMaterial.dispatchEvent(new Event("change", { bubbles: true }));
-                        console.log("valor combo después:", comboMaterial.value);
-                    }
-
-                    if (hiddenMatId) {
-                        hiddenMatId.value = result.ibMatId ?? "";
-                    }
-
-                    if (codigoProductoInput) {
-                        codigoProductoInput.value = result.ibMatId ?? "";
-                    }
-
-
-                    mostrarOk(result.mensaje || "Reuso encontrado correctamente.");
-                    console.log("Respuesta reuso:", result);
-
-                } catch (error) {
-                    console.error("Error al validar reuso:", error);
                 }
-            }
-        });
-    }
-
+            });
+        }
 
         function limpiarMensaje() {
             if (!msj) return;
@@ -355,6 +471,7 @@
             requiereControlAdicional = false;
             modalControlCompleto = false;
             datosControlAdicional = null;
+            confirmarReusoExcedido = false;
         }
 
         function aplicarSwitchDeStock() {
@@ -398,34 +515,34 @@
             }
         }
 
-            function fijarRevisionYBloquear(revisionId, textoRevision) {
-        if (revisionSelect) {
-            revisionSelect.value = revisionId.toString();
-            revisionSelect.disabled = true;
+        function fijarRevisionYBloquear(revisionId, textoRevision) {
+            if (revisionSelect) {
+                revisionSelect.value = revisionId.toString();
+                revisionSelect.disabled = true;
+            }
+
+            if (hiddenNum3) {
+                hiddenNum3.value = revisionId.toString();
+            }
+
+            if (hiddenDti1) {
+                hiddenDti1.value = new Date().toISOString();
+            }
         }
 
-        if (hiddenNum3) {
-            hiddenNum3.value = revisionId.toString();
+        function aplicarRevisionSinModal(revisionId) {
+            if (hiddenNum2) hiddenNum2.value = "0";
+            if (hiddenNum3) hiddenNum3.value = revisionId.toString();
+
+            if (revisionId === 1) {
+                if (hiddenTxt3) hiddenTxt3.value = "NO REGISTRA";
+                if (hiddenMem1) hiddenMem1.value = "NO REGISTRADO";
+            }
+
+            if (hiddenDti1) hiddenDti1.value = new Date().toISOString();
+
+            fijarRevisionYBloquear(revisionId);
         }
-
-        if (hiddenDti1) {
-            hiddenDti1.value = new Date().toISOString();
-        }
-    }
-            function aplicarRevisionSinModal(revisionId) {
-        if (hiddenNum2) hiddenNum2.value = "0";
-        if (hiddenNum3) hiddenNum3.value = revisionId.toString();
-
-        if (revisionId === 1) {
-            if (hiddenTxt3) hiddenTxt3.value = "NO REGISTRA";
-            if (hiddenMem1) hiddenMem1.value = "NO REGISTRADO";
-        }
-
-        if (hiddenDti1) hiddenDti1.value = new Date().toISOString();
-
-        fijarRevisionYBloquear(revisionId);
-    }
-        
 
         function preguntarPrioridadProceso() {
             return new Promise((resolve) => {
@@ -475,10 +592,10 @@
 
         async function controlarReusoMaterial(matId) {
             try {
-                const response = await fetch('/TbRecDet/ControlarReuso', {
-                    method: 'POST',
+                const response = await fetch("/TbRecDet/ControlarReuso", {
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json'
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
                         IB_MAT_ID: matId
@@ -488,15 +605,15 @@
                 const data = await response.json();
 
                 if (!data.ok) {
-                    alert(data.mensaje || 'Error.');
+                    alert(data.mensaje || "Error.");
                     return;
                 }
 
                 if (data.requiereControlReuso) {
-                    const modalElement = document.getElementById('modalControlReuso');
-                    const mensaje1 = document.getElementById('mensajeReuso1');
-                    const mensaje2 = document.getElementById('mensajeReuso2');
-                    const btnAceptar = document.getElementById('btnAceptarControlReuso');
+                    const modalElement = document.getElementById("modalControlReuso");
+                    const mensaje1 = document.getElementById("mensajeReuso1");
+                    const mensaje2 = document.getElementById("mensajeReuso2");
+                    const btnAceptar = document.getElementById("btnAceptarControlReuso");
 
                     if (mensaje1) mensaje1.innerText = data.mensaje1 || "";
                     if (mensaje2) mensaje2.innerText = data.mensaje2 || "";
@@ -504,17 +621,17 @@
                     const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
 
                     const alCerrar = function () {
-                        modalElement.removeEventListener('hidden.bs.modal', alCerrar);
+                        modalElement.removeEventListener("hidden.bs.modal", alCerrar);
 
-                        const input = document.getElementById('TB_REC_DET_REU_ID_VISIBLE');
+                        const input = document.getElementById("TB_REC_DET_REU_ID_VISIBLE");
                         if (input) {
-                            input.removeAttribute('readonly');
-                            input.removeAttribute('disabled');
+                            input.removeAttribute("readonly");
+                            input.removeAttribute("disabled");
                             input.focus();
                         }
                     };
 
-                    modalElement.addEventListener('hidden.bs.modal', alCerrar);
+                    modalElement.addEventListener("hidden.bs.modal", alCerrar);
 
                     if (btnAceptar) {
                         btnAceptar.onclick = function () {
@@ -526,7 +643,7 @@
                 }
             } catch (error) {
                 console.error(error);
-                alert('Error en control de reuso');
+                alert("Error en control de reuso");
             }
         }
 
@@ -636,7 +753,7 @@
                 return true;
             } catch (err) {
                 limpiarDatosBusqueda();
-                mostrarError("❌ Error al buscar material: " + err.message);
+                mostrarError("❌ Error al guardar: " + err.message);
                 return false;
             }
         }
@@ -667,28 +784,21 @@
                     hiddenNum3.value = revisionSelect.value || hiddenNum3.value;
                 }
 
-
-                if (hiddenNum3 && revisionSelect) {
-                    hiddenNum3.value = revisionSelect.value || hiddenNum3.value;
-                }
-
                 if (hiddenReuId && inputReuVisible) {
                     hiddenReuId.value = inputReuVisible.value || "";
                 }
 
-                                    const revisionId = parseInt(revisionSelect?.value) || 0;
+                const revisionId = parseInt(revisionSelect?.value) || 0;
 
-                    if (revisionId === 1) {
-                        if (hiddenNum2) hiddenNum2.value = "0";
-                        if (hiddenNum3) hiddenNum3.value = "1";
-                        if (hiddenTxt3) hiddenTxt3.value = "NO REGISTRA";
-                        if (hiddenMem1) hiddenMem1.value = "NO REGISTRADO";
-                        if (hiddenDti1) hiddenDti1.value = new Date().toISOString();
-                    }
+                if (revisionId === 1) {
+                    if (hiddenNum2) hiddenNum2.value = "0";
+                    if (hiddenNum3) hiddenNum3.value = "1";
+                    if (hiddenTxt3) hiddenTxt3.value = "NO REGISTRA";
+                    if (hiddenMem1) hiddenMem1.value = "NO REGISTRADO";
+                    if (hiddenDti1) hiddenDti1.value = new Date().toISOString();
+                }
 
                 const formData = new FormData(form);
-
-
 
                 const data = {
                     TB_REC_ID: parseInt(formData.get("Detalle.TB_REC_ID")) || 0,
@@ -711,6 +821,8 @@
                     TB_REC_DET_ENT_STOCK: parseInt(stockEntInput?.value) || 0,
                     TB_REC_DET_DEC_STOCK: parseInt(stockDecInput?.value) || 0,
                     TB_REC_DET_ENT_CANT: parseInt(entCantInput?.value) || 0,
+
+                    ConfirmarReusoExcedido: confirmarReusoExcedido,
 
                     RegistroControlArmado: datosControlAdicional
                 };
@@ -758,6 +870,8 @@
                     requiereControlAdicional = false;
                     modalControlCompleto = false;
                     datosControlAdicional = null;
+                    confirmarReusoExcedido = false;
+                    window.reusoPendiente = null;
 
                     const contenedor = document.getElementById("contenedor-detalles");
                     if (contenedor && resultInsertar.html !== undefined) {
@@ -773,31 +887,79 @@
             }
         }
 
-                if (revisionSelect) {
-        revisionSelect.addEventListener("change", function () {
-            const revisionId = parseInt(this.value) || 0;
+        document.getElementById("btnSiReuso")?.addEventListener("click", async function () {
+            confirmarReusoExcedido = true;
 
-            if (revisionId === 1) {
-                aplicarRevisionSinModal(1);
+            const modal = bootstrap.Modal.getInstance(document.getElementById("modalConfirmarReuso"));
+            if (modal) modal.hide();
 
-                if (modalRevision) modalRevision.hide();
+            if (!window.reusoPendiente) return;
+
+            const codigo = window.reusoPendiente.codigo;
+
+            document.getElementById("TB_REC_DET_REU_ID_VISIBLE").value = codigo;
+            document.getElementById("TB_REC_DET_REU_ID").value = codigo;
+
+            const response = await fetch("/TbRecDet/ValidarCodigoReuso", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    TB_REC_ID: parseInt(document.getElementById("Detalle_TB_REC_ID")?.value) || 0,
+                    IB_MAT_ID: parseInt(document.getElementById("IB_MAT_ID")?.value) || 0,
+                    TB_REC_DET_REU_ID: codigo,
+                    IB_EST_ID: parseInt(document.getElementById("IB_EST_ID")?.value) || 0,
+                    TB_REC_DET_REP_ID: parseInt(document.getElementById("TB_REC_DET_REP_ID")?.value) || 0,
+                    ConfirmarReusoExcedido: true
+                })
+            });
+
+            const result = await response.json();
+
+            if (!result.ok) {
+                alert(result.mensaje);
+                confirmarReusoExcedido = false;
+                return;
             }
-            else if (revisionId === 2) {
-                limpiarModalRevision();
-                if (grupoFaltantes) grupoFaltantes.style.display = "none";
-                if (modalRevision) modalRevision.show();
-            }
-            else if (revisionId === 3) {
-                limpiarModalRevision();
-                if (grupoFaltantes) grupoFaltantes.style.display = "block";
-                if (modalRevision) modalRevision.show();
-            }
-            else {
-                limpiarModalRevision();
-                if (modalRevision) modalRevision.hide();
-            }
+
+            window.reusoPendiente = null;
         });
-    }
+
+        document.getElementById("btnNoReuso")?.addEventListener("click", function () {
+            confirmarReusoExcedido = false;
+
+            const modal = bootstrap.Modal.getInstance(document.getElementById("modalConfirmarReuso"));
+            if (modal) modal.hide();
+
+            window.reusoPendiente = null;
+        });
+
+        if (revisionSelect) {
+            revisionSelect.addEventListener("change", function () {
+                const revisionId = parseInt(this.value) || 0;
+
+                if (revisionId === 1) {
+                    aplicarRevisionSinModal(1);
+
+                    if (modalRevision) modalRevision.hide();
+                }
+                else if (revisionId === 2) {
+                    limpiarModalRevision();
+                    if (grupoFaltantes) grupoFaltantes.style.display = "none";
+                    if (modalRevision) modalRevision.show();
+                }
+                else if (revisionId === 3) {
+                    limpiarModalRevision();
+                    if (grupoFaltantes) grupoFaltantes.style.display = "block";
+                    if (modalRevision) modalRevision.show();
+                }
+                else {
+                    limpiarModalRevision();
+                    if (modalRevision) modalRevision.hide();
+                }
+            });
+        }
 
         if (btnAceptarModal) {
             btnAceptarModal.addEventListener("click", function () {
@@ -931,8 +1093,6 @@
                 buscarMaterialPorCodigo();
             });
 
-
-
             codigoProductoInput.addEventListener("keydown", function (e) {
                 if (e.key === "Enter") {
                     e.preventDefault();
@@ -952,38 +1112,21 @@
         aplicarSwitchDeStock();
         restaurarRevision();
 
-            if (inputReuVisible && !inputReuVisible.value) {
-        inputReuVisible.value = "";
-    }
+        if (inputReuVisible && !inputReuVisible.value) {
+            inputReuVisible.value = "";
+        }
 
-    if (hiddenReuId && !hiddenReuId.value) {
-        hiddenReuId.value = "";
-    }
+        if (hiddenReuId && !hiddenReuId.value) {
+            hiddenReuId.value = "";
+        }
     });
 
-        document.addEventListener("keydown", function (e) {
+    document.addEventListener("keydown", function (e) {
         if (e.key === "Enter") {
             const modal = document.getElementById("modalControlReuso");
             if (modal && modal.classList.contains("show")) {
                 document.getElementById("btnAceptarControlReuso")?.click();
             }
         }
-    });
-
-        document.getElementById("btnSiReuso")?.addEventListener("click", async function () {
-
-        const modal = bootstrap.Modal.getInstance(document.getElementById('modalConfirmarReuso'));
-        if (modal) modal.hide();
-
-        if (!window.reusoPendiente) return;
-
-        // 👇 volvemos a ejecutar validación pero permitiendo continuar
-        const codigo = window.reusoPendiente.codigo;
-
-        document.getElementById("TB_REC_DET_REU_ID_VISIBLE").value = codigo;
-        document.getElementById("TB_REC_DET_REU_ID").value = codigo;
-
-        // 👇 seguís el flujo normal (esto ya lo tenés)
-        document.getElementById("TB_REC_DET_CANT").focus();
     });
 </script>
