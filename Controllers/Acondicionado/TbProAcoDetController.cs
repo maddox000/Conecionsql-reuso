@@ -49,6 +49,9 @@ namespace ConexionSql.Controllers
                 recDet.TbRecDetEmpStock -= cantidad;
                 recDet.TbRecDetEmpTot = (recDet.TbRecDetEmpTot ?? 0) + cantidad;
                 recDet.TbRecDetProStock = (recDet.TbRecDetProStock ?? 0) + cantidad;
+                // Estado ingreso en TB_REC_DET
+                recDet.TbRecDetEstIngId = 24;
+                recDet.TbRecDetEstIngDen = "CE PROCESO ACONDICIONADO";
 
                 // Crear nuevo detalle de acondicionado
                 var nuevoDet = new TbProAcoDet

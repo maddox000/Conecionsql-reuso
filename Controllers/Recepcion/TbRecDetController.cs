@@ -512,7 +512,7 @@ namespace ConexionSql.Controllers
                 var material = _context.IbMat.FirstOrDefault(m =>
                     (codigoNumerico > 0 && m.IB_MAT_ID == codigoNumerico)
                     || m.IB_MAT_PR == codigo
-                    || m.IB_MAT_DEN == codigo);
+                || m.IB_MAT_DEN == codigo);
 
                 if (material != null)
                 {
@@ -522,6 +522,7 @@ namespace ConexionSql.Controllers
 
                         // ID del material
                         ibMatId = material.IB_MAT_ID,
+                        denominacion = material.IB_MAT_DEN,
 
                         // Tipo de material
                         ibMatMtiId = material.IB_MAT_MTI_ID,
@@ -904,6 +905,12 @@ namespace ConexionSql.Controllers
 
 
                 _context.TbRecDet.Add(entidad);
+                await _context.SaveChangesAsync();
+
+                // 🔢 SUMAR AL TOTAL DE LA CABECERA
+                tbRec.TbRecCantTot = (tbRec.TbRecCantTot ?? 0) + detalle.TB_REC_DET_CANT;
+
+                _context.TbRec.Update(tbRec);
                 await _context.SaveChangesAsync();
 
                 string zpl = Etiquetas.RecepcionDetalle(

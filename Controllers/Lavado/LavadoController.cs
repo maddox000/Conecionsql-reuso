@@ -122,8 +122,8 @@ namespace ConexionSql.Controllers
                 var entidad = new TbProLav
                 {
                     TbProLavFec = dto.Fecha ?? DateTime.Now.Date,
-                    TbProLavHorIni = dto.HoraIni.HasValue ? DateTime.Today.Add(dto.HoraIni.Value) : null,
-                    TbProLavHorFin = dto.HoraFin.HasValue ? DateTime.Today.Add(dto.HoraFin.Value) : null,
+                    TbProLavHorIni = new DateTime(1899, 12, 30, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second),
+                    TbProLavHorFin = null,
 
                     TbProLavPtiId = dto.TipoLavadoId,
                     TbProLavPtiDen = dto.TipoLavadoDen,
@@ -133,8 +133,8 @@ namespace ConexionSql.Controllers
                     TbProLavTciDen = dto.TipoCicloDen,
 
                     TbProLavPerId = personal.IbPerId,
-                    TbProLavPerApe = personal.IbPerApe,
-                    TbProLavPerNom = personal.IbPerNom,
+                    TbProLavPerApe = null,
+                    TbProLavPerNom = $"{personal.IbPerApe}, {personal.IbPerNom}",
                     TbProLavPerCarId = personal.IbPerCarId,
                     TbProLavPerCarDen = personal.IbPerCarDen,
 

@@ -326,7 +326,7 @@ namespace ConexionSql.Models.Recepciones
         public int? TbRecDetSecRegTot { get; set; }
 
         [Column("TB_REC_DET_PMAT")]
-        public float? TbRecDetPmat { get; set; }
+        public double? TbRecDetPmat { get; set; }
 
         [Column("TB_REC_DET_MORT")]
         public int? TbRecDetMort { get; set; }

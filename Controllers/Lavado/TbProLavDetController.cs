@@ -67,6 +67,7 @@ namespace ConexionSql.Controllers.Lavado
             var recDet = await _context.TbRecDet
                 .FirstOrDefaultAsync(r => r.TbRecDetId == dto.TB_PRO_LAV_DET_REC_DET_ID);
 
+
             if (recDet == null)
                 return Json(new { success = false, mensaje = "❌ Etiqueta no encontrada." });
 
@@ -82,17 +83,66 @@ namespace ConexionSql.Controllers.Lavado
             recDet.TbRecDetLavStock = stock - cantidad;
             recDet.TbRecDetLavTot = (recDet.TbRecDetLavTot ?? 0) + cantidad;
             recDet.TbRecDetEmpStock = (recDet.TbRecDetEmpStock ?? 0) + cantidad;
+            recDet.TbRecDetEstIngId = 23;
+            recDet.TbRecDetEstIngDen = "CE PROCESO LAVADO";
+
+            var mat = await _context.IbMat
+                .FirstOrDefaultAsync(x => x.IB_MAT_ID == recDet.TbRecDetMatId);
 
             var nuevo = new TbProLavDet
             {
                 TB_PRO_LAV_DET_PRO_LAV_ID = dto.TB_PRO_LAV_ID ?? 0,
                 TB_PRO_LAV_DET_REC_DET_ID = dto.TB_PRO_LAV_DET_REC_DET_ID,
-                TB_PRO_LAV_DET_IB_MAT_ID = dto.TB_PRO_LAV_DET_REC_DET_MAT_ID,
-                TB_PRO_LAV_DET_IB_MAT_DEN = dto.TB_PRO_LAV_DET_REC_DET_MAT_DEN,
+
+                // MATERIAL → desde TB_REC_DET
+                TB_PRO_LAV_DET_IB_MAT_ID = recDet.TbRecDetMatId,
+                TB_PRO_LAV_DET_IB_MAT_PR = recDet.TbRecDetMatPr,
+                TB_PRO_LAV_DET_IB_MAT_DEN = recDet.TbRecDetMatDen,
+
+                // DESDE IB_MAT
+                TB_PRO_LAV_DET_IB_MAT_MAR_ID = mat?.IB_MAT_MAR_ID,
+                TB_PRO_LAV_DET_IB_MAT_MAR_DEN = mat?.IB_MAT_MAR_DEN,
+                TB_PRO_LAV_DET_IB_MAT_MAR_CAT = mat?.IB_MAT_MAR_CAT,
+                TB_PRO_LAV_DET_IB_MAT_PRI_OPC = mat?.IB_MAT_PRI_OPC ?? false,
+                TB_PRO_LAV_DET_IB_MAT_CON_REG = mat?.IB_MAT_CON_UNID,
+                TB_PRO_LAV_DET_IB_MAT_CON_ACT = mat?.IB_MAT_CON_ACT,
+
+                // SECTOR
+                TB_PRO_LAV_DET_SEC_DES_ID = recDet.TbRecSecDesId,
+                TB_PRO_LAV_DET_SEC_DES_DEN = recDet.TbRecSecDesDen,
+
+                // ORT
+                TB_PRO_LAV_DET_ORT_ID = recDet.TbRecOrtId,
+                TB_PRO_LAV_DET_ORT_DEN = recDet.TbRecOrtDen,
+                TB_PRO_LAV_DET_ORT_PAC = recDet.TbRecDetPac,
+                TB_PRO_LAV_DET_ORT_REM = recDet.TbRecDetRem,
+
+                // OTROS
+                TB_PRO_LAV_DET_PRO_ID = recDet.TbRecDetProId,
+                TB_PRO_LAV_DET_REU_ID = recDet.TbRecDetReuId,
+
+                // CANTIDADES / VOLUMEN / STOCK
+                TB_PRO_LAV_DET_REC_DET_CANT = recDet.TbRecDetCant,
+                TB_PRO_LAV_DET_REC_CANT = dto.TB_PRO_LAV_DET_CANT,
+                TB_PRO_LAV_DET_VOL_MAT = recDet.IbMatVol,
+                TB_PRO_LAV_DET_VOL_PRO = (recDet.IbMatVol ?? 0) * (dto.TB_PRO_LAV_DET_CANT ?? 0),
+                TB_PRO_LAV_DET_STOCK = recDet.TbRecDetLavStock,
+                TB_PRO_LAV_DET_TOT = recDet.TbRecDetLavTot,
+
+                // CANTIDAD
                 TB_PRO_LAV_DET_CANT = dto.TB_PRO_LAV_DET_CANT,
+
+                // SISTEMA
                 TB_PRO_LAV_DET_PC_LOG = Environment.MachineName,
                 TB_PRO_LAV_DET_PC_USR = Environment.UserName,
-                TB_PRO_LAV_DET_PRO_LAV_FEC = DateTime.Now
+
+                // FECHA Y HORA
+                TB_PRO_LAV_DET_PRO_LAV_FEC = DateTime.Now,
+                TB_PRO_LAV_DET_PRO_LAV_HOR = DateTime.Now,
+
+                // ESTADO
+                TB_PRO_LAV_DET_EST_ID = 1,
+                TB_PRO_LAV_DET_EST_DEN = "EN PROCESO"
             };
 
             _context.TbProLavDet.Add(nuevo);
