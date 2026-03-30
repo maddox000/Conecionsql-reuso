@@ -249,15 +249,22 @@ namespace ConexionSql.Controllers.Recepcion
                     })
                     .ToList();
 
+                var configEstado = _context.APanOpc
+                 .FirstOrDefault(x => x.IdDenominacion == "A_PAN_EST_DEFAULT" && x.Valor == true);
+
+                var estadoDefaultId = configEstado?.ValorId;
+
                 ViewBag.SubFormularioDetalle = new TbRecDetFormDto
                 {
                     Detalle = new TbRecDetDto
                     {
-                        TB_REC_ID = nuevaRecepcion.TbRecId
+                        TB_REC_ID = nuevaRecepcion.TbRecId,
+                        IB_EST_ID = estadoDefaultId
                     },
                     Materiales = materiales,
                     Revisiones = revisiones,
-                    Estados = estados
+                    Estados = estados,
+                    EstadoDefaultId = estadoDefaultId
                 };
 
                 ViewBag.Detalles = new List<TbRecDetDto>();

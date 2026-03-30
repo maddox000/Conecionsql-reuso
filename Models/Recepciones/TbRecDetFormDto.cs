@@ -19,5 +19,8 @@ namespace ConexionSql.Models.Recepciones
         // Lista de revision para el combobox
         public List<IbMatRevDto> Revisiones { get; set; } = new List<IbMatRevDto>();
 
+        // Default de estado desde configuración
+        public int? EstadoDefaultId { get; set; }
+
     }
 }

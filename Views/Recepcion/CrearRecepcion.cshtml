@@ -40,31 +40,31 @@
 
         <!-- 🏭 Sectores a la derecha -->
         <div class="col-md-3">
-            <label for="TbRecSecOriId">Sector Origen</label>
-            <select asp-for="TbRecSecOriId" class="form-control">
-                <option value="">-- Seleccione --</option>
-                @if (listaSectores != null)
-                {
-                    @foreach (var s in listaSectores)
-                    {
-                        <option value="@s.IbSecId">@s.IbSecDen</option>
-                    }
-                }
-            </select>
+            <label for="TbRecSecOriBusqueda">Sector Origen</label>
+
+            <input type="text"
+                   id="TbRecSecOriBusqueda"
+                   class="form-control"
+                   autocomplete="off"
+                   value="@(listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecOriId)?.IbSecDen ?? "")" />
+
+            <div id="listaSectoresOrigen" class="list-group mt-2"></div>
+
+            <input type="hidden" asp-for="TbRecSecOriId" id="TbRecSecOriId" />
         </div>
 
         <div class="col-md-3">
-            <label for="TbRecSecDesId">Sector Destino</label>
-            <select asp-for="TbRecSecDesId" class="form-control">
-                <option value="">-- Seleccione --</option>
-                @if (listaSectores != null)
-                {
-                    @foreach (var s in listaSectores)
-                    {
-                        <option value="@s.IbSecId">@s.IbSecDen</option>
-                    }
-                }
-            </select>
+            <label for="TbRecSecDesBusqueda">Sector Destino</label>
+
+            <input type="text"
+                   id="TbRecSecDesBusqueda"
+                   class="form-control"
+                   autocomplete="off"
+                   value="@(listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecDesId)?.IbSecDen ?? "")" />
+
+            <div id="listaSectoresDestino" class="list-group mt-2"></div>
+
+            <input type="hidden" asp-for="TbRecSecDesId" id="TbRecSecDesId" />
         </div>
     </div>
 
@@ -80,7 +80,7 @@
 
         <div class="col-md-2">
             <label>Total recibido</label>
-            <input type="text" class="form-control"
+            <input type="text" id="TbRecCantTot" class="form-control"
                    value="@(Model?.TbRecCantTot ?? 0)"
                    readonly />
         </div>
@@ -102,24 +102,252 @@
 }
 
 @section Scripts {
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const sectorDestino = document.getElementById("TbRecSecDesId");
 
-            if (sectorDestino) {
-                sectorDestino.addEventListener("keydown", function (e) {
-                    if (e.key === "Enter") {
-                        e.preventDefault();
-                        this.form.submit();
-                    }
+            const sectores = [
+                @if (listaSectores != null)
+                {
+                        for (int i = 0; i < listaSectores.Count; i++)
+                        {
+                                var s = listaSectores[i];
+                                @:{ id: @s.IbSecId, den: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(s.IbSecDen ?? ""))" }@(i < listaSectores.Count - 1 ? "," : "")
+                        }
+                }
+            ];
+
+            const inputSectorDestino = document.getElementById("TbRecSecDesBusqueda");
+            const hiddenSectorDestino = document.getElementById("TbRecSecDesId");
+            const listaSectoresDestino = document.getElementById("listaSectoresDestino");
+
+            const inputSectorOrigen = document.getElementById("TbRecSecOriBusqueda");
+            const hiddenSectorOrigen = document.getElementById("TbRecSecOriId");
+            const listaSectoresOrigen = document.getElementById("listaSectoresOrigen");
+
+            if (inputSectorOrigen) {
+            inputSectorOrigen.focus();
+            inputSectorOrigen.select();
+        }
+
+            let sectoresDestinoFiltrados = [];
+            let indiceDestino = -1;
+
+            let sectoresOrigenFiltrados = [];
+            let indiceOrigen = -1;
+
+            // ================= DESTINO =================
+
+            function renderDestino(items) {
+                sectoresDestinoFiltrados = items || [];
+                listaSectoresDestino.innerHTML = "";
+
+                if (!items.length) {
+                    listaSectoresDestino.style.display = "none";
+                    return;
+                }
+
+                items.forEach((sec, i) => {
+                    const item = document.createElement("button");
+                    item.type = "button";
+                    item.className = "list-group-item list-group-item-action";
+                    item.textContent = sec.den;
+
+                    if (i === indiceDestino) item.classList.add("active");
+
+                    item.onclick = () => {
+                        inputSectorDestino.value = sec.den;
+                        hiddenSectorDestino.value = sec.id;
+                        listaSectoresDestino.style.display = "none";
+                        hiddenSectorDestino.form.submit();
+                    };
+
+                    listaSectoresDestino.appendChild(item);
                 });
 
-                sectorDestino.addEventListener("blur", function () {
-                    if (this.value) {
-                        this.form.submit();
+                listaSectoresDestino.style.display = "block";
+            }
+
+            if (inputSectorDestino) {
+
+                inputSectorDestino.addEventListener("focus", () => {
+                    indiceDestino = -1;
+                    renderDestino(sectores);
+                });
+
+                inputSectorDestino.addEventListener("input", function () {
+                    indiceDestino = -1;
+                    hiddenSectorDestino.value = "";
+
+                    const filtrados = sectores.filter(x =>
+                        x.den.toLowerCase().includes(this.value.toLowerCase())
+                    );
+
+                    renderDestino(filtrados);
+                });
+
+                inputSectorDestino.addEventListener("keydown", function (e) {
+
+                    if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        indiceDestino = (indiceDestino + 1) % sectoresDestinoFiltrados.length;
+                        renderDestino(sectoresDestinoFiltrados);
+                    }
+
+                    if (e.key === "ArrowUp") {
+                        e.preventDefault();
+                        indiceDestino = (indiceDestino - 1 + sectoresDestinoFiltrados.length) % sectoresDestinoFiltrados.length;
+                        renderDestino(sectoresDestinoFiltrados);
+                    }
+
+                if (e.key === "Enter") {
+                e.preventDefault();
+
+                const textoActual = (inputSectorDestino.value || "").trim();
+
+                // 🔥 1. si ya viene de ORIGEN (o ya tiene valor válido) → guardar directo
+                if (hiddenSectorDestino.value && textoActual !== "") {
+                    listaSectoresDestino.style.display = "none";
+                    hiddenSectorDestino.form.submit();
+                    return;
+                }
+
+                // 🔥 2. si usó flechas
+                if (indiceDestino >= 0 && sectoresDestinoFiltrados.length > 0) {
+                    const sel = sectoresDestinoFiltrados[indiceDestino];
+                    hiddenSectorDestino.value = sel.id;
+                    inputSectorDestino.value = sel.den;
+                    listaSectoresDestino.style.display = "none";
+                    hiddenSectorDestino.form.submit();
+                    return;
+                }
+
+                // 🔥 3. si escribió exacto
+                const exacto = sectores.find(x =>
+                    x.den.toLowerCase() === textoActual.toLowerCase()
+                );
+
+                if (exacto) {
+                    hiddenSectorDestino.value = exacto.id;
+                    inputSectorDestino.value = exacto.den;
+                    listaSectoresDestino.style.display = "none";
+                    hiddenSectorDestino.form.submit();
+                }
+            }
+                });
+            }
+
+            // ================= ORIGEN =================
+
+            function renderOrigen(items) {
+                sectoresOrigenFiltrados = items || [];
+                listaSectoresOrigen.innerHTML = "";
+
+                if (!items.length) {
+                    listaSectoresOrigen.style.display = "none";
+                    return;
+                }
+
+                items.forEach((sec, i) => {
+                    const item = document.createElement("button");
+                    item.type = "button";
+                    item.className = "list-group-item list-group-item-action";
+                    item.textContent = sec.den;
+
+                    if (i === indiceOrigen) item.classList.add("active");
+
+                    item.onclick = () => seleccionarOrigen(sec);
+
+                    listaSectoresOrigen.appendChild(item);
+                });
+
+                listaSectoresOrigen.style.display = "block";
+            }
+
+            function seleccionarOrigen(sec) {
+                inputSectorOrigen.value = sec.den;
+                hiddenSectorOrigen.value = sec.id;
+
+                // copiar a destino
+                inputSectorDestino.value = sec.den;
+                hiddenSectorDestino.value = sec.id;
+
+                listaSectoresOrigen.style.display = "none";
+
+                inputSectorDestino.focus();
+                inputSectorDestino.select();
+            }
+
+            if (inputSectorOrigen) {
+
+                inputSectorOrigen.addEventListener("focus", () => {
+                    indiceOrigen = -1;
+                    renderOrigen(sectores);
+                });
+
+                inputSectorOrigen.addEventListener("click", () => { indiceOrigen = -1; renderOrigen(sectores); });
+
+                inputSectorOrigen.addEventListener("input", function () {
+                    indiceOrigen = -1;
+                    hiddenSectorOrigen.value = "";
+
+                    const filtrados = sectores.filter(x =>
+                        x.den.toLowerCase().includes(this.value.toLowerCase())
+                    );
+
+                    renderOrigen(filtrados);
+                });
+
+                inputSectorOrigen.addEventListener("keydown", function (e) {
+
+                    if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        indiceOrigen = (indiceOrigen + 1) % sectoresOrigenFiltrados.length;
+                        renderOrigen(sectoresOrigenFiltrados);
+                    }
+
+                    if (e.key === "ArrowUp") {
+                        e.preventDefault();
+                        indiceOrigen = (indiceOrigen - 1 + sectoresOrigenFiltrados.length) % sectoresOrigenFiltrados.length;
+                        renderOrigen(sectoresOrigenFiltrados);
+                    }
+
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+
+                        if (indiceOrigen >= 0) {
+                            seleccionarOrigen(sectoresOrigenFiltrados[indiceOrigen]);
+                        }
                     }
                 });
             }
+
+            // cerrar listas
+            document.addEventListener("click", function (e) {
+                if (!inputSectorDestino.contains(e.target) && !listaSectoresDestino.contains(e.target)) {
+                    listaSectoresDestino.style.display = "none";
+                }
+                if (!inputSectorOrigen.contains(e.target) && !listaSectoresOrigen.contains(e.target)) {
+                    listaSectoresOrigen.style.display = "none";
+                }
+            });
+
         });
     </script>
+
+    @if (Model != null && Model.TbRecId > 0)
+    {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const inputCodigo = document.getElementById("TB_REC_DET_MAT_PR");
+                if (inputCodigo) {
+                    setTimeout(() => {
+                        inputCodigo.focus();
+                        inputCodigo.select();
+                    }, 200);
+                }
+            });
+        </script>
+    }
+
 }

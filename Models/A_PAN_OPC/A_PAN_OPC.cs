@@ -18,5 +18,8 @@ namespace ConexionSql.Models.A_PAN_OPC
 
         [Column("VALOR")]
         public bool Valor { get; set; }
+
+        [Column("VALOR_ID")]
+        public int? ValorId { get; set; }
     }
 }

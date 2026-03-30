@@ -117,6 +117,96 @@
         const revisionSelect = document.getElementById("TB_REC_DET_REP_ID");
         const btnGuardar = document.getElementById("btnGuardar");
 
+
+            if (revisionSelect && !revisionSelect.value) {
+                revisionSelect.value = "1";
+                revisionSelect.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+
+            if (revisionSelect) {
+                revisionSelect.addEventListener("focus", function () {
+                    if (!this.value) {
+                        this.value = "1";
+                        this.dispatchEvent(new Event("change", { bubbles: true }));
+                    }
+                });
+            }
+
+                if (revisionSelect) {
+        revisionSelect.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+
+                if (!this.value) {
+                    this.value = "1";
+                    this.dispatchEvent(new Event("change", { bubbles: true }));
+                }
+
+                if (estadoSelect) {
+                    estadoSelect.focus();
+                }
+            }
+        });
+
+    }
+
+
+        if (estadoSelect) {
+        estadoSelect.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+
+                if (!this.value) {
+                    const primeraOpcionValida = Array.from(this.options).find(x => x.value);
+                    if (primeraOpcionValida) {
+                        this.value = primeraOpcionValida.value;
+                        this.dispatchEvent(new Event("change", { bubbles: true }));
+                    }
+                }
+
+                if (cantidadInput) {
+                    cantidadInput.focus();
+                    cantidadInput.select?.();
+                }
+            }
+        });
+    }
+
+        if (estadoSelect) {
+        estadoSelect.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+
+                if (!this.value) {
+                    const primeraOpcionValida = Array.from(this.options).find(x => x.value);
+                    if (primeraOpcionValida) {
+                        this.value = primeraOpcionValida.value;
+                        this.dispatchEvent(new Event("change", { bubbles: true }));
+                    }
+                }
+
+                if (cantidadInput) {
+                    cantidadInput.focus();
+                    cantidadInput.select?.();
+                }
+            }
+        });
+    }
+
+    if (cantidadInput) {
+        cantidadInput.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+
+                if (codigoProductoInput) {
+                    codigoProductoInput.focus();
+                    codigoProductoInput.select?.();
+                }
+            }
+        });
+    }
+
+
         const stockEmpInput = document.getElementById("TB_REC_DET_EMP_STOCK");
         const stockProInput = document.getElementById("TB_REC_DET_PRO_STOCK");
         const stockLavInput = document.getElementById("TB_REC_DET_LAV_STOCK");
@@ -148,6 +238,33 @@
 
         const materialBusqueda = document.getElementById("materialBusqueda");
         const listaMateriales = document.getElementById("listaMateriales");
+
+        //lleva de codigo producto a denominacion
+
+        if (codigoProductoInput && materialBusqueda) {
+                codigoProductoInput.addEventListener("keydown", function (e) {
+                    if (e.key === "Enter") {
+                        const valor = (this.value || "").trim();
+
+                        if (valor === "") {
+                            e.preventDefault();
+                            materialBusqueda.focus();
+                            materialBusqueda.select();
+                        }
+                    }
+                });
+
+                codigoProductoInput.addEventListener("blur", function () {
+                    const valor = (this.value || "").trim();
+
+                    if (valor === "") {
+                        setTimeout(() => {
+                            materialBusqueda.focus();
+                            materialBusqueda.select();
+                        }, 100);
+                    }
+                });
+            }
 
         let materialesBusqueda = [];
         let indiceMaterial = -1;
@@ -190,71 +307,107 @@
             });
         }
 
-        if (materialBusqueda && listaMateriales) {
-            materialBusqueda.addEventListener("input", function () {
-                const texto = this.value.trim();
+                    if (materialBusqueda && listaMateriales) {
 
-                listaMateriales.innerHTML = "";
-                document.getElementById("IB_MAT_ID").value = "";
-                document.getElementById("TB_REC_DET_MAT_ID").value = "";
-                materialesBusqueda = [];
-                indiceMaterial = -1;
+        materialBusqueda.addEventListener("click", function () {
 
-                if (texto.length < 2) return;
+            // solo abrir lista si el campo está vacío
+            if ((this.value || "").trim() !== "") return;
 
-                console.log("buscando texto:", texto);
+            fetch(`/TbRecDet/BuscarMaterial?texto=1`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || data.length === 0) return;
 
-                fetch(`/TbRecDet/BuscarMaterial?texto=${encodeURIComponent(texto)}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (!data || data.length === 0) return;
+                    materialesBusqueda = data;
+                    indiceMaterial = -1;
 
-                        materialesBusqueda = data;
-                        indiceMaterial = -1;
+                    renderizarListaMateriales();
+                })
+                .catch(error => {
+                    console.error("Error al desplegar materiales:", error);
+                });
+        });
 
-                        renderizarListaMateriales();
-                    })
-                    .catch(error => {
-                        console.error("Error al buscar material:", error);
-                    });
-            });
+        materialBusqueda.addEventListener("input", function () {
+            const texto = this.value.trim();
 
-            materialBusqueda.addEventListener("keydown", function (e) {
+            listaMateriales.innerHTML = "";
+            document.getElementById("IB_MAT_ID").value = "";
+            document.getElementById("TB_REC_DET_MAT_ID").value = "";
+            materialesBusqueda = [];
+            indiceMaterial = -1;
+
+            if (texto.length < 2) return;
+
+            console.log("buscando texto:", texto);
+
+            fetch(`/TbRecDet/BuscarMaterial?texto=${encodeURIComponent(texto)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || data.length === 0) return;
+
+                    materialesBusqueda = data;
+                    indiceMaterial = -1;
+
+                    renderizarListaMateriales();
+                })
+                .catch(error => {
+                    console.error("Error al buscar material:", error);
+                });
+        });
+
+        materialBusqueda.addEventListener("keydown", function (e) {
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+
                 if (!materialesBusqueda || materialesBusqueda.length === 0) return;
 
-                if (e.key === "ArrowDown") {
-                    e.preventDefault();
-
-                    if (indiceMaterial < materialesBusqueda.length - 1) {
-                        indiceMaterial++;
-                    } else {
-                        indiceMaterial = 0;
-                    }
-
-                    renderizarListaMateriales();
+                if (indiceMaterial < materialesBusqueda.length - 1) {
+                    indiceMaterial++;
+                } else {
+                    indiceMaterial = 0;
                 }
 
-                if (e.key === "ArrowUp") {
-                    e.preventDefault();
+                renderizarListaMateriales();
+            }
 
-                    if (indiceMaterial > 0) {
-                        indiceMaterial--;
-                    } else {
-                        indiceMaterial = materialesBusqueda.length - 1;
-                    }
+            if (e.key === "ArrowUp") {
+                e.preventDefault();
 
-                    renderizarListaMateriales();
+                if (!materialesBusqueda || materialesBusqueda.length === 0) return;
+
+                if (indiceMaterial > 0) {
+                    indiceMaterial--;
+                } else {
+                    indiceMaterial = materialesBusqueda.length - 1;
                 }
 
-                if (e.key === "Enter") {
-                    e.preventDefault();
+                renderizarListaMateriales();
+            }
 
-                    if (indiceMaterial >= 0 && indiceMaterial < materialesBusqueda.length) {
-                        seleccionarMaterial(materialesBusqueda[indiceMaterial]);
+            if (e.key === "Enter") {
+                e.preventDefault();
+
+                if (indiceMaterial >= 0 && indiceMaterial < materialesBusqueda.length) {
+                    seleccionarMaterial(materialesBusqueda[indiceMaterial]);
+
+                    if (revisionSelect) {
+                        revisionSelect.focus();
                     }
+
+                    return;
                 }
-            });
-        }
+
+                listaMateriales.innerHTML = "";
+
+                if (revisionSelect) {
+                    revisionSelect.focus();
+                }
+            }
+        });
+    }
+    
 
         const modalRegistroControlArmadoElement = document.getElementById("modalRegistroControlArmado");
         const modalRegistroControlArmado = modalRegistroControlArmadoElement
@@ -881,6 +1034,11 @@
                     const contenedor = document.getElementById("contenedor-detalles");
                     if (contenedor && resultInsertar.html !== undefined) {
                         contenedor.innerHTML = resultInsertar.html;
+                    }
+
+                const totalInput = document.getElementById("TbRecCantTot");
+                    if (totalInput) {
+                        totalInput.value = resultInsertar.totalRecibido ?? 0;
                     }
                 } else {
                     mostrarError("❌ " + resultInsertar.mensaje);

@@ -907,11 +907,17 @@ namespace ConexionSql.Controllers
                 _context.TbRecDet.Add(entidad);
                 await _context.SaveChangesAsync();
 
-                // 🔢 SUMAR AL TOTAL DE LA CABECERA
-                tbRec.TbRecCantTot = (tbRec.TbRecCantTot ?? 0) + detalle.TB_REC_DET_CANT;
+                // 🔢 CONSULTAR TOTAL ACTUAL Y SUMAR CANTIDAD INSERTADA
+                var totalActual = await _context.TbRec
+                    .Where(r => r.TbRecId == detalle.TB_REC_ID)
+                    .Select(r => r.TbRecCantTot)
+                    .FirstOrDefaultAsync();
+
+                tbRec.TbRecCantTot = (totalActual ?? 0) + (entidad.TbRecDetCant);
 
                 _context.TbRec.Update(tbRec);
                 await _context.SaveChangesAsync();
+
 
                 string zpl = Etiquetas.RecepcionDetalle(
                     material: nombreMaterial,
@@ -952,7 +958,8 @@ namespace ConexionSql.Controllers
                 {
                     success = true,
                     mensaje = "✅ Detalle agregado correctamente.",
-                    html
+                    html,
+                    totalRecibido = tbRec.TbRecCantTot
                 });
             }
             catch (Exception ex)
