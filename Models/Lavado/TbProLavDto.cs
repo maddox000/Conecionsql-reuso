@@ -19,6 +19,6 @@
         public string? TbProLavTciDen { get; set; } // Tipo de ciclo
 
         public string? TbProLavEstDen { get; set; } // Estado del proceso
-        public int? TbProLavCant { get; set; } // Cantidad de unidades
+        public int? TbProLavUpro { get; set; } // Cantidad de unidades
     }
 }

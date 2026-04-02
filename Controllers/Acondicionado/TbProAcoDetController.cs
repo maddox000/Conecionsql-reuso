@@ -34,7 +34,9 @@ namespace ConexionSql.Controllers
                 if (cabecera == null)
                     return Json(new { success = false, mensaje = "❌ Cabecera no encontrada." });
 
-                var recDet = await _context.TbRecDet.FirstOrDefaultAsync(r => r.TbRecDetId == tbRecDetId);
+                var recDet = await _context.TbRecDet
+                    .FirstOrDefaultAsync(r => r.TbRecDetId == tbRecDetId);
+
                 if (recDet == null)
                     return Json(new { success = false, mensaje = "❌ No se encontró el detalle de recepción." });
 
@@ -49,6 +51,7 @@ namespace ConexionSql.Controllers
                 recDet.TbRecDetEmpStock -= cantidad;
                 recDet.TbRecDetEmpTot = (recDet.TbRecDetEmpTot ?? 0) + cantidad;
                 recDet.TbRecDetProStock = (recDet.TbRecDetProStock ?? 0) + cantidad;
+
                 // Estado ingreso en TB_REC_DET
                 recDet.TbRecDetEstIngId = 24;
                 recDet.TbRecDetEstIngDen = "CE PROCESO ACONDICIONADO";
@@ -61,19 +64,35 @@ namespace ConexionSql.Controllers
                     TbProAcoDetMatId = recDet.TbRecDetMatId,
                     TbProAcoDetMatDen = recDet.TbRecDetMatDen,
                     TbProAcoDetCant = cantidad,
+
+                    // Extras seguros
+                    TbProAcoDetReuId = recDet.TbRecDetReuId,
+                    TbProAcoDetMatEtiId = recDet.TbRecDetMatEtiId,
+                    TbProAcoDetMatEtiDen = recDet.TbRecDetMatEtiDen,
+                    TbProAcoDetRecDetCant = recDet.TbRecDetCant,
+
+                    // Estos los dejamos fijos para no romper
+                    TbProAcoDetSecDesId = 0,
+                    TbProAcoDetMatVol = 0,
+
+                    // Stock
                     TbProAcoDetEmpStock = stockDisponible,
                     TbProAcoDetEmpCant = cantidad,
                     TbProAcoDetEmpTot = cantidad,
                     TbProAcoDetProStock = cantidad,
+
                     TbProAcoDetPcLog = Environment.MachineName,
                     TbProAcoDetPcUsr = Environment.UserName,
                     TbProAcoDetHor = DateTime.Now
                 };
 
                 _context.TbProAcoDet.Add(nuevoDet);
+
+                // Sumar cantidad a la cabecera
+                cabecera.TbProAcoUpro = (cabecera.TbProAcoUpro ?? 0) + cantidad;
+
                 await _context.SaveChangesAsync();
 
-                // Cargar lista actualizada
                 var detallesActualizados = await _context.TbProAcoDet
                     .Where(d => d.TbProAcoDetAcoId == tbProAcoId)
                     .Select(d => new TbProAcoDetDto
@@ -88,7 +107,6 @@ namespace ConexionSql.Controllers
                     })
                     .ToListAsync();
 
-                // 🔁 Renderizar vista parcial como string (como en Recepción)
                 string html = await this.RenderViewToStringAsync(
                     "~/Views/Acondicionado/_DetalleTablaAco.cshtml",
                     detallesActualizados,

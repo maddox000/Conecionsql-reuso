@@ -170,7 +170,7 @@
 
             if (inputSectorDestino) {
 
-                inputSectorDestino.addEventListener("focus", () => {
+                inputSectorDestino.addEventListener("click", () => {
                     indiceDestino = -1;
                     renderDestino(sectores);
                 });
@@ -345,9 +345,19 @@
                         inputCodigo.focus();
                         inputCodigo.select();
                     }, 200);
+
                 }
             });
+
         </script>
     }
+
+    <script>
+        localStorage.setItem("modulo_23_abierto", "1");
+
+        window.addEventListener("beforeunload", function () {
+            localStorage.removeItem("modulo_23_abierto");
+        });
+    </script>
 
 }

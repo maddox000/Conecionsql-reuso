@@ -61,6 +61,7 @@ namespace ConexionSql.Models.Acondicionado
 
         // TB_PRO_ACO_OBS
         [Column("TB_PRO_ACO_OBS")]
-        public string? TbProAcoObs { get; set; }
+       public string? TbProAcoObs { get; set; }
+
     }
 }

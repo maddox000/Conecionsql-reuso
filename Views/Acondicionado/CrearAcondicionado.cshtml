@@ -1,30 +1,45 @@
 ﻿@model ConexionSql.Models.Acondicionado.TbProAco
 
-@{
-    ViewData["Title"] = "Nuevo Acondicionado";
-}
-
-<h2 class="mb-4">➕ Nuevo Acondicionado</h2>
-
-@if (TempData["MensajeExito"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["MensajeExito"]
-    </div>
-}
-
 <form asp-action="CrearAcondicionado" method="post">
+
     <div class="form-group mb-3">
         <label>👤 Usuario</label>
         <input type="text" class="form-control" value="@ViewBag.UsuarioLogueado" readonly />
     </div>
 
+    <div class="form-group mb-3">
+        <label>⏱ Hora inicio</label>
+        <input asp-for="TbProAcoHorIni"
+               type="datetime-local"
+               class="form-control"
+               value="@(Model?.TbProAcoHorIni?.ToString("yyyy-MM-ddTHH:mm") ?? DateTime.Now.ToString("yyyy-MM-ddTHH:mm"))" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label>⏱ Hora fin</label>
+        <input asp-for="TbProAcoHorFin"
+               type="datetime-local"
+               class="form-control"
+               value="@(Model?.TbProAcoHorFin?.ToString("yyyy-MM-ddTHH:mm") ?? DateTime.Now.ToString("yyyy-MM-ddTHH:mm"))" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label>📦 Cantidad</label>
+        <input asp-for="TbProAcoUpro" type="number" class="form-control" />
+    </div>
+
     <button type="submit" class="btn btn-success">💾 Guardar Cabecera</button>
+
 </form>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        window.addEventListener("beforeunload", function () {
+            localStorage.removeItem("modulo_135_abierto");
+        });
+    </script>
 }

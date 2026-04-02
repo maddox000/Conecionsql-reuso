@@ -148,6 +148,15 @@ namespace ConexionSql.Controllers.Lavado
             _context.TbProLavDet.Add(nuevo);
             await _context.SaveChangesAsync();
 
+            var cabecera = await _context.TbProLav
+            .FirstOrDefaultAsync(x => x.TbProLavId == dto.TB_PRO_LAV_ID);
+
+            if (cabecera != null)
+            {
+                cabecera.TbProLavUpro = (cabecera.TbProLavUpro ?? 0) + (dto.TB_PRO_LAV_DET_CANT ?? 0);
+                await _context.SaveChangesAsync();
+            }
+
             var detalles = await _context.TbProLavDet
                 .Where(d => d.TB_PRO_LAV_DET_PRO_LAV_ID == dto.TB_PRO_LAV_ID)
                 .OrderByDescending(d => d.TB_PRO_LAV_DET_ID)
@@ -171,7 +180,8 @@ namespace ConexionSql.Controllers.Lavado
                 success = true,
                 html,
                 mensaje = "✅ Detalle agregado correctamente.",
-                tbProLavId = dto.TB_PRO_LAV_ID
+                tbProLavId = dto.TB_PRO_LAV_ID,
+                total = cabecera?.TbProLavUpro ?? 0
             });
         }
 

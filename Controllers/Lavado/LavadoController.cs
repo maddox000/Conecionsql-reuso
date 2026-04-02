@@ -118,6 +118,9 @@ namespace ConexionSql.Controllers
                 if (personal == null)
                     return Json(new { success = false, mensaje = "No se encontró el personal logueado." });
 
+                var equipo = await _context.IbEqu
+                .FirstOrDefaultAsync(e => e.IbEquId == dto.EquipoId);
+
                 // 📄 Instancia del modelo
                 var entidad = new TbProLav
                 {
@@ -129,6 +132,13 @@ namespace ConexionSql.Controllers
                     TbProLavPtiDen = dto.TipoLavadoDen,
                     TbProLavEquId = dto.EquipoId,
                     TbProLavEquDen = dto.EquipoDen,
+                    TbProLavEquNum = equipo?.IbEquNum?.ToString(),
+                    TbProIbEquTeqId = equipo?.IbEquTeqId,
+                    TbProIbEquTeqDen = equipo?.IbEquTeqDen,
+                    TbProLavEquMarId = equipo?.IbEquMarId,
+                    TbProLavEquMarDen = equipo?.IbEquMarDen,
+                    TbProLavEquSer = equipo?.IbEquSer,
+                    TbProLavEquMod = equipo?.IbEquMod,
                     TbProLavTciId = dto.TipoCicloId,
                     TbProLavTciDen = dto.TipoCicloDen,
 
@@ -141,6 +151,23 @@ namespace ConexionSql.Controllers
                     TbProLavPcLog = Environment.MachineName,
                     TbProLavPcUsr = Environment.UserName
                 };
+
+                if (dto.TipoLavadoId == 4)
+                {
+                    entidad.TbProLavEquId = 1;
+                    entidad.TbProLavEquDen = "NO REGISTRADO";
+
+                    entidad.TbProLavTciId = 1;
+                    entidad.TbProLavTciDen = "NO REGISTRADO";
+
+                    entidad.TbProLavEquNum = null;
+                    entidad.TbProIbEquTeqId = null;
+                    entidad.TbProIbEquTeqDen = null;
+                    entidad.TbProLavEquMarId = null;
+                    entidad.TbProLavEquMarDen = null;
+                    entidad.TbProLavEquSer = null;
+                    entidad.TbProLavEquMod = null;
+                }
 
                 _context.TbProLav.Add(entidad);
                 await _context.SaveChangesAsync();

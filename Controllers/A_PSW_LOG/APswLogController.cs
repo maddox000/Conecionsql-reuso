@@ -86,8 +86,3 @@ namespace ConexionSql.Controllers.A_PSW_LOG
     }
 }
 
-public class LoginRequest
-{
-    public int Id { get; set; }
-    public string Clave { get; set; } = string.Empty;
-}

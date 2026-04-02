@@ -11,7 +11,7 @@
         <tr><th>🔁 Tipo de Ciclo</th><td>@Model.Cabecera.TbProLavTciDen</td></tr>
         <tr><th>📅 Fecha</th><td>@Model.Cabecera.TbProLavFec?.ToString("yyyy-MM-dd")</td></tr>
         <tr><th>🕐 Hora Inicio</th><td>@Model.Cabecera.TbProLavHorIni?.ToString(@"hh\:mm")</td></tr>
-
+        <tr><th>📦 Cantidad Total</th><td id="cantidadTotal">@((Model.Cabecera.TbProLavUpro ?? 0))</td></tr>
     </table>
 
 
@@ -132,19 +132,26 @@
             })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success) {
-                        mostrarOk(data.mensaje || "✅ Detalle agregado correctamente.");
-                        inputEtiqueta.value = "";
-                        inputMaterial.value = "";
-                        inputCantidad.value = "1";
-                        etiquetaId = 0;
-                        materialId = 0;
-                        document.getElementById("detalleTabla").innerHTML = data.html;
-                        inputEtiqueta.focus();
-                    } else {
-                        mostrarError(data.mensaje || "❌ Error al guardar.");
+                if (data.success) {
+                    mostrarOk(data.mensaje || "✅ Detalle agregado correctamente.");
+                    inputEtiqueta.value = "";
+                    inputMaterial.value = "";
+                    inputCantidad.value = "1";
+                    etiquetaId = 0;
+                    materialId = 0;
+
+                    document.getElementById("detalleTabla").innerHTML = data.html;
+
+                    const totalCell = document.getElementById("cantidadTotal");
+                    if (totalCell) {
+                        totalCell.innerText = data.total ?? 0;
                     }
-                })
+
+                    inputEtiqueta.focus();
+                } else {
+                    mostrarError(data.mensaje || "❌ Error al guardar.");
+                }
+            })
                 .catch(() => mostrarError("❌ Error inesperado."));
         }
 

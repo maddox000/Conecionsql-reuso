@@ -89,7 +89,9 @@ namespace ConexionSql.Controllers.Acondicionado
                 var entidad = new TbProAco
                 {
                     TbProAcoFec = DateTime.Now.Date,
-                    TbProAcoHorIni = DateTime.Now,
+                    TbProAcoHorIni = model.TbProAcoHorIni,
+                    TbProAcoHorFin = model.TbProAcoHorFin,
+                    TbProAcoUpro = model.TbProAcoUpro,
 
                     // 👤 Usuario logueado
                     TbProAcoPerId = personal?.IbPerId,
@@ -98,7 +100,22 @@ namespace ConexionSql.Controllers.Acondicionado
                     TbProAcoPerCarDen = personal?.IbPerCarDen,
 
                     TbProAcoPcLog = Environment.MachineName,
-                    TbProAcoPcUsr = Environment.UserName
+                    TbProAcoPcUsr = Environment.UserName,
+
+                    TbProAcoNum1 = 0,
+                    TbProAcoNum2 = 0,
+                    TbProAcoNum3 = 0,
+                    TbProAcoTxt1 = "TXT",
+                    TbProAcoTxt2 = "TXT",
+                    TbProAcoTxt3 = "TXT",
+                    // MEM
+                    TbProAcoMem1 = "MEM",
+                    TbProAcoMem2 = "MEM",
+                    TbProAcoMem3 = "MEM",
+
+                    // CLIENTE
+                    TbProAcoCliId = 0,
+                    TbProAcoCliDen = "NO REGISTRADO",
                 };
 
                 _context.TbProAco.Add(entidad);

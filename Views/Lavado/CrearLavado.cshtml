@@ -27,6 +27,11 @@
         <input type="text" class="form-control" id="horaInicio" value="@horaInicio" readonly />
     </div>
 
+    <div class="form-group mt-3">
+        <label>Cantidad Total</label>
+        <input type="text" class="form-control" id="cantidadTotal" value="0" readonly />
+    </div>
+
     <!-- 🧼 Tipo de Lavado -->
     <div class="form-group mt-4">
         <label for="TipoLavadoId">Tipo de Lavado</label>
@@ -123,6 +128,13 @@
                 opt.text = c.nombre;
                 comboCiclo.appendChild(opt);
             });
+        });
+    </script>
+    <script>
+        localStorage.setItem("modulo_134_abierto", "1");
+
+        window.addEventListener("beforeunload", function () {
+            localStorage.removeItem("modulo_134_abierto");
         });
     </script>
 }

@@ -1,48 +1,56 @@
 ﻿@model ConexionSql.Models.Acondicionado.TbProAcoDetFormDto
 
-<!-- 🧪 Subformulario de Acondicionado -->
 <div class="subform-acondicionado mt-4">
-    <h4>➕ Agregar Detalle desde Etiqueta</h4>
 
-    <!-- 🧾 Cabecera del proceso -->
+    <!-- CABECERA -->
     <table class="table table-bordered mt-3">
         <tr><th>ID</th><td>@Model.Cabecera.TbProAcoId</td></tr>
         <tr><th>Personal</th><td>@Model.Cabecera.TbProAcoPerNom</td></tr>
+        <tr><th>Hora inicio</th><td>@Model.Cabecera.TbProAcoHorIni</td></tr>
+        <tr><th>Hora fin</th><td>@Model.Cabecera.TbProAcoHorFin</td></tr>
+        <tr><th>Cantidad</th><td id="cabeceraCantidad">@Model.Cabecera.TbProAcoUpro</td></tr>
     </table>
 
     <form id="formAcoDetalle" onsubmit="return false;">
-        <!-- 🛠️ Campo oculto con el ID de la cabecera de acondicionado -->
+
         <input type="hidden" id="tbProAcoId" value="@Model.Cabecera.TbProAcoId" />
 
-        <!-- 🏷️ Código de etiqueta -->
         <div class="form-group">
             <label for="tbRecDetId">Código de etiqueta</label>
-            <input type="number" class="form-control" id="tbRecDetId" name="tbRecDetId" placeholder="Ingrese código y presione Enter" required />
+            <input type="number"
+                   class="form-control"
+                   id="tbRecDetId"
+                   name="tbRecDetId"
+                   placeholder="Ingrese código y presione Enter"
+                   required />
         </div>
 
-        <!-- 🧾 Nombre del material -->
         <div class="form-group mt-2">
             <label for="materialNombre">Material</label>
-            <input type="text" class="form-control" id="materialNombre" name="materialNombre" readonly />
+            <input type="text"
+                   class="form-control"
+                   id="materialNombre"
+                   readonly />
         </div>
 
-        <!-- 🔢 Cantidad -->
         <div class="form-group mt-2">
             <label for="cantidad">Cantidad a emplear</label>
-            <input type="number" class="form-control" id="cantidad" name="cantidad" min="1" step="1" placeholder="Cantidad a procesar" required />
+            <input type="number"
+                   class="form-control"
+                   id="cantidad"
+                   min="1"
+                   step="1"
+                   required />
         </div>
     </form>
 
-    <!-- 🗨️ Mensajes -->
     <div id="mensajeAco" class="mt-3 text-success"></div>
+
+    <div id="contenedor-aco-detalles" class="mt-4">
+        @await Html.PartialAsync("~/Views/Acondicionado/_DetalleTablaAco.cshtml", Model.Detalles)
+    </div>
 </div>
 
-<!-- 📋 Tabla de detalles cargados -->
-<div id="contenedor-aco-detalles" class="mt-4">
-    @await Html.PartialAsync("~/Views/Acondicionado/_DetalleTablaAco.cshtml", Model.Detalles)
-</div>
-
-<!-- 📜 Script -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const inputEtiqueta = document.getElementById("tbRecDetId");
@@ -50,11 +58,19 @@
         const inputCabecera = document.getElementById("tbProAcoId");
         const inputMaterial = document.getElementById("materialNombre");
         const mensaje = document.getElementById("mensajeAco");
+        const cabeceraCantidad = document.getElementById("cabeceraCantidad");
+        const formAcoDetalle = document.getElementById("formAcoDetalle");
+
+        if (!inputEtiqueta || !inputCantidad || !inputCabecera || !inputMaterial || !mensaje || !formAcoDetalle) {
+            return;
+        }
 
         inputEtiqueta.addEventListener("keydown", function (event) {
             if (event.key === "Enter") {
                 event.preventDefault();
+
                 const idEtiqueta = parseInt(inputEtiqueta.value);
+
                 if (!Number.isInteger(idEtiqueta)) {
                     mensaje.innerText = "❌ Código inválido.";
                     mensaje.className = "text-danger mt-3";
@@ -78,6 +94,7 @@
         inputCantidad.addEventListener("keydown", function (event) {
             if (event.key === "Enter") {
                 event.preventDefault();
+
                 const tbRecDetId = parseInt(inputEtiqueta.value);
                 const cantidad = parseInt(inputCantidad.value);
                 const tbProAcoId = parseInt(inputCabecera.value);
@@ -97,11 +114,19 @@
                     mensaje.className = result.success ? "text-success mt-3" : "text-danger mt-3";
 
                     if (result.success) {
-                        document.getElementById("formAcoDetalle").reset();
+                        formAcoDetalle.reset();
                         inputMaterial.value = "";
+
                         if (result.html) {
                             document.getElementById("contenedor-aco-detalles").innerHTML = result.html;
                         }
+
+                        if (cabeceraCantidad) {
+                            const actual = parseInt(cabeceraCantidad.innerText || "0");
+                            cabeceraCantidad.innerText = actual + cantidad;
+                        }
+
+                        inputEtiqueta.focus();
                     }
                 })
                 .catch(err => {

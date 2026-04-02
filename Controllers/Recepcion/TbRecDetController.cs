@@ -771,7 +771,9 @@ namespace ConexionSql.Controllers
                     TbRecHor = tbRec.TbRecHorIni,
                     TbRecPerId = tbRec.TbRecPerId,
                     TbRecPerNom = tbRec.TbRecPerNom,
-                    TbRecPerApe = tbRec.TbRecPerApe,
+                    TbRecPerApe = !string.IsNullOrWhiteSpace(tbRec.TbRecPerApe)
+        ? tbRec.TbRecPerApe
+        : "NO REGISTRA",
                     TbRecPerCarId = tbRec.TbRecPerCarId,
                     TbRecPerCarDen = tbRec.TbRecPerCarDen,
                     TbRecSecOriId = tbRec.TbRecSecOriId,
@@ -788,6 +790,8 @@ namespace ConexionSql.Controllers
                     TbRecDetMatPr = material.IB_MAT_PR,
                     TbRecDetMatMtiId = material.IB_MAT_MTI_ID,
                     TbRecDetMatMtiDen = material.IB_MAT_MTI_DEN,
+                    TbRecDetMatEtiId = material.IB_MAT_ETI_ID,
+                    TbRecDetMatEtiDen = material.IB_MAT_ETI_DEN,
 
                     // DATOS CALCULADOS POR BOT_AUT
                     IbMatVol = detalle.TB_REC_DET_VOL,
@@ -808,26 +812,32 @@ namespace ConexionSql.Controllers
                     TbRecDetReuOpc = detalle.TB_REC_DET_REU_OPC,
 
                     TbRecDetReuId = !string.IsNullOrWhiteSpace(detalle.TB_REC_DET_REU_ID)
-                    ? detalle.TB_REC_DET_REU_ID
-                    : "1",
+        ? detalle.TB_REC_DET_REU_ID
+        : "1",
 
                     TbRecDetReuDen = !string.IsNullOrWhiteSpace(detalle.TB_REC_DET_REU_DEN)
-                    ? detalle.TB_REC_DET_REU_DEN
-                    : "NO REGISTRADO",
+        ? detalle.TB_REC_DET_REU_DEN
+        : "NO REGISTRADO",
 
                     TbRecDetReuCant = detalle.TB_REC_DET_REU_CANT ?? 0,
                     TbRecDetOrtId = 0,
                     TbRecDetOrtDen = "NO REGISTRA",
-                    
 
                     // CAMPOS QUE VENÍAN CARGADOS
                     TbRecDetProId = 1,
                     TbRecDetProNom = "NO REGISTRA",
                     TbRecDetProApe = "NO REGISTRA",
+                    TbRecDetProPtiId = 1,
+                    TbRecDetProPtiDen = "NO REGISTRA",
                     TbRecDetPac = "NO REGISTRA",
                     TbRecDetRem = "0",
+                    TbRecDetDat = "NO REGISTRA",
+                    TbRecDetTxt1 = "NO REGISTRA",
+                    TbRecDetTxt2 = "NO REGISTRA",
                     TbRecDetObs = registro?.FaltantesObservaciones,
                     TbRecDetMde = registro?.TbRecDetMde ?? false,
+                    TbRecDetMort = 1,
+                    TbRecDetCantMult = 1,
 
                     // STOCKS DE RECEPCIÓN
                     TbRecDetRecCant = 0,
@@ -863,6 +873,9 @@ namespace ConexionSql.Controllers
                     TbRecDetProCant = 0,
                     TbRecDetProTot = 0,
                     TbRecDetProUde = udePro,
+                    TbRecDetSecProcStock = 0,
+                    TbRecDetSecProcTot = 0,
+                    TbRecDetProcSecStock = 0,
 
                     // ENTREGA
                     TbRecDetEntTot = 0,
@@ -872,6 +885,8 @@ namespace ConexionSql.Controllers
                     TbRecDetSecCant = 0,
                     TbRecDetSecStock = 0,
                     TbRecDetSecTot = 0,
+                    TbRecDetSecRegStock = 0,
+                    TbRecDetSecRegTot = 0,
 
                     // DEVOLUCIÓN
                     TbRecDetDevCant = 0,
@@ -899,8 +914,13 @@ namespace ConexionSql.Controllers
                     TbRecDetIvisOpc = registro?.Control ?? false,
                     TbRecDetAcajOpc = registro?.ArmadoCaja ?? false,
 
-                    TbRecDetIvisOpcNom = registro?.ControladaPor,
-                    TbRecDetAcajOpcNom = registro?.ArmadaPor,
+                    TbRecDetIvisOpcNom = !string.IsNullOrWhiteSpace(registro?.ControladaPor)
+        ? registro.ControladaPor
+        : "NO REGISTRADO",
+
+                    TbRecDetAcajOpcNom = !string.IsNullOrWhiteSpace(registro?.ArmadaPor)
+        ? registro.ArmadaPor
+        : "NO REGISTRA",
                 };
 
 

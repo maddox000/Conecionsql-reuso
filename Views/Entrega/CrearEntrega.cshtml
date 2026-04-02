@@ -122,4 +122,11 @@
             }
         }
     </script>
+    <script>
+        localStorage.setItem("modulo_25_abierto", "1");
+
+        window.addEventListener("beforeunload", function () {
+            localStorage.removeItem("modulo_25_abierto");
+        });
+    </script>
 }

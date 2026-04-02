@@ -1,37 +1,78 @@
 ﻿// ==========================================
-// ABRIR MODAL DESDE RECEPCIONES
+// ABRIR MODAL SOLO SI EL MODULO NO ESTA ABIERTO
+// ==========================================
+function abrirModuloConLogin(e, claveModulo, mensaje, destino) {
+    e.preventDefault();
+
+    if (localStorage.getItem(claveModulo) === "1") {
+        alert(mensaje);
+        return;
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById('loginTareasModal'));
+    modal.show();
+
+    localStorage.setItem("loginDestino", destino);
+}
+
+// ==========================================
+// RECEPCION - 23
 // ==========================================
 document.getElementById('btnRecepcion')?.addEventListener('click', function (e) {
-    e.preventDefault();
-
-    const modal = new bootstrap.Modal(document.getElementById('loginTareasModal'));
-    modal.show();
-
-    localStorage.setItem("loginDestino", "/Recepcion/CrearRecepcion");
+    abrirModuloConLogin(
+        e,
+        "modulo_23_abierto",
+        "La recepción ya está abierta.",
+        "/Recepcion/CrearRecepcion"
+    );
 });
 
 // ==========================================
-// ABRIR MODAL DESDE LAVADO
+// PROCESOS - 24
+// ==========================================
+document.getElementById('btnProcesos')?.addEventListener('click', function (e) {
+    abrirModuloConLogin(
+        e,
+        "modulo_24_abierto",
+        "El proceso ya está abierto.",
+        "/Proceso/CrearProceso"
+    );
+});
+
+// ==========================================
+// ENTREGA - 25
+// ==========================================
+document.getElementById('btnEntrega')?.addEventListener('click', function (e) {
+    abrirModuloConLogin(
+        e,
+        "modulo_25_abierto",
+        "La entrega ya está abierta.",
+        "/Entrega/CrearEntrega"
+    );
+});
+
+// ==========================================
+// LAVADO - 134
 // ==========================================
 document.getElementById('btnLavado')?.addEventListener('click', function (e) {
-    e.preventDefault();
-
-    const modal = new bootstrap.Modal(document.getElementById('loginTareasModal'));
-    modal.show();
-
-    localStorage.setItem("loginDestino", "/Lavado/CrearLavado");
+    abrirModuloConLogin(
+        e,
+        "modulo_134_abierto",
+        "El lavado ya está abierto.",
+        "/Lavado/CrearLavado"
+    );
 });
 
 // ==========================================
-// ABRIR MODAL DESDE ACONDICIONADO
+// ACONDICIONADO - 135
 // ==========================================
 document.getElementById('btnAcondicionado')?.addEventListener('click', function (e) {
-    e.preventDefault();
-
-    const modal = new bootstrap.Modal(document.getElementById('loginTareasModal'));
-    modal.show();
-
-    localStorage.setItem("loginDestino", "/Acondicionado/CrearAcondicionado");
+    abrirModuloConLogin(
+        e,
+        "modulo_135_abierto",
+        "El acondicionado ya está abierto.",
+        "/Acondicionado/CrearAcondicionado"
+    );
 });
 
 // ==========================================
@@ -48,12 +89,39 @@ document.getElementById('loginTareasModal')?.addEventListener('shown.bs.modal', 
 });
 
 // ==========================================
+// LIMPIAR MODAL AL CERRAR
+// ==========================================
+document.getElementById('loginTareasModal')?.addEventListener('hidden.bs.modal', function () {
+    document.getElementById('loginNombre').value = "";
+    document.getElementById('loginUsuarioId').value = "";
+    document.getElementById('loginClave').value = "";
+    document.getElementById('loginMensaje').innerText = "";
+    document.getElementById('listaUsuarios').innerHTML = "";
+
+    usuariosBusqueda = [];
+    indiceSeleccionado = -1;
+});
+
+// ==========================================
 // ENTER EN CLAVE = VALIDAR LOGIN
 // ==========================================
 document.getElementById('loginClave')?.addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
         e.preventDefault();
         document.getElementById('btnValidarLogin').click();
+    }
+});
+
+// ==========================================
+// NO DEJAR SALIR DE NOMBRE SIN ELEGIR USUARIO
+// ==========================================
+document.getElementById('loginNombre')?.addEventListener('blur', function () {
+    const id = document.getElementById('loginUsuarioId').value;
+    const mensaje = document.getElementById('loginMensaje');
+
+    if (!id && this.value.trim() !== "") {
+        mensaje.innerText = "Debe seleccionar un usuario de la lista.";
+        this.focus();
     }
 });
 
@@ -65,11 +133,20 @@ document.getElementById('btnValidarLogin')?.addEventListener('click', async func
     const id = document.getElementById('loginUsuarioId').value;
     const clave = document.getElementById('loginClave').value;
     const mensaje = document.getElementById('loginMensaje');
+    const inputNombre = document.getElementById('loginNombre');
+    const inputClave = document.getElementById('loginClave');
 
     mensaje.innerText = "";
 
-    if (!id || !clave) {
-        mensaje.innerText = "Debe seleccionar usuario y clave.";
+    if (!id) {
+        mensaje.innerText = "Debe seleccionar un usuario de la lista.";
+        inputNombre.focus();
+        return;
+    }
+
+    if (!clave) {
+        mensaje.innerText = "Debe ingresar la clave.";
+        inputClave.focus();
         return;
     }
 
@@ -77,7 +154,10 @@ document.getElementById('btnValidarLogin')?.addEventListener('click', async func
         const response = await fetch('/APswLog/Validar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: parseInt(id), clave: clave })
+            body: JSON.stringify({
+                id: parseInt(id),
+                clave: clave
+            })
         });
 
         const data = await response.json();
@@ -89,7 +169,14 @@ document.getElementById('btnValidarLogin')?.addEventListener('click', async func
             modal.hide();
 
             const destino = localStorage.getItem("loginDestino") || "/";
-            window.location.href = destino;
+
+            if (sessionStorage.getItem("primerModulo")) {
+                window.open(destino, '_blank');
+            } else {
+                sessionStorage.setItem("primerModulo", "true");
+                window.location.href = destino;
+            }
+
         } else {
             mensaje.innerText = data.mensaje || "Clave incorrecta.";
             document.getElementById('loginClave').value = "";
@@ -171,11 +258,17 @@ document.getElementById('loginNombre')?.addEventListener('input', function () {
 // ==========================================
 document.getElementById('loginNombre')?.addEventListener('keydown', function (e) {
 
-    const listaUsuarios = document.getElementById('listaUsuarios');
+    const loginMensaje = document.getElementById('loginMensaje');
 
     if (!usuariosBusqueda || usuariosBusqueda.length === 0) {
         if (e.key === 'Enter') {
             e.preventDefault();
+
+            if (!document.getElementById('loginUsuarioId').value) {
+                loginMensaje.innerText = "Debe seleccionar un usuario de la lista.";
+                return;
+            }
+
             document.getElementById('loginClave').focus();
         }
         return;
@@ -184,67 +277,32 @@ document.getElementById('loginNombre')?.addEventListener('keydown', function (e)
     if (e.key === 'ArrowDown') {
         e.preventDefault();
 
-        if (indiceSeleccionado < usuariosBusqueda.length - 1) {
-            indiceSeleccionado++;
-        } else {
-            indiceSeleccionado = 0;
-        }
-
+        indiceSeleccionado = (indiceSeleccionado + 1) % usuariosBusqueda.length;
         renderizarListaUsuarios();
     }
 
     if (e.key === 'ArrowUp') {
         e.preventDefault();
 
-        if (indiceSeleccionado > 0) {
-            indiceSeleccionado--;
-        } else {
-            indiceSeleccionado = usuariosBusqueda.length - 1;
-        }
-
+        indiceSeleccionado = (indiceSeleccionado - 1 + usuariosBusqueda.length) % usuariosBusqueda.length;
         renderizarListaUsuarios();
     }
 
     if (e.key === 'Enter') {
         e.preventDefault();
 
-        if (indiceSeleccionado >= 0 && indiceSeleccionado < usuariosBusqueda.length) {
+        if (indiceSeleccionado >= 0) {
             const usuario = usuariosBusqueda[indiceSeleccionado];
 
             document.getElementById('loginUsuarioId').value = usuario.id;
             document.getElementById('loginNombre').value = `${usuario.apellido} ${usuario.nombre}`;
-            listaUsuarios.innerHTML = "";
+            document.getElementById('listaUsuarios').innerHTML = "";
             usuariosBusqueda = [];
             indiceSeleccionado = -1;
 
             document.getElementById('loginClave').focus();
         } else {
-            document.getElementById('loginClave').focus();
+            loginMensaje.innerText = "Debe seleccionar un usuario de la lista.";
         }
     }
-});
-
-// ==========================================
-// ABRIR MODAL DESDE PROCESOS
-// ==========================================
-document.getElementById('btnProcesos')?.addEventListener('click', function (e) {
-    e.preventDefault();
-
-    const modal = new bootstrap.Modal(document.getElementById('loginTareasModal'));
-    modal.show();
-
-    localStorage.setItem("loginDestino", "/Proceso/CrearProceso");
-});
-
-// ==========================================
-// ABRIR MODAL ENTREGA
-// ==========================================
-
-document.getElementById('btnEntrega')?.addEventListener('click', function (e) {
-    e.preventDefault();
-
-    const modal = new bootstrap.Modal(document.getElementById('loginTareasModal'));
-    modal.show();
-
-    localStorage.setItem("loginDestino", "/Entrega/CrearEntrega");
 });
