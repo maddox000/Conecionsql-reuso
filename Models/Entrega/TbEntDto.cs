@@ -25,8 +25,13 @@ namespace ConexionSql.Models.Entrega
         // 🏢 Denominación del sector (texto mostrado en el combo)
         public string? TB_ENT_SEC_DEN { get; set; }
 
+        // 👤 Personal del sector
+        public string? TB_ENT_SEC_PER { get; set; }
+
+        // 📝 Observaciones
+        public string? TB_ENT_OBS { get; set; }
+
         // 🔢 Cantidad total de elementos entregados (se calcula desde los detalles)
         public int? TB_ENT_CANT_TOT { get; set; }
     }
 }
-

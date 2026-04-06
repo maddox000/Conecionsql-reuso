@@ -20,5 +20,8 @@
         public bool TbRecDetMde { get; set; }
         public bool Vop { get; set; }
         public bool TbRecMco { get; set; }
+
+        public string? TbRecDetTxt3 { get; set; }
+        public string? TbRecDetMem1 { get; set; }
     }
 }

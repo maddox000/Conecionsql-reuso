@@ -19,12 +19,12 @@ namespace ConexionSql.Controllers.Procesos
         }
 
         [HttpGet]
-        public async Task<IActionResult> SubFormulario(int id)
+        public async Task<IActionResult> SubFormulario(int tbProId)
         {
-            Console.WriteLine($"📥 SubFormulario INVOCADO con tbProId = {id}");
+            Console.WriteLine($"📥 SubFormulario INVOCADO con tbProId = {tbProId}");
 
             var cabecera = await _context.TbPro
-                .FirstOrDefaultAsync(p => p.TbProId == id);
+                .FirstOrDefaultAsync(p => p.TbProId == tbProId);
 
             if (cabecera == null)
                 return NotFound("❌ No se encontró la cabecera del proceso.");
@@ -34,10 +34,10 @@ namespace ConexionSql.Controllers.Procesos
                 Cabecera = cabecera,
                 Detalle = new TbProDetDto
                 {
-                    TB_PRO_ID = id
+                    TB_PRO_ID = tbProId
                 },
                 Detalles = await _context.TbProDet
-                    .Where(d => d.TbProId == id)
+                    .Where(d => d.TbProId == tbProId)
                     .OrderByDescending(d => d.TbProDetId)
                     .Select(d => new TbProDetDto
                     {
@@ -87,19 +87,96 @@ namespace ConexionSql.Controllers.Procesos
             if (cantidad > stock)
                 return Json(new { success = false, mensaje = $"❌ Stock insuficiente. Disponible: {stock}" });
 
-            // ✅ Actualizar stock en TB_REC_DET
             recDet.TbRecDetProStock = stock - cantidad;
             recDet.TbRecDetProTot = (recDet.TbRecDetProTot ?? 0) + cantidad;
             recDet.TbRecDetEntCant = (recDet.TbRecDetEntCant ?? 0) + cantidad;
 
-            // ✅ Insertar detalle en TB_PRO_DET
+            var material = await _context.IbMat
+            .FirstOrDefaultAsync(m => m.IB_MAT_ID == recDet.TbRecDetMatId);
+            var equipo = await _context.IbEqu
+            .FirstOrDefaultAsync(e => e.IbEquId == cabecera.TbProEquId);
+
+            if (equipo == null)
+                return Json(new { success = false, mensaje = "❌ No se encontró el equipo del proceso." });
+
             var nuevo = new TbProDet
             {
                 TbProId = dto.TB_PRO_ID,
-                TbProDetRecDetId = dto.TB_PRO_DET_REC_DET_ID,
+
+                // 🔥 REC_DET
+                TbProDetRecDetId = recDet.TbRecDetId,
+
+                // 🔥 REC
+                TbProDetRecId = recDet.TbRecId,
+
+                // 🔥 MATERIAL
                 TbProDetRecDetMatId = recDet.TbRecDetMatId ?? 0,
                 TbProDetRecDetMatDen = recDet.TbRecDetMatDen,
+
+                // 🔥 TIPO MATERIAL (IB_MAT)
+                TbProDetRecDetMatTipId = material?.IB_MAT_MTI_ID,
+                TbProDetRecDetMatTipDen = material?.IB_MAT_MTI_DEN,
+
+                // 🔥 DATOS DE REC_DET
+                TbProDetRecDetCant = recDet.TbRecDetCant,
+                TbProDetRecDetProStock = recDet.TbRecDetProStock,
+                TbProDetRecDetProTot = recDet.TbRecDetProTot,
+                TbProDetRecDetReuId = recDet.TbRecDetReuId,
+
+                // 🔥 INGRESO
                 TbProDetCant = cantidad,
+                TbProDetCantAbo = cantidad,
+
+                // 🔥 SECTORES (DESDE TB_REC_DET)
+                TbRecSecDesId = recDet.TbRecSecDesId,
+                TbRecSecDesDen = recDet.TbRecSecDesDen,
+                TbRecSecOriId = recDet.TbRecSecOriId,
+                TbRecSecOriDen = recDet.TbRecSecOriDen,
+
+                // 🔥 ORIGEN / LOTE
+                TbRecOrtId = recDet.TbRecOrtId,
+                TbRecOrtDen = recDet.TbRecOrtDen,
+                TbCodTexLot = recDet.TbRecDetLot,
+
+                // 🔥 VOLUMEN
+                IbMatVol = recDet.IbMatVol,
+
+                // 🔥 CABECERA TB_PRO
+                TbProPtiId = cabecera.TbProPtiId,
+                TbProPtiDen = cabecera.TbProPtiDen,
+                TbProEquId = cabecera.TbProEquId,
+                TbProIbEquTeqId = cabecera.TbProIbEquTeqId,
+                TbProIbEquTeqDen = cabecera.TbProIbEquTeqDen,
+                TbProEquNum = cabecera.TbProEquNum,
+                TbProEquDen = cabecera.TbProEquDen,
+                TbProEquMarId = cabecera.TbProEquMarId,
+                TbProEquMarDen = cabecera.TbProEquMarDen,
+                TbProEquMod = cabecera.TbProEquMod,
+                TbProEquSer = cabecera.TbProEquSer,
+                TbProTciId = cabecera.TbProTciId,
+                TbProTciDen = cabecera.TbProTciDen,
+
+                // 🔥 CAPACIDAD / PARÁMETROS DE EQUIPO DESDE CABECERA
+                IbEquCap = cabecera.IbEquCap,
+                IbEquCapu = cabecera.IbEquCapu,
+                IbEquCapr = cabecera.IbEquCapr,
+                IbEquPco = cabecera.IbEquPco,
+                IbEquPve = cabecera.IbEquPve,
+
+                // 🔥 NUM / TXT / ESTADO
+                TbProDetNum1 = recDet.TbRecDetCant,   // cantidad de recepción
+                TbProDetNum2 = 1,
+                TbProDetNum3 = 0,
+                TbProDetTxt1 = "-",
+                TbProDetTxt2 = "NO REGISTRADO",
+                TbProDetRepro = false,
+                TbProDetEstId = 2,
+                TbProDetEstDen = "PROCESADO",
+                TbProDetEstFec = DateTime.Now,
+                TbProDetCantMult = 1,
+                TbProDetCantElim = 0,
+
+                // 🔥 SISTEMA
                 TbProDetPcLog = Environment.MachineName,
                 TbProDetPcUsr = Environment.UserName,
                 TbProFec = dto.TB_PRO_FEC ?? DateTime.Now

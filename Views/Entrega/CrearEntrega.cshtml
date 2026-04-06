@@ -13,7 +13,7 @@
     var usuarioLogueado = ViewBag.UsuarioLogueado as string;
 }
 
-<h4 class="mt-4">🚚 Crear Nueva Entrega</h4>
+<h4 class="mt-4">🚚 Entrega</h4>
 
 <form id="formCrearEntrega" onsubmit="return false;" class="mt-4">
     <div class="form-group">
@@ -44,17 +44,33 @@
     </div>
 
     <div class="form-group mt-3">
-        <label for="TB_ENT_SEC_ID">Sector Destino</label>
-        <select class="form-control" id="TB_ENT_SEC_ID" required>
-            <option value="">Seleccione un sector</option>
-            @if (listaSectores != null)
-            {
-                @foreach (var sec in listaSectores)
-                {
-                    <option value="@sec.IbSecId">@sec.IbSecDen</option>
-                }
-            }
-        </select>
+        <label for="TB_ENT_SEC_BUSQUEDA">Sector Destino</label>
+
+        <input type="text"
+               class="form-control"
+               id="TB_ENT_SEC_BUSQUEDA"
+               autocomplete="off"
+               placeholder="Buscar sector..." />
+
+        <div id="listaSectores" class="list-group mt-2"></div>
+
+        <input type="hidden" id="TB_ENT_SEC_ID" />
+    </div>
+
+    <div class="form-group mt-3">
+        <label for="TB_ENT_SEC_PER">Personal de sector</label>
+        <input type="text"
+               class="form-control"
+               id="TB_ENT_SEC_PER"
+               placeholder="Ingrese personal del sector" />
+    </div>
+
+    <div class="form-group mt-3">
+        <label for="TB_ENT_OBS">Observaciones</label>
+        <textarea class="form-control"
+                  id="TB_ENT_OBS"
+                  rows="3"
+                  placeholder="Ingrese observaciones"></textarea>
     </div>
 
     <div class="form-group mt-4">
@@ -73,6 +89,7 @@
         <h4>➕ Agregar Detalle</h4>
         @await Html.PartialAsync("_SubFormEntDet", subFormModel)
     </div>
+
 }
 
 @section Scripts {
@@ -83,7 +100,9 @@
             const perId = @((usuarioId ?? 0));
             const perNom = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(usuarioLogueado ?? ""));
             const secId = document.getElementById("TB_ENT_SEC_ID").value;
-            const secDen = document.getElementById("TB_ENT_SEC_ID").selectedOptions[0]?.text || "";
+            const secDen = document.getElementById("TB_ENT_SEC_BUSQUEDA").value || "";
+            const secPer = document.getElementById("TB_ENT_SEC_PER").value || "";
+            const obs = document.getElementById("TB_ENT_OBS").value || "";
 
             if (!perId || perId === 0) {
                 document.getElementById("mensajeEntrega").innerText = "❌ No hay usuario logueado en sesión.";
@@ -103,6 +122,8 @@
                 TB_ENT_PER_NOM: perNom,
                 TB_ENT_SEC_ID: parseInt(secId),
                 TB_ENT_SEC_DEN: secDen,
+                TB_ENT_SEC_PER: secPer,
+                TB_ENT_OBS: obs,
                 TB_ENT_CANT_TOT: 0
             };
 
@@ -122,6 +143,7 @@
             }
         }
     </script>
+
     <script>
         localStorage.setItem("modulo_25_abierto", "1");
 
@@ -129,4 +151,158 @@
             localStorage.removeItem("modulo_25_abierto");
         });
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const sector = document.getElementById("TB_ENT_SEC_BUSQUEDA");
+
+            if (sector) {
+                setTimeout(() => {
+                    sector.focus();
+                }, 200);
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const input = document.getElementById("TB_ENT_SEC_BUSQUEDA");
+            const lista = document.getElementById("listaSectores");
+            const hidden = document.getElementById("TB_ENT_SEC_ID");
+            const inputPersonal = document.getElementById("TB_ENT_SEC_PER");
+            const inputObs = document.getElementById("TB_ENT_OBS");
+
+            let indice = -1;
+            let itemsFiltrados = [];
+
+            if (!input) return;
+
+            const sectores = [
+                @if (listaSectores != null)
+                {
+                        for (int i = 0; i < listaSectores.Count; i++)
+                        {
+                                var s = listaSectores[i];
+                                @:{ id: @s.IbSecId, den: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(s.IbSecDen ?? ""))" }@(i < listaSectores.Count - 1 ? "," : "")
+                        }
+                }
+            ];
+
+            function marcarActivo() {
+                const items = lista.querySelectorAll(".list-group-item");
+
+                items.forEach((el, i) => {
+                    el.classList.toggle("active", i === indice);
+                });
+            }
+
+            function seleccionarSector(sec) {
+                input.value = sec.den;
+                hidden.value = sec.id;
+                lista.innerHTML = "";
+                indice = -1;
+
+                if (inputPersonal) {
+                    inputPersonal.focus();
+                    inputPersonal.select();
+                }
+            }
+
+            input.addEventListener("input", function () {
+                const texto = this.value.toLowerCase().trim();
+
+                lista.innerHTML = "";
+                hidden.value = "";
+                indice = -1;
+
+                if (texto.length < 1) {
+                    itemsFiltrados = [];
+                    return;
+                }
+
+                itemsFiltrados = sectores.filter(s =>
+                    s.den.toLowerCase().includes(texto)
+                );
+
+                itemsFiltrados.forEach(sec => {
+                    const item = document.createElement("a");
+                    item.classList.add("list-group-item", "list-group-item-action");
+                    item.textContent = sec.den;
+                    item.href = "#";
+
+                    item.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        seleccionarSector(sec);
+                    });
+
+                    lista.appendChild(item);
+                });
+            });
+
+            input.addEventListener("keydown", function (e) {
+
+                if (e.key === "ArrowDown") {
+                    if (!itemsFiltrados.length) return;
+                    e.preventDefault();
+                    indice = (indice + 1) % itemsFiltrados.length;
+                    marcarActivo();
+                }
+
+                if (e.key === "ArrowUp") {
+                    if (!itemsFiltrados.length) return;
+                    e.preventDefault();
+                    indice = (indice - 1 + itemsFiltrados.length) % itemsFiltrados.length;
+                    marcarActivo();
+                }
+
+                if (e.key === "Enter") {
+                    e.preventDefault();
+
+                    if (indice >= 0 && itemsFiltrados[indice]) {
+                        seleccionarSector(itemsFiltrados[indice]);
+                        return;
+                    }
+
+                    const texto = input.value.trim().toLowerCase();
+                    const exacto = sectores.find(s => s.den.toLowerCase() === texto);
+
+                    if (exacto) {
+                        seleccionarSector(exacto);
+                    } else if (inputPersonal) {
+                        inputPersonal.focus();
+                        inputPersonal.select();
+                    }
+                }
+            });
+
+            if (inputPersonal) {
+                inputPersonal.addEventListener("keydown", function (e) {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (inputObs) {
+                            inputObs.focus();
+                        }
+                    }
+                });
+            }
+
+            if (inputObs) {
+                inputObs.addEventListener("keydown", function (e) {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        guardarEntrega();
+                    }
+                });
+            }
+
+            document.addEventListener("click", function (e) {
+                if (!input.contains(e.target) && !lista.contains(e.target)) {
+                    lista.innerHTML = "";
+                }
+            });
+
+        });
+    </script>
+}
 }

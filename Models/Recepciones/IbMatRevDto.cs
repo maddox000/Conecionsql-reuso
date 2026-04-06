@@ -4,5 +4,6 @@
     {
         public int IbMatRevId { get; set; }
         public string? IbMatRevDen { get; set; }
+        public bool IbMatRevOcu { get; set; }
     }
 }

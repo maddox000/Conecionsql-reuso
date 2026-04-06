@@ -40,6 +40,23 @@
         </select>
     </div>
 
+    <div class="form-group mt-3" id="grupoProveedor" style="display:none;">
+        <label for="ProveedorId">Proveedor</label>
+        <select class="form-control" id="ProveedorId">
+            <option value="">-- Seleccionar proveedor --</option>
+        </select>
+    </div>
+
+    <div class="form-group mt-3">
+        <label>Unidades Procesadas</label>
+        <input type="text" class="form-control" id="unidadesProcesadas" value="0" readonly />
+    </div>
+
+    <div class="form-group mt-3">
+        <label>Estado</label>
+        <input type="text" class="form-control" value="EN PROCESO" readonly />
+    </div>
+
     <div class="form-group mt-4">
         <button type="button" class="btn btn-success" onclick="guardarProceso()">💾 Guardar Proceso</button>
     </div>
@@ -51,25 +68,145 @@
 
 @section Scripts {
     <script>
+        async function cargarTiposCiclo(ptiId, comboCiclo) {
+            comboCiclo.innerHTML = '<option value="">-- Cargando ciclos... --</option>';
+
+            try {
+                const resp = await fetch(`/Proceso/ObtenerTiposCicloPorProceso?ptiId=${ptiId}`);
+                const ciclos = await resp.json();
+
+                comboCiclo.innerHTML = '<option value="">-- Seleccionar ciclo --</option>';
+
+                if (Array.isArray(ciclos) && ciclos.length > 0) {
+                    ciclos.forEach(c => {
+                        const opt = document.createElement("option");
+                        opt.value = c.id;
+                        opt.text = c.nombre;
+                        comboCiclo.appendChild(opt);
+                    });
+                } else {
+                    comboCiclo.innerHTML = '<option value="">-- Sin ciclos disponibles --</option>';
+                }
+            } catch (error) {
+                console.error("Error cargando ciclos:", error);
+                comboCiclo.innerHTML = '<option value="">-- Error al cargar ciclos --</option>';
+            }
+        }
+
+        async function cargarEquipos(ptiId, comboEquipo) {
+            comboEquipo.innerHTML = '<option value="">-- Cargando equipos... --</option>';
+
+            try {
+                const resp = await fetch(`/Proceso/ObtenerEquiposPorTipo?ptiId=${ptiId}`);
+                const equipos = await resp.json();
+
+                comboEquipo.innerHTML = '<option value="">-- Seleccionar equipo --</option>';
+
+                if (Array.isArray(equipos) && equipos.length > 0) {
+                    equipos.forEach(e => {
+                        const opt = document.createElement("option");
+                        opt.value = e.id;
+                        opt.text = e.nombre;
+                        comboEquipo.appendChild(opt);
+                    });
+                } else {
+                    comboEquipo.innerHTML = '<option value="">-- Sin equipos disponibles --</option>';
+                }
+            } catch (error) {
+                console.error("Error cargando equipos:", error);
+                comboEquipo.innerHTML = '<option value="">-- Error al cargar equipos --</option>';
+            }
+        }
+
+        async function cargarProveedores(comboProveedor) {
+            comboProveedor.innerHTML = '<option value="">-- Cargando proveedores... --</option>';
+
+            try {
+                const resp = await fetch('/Proceso/ObtenerProveedores');
+                const proveedores = await resp.json();
+
+                comboProveedor.innerHTML = '<option value="">-- Seleccionar proveedor --</option>';
+
+                if (Array.isArray(proveedores) && proveedores.length > 0) {
+                    proveedores.forEach(p => {
+                        const opt = document.createElement("option");
+                        opt.value = p.id;
+                        opt.text = p.nombre;
+                        comboProveedor.appendChild(opt);
+                    });
+                } else {
+                    comboProveedor.innerHTML = '<option value="">-- Sin proveedores disponibles --</option>';
+                }
+            } catch (error) {
+                console.error("Error cargando proveedores:", error);
+                comboProveedor.innerHTML = '<option value="">-- Error al cargar proveedores --</option>';
+            }
+        }
+
         async function guardarProceso() {
+            const mensaje = document.getElementById("mensajeProceso");
+            if (mensaje) mensaje.innerText = "";
 
-            const data = {
-                TbProFec: document.getElementById("fechaProceso").value,
-                TbProHorIni: document.getElementById("horaInicio").value,
-                TipoProcesoId: parseInt(document.getElementById("TipoProcesoId").value),
-                EquipoId: parseInt(document.getElementById("EquipoId").value),
-                TipoCicloId: parseInt(document.getElementById("TipoCicloId").value),
-                TipoProcesoDen: document.getElementById("TipoProcesoId").selectedOptions[0]?.text || "",
-                EquipoDen: document.getElementById("EquipoId").selectedOptions[0]?.text || "",
-                TipoCicloDen: document.getElementById("TipoCicloId").selectedOptions[0]?.text || ""
-            };
+            const tipoProcesoSelect = document.getElementById("TipoProcesoId");
+            const equipoSelect = document.getElementById("EquipoId");
+            const tipoCicloSelect = document.getElementById("TipoCicloId");
+            const proveedorSelect = document.getElementById("ProveedorId");
 
-            if (!data.TipoProcesoId || !data.EquipoId || !data.TipoCicloId) {
-                document.getElementById("mensajeProceso").innerText = "⚠️ Complete todos los campos.";
+            const tipoProcesoId = parseInt(tipoProcesoSelect?.value || "") || 0;
+            const esExterno = tipoProcesoId === 5;
+
+            const equipoIdLeido = parseInt(equipoSelect?.value || "") || 0;
+            const tipoCicloIdLeido = parseInt(tipoCicloSelect?.value || "") || 0;
+            const proveedorIdLeido = parseInt(proveedorSelect?.value || "") || 0;
+
+            if (!tipoProcesoId) {
+                mensaje.innerText = "⚠️ Complete el tipo de proceso.";
                 return;
             }
 
+            if (esExterno) {
+                if (!proveedorIdLeido) {
+                    mensaje.innerText = "⚠️ Debe seleccionar un proveedor.";
+                    return;
+                }
+            } else {
+                if (!equipoIdLeido || equipoIdLeido <= 0) {
+                    mensaje.innerText = "⚠️ Debe seleccionar un equipo válido.";
+                    return;
+                }
+
+                if (!tipoCicloIdLeido || tipoCicloIdLeido <= 0) {
+                    mensaje.innerText = "⚠️ Debe seleccionar un tipo de ciclo válido.";
+                    return;
+                }
+            }
+
+            const data = {
+                TbProFec: document.getElementById("fechaProceso")?.value,
+                TbProHorIni: document.getElementById("horaInicio")?.value,
+
+                TipoProcesoId: tipoProcesoId,
+                TipoProcesoDen: tipoProcesoSelect?.selectedOptions[0]?.text || "",
+
+                EquipoId: esExterno ? 1 : equipoIdLeido,
+                EquipoDen: esExterno ? "1" : (equipoSelect?.selectedOptions[0]?.text || ""),
+
+                TipoCicloId: esExterno ? 1 : tipoCicloIdLeido,
+                TipoCicloDen: esExterno ? "1" : (tipoCicloSelect?.selectedOptions[0]?.text || ""),
+
+                ProveedorId: esExterno ? proveedorIdLeido : null,
+                ProveedorDen: esExterno ? (proveedorSelect?.selectedOptions[0]?.text || "") : "",
+
+                UsuarioId: parseInt(localStorage.getItem("usuarioId") || "0"),
+                UsuarioNom: localStorage.getItem("usuarioNom") || "",
+                UsuarioApe: localStorage.getItem("usuarioApe") || "",
+                UsuarioCarId: parseInt(localStorage.getItem("usuarioCarId") || "0"),
+                UsuarioCarDen: localStorage.getItem("usuarioCarDen") || ""
+            };
+
             try {
+                console.log("Payload enviado:", data);
+                debugger;
                 const resp = await fetch('/Proceso/Insertar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -81,66 +218,96 @@
 
                 if (json.success) {
                     if (!json.redirectUrl) {
-                        document.getElementById("mensajeProceso").innerText =
-                            "❌ No vino redirectUrl desde el controller.";
+                        mensaje.innerText = "❌ No vino redirectUrl desde el controller.";
                         return;
                     }
 
                     window.location.href = json.redirectUrl;
                 } else {
-                    document.getElementById("mensajeProceso").innerText =
-                        json.mensaje || "❌ Error al guardar el proceso.";
+                    mensaje.innerText = json.mensaje || "❌ Error al guardar el proceso.";
                 }
 
             } catch (error) {
                 console.error("Error en guardarProceso:", error);
-                document.getElementById("mensajeProceso").innerText =
-                    "❌ Error de conexión con el servidor.";
+                mensaje.innerText = "❌ Error de conexión con el servidor.";
             }
         }
 
         document.getElementById("TipoProcesoId").addEventListener("change", async function () {
             const ptiId = this.value;
 
+            const grupoEquipo = document.getElementById("EquipoId").parentElement;
+            const grupoCiclo = document.getElementById("TipoCicloId").parentElement;
+            const grupoProveedor = document.getElementById("grupoProveedor");
+
             const comboEquipo = document.getElementById("EquipoId");
-            comboEquipo.innerHTML = '<option value="">-- Cargando equipos... --</option>';
+            const comboCiclo = document.getElementById("TipoCicloId");
+            const comboProveedor = document.getElementById("ProveedorId");
+
+            document.getElementById("mensajeProceso").innerText = "";
+
+            comboEquipo.innerHTML = '<option value="">-- Seleccionar equipo --</option>';
+            comboCiclo.innerHTML = '<option value="">-- Seleccionar ciclo --</option>';
+            comboProveedor.innerHTML = '<option value="">-- Seleccionar proveedor --</option>';
 
             if (!ptiId) {
-                comboEquipo.innerHTML = '<option value="">-- Seleccionar equipo --</option>';
-                document.getElementById("TipoCicloId").innerHTML = '<option value="">-- Seleccionar ciclo --</option>';
+                grupoEquipo.style.display = "block";
+                grupoCiclo.style.display = "block";
+                grupoProveedor.style.display = "none";
                 return;
             }
 
-            const respEquipos = await fetch(`/Proceso/ObtenerEquiposPorTipo?ptiId=${ptiId}`);
-            const equipos = await respEquipos.json();
+            if (ptiId === "5") {
+                grupoEquipo.style.display = "none";
+                grupoCiclo.style.display = "none";
+                grupoProveedor.style.display = "block";
 
-            comboEquipo.innerHTML = '<option value="">-- Seleccionar equipo --</option>';
-            equipos.forEach(e => {
-                const opt = document.createElement("option");
-                opt.value = e.id;
-                opt.text = e.nombre;
-                comboEquipo.appendChild(opt);
-            });
+                comboEquipo.innerHTML = '<option value="1">1</option>';
+                comboEquipo.value = "1";
 
-            const comboCiclo = document.getElementById("TipoCicloId");
-            comboCiclo.innerHTML = '<option value="">-- Cargando ciclos... --</option>';
+                comboCiclo.innerHTML = '<option value="1">1</option>';
+                comboCiclo.value = "1";
 
-            const respCiclos = await fetch(`/Proceso/ObtenerTiposCicloPorProceso?ptiId=${ptiId}`);
-            const ciclos = await respCiclos.json();
+                comboProveedor.innerHTML = '<option value="">-- Cargando proveedores... --</option>';
 
-            comboCiclo.innerHTML = '<option value="">-- Seleccionar ciclo --</option>';
-            ciclos.forEach(c => {
-                const opt = document.createElement("option");
-                opt.value = c.id;
-                opt.text = c.nombre;
-                comboCiclo.appendChild(opt);
-            });
+                try {
+                    const respProv = await fetch('/Proceso/ObtenerProveedores');
+                    const proveedores = await respProv.json();
+
+                    comboProveedor.innerHTML = '<option value="">-- Seleccionar proveedor --</option>';
+
+                    if (Array.isArray(proveedores) && proveedores.length > 0) {
+                        proveedores.forEach(p => {
+                            const opt = document.createElement("option");
+                            opt.value = p.id;
+                            opt.text = p.nombre;
+                            comboProveedor.appendChild(opt);
+                        });
+                    } else {
+                        comboProveedor.innerHTML = '<option value="">-- Sin proveedores disponibles --</option>';
+                    }
+
+                } catch (error) {
+                    console.error("Error cargando proveedores:", error);
+                    comboProveedor.innerHTML = '<option value="">-- Error al cargar proveedores --</option>';
+                }
+
+                return;
+            }
+
+            grupoEquipo.style.display = "block";
+            grupoCiclo.style.display = "block";
+            grupoProveedor.style.display = "none";
+
+            await cargarEquipos(ptiId, comboEquipo);
+            await cargarTiposCiclo(ptiId, comboCiclo);
         });
     </script>
+
     <script>
         localStorage.setItem("modulo_24_abierto", "1");
 
-        window.addEventListener("beforeunload", function () {
+        window.addEventListener("unload", function () {
             localStorage.removeItem("modulo_24_abierto");
         });
     </script>

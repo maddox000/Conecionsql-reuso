@@ -170,5 +170,11 @@ namespace ConexionSql.Models.Recepciones
         public int? TbRecCantTot { get; set; } // Total de la cabecera
 
         public RegistroControlArmadoDto? RegistroControlArmado { get; set; }
+
+        public string? TbRecDetObs { get; set; }
+
+        public string? TbRecDetMem1 { get; set; }
+
+        public string? TbRecDetTxt3 { get; set; }
     }
 }

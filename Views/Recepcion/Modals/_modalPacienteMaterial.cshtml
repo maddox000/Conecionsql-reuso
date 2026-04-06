@@ -1,0 +1,293 @@
+﻿<!-- MODAL REGISTRO DE PACIENTE -->
+<div class="modal fade"
+     id="modalPacienteMaterial"
+     tabindex="-1"
+     aria-labelledby="modalPacienteMaterialLabel"
+     aria-hidden="true"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="border-radius: 14px; overflow: hidden;">
+
+            <div class="modal-header" style="background: #e9ecef;">
+                <h5 class="modal-title" id="modalPacienteMaterialLabel">DAT®8S Esterilizacion</h5>
+            </div>
+
+            <div class="modal-body" style="background: #f4f4f4;">
+
+                <div class="mb-3">
+                    <div style="background:#1f3b73; color:white; padding:8px 14px; border-radius:4px; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,.2);">
+                        Datos de registro de pacientes:
+                    </div>
+                </div>
+
+                <!-- DATOS DEL MATERIAL -->
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <label class="form-label w-100 border px-2 py-1 bg-white">Código de reuso</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text"
+                                   id="pacienteCodigoReuso"
+                                   class="form-control-plaintext border-bottom px-2"
+                                   readonly
+                                   tabindex="-1"
+                                   data-reu-id="0" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <label class="form-label w-100 border px-2 py-1 bg-white">Denominación</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text"
+                                   id="pacienteDenominacion"
+                                   class="form-control-plaintext border-bottom px-2"
+                                   readonly
+                                   tabindex="-1" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <label class="form-label w-100 border px-2 py-1 bg-white">Recepción</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text"
+                                   id="pacienteRecepcion"
+                                   class="form-control-plaintext border-bottom px-2"
+                                   readonly
+                                   tabindex="-1" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label w-100 border px-2 py-1 bg-white">Fecha</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text"
+                                   id="pacienteFecha"
+                                   class="form-control-plaintext border-bottom px-2"
+                                   readonly
+                                   tabindex="-1" />
+                        </div>
+                    </div>
+
+                    <!-- DATOS DEL PACIENTE -->
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <label for="pacienteHistoriaClinica" class="form-label w-100 border px-2 py-1 bg-white">Historia Clínica</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" id="pacienteHistoriaClinica" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <label for="pacienteDocumento" class="form-label w-100 border px-2 py-1 bg-white">Documento de paciente</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" id="pacienteDocumento" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <label for="pacienteApellido" class="form-label w-100 border px-2 py-1 bg-white">Apellido</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" id="pacienteApellido" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <label for="pacienteNombre" class="form-label w-100 border px-2 py-1 bg-white">Nombre</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" id="pacienteNombre" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <label for="pacienteEdad" class="form-label w-100 border px-2 py-1 bg-white">Edad</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="number" id="pacienteEdad" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <label for="pacienteObraSocial" class="form-label w-100 border px-2 py-1 bg-white">Obra Social</label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" id="pacienteObraSocial" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="pacienteEliminar" class="form-label w-100 border px-2 py-1 bg-white">Eliminar</label>
+                        </div>
+                        <div class="col-md-8 d-flex align-items-center">
+                            <input type="checkbox" id="pacienteEliminar" class="form-check-input ms-2" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer" style="background: #f4f4f4;">
+                <button type="button" class="btn btn-success px-4" id="btnGuardarPaciente">
+                    Guardar
+                </button>
+                <button type="button" class="btn btn-primary px-4" id="btnCerrarModalPaciente" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const btnGuardarPaciente = document.getElementById("btnGuardarPaciente");
+        const modalEl = document.getElementById("modalPacienteMaterial");
+
+        const inputHistoria = document.getElementById("pacienteHistoriaClinica");
+        const inputDocumento = document.getElementById("pacienteDocumento");
+        const inputApellido = document.getElementById("pacienteApellido");
+        const inputNombre = document.getElementById("pacienteNombre");
+        const inputEdad = document.getElementById("pacienteEdad");
+        const inputObraSocial = document.getElementById("pacienteObraSocial");
+        const inputEliminar = document.getElementById("pacienteEliminar");
+
+        async function guardarPaciente() {
+            try {
+                const tbReuId = parseInt(document.getElementById("pacienteCodigoReuso")?.dataset.reuId || "0");
+                const tbRecId = parseInt(document.getElementById("pacienteRecepcion")?.value || "0");
+
+                if (tbReuId <= 0) {
+                    alert("No se encontró el ID real del reuso.");
+                    return;
+                }
+
+                if (tbRecId <= 0) {
+                    alert("No se encontró la recepción.");
+                    return;
+                }
+
+                const data = {
+                    TB_REU_ID: tbReuId,
+                    TB_REC_ID: tbRecId,
+                    CODIGO_REUSO: document.getElementById("pacienteCodigoReuso")?.value || "",
+                    NOMBRE: inputNombre?.value || "",
+                    APELLIDO: inputApellido?.value || "",
+                    HISTORIA_CLINICA: inputHistoria?.value || "",
+                    DOCUMENTO: inputDocumento?.value || "",
+                    EDAD: parseInt(inputEdad?.value || "0"),
+                    OBRA_SOCIAL: inputObraSocial?.value || "",
+                    ELIMINAR: inputEliminar?.checked || false
+                };
+
+                const response = await fetch("/TbReuPac/Insertar", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (!result.ok) {
+                    alert(result.mensaje || "Error al guardar paciente");
+                    return;
+                }
+
+                if (inputHistoria) inputHistoria.value = "";
+                if (inputDocumento) inputDocumento.value = "";
+                if (inputApellido) inputApellido.value = "";
+                if (inputNombre) inputNombre.value = "";
+                if (inputEdad) inputEdad.value = "";
+                if (inputObraSocial) inputObraSocial.value = "";
+                if (inputEliminar) inputEliminar.checked = false;
+
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) {
+                    modal.hide();
+                }
+            }
+            catch (error) {
+                console.error("Error al guardar paciente:", error);
+                alert("Error al guardar paciente.");
+            }
+        }
+
+        if (btnGuardarPaciente) {
+            btnGuardarPaciente.addEventListener("click", guardarPaciente);
+        }
+
+        function pasarConEnter(origen, destino) {
+            if (!origen) return;
+
+            origen.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+
+                    if (destino) {
+                        destino.focus();
+                        destino.select?.();
+                    }
+                }
+            });
+        }
+
+        pasarConEnter(inputHistoria, inputDocumento);
+        pasarConEnter(inputDocumento, inputApellido);
+        pasarConEnter(inputApellido, inputNombre);
+        pasarConEnter(inputNombre, inputEdad);
+        pasarConEnter(inputEdad, inputObraSocial);
+
+        if (inputObraSocial) {
+            inputObraSocial.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    guardarPaciente();
+                }
+            });
+        }
+
+        if (modalEl) {
+            modalEl.addEventListener("hidden.bs.modal", function () {
+                setTimeout(() => {
+                    const focoAlCerrar = document.getElementById("estadoBusqueda");
+                    if (focoAlCerrar) {
+                        focoAlCerrar.focus();
+                        focoAlCerrar.select?.();
+                    }
+                }, 100);
+            });
+        }
+
+            function forzarMayusculas(input) {
+        if (!input) return;
+
+            input.addEventListener("input", function () {
+                this.value = this.value.toUpperCase();
+            });
+        }
+
+        // aplicar a campos de texto
+        forzarMayusculas(inputHistoria);
+        forzarMayusculas(inputDocumento);
+        forzarMayusculas(inputApellido);
+        forzarMayusculas(inputNombre);
+        forzarMayusculas(inputObraSocial);
+    });
+</script>

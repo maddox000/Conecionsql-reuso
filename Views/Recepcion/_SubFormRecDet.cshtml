@@ -32,23 +32,34 @@
             </div>
 
             <div class="rec-det-campo rec-det-revision">
-                <label for="TB_REC_DET_REP_ID">Revisión</label>
-                <select asp-for="Detalle.TB_REC_DET_REP_ID"
-                        asp-items="@(new SelectList(Model.Revisiones, "IbMatRevId", "IbMatRevDen"))"
-                        class="form-control"
-                        id="TB_REC_DET_REP_ID">
-                    <option value="">Seleccione</option>
-                </select>
+                <label>Revisión</label>
+
+                <input type="text"
+                       id="revisionBusqueda"
+                       class="form-control"
+                       autocomplete="off"
+                       value="NO REGISTRA" />
+
+                <div id="listaRevisiones" class="list-group mt-2"></div>
+
+                <input asp-for="Detalle.TB_REC_DET_REP_ID"
+                       type="hidden"
+                       id="TB_REC_DET_REP_ID" />
             </div>
 
             <div class="rec-det-campo rec-det-estado">
-                <label for="IB_EST_ID">Estado</label>
-                <select asp-for="Detalle.IB_EST_ID"
-                        asp-items="@(new SelectList(Model.Estados, "IbEstId", "IbEstDen"))"
-                        class="form-control"
-                        id="IB_EST_ID">
-                    <option value="">Seleccione un estado</option>
-                </select>
+                <label>Estado</label>
+
+                <input type="text"
+                       id="estadoBusqueda"
+                       class="form-control"
+                       autocomplete="off" />
+
+                <div id="listaEstados" class="list-group mt-2"></div>
+
+                <input asp-for="Detalle.IB_EST_ID"
+                       type="hidden"
+                       id="IB_EST_ID" />
             </div>
 
             <div class="rec-det-campo rec-det-cantidad">
@@ -106,92 +117,23 @@
 @await Html.PartialAsync("~/Views/Recepcion/Modals/_modalPrioridadProceso.cshtml")
 @await Html.PartialAsync("Modals/_modalControlReuso")
 @await Html.PartialAsync("Modals/_modalConfirmarReuso")
+@await Html.PartialAsync("Modals/_modalPacienteMaterial")
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const form = document.getElementById("formDetalle");
         const msj = document.getElementById("mensaje");
 
+        const estadoBusqueda = document.getElementById("estadoBusqueda");
         const estadoSelect = document.getElementById("IB_EST_ID");
         const cantidadInput = document.getElementById("TB_REC_DET_CANT");
         const revisionSelect = document.getElementById("TB_REC_DET_REP_ID");
+        const revisionBusqueda = document.getElementById("revisionBusqueda");
         const btnGuardar = document.getElementById("btnGuardar");
 
 
-            if (revisionSelect && !revisionSelect.value) {
-                revisionSelect.value = "1";
-                revisionSelect.dispatchEvent(new Event("change", { bubbles: true }));
-            }
 
-            if (revisionSelect) {
-                revisionSelect.addEventListener("focus", function () {
-                    if (!this.value) {
-                        this.value = "1";
-                        this.dispatchEvent(new Event("change", { bubbles: true }));
-                    }
-                });
-            }
-
-                if (revisionSelect) {
-        revisionSelect.addEventListener("keydown", function (e) {
-            if (e.key === "Enter") {
-                e.preventDefault();
-
-                if (!this.value) {
-                    this.value = "1";
-                    this.dispatchEvent(new Event("change", { bubbles: true }));
-                }
-
-                if (estadoSelect) {
-                    estadoSelect.focus();
-                }
-            }
-        });
-
-    }
-
-
-        if (estadoSelect) {
-        estadoSelect.addEventListener("keydown", function (e) {
-            if (e.key === "Enter") {
-                e.preventDefault();
-
-                if (!this.value) {
-                    const primeraOpcionValida = Array.from(this.options).find(x => x.value);
-                    if (primeraOpcionValida) {
-                        this.value = primeraOpcionValida.value;
-                        this.dispatchEvent(new Event("change", { bubbles: true }));
-                    }
-                }
-
-                if (cantidadInput) {
-                    cantidadInput.focus();
-                    cantidadInput.select?.();
-                }
-            }
-        });
-    }
-
-        if (estadoSelect) {
-        estadoSelect.addEventListener("keydown", function (e) {
-            if (e.key === "Enter") {
-                e.preventDefault();
-
-                if (!this.value) {
-                    const primeraOpcionValida = Array.from(this.options).find(x => x.value);
-                    if (primeraOpcionValida) {
-                        this.value = primeraOpcionValida.value;
-                        this.dispatchEvent(new Event("change", { bubbles: true }));
-                    }
-                }
-
-                if (cantidadInput) {
-                    cantidadInput.focus();
-                    cantidadInput.select?.();
-                }
-            }
-        });
-    }
+       
 
     if (cantidadInput) {
         cantidadInput.addEventListener("keydown", function (e) {
@@ -239,32 +181,452 @@
         const materialBusqueda = document.getElementById("materialBusqueda");
         const listaMateriales = document.getElementById("listaMateriales");
 
+            const listaRevisiones = document.getElementById("listaRevisiones");
+
+    let revisionesBusqueda = [];
+    let indiceRevision = -1;
+
+    const revisionesOriginales = [
+            @foreach (var rev in Model.Revisiones)
+            {
+            <text>{ id: @rev.IbMatRevId, denominacion: "@rev.IbMatRevDen" },</text>
+            }
+    ];
+
+    //         if (revisionSelect && !revisionSelect.value) {
+    //     revisionSelect.value = "1";
+    //     revisionSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    // }
+
+    if (revisionSelect && revisionBusqueda) {
+        revisionSelect.value = "1";
+        revisionBusqueda.value = "NO REGISTRA";
+    }
+
+
+        let reemplazarTextoRevision = true;
+
+    if (revisionBusqueda) {
+        revisionBusqueda.addEventListener("focus", function () {
+            if ((this.value || "").trim() === "NO REGISTRA") {
+                this.select();
+            }
+        });
+
+        revisionBusqueda.addEventListener("click", function () {
+            if ((this.value || "").trim() === "NO REGISTRA") {
+                this.select();
+            }
+        });
+    }
+
+        async function seleccionarRevision(rev) {
+        revisionBusqueda.value = rev.denominacion;
+        revisionSelect.value = rev.id;
+
+        listaRevisiones.innerHTML = "";
+        revisionesBusqueda = [];
+        indiceRevision = -1;
+
+        // 🔥 NUEVO BLOQUE (NO ROMPE LO EXISTENTE)
+        const matId = parseInt(document.getElementById("IB_MAT_ID")?.value) || 0;
+
+        try {
+            const response = await fetch("/TbRecDet/EvaluarRevision", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    IB_MAT_ID: matId,
+                    TB_REC_DET_REP_ID: rev.id
+                })
+            });
+
+            const data = await response.json();
+
+            if (!data.ok) {
+                mostrarError(data.mensaje || "Error al evaluar revisión");
+                return;
+            }
+
+            // 🔹 CASO 1 → usar flujo actual (NO TOCA NADA)
+            if (data.usarFlujoActual) {
+                revisionSelect.dispatchEvent(new Event("change", { bubbles: true }));
+
+                if (estadoBusqueda) {
+                    estadoBusqueda.focus();
+                    estadoBusqueda.select?.();
+                }
+                return;
+            }
+
+            // 🔹 CASO 2 → modal revisión
+            if (data.abrirModalRevision) {
+                if (grupoFaltantes) {
+                    grupoFaltantes.style.display = data.requiereFaltantes ? "block" : "none";
+                }
+
+                if (modalRevision) {
+                    modalRevision.show();
+                }
+                return;
+            }
+
+            //🔹 CASO 3 → modal control armado
+                if (data.abrirModalRca) {
+                requiereControlAdicional = true;
+                modalControlCompleto = false;
+                datosControlAdicional = null;
+
+                if (hiddenNum2) hiddenNum2.value = "0";
+                if (hiddenNum3) hiddenNum3.value = "24";
+                if (hiddenTxt3) hiddenTxt3.value = "REGISTRO CONTROL DE ARMADO";
+                if (hiddenMem1) hiddenMem1.value = "NO REGISTRADO";
+                if (hiddenDti1) hiddenDti1.value = new Date().toISOString();
+
+                if (revisionSelect) {
+                    revisionSelect.value = "24";
+                }
+
+                if (revisionBusqueda) {
+                    revisionBusqueda.value = "REGISTRO CONTROL DE ARMADO";
+                }
+
+                if (modalRegistroControlArmado) {
+                    limpiarModalRegistroControlArmado();
+                    actualizarEstadoModalRegistroControlArmado();
+                    modalRegistroControlArmado.show();
+                }
+                return;
+            }
+
+                    // 🔹 CASO 4 → modal paciente
+            if (data.abrirModalPaciente) {
+            if (hiddenNum2) hiddenNum2.value = "0";
+            if (hiddenNum3) hiddenNum3.value = rev.id;
+            if (hiddenTxt3) hiddenTxt3.value = data.txt3 || "";
+            if (hiddenMem1) hiddenMem1.value = data.mem1 || "NO REGISTRADO";
+            if (hiddenDti1) hiddenDti1.value = new Date().toISOString();
+
+            if (document.getElementById("pacienteCodigoReuso")) {
+                const inputPacReuso = document.getElementById("pacienteCodigoReuso");
+                inputPacReuso.value = data.codigoReuso || "";
+                inputPacReuso.dataset.reuId = data.tbReuId || 0;
+    }
+
+            if (document.getElementById("pacienteDenominacion")) {
+                document.getElementById("pacienteDenominacion").value = data.denominacion || "";
+            }
+
+            if (document.getElementById("pacienteRecepcion")) {
+                document.getElementById("pacienteRecepcion").value = data.recepcion || "";
+            }
+
+            if (document.getElementById("pacienteFecha")) {
+                document.getElementById("pacienteFecha").value = data.fecha || "";
+            }
+
+            const modalPacienteMaterialElement = document.getElementById("modalPacienteMaterial");
+            const modalPacienteMaterial = modalPacienteMaterialElement
+                ? bootstrap.Modal.getOrCreateInstance(modalPacienteMaterialElement)
+                : null;
+
+            if (modalPacienteMaterial) {
+                modalPacienteMaterial.show();
+            }
+                // 👉 foco automático en Historia Clínica
+            setTimeout(() => {
+                const historia = document.getElementById("pacienteHistoriaClinica");
+                if (historia) {
+                    historia.focus();
+                    historia.select?.();
+                }
+            },200);
+
+            return;
+        }
+
+            // 🔹 CASO 4 → aplicar directo
+            if (hiddenNum2) hiddenNum2.value = "0";
+            if (hiddenNum3) hiddenNum3.value = rev.id;
+            if (hiddenTxt3) hiddenTxt3.value = data.txt3 || "";
+            if (hiddenMem1) hiddenMem1.value = data.mem1 || "NO REGISTRADO";
+            if (hiddenDti1) hiddenDti1.value = new Date().toISOString();
+
+            fijarRevisionYBloquear(rev.id);
+
+            if (estadoBusqueda) {
+                estadoBusqueda.focus();
+                estadoBusqueda.select?.();
+            }
+
+        } catch (error) {
+            console.error(error);
+            mostrarError("Error al evaluar revisión");
+        }
+    }
+
+
+
+    function renderizarListaRevisiones() {
+        if (!listaRevisiones) return;
+
+        listaRevisiones.innerHTML = "";
+
+        revisionesBusqueda.forEach((rev, index) => {
+            const item = document.createElement("button");
+            item.type = "button";
+            item.className = "list-group-item list-group-item-action";
+            item.textContent = rev.denominacion;
+
+            if (index === indiceRevision) {
+                item.classList.add("active");
+            }
+
+            item.addEventListener("click", function () {
+                seleccionarRevision(rev);
+            });
+
+            listaRevisiones.appendChild(item);
+        });
+    }
+
+    if (revisionBusqueda && listaRevisiones) {
+
+        revisionBusqueda.addEventListener("click", function () {
+            if ((this.value || "").trim() !== "") return;
+
+            revisionesBusqueda = [...revisionesOriginales];
+            indiceRevision = -1;
+            renderizarListaRevisiones();
+        });
+
+        revisionBusqueda.addEventListener("input", function () {
+            const texto = this.value.trim().toLowerCase();
+
+            listaRevisiones.innerHTML = "";
+            revisionSelect.value = "";
+            revisionesBusqueda = [];
+            indiceRevision = -1;
+
+            if (texto.length < 1) return;
+
+            revisionesBusqueda = revisionesOriginales.filter(r =>
+                (r.denominacion || "").toLowerCase().includes(texto)
+            );
+
+            renderizarListaRevisiones();
+        });
+
+        revisionBusqueda.addEventListener("keydown", function (e) {
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+
+                if (!revisionesBusqueda.length) return;
+
+                if (indiceRevision < revisionesBusqueda.length - 1) {
+                    indiceRevision++;
+                } else {
+                    indiceRevision = 0;
+                }
+
+                renderizarListaRevisiones();
+            }
+
+            if (e.key === "ArrowUp") {
+                e.preventDefault();
+
+                if (!revisionesBusqueda.length) return;
+
+                if (indiceRevision > 0) {
+                    indiceRevision--;
+                } else {
+                    indiceRevision = revisionesBusqueda.length - 1;
+                }
+
+                renderizarListaRevisiones();
+            }
+
+            if (e.key === "Enter") {
+                e.preventDefault();
+
+                if (indiceRevision >= 0 && indiceRevision < revisionesBusqueda.length) {
+                    seleccionarRevision(revisionesBusqueda[indiceRevision]);
+                    return;
+                }
+
+                if (revisionesBusqueda.length === 1) {
+                    seleccionarRevision(revisionesBusqueda[0]);
+                    return;
+                }
+
+                listaRevisiones.innerHTML = "";
+
+                if (estadoBusqueda) {
+                    estadoBusqueda.focus();
+                    estadoBusqueda.select?.();
+                }
+            }
+        });
+    }
+
+    const listaEstados = document.getElementById("listaEstados");
+
+    let estadosBusqueda = [];
+    let indiceEstado = -1;
+
+    const estadosOriginales = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                Model.Estados.Select(x => new
+                {
+                        id = x.IbEstId,
+                        denominacion = x.IbEstDen
+                }).ToList()
+        ));
+
+    function seleccionarEstado(est) {
+        estadoBusqueda.value = est.denominacion;
+        estadoSelect.value = est.id;
+
+        listaEstados.innerHTML = "";
+        estadosBusqueda = [];
+        indiceEstado = -1;
+
+        if (cantidadInput) {
+            cantidadInput.focus();
+            cantidadInput.select?.();
+        }
+    }
+
+    function renderizarListaEstados() {
+        if (!listaEstados) return;
+
+        listaEstados.innerHTML = "";
+
+        estadosBusqueda.forEach((est, index) => {
+            const item = document.createElement("button");
+            item.type = "button";
+            item.className = "list-group-item list-group-item-action";
+            item.textContent = est.denominacion;
+
+            if (index === indiceEstado) {
+                item.classList.add("active");
+            }
+
+            item.addEventListener("click", function () {
+                seleccionarEstado(est);
+            });
+
+            listaEstados.appendChild(item);
+        });
+    }
+
+    if (estadoBusqueda && listaEstados) {
+
+        estadoBusqueda.addEventListener("click", function () {
+            if ((this.value || "").trim() !== "") return;
+
+            estadosBusqueda = [...estadosOriginales];
+            indiceEstado = -1;
+            renderizarListaEstados();
+        });
+
+        estadoBusqueda.addEventListener("input", function () {
+            const texto = this.value.trim().toLowerCase();
+
+            listaEstados.innerHTML = "";
+            estadoSelect.value = "";
+            estadosBusqueda = [];
+            indiceEstado = -1;
+
+            if (texto.length < 1) return;
+
+            estadosBusqueda = estadosOriginales.filter(e =>
+                (e.denominacion || "").toLowerCase().includes(texto)
+            );
+
+            renderizarListaEstados();
+        });
+
+        estadoBusqueda.addEventListener("keydown", function (e) {
+
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+
+                if (!estadosBusqueda.length) return;
+
+                indiceEstado = (indiceEstado + 1) % estadosBusqueda.length;
+                renderizarListaEstados();
+            }
+
+            if (e.key === "ArrowUp") {
+                e.preventDefault();
+
+                if (!estadosBusqueda.length) return;
+
+                indiceEstado = (indiceEstado - 1 + estadosBusqueda.length) % estadosBusqueda.length;
+                renderizarListaEstados();
+            }
+
+            if (e.key === "Enter") {
+                e.preventDefault();
+
+                if (indiceEstado >= 0) {
+                    seleccionarEstado(estadosBusqueda[indiceEstado]);
+                    return;
+                }
+
+                if (estadosBusqueda.length === 1) {
+                    seleccionarEstado(estadosBusqueda[0]);
+                    return;
+                }
+
+                listaEstados.innerHTML = "";
+
+                if (cantidadInput) {
+                    cantidadInput.focus();
+                }
+            }
+        });
+    }
+
         //lleva de codigo producto a denominacion
 
-        if (codigoProductoInput && materialBusqueda) {
-                codigoProductoInput.addEventListener("keydown", function (e) {
-                    if (e.key === "Enter") {
-                        const valor = (this.value || "").trim();
+                function inicializarCodigoProducto() {
+        if (!codigoProductoInput || !materialBusqueda) return;
 
-                        if (valor === "") {
-                            e.preventDefault();
-                            materialBusqueda.focus();
-                            materialBusqueda.select();
-                        }
-                    }
-                });
+        // ENTER
+        codigoProductoInput.addEventListener("keydown", async function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
 
-                codigoProductoInput.addEventListener("blur", function () {
-                    const valor = (this.value || "").trim();
+                const valor = (this.value || "").trim();
 
-                    if (valor === "") {
-                        setTimeout(() => {
-                            materialBusqueda.focus();
-                            materialBusqueda.select();
-                        }, 100);
-                    }
-                });
+                if (valor === "") {
+                    materialBusqueda.focus();
+                    materialBusqueda.select?.();
+                    return;
+                }
+
+                await buscarMaterialPorCodigo();
             }
+        });
+
+        // BLUR
+        codigoProductoInput.addEventListener("blur", async function () {
+            const valor = (this.value || "").trim();
+
+            if (valor === "") {
+                setTimeout(() => {
+                    materialBusqueda.focus();
+                    materialBusqueda.select?.();
+                }, 100);
+                return;
+            }
+
+            await buscarMaterialPorCodigo();
+        });
+    }
+
+    inicializarCodigoProducto();
 
         let materialesBusqueda = [];
         let indiceMaterial = -1;
@@ -329,6 +691,24 @@
                 });
         });
 
+            materialBusqueda.addEventListener("blur", function () {
+        setTimeout(() => {
+            const texto = (materialBusqueda.value || "").trim();
+            const matId = parseInt(document.getElementById("IB_MAT_ID")?.value) || 0;
+
+            if (texto !== "" && matId === 0) {
+                mostrarError("❌ Debe elegir un material válido de la lista.");
+
+                materialBusqueda.value = "";
+                document.getElementById("IB_MAT_ID").value = "";
+                document.getElementById("TB_REC_DET_MAT_ID").value = "";
+
+                materialBusqueda.focus();
+                materialBusqueda.select?.();
+            }
+        }, 150);
+    });
+
         materialBusqueda.addEventListener("input", function () {
             const texto = this.value.trim();
 
@@ -338,7 +718,7 @@
             materialesBusqueda = [];
             indiceMaterial = -1;
 
-            if (texto.length < 2) return;
+            if (texto.length < 1) return;
 
             console.log("buscando texto:", texto);
 
@@ -357,55 +737,66 @@
                 });
         });
 
-        materialBusqueda.addEventListener("keydown", function (e) {
-            if (e.key === "ArrowDown") {
-                e.preventDefault();
+            materialBusqueda.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
 
-                if (!materialesBusqueda || materialesBusqueda.length === 0) return;
+            if (!materialesBusqueda || materialesBusqueda.length === 0) return;
 
-                if (indiceMaterial < materialesBusqueda.length - 1) {
-                    indiceMaterial++;
-                } else {
-                    indiceMaterial = 0;
-                }
-
-                renderizarListaMateriales();
+            if (indiceMaterial < materialesBusqueda.length - 1) {
+                indiceMaterial++;
+            } else {
+                indiceMaterial = 0;
             }
 
-            if (e.key === "ArrowUp") {
-                e.preventDefault();
+            renderizarListaMateriales();
+        }
 
-                if (!materialesBusqueda || materialesBusqueda.length === 0) return;
+        if (e.key === "ArrowUp") {
+            e.preventDefault();
 
-                if (indiceMaterial > 0) {
-                    indiceMaterial--;
-                } else {
-                    indiceMaterial = materialesBusqueda.length - 1;
-                }
+            if (!materialesBusqueda || materialesBusqueda.length === 0) return;
 
-                renderizarListaMateriales();
+            if (indiceMaterial > 0) {
+                indiceMaterial--;
+            } else {
+                indiceMaterial = materialesBusqueda.length - 1;
             }
+
+            renderizarListaMateriales();
+        }
 
             if (e.key === "Enter") {
-                e.preventDefault();
+        e.preventDefault();
 
-                if (indiceMaterial >= 0 && indiceMaterial < materialesBusqueda.length) {
-                    seleccionarMaterial(materialesBusqueda[indiceMaterial]);
+        const matId = parseInt(document.getElementById("IB_MAT_ID")?.value) || 0;
+        const texto = (materialBusqueda.value || "").trim();
 
-                    if (revisionSelect) {
-                        revisionSelect.focus();
-                    }
+        if (indiceMaterial >= 0 && indiceMaterial < materialesBusqueda.length) {
+            seleccionarMaterial(materialesBusqueda[indiceMaterial]);
 
-                    return;
-                }
-
-                listaMateriales.innerHTML = "";
-
-                if (revisionSelect) {
-                    revisionSelect.focus();
-                }
+            if (revisionBusqueda) {
+                revisionBusqueda.focus();
             }
-        });
+
+            return;
+        }
+
+        if (texto !== "" && matId === 0) {
+            mostrarError("❌ Debe elegir un material válido de la lista.");
+            listaMateriales.innerHTML = "";
+            materialBusqueda.focus();
+            materialBusqueda.select?.();
+            return;
+        }
+
+        listaMateriales.innerHTML = "";
+
+        if (revisionBusqueda) {
+            revisionBusqueda.focus();
+        }
+    }
+    });
     }
     
 
@@ -442,80 +833,120 @@
         let datosControlAdicional = null;
         let resolverPrioridadProceso = null;
         let confirmarReusoExcedido = false;
+        let requiereRegistroPaciente = false;
 
-        if (inputReuVisible) {
-            inputReuVisible.addEventListener("keydown", async function (e) {
-                if (e.key === "Enter") {
-                    e.preventDefault();
+            if (inputReuVisible) {
+        inputReuVisible.addEventListener("keydown", async function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
 
-                    const codigo = this.value.trim();
-                    if (!codigo) return;
+                const codigo = this.value.trim();
+                if (!codigo) return;
 
-                    if (hiddenReuId) {
-                        hiddenReuId.value = codigo;
-                    }
+                if (hiddenReuId) {
+                    hiddenReuId.value = codigo;
+                }
 
-                    try {
-                        const response = await fetch("/TbRecDet/ValidarCodigoReuso", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                TB_REC_ID: parseInt(document.getElementById("Detalle_TB_REC_ID")?.value) || 0,
-                                IB_MAT_ID: parseInt(document.getElementById("IB_MAT_ID")?.value) || 0,
-                                TB_REC_DET_REU_ID: codigo,
-                                IB_EST_ID: parseInt(estadoSelect?.value) || 0,
-                                TB_REC_DET_REP_ID: parseInt(revisionSelect?.value) || 0,
-                                ConfirmarReusoExcedido: false
-                            })
-                        });
+                try {
+                    const response = await fetch("/TbRecDet/ValidarCodigoReuso", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            TB_REC_ID: parseInt(document.getElementById("Detalle_TB_REC_ID")?.value) || 0,
+                            IB_MAT_ID: parseInt(document.getElementById("IB_MAT_ID")?.value) || 0,
+                            TB_REC_DET_REU_ID: codigo,
+                            IB_EST_ID: parseInt(estadoSelect?.value) || 0,
+                            TB_REC_DET_REP_ID: parseInt(revisionSelect?.value) || 0,
+                            ConfirmarReusoExcedido: false
+                        })
+                    });
 
-                        const result = await response.json();
+                    const result = await response.json();
 
-                        if (!result.ok) {
-                            if (result.requiereConfirmacion) {
-                                confirmarReusoExcedido = false;
+                    if (!result.ok) {
+                        if (result.requiereConfirmacion) {
+                            confirmarReusoExcedido = false;
 
-                                const modalConfirmar = bootstrap.Modal.getOrCreateInstance(
-                                    document.getElementById("modalConfirmarReuso")
-                                );
+                            const modalConfirmar = bootstrap.Modal.getOrCreateInstance(
+                                document.getElementById("modalConfirmarReuso")
+                            );
 
-                                window.reusoPendiente = {
-                                    codigo: codigo
-                                };
+                            window.reusoPendiente = {
+                                codigo: codigo
+                            };
 
-                                modalConfirmar.show();
-                                return;
-                            }
-
-                            mostrarError(result.mensaje || "Error al validar reuso");
+                            modalConfirmar.show();
                             return;
                         }
 
-                        if (comboMaterial) {
-                            comboMaterial.value = String(result.ibMatId);
-                            comboMaterial.dispatchEvent(new Event("change", { bubbles: true }));
-                            console.log("valor combo después:", comboMaterial.value);
-                        }
+                        mostrarError(result.mensaje || "Error al validar reuso");
+                        return;
+                    }
 
-                        if (hiddenMatId) {
-                            hiddenMatId.value = result.ibMatId ?? "";
-                        }
+                    if (comboMaterial) {
+                        comboMaterial.value = String(result.ibMatId);
+                        comboMaterial.dispatchEvent(new Event("change", { bubbles: true }));
+                        console.log("valor combo después:", comboMaterial.value);
+                    }
 
-                        if (codigoProductoInput) {
-                            codigoProductoInput.value = result.ibMatId ?? "";
-                        }
+                    if (hiddenMatId) {
+                        hiddenMatId.value = result.ibMatId ?? "";
+                    }
 
-                        mostrarOk(result.mensaje || "Reuso encontrado correctamente.");
+                    if (codigoProductoInput) {
+                        codigoProductoInput.value = result.ibMatId ?? "";
+                    }
+
+                    mostrarOk(result.mensaje || "Reuso encontrado correctamente.");
                         console.log("Respuesta reuso:", result);
 
-                    } catch (error) {
-                        console.error("Error al validar reuso:", error);
-                    }
+                        if (requiereRegistroPaciente) {
+                            if (document.getElementById("pacienteCodigoReuso")) {
+                                const inputPacReuso = document.getElementById("pacienteCodigoReuso");
+                                inputPacReuso.value = codigo || "";
+                                inputPacReuso.dataset.reuId = result.tbReuId || 0;
+                            }
+
+                            if (document.getElementById("pacienteDenominacion")) {
+                                document.getElementById("pacienteDenominacion").value =
+                                    materialBusqueda?.value || result.ibMatDen || "";
+                            }
+
+                            if (document.getElementById("pacienteRecepcion")) {
+                                document.getElementById("pacienteRecepcion").value =
+                                    document.getElementById("Detalle_TB_REC_ID")?.value || "";
+                            }
+
+                            if (document.getElementById("pacienteFecha")) {
+                                const hoy = new Date();
+                                const yyyy = hoy.getFullYear();
+                                const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+                                const dd = String(hoy.getDate()).padStart(2, "0");
+                                document.getElementById("pacienteFecha").value = `${yyyy}-${mm}-${dd}`;
+                            }
+
+                            const modalPacienteMaterialElement = document.getElementById("modalPacienteMaterial");
+                            const modalPacienteMaterial = modalPacienteMaterialElement
+                                ? bootstrap.Modal.getOrCreateInstance(modalPacienteMaterialElement)
+                                : null;
+
+                            if (modalPacienteMaterial) {
+                                modalPacienteMaterial.show();
+                            }
+
+                            requiereRegistroPaciente = false;
+                            return;
+                        }
+
+                } catch (error) {
+                    console.error("Error al validar reuso:", error);
+                    mostrarError("❌ Error al validar reuso.");
                 }
-            });
-        }
+            }
+        });
+    }
 
         function limpiarMensaje() {
             if (!msj) return;
@@ -712,17 +1143,30 @@
         }
 
         function restaurarRevision() {
-            if (!revisionSelect) return;
-
+        if (revisionSelect) {
             revisionSelect.disabled = false;
             revisionSelect.value = "1";
-
-            for (let i = 0; i < revisionSelect.options.length; i++) {
-                const opt = revisionSelect.options[i];
-                if (opt.value === "2") opt.text = "Completo";
-                if (opt.value === "3") opt.text = "Incompleto";
-            }
+            revisionSelect.dispatchEvent(new Event("change", { bubbles: true }));
         }
+
+        if (revisionBusqueda) {
+            revisionBusqueda.value = "NO REGISTRA";
+        }
+
+        if (hiddenNum2) hiddenNum2.value = "";
+        if (hiddenNum3) hiddenNum3.value = "";
+        if (hiddenTxt3) hiddenTxt3.value = "";
+        if (hiddenMem1) hiddenMem1.value = "";
+        if (hiddenDti1) hiddenDti1.value = "";
+
+        if (listaRevisiones) {
+            listaRevisiones.innerHTML = "";
+        }
+
+        if (modalRevision) {
+            modalRevision.hide();
+        }
+    }
 
         async function postJson(url, data) {
             const response = await fetch(url, {
@@ -801,120 +1245,136 @@
             }
         }
 
-        async function buscarMaterialPorCodigo() {
-            const codigoOriginal = (codigoProductoInput?.value || "").trim();
-            debugger;
+            async function buscarMaterialPorCodigo() {
+        const codigoOriginal = (codigoProductoInput?.value || "").trim();
 
-            if (!codigoOriginal) {
-                limpiarDatosBusqueda();
-                return false;
-            }
-
-            try {
-                mostrarError("🔍 Buscando material...");
-
-                const response = await fetch(`/TbRecDet/BuscarMaterialPorCodigo?codigo=${encodeURIComponent(codigoOriginal)}`);
-                const texto = await response.text();
-
-                if (!texto) {
-                    throw new Error("Respuesta vacía en la búsqueda.");
-                }
-
-                let result;
-                try {
-                    result = JSON.parse(texto);
-                } catch {
-                    throw new Error("Respuesta no válida en la búsqueda: " + texto);
-                }
-
-                if (!result.ok) {
-                    limpiarDatosBusqueda();
-                    mostrarError("❌ " + result.mensaje);
-                    return false;
-                }
-
-                if (comboMaterial) {
-                    comboMaterial.value = String(result.ibMatId);
-                    comboMaterial.dispatchEvent(new Event("change", { bubbles: true }));
-                    console.log("valor combo después:", comboMaterial.value);
-                }
-
-                if (hiddenMatId) {
-                    hiddenMatId.value = result.ibMatId ?? "";
-                }
-                if (materialBusqueda) {
-                    materialBusqueda.value = result.denominacion ?? "";
-                }
-
-                if (inputVol) {
-                    inputVol.value = result.volumen ?? 0;
-                }
-
-                if (result.ibMatId && parseInt(result.ibMatId) > 0) {
-                    await controlarReusoMaterial(parseInt(result.ibMatId));
-                }
-
-                const tienePrioridad =
-                    result.ibMatPriOpc === true ||
-                    result.ibMatPriOpc === 1 ||
-                    result.ibMatPriOpc === "1";
-
-                let mensajePrioridadMostrado = false;
-
-                if (tienePrioridad) {
-                    const respuesta = await preguntarPrioridadProceso();
-
-                    if (respuesta) {
-                        fijarRevisionYBloquear(5, "PRIORIDAD DE PROCESO");
-                        mostrarOk("✅ Se asignó prioridad de proceso.");
-                    } else {
-                        fijarRevisionYBloquear(1, "NO REGISTRADO");
-                        mostrarOk("ℹ️ Se dejó sin prioridad de proceso.");
-                    }
-
-                    mensajePrioridadMostrado = true;
-                }
-
-                if (result.origen === "TB_REU") {
-                    if (hiddenReuId) hiddenReuId.value = codigoOriginal;
-                    if (inputReuVisible) inputReuVisible.value = codigoOriginal;
-                    vieneDeReuso = true;
-                } else {
-                    if (hiddenReuId) hiddenReuId.value = "";
-                    if (inputReuVisible) inputReuVisible.value = "";
-                    vieneDeReuso = false;
-                }
-
-                if (parseInt(result.ibMatMtiId) === 16) {
-                    requiereControlAdicional = true;
-                    modalControlCompleto = false;
-                    datosControlAdicional = null;
-
-                    mostrarError("⚠️ Este material requiere control adicional. Complete el formulario correspondiente.");
-
-                    limpiarModalRegistroControlArmado();
-                    actualizarEstadoModalRegistroControlArmado();
-
-                    if (modalRegistroControlArmado) {
-                        modalRegistroControlArmado.show();
-                    }
-                } else {
-                    requiereControlAdicional = false;
-                    modalControlCompleto = false;
-                    datosControlAdicional = null;
-
-                    if (!mensajePrioridadMostrado) {
-                        mostrarOk("✅ " + result.mensaje);
-                    }
-                }
-
-                return true;
-            } catch (err) {
-                limpiarDatosBusqueda();
-                mostrarError("❌ Error al guardar: " + err.message);
-                return false;
-            }
+        if (!codigoOriginal) {
+            limpiarDatosBusqueda();
+            requiereRegistroPaciente = false;
+            return false;
         }
+
+        try {
+            mostrarError("🔍 Buscando material...");
+
+            const response = await fetch(`/TbRecDet/BuscarMaterialPorCodigo?codigo=${encodeURIComponent(codigoOriginal)}`);
+            const texto = await response.text();
+
+            if (!texto) {
+                throw new Error("Respuesta vacía en la búsqueda.");
+            }
+
+            let result;
+            try {
+                result = JSON.parse(texto);
+            } catch {
+                throw new Error("Respuesta no válida en la búsqueda: " + texto);
+            }
+
+            if (!result.ok) {
+                limpiarDatosBusqueda();
+                requiereRegistroPaciente = false;
+                mostrarError("❌ " + result.mensaje);
+                return false;
+            }
+
+            if (comboMaterial) {
+                comboMaterial.value = String(result.ibMatId);
+                comboMaterial.dispatchEvent(new Event("change", { bubbles: true }));
+                console.log("valor combo después:", comboMaterial.value);
+            }
+
+            if (hiddenMatId) {
+                hiddenMatId.value = result.ibMatId ?? "";
+            }
+
+            if (materialBusqueda) {
+                materialBusqueda.value = result.denominacion ?? "";
+            }
+
+            if (inputVol) {
+                inputVol.value = result.volumen ?? 0;
+            }
+
+            if (result.ibMatId && parseInt(result.ibMatId) > 0) {
+                await controlarReusoMaterial(parseInt(result.ibMatId));
+            }
+
+            const tienePrioridad =
+                result.ibMatPriOpc === true ||
+                result.ibMatPriOpc === 1 ||
+                result.ibMatPriOpc === "1";
+
+            let mensajePrioridadMostrado = false;
+
+            if (tienePrioridad) {
+                const respuesta = await preguntarPrioridadProceso();
+
+                if (respuesta) {
+                    fijarRevisionYBloquear(5, "PRIORIDAD DE PROCESO");
+                    mostrarOk("✅ Se asignó prioridad de proceso.");
+                } else {
+                    fijarRevisionYBloquear(1, "NO REGISTRADO");
+                    mostrarOk("ℹ️ Se dejó sin prioridad de proceso.");
+                }
+
+                mensajePrioridadMostrado = true;
+            }
+
+            if (result.origen === "TB_REU") {
+                if (hiddenReuId) hiddenReuId.value = codigoOriginal;
+                if (inputReuVisible) inputReuVisible.value = codigoOriginal;
+                vieneDeReuso = true;
+            } else {
+                if (hiddenReuId) hiddenReuId.value = "";
+                if (inputReuVisible) inputReuVisible.value = "";
+                vieneDeReuso = false;
+            }
+
+            if (parseInt(result.ibMatMtiId) === 16) {
+                requiereControlAdicional = true;
+                modalControlCompleto = false;
+                datosControlAdicional = null;
+                requiereRegistroPaciente = false;
+
+                mostrarError("⚠️ Este material requiere control adicional. Complete el formulario correspondiente.");
+
+                limpiarModalRegistroControlArmado();
+                actualizarEstadoModalRegistroControlArmado();
+
+                if (modalRegistroControlArmado) {
+                    modalRegistroControlArmado.show();
+                }
+            }
+            else if (parseInt(result.ibMatMtiId) === 14) {
+                requiereControlAdicional = false;
+                modalControlCompleto = false;
+                datosControlAdicional = null;
+                requiereRegistroPaciente = true;
+
+                mostrarError("⚠️ Este material requiere registro de paciente. Primero valide el reuso.");
+            }
+            else {
+                requiereControlAdicional = false;
+                modalControlCompleto = false;
+                datosControlAdicional = null;
+                requiereRegistroPaciente = false;
+
+                if (!mensajePrioridadMostrado) {
+                    mostrarOk("✅ " + result.mensaje);
+                }
+            }
+
+            return true;
+        }
+        catch (err) {
+            limpiarDatosBusqueda();
+            requiereRegistroPaciente = false;
+            mostrarError("❌ Error al guardar: " + err.message);
+            return false;
+        }
+    }
+
 
         async function ejecutarBotAutEInsertar() {
             if (ejecutandoGuardado) return;
@@ -924,8 +1384,8 @@
                 const codigoIngresado = (codigoProductoInput?.value || "").trim();
                 const materialSeleccionado = parseInt(comboMaterial?.value) || 0;
 
-                if (codigoIngresado && !materialSeleccionado) {
-                    const okBusqueda = await buscarMaterialPorCodigo();
+                    if (codigoIngresado && !materialSeleccionado) {
+                    const okBusqueda = await buscarMaterialPorCodigo(codigoIngresado); // ejemplo
                     if (!okBusqueda) {
                         return;
                     }
@@ -985,6 +1445,7 @@
                     RegistroControlArmado: datosControlAdicional
                 };
 
+                
                 if (!data.TB_REC_ID || !data.IB_MAT_ID || !data.TB_REC_DET_CANT || data.TB_REC_DET_CANT < 1 || !data.IB_EST_ID) {
                     mostrarError("❌ Todos los campos son obligatorios.");
                     return;
@@ -1176,51 +1637,70 @@
             rcaAcajRev.addEventListener("change", actualizarEstadoModalRegistroControlArmado);
         }
 
-        if (btnAceptarRegistroControlArmado) {
-            btnAceptarRegistroControlArmado.addEventListener("click", function () {
-                const revisionId = parseInt(rcaAcajRev?.value) || 1;
-                const revisionDen = rcaAcajRev?.options[rcaAcajRev.selectedIndex]?.text || "NO REGISTRADO";
+        //registro control armado
+                 if (btnAceptarRegistroControlArmado) {
+        btnAceptarRegistroControlArmado.addEventListener("click", function () {
+            const estadoCajaId = parseInt(rcaAcajRev?.value) || 1;
+            const estadoCajaDen = rcaAcajRev?.options[rcaAcajRev.selectedIndex]?.text || "NO REGISTRADO";
 
-                const control = rcaIvisOpc?.checked || false;
-                const controladaPor = control
-                    ? ((rcaIvisOpcNom?.value || "").trim().toUpperCase() || "NO REGISTRADO")
-                    : "NO REGISTRADO";
+            const control = rcaIvisOpc?.checked || false;
+            const controladaPor = control
+                ? ((rcaIvisOpcNom?.value || "").trim().toUpperCase() || "NO REGISTRADO")
+                : "NO REGISTRADO";
 
-                const armadoCaja = rcaAcajOpc?.checked || false;
-                const armadaPor = armadoCaja
-                    ? ((rcaAcajOpcNom?.value || "").trim().toUpperCase() || "NO REGISTRADO")
-                    : "NO REGISTRADO";
+            const armadoCaja = rcaAcajOpc?.checked || false;
+            const armadaPor = armadoCaja
+                ? ((rcaAcajOpcNom?.value || "").trim().toUpperCase() || "NO REGISTRADO")
+                : "NO REGISTRADO";
 
-                const cantidadElementos = parseInt(rcaAcajCant?.value) || 0;
-                const faltantesObservaciones = revisionId === 3
-                    ? ((rcaAcajFalt?.value || "").trim() || "NO REGISTRADO")
-                    : "NO REGISTRADO";
+            const cantidadElementos = parseInt(rcaAcajCant?.value) || 0;
+            const faltantesObservaciones = estadoCajaId === 3
+                ? ((rcaAcajFalt?.value || "").trim() || "NO REGISTRADO")
+                : "NO REGISTRADO";
 
-                datosControlAdicional = {
-                    control: control,
-                    controladaPor: controladaPor,
-                    armadoCaja: armadoCaja,
-                    armadaPor: armadaPor,
-                    estadoCajaId: revisionId,
-                    estadoCajaDen: revisionDen,
-                    cantidadElementos: cantidadElementos,
-                    faltantesObservaciones: faltantesObservaciones,
-                    tbRecDetRevId: revisionId,
-                    tbRecDetRev: revisionDen,
-                    tbRecDetMde: true,
-                    vop: true,
-                    tbRecMco: true
-                };
+            datosControlAdicional = {
+                control: control,
+                controladaPor: controladaPor,
+                armadoCaja: armadoCaja,
+                armadaPor: armadaPor,
 
-                modalControlCompleto = true;
+                estadoCajaId: estadoCajaId,
+                estadoCajaDen: estadoCajaDen,
+                cantidadElementos: cantidadElementos,
+                faltantesObservaciones: faltantesObservaciones,
 
-                if (modalRegistroControlArmado) {
-                    modalRegistroControlArmado.hide();
-                }
+                // revisión principal
+                tbRecDetRevId: 24,
+                tbRecDetRev: "REGISTRO CONTROL DE ARMADO",
 
-                mostrarOk("✅ Registro de control de armado completado.");
-            });
-        }
+                // campos reales del detalle
+                tbRecDetTxt3: estadoCajaDen,
+                tbRecDetMem1: faltantesObservaciones,
+
+                tbRecDetMde: true,
+                vop: true,
+                tbRecMco: true
+            };
+
+            requiereControlAdicional = true;
+            modalControlCompleto = true;
+
+            if (revisionSelect) {
+                revisionSelect.value = "24";
+            }
+
+            if (hiddenNum3) hiddenNum3.value = "24";
+            if (hiddenTxt3) hiddenTxt3.value = estadoCajaDen;
+            if (hiddenMem1) hiddenMem1.value = faltantesObservaciones;
+            if (hiddenDti1) hiddenDti1.value = new Date().toISOString();
+
+            if (modalRegistroControlArmado) {
+                modalRegistroControlArmado.hide();
+            }
+
+            mostrarOk("✅ Control de armado cargado. Continúe con la carga.");
+        });
+    }
 
         if (btnContenidoRegistroControlArmado) {
             btnContenidoRegistroControlArmado.addEventListener("click", function () {

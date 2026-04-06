@@ -90,6 +90,7 @@
     <button type="submit" class="btn btn-primary mt-3">Guardar Recepción</button>
 </form>
 
+
 @if (Model != null && Model.TbRecId > 0 && subFormModel != null)
 {
     subFormModel.Detalle ??= new TbRecDetDto();
@@ -97,7 +98,7 @@
 
     <div class="mt-4">
         <h4>Agregar Material</h4>
-        @await Html.PartialAsync("_SubFormRecDet", subFormModel)
+        @await Html.PartialAsync("_SubFormRecDet.cshtml", subFormModel)
     </div>
 }
 
@@ -106,16 +107,16 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
-            const sectores = [
-                @if (listaSectores != null)
-                {
+        const sectores = [
+            @if (listaSectores != null)
+            {
                         for (int i = 0; i < listaSectores.Count; i++)
                         {
-                                var s = listaSectores[i];
-                                @:{ id: @s.IbSecId, den: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(s.IbSecDen ?? ""))" }@(i < listaSectores.Count - 1 ? "," : "")
+                                    var s = listaSectores[i];
+                                    @:{ id: @s.IbSecId, den: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(s.IbSecDen ?? ""))" }@(i < listaSectores.Count - 1 ? "," : "")
                         }
-                }
-            ];
+            }
+        ];
 
             const inputSectorDestino = document.getElementById("TbRecSecDesBusqueda");
             const hiddenSectorDestino = document.getElementById("TbRecSecDesId");

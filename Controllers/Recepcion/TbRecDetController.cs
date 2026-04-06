@@ -71,6 +71,190 @@ namespace ConexionSql.Controllers
             }
         }
 
+        [HttpPost]
+        public IActionResult EvaluarRevision([FromBody] TbRecDetDto detalle)
+        {
+            try
+            {
+                int revisionId = detalle.TB_REC_DET_REP_ID ?? 0;
+
+                // 🔹 1 → NO REGISTRA
+                if (revisionId == 1)
+                {
+                    return Json(new { ok = true, usarFlujoActual = true });
+                }
+
+                // 🔹 2 → COMPLETO
+                if (revisionId == 2)
+                {
+                    return Json(new
+                    {
+                        ok = true,
+                        abrirModalRevision = true,
+                        requiereFaltantes = false
+                    });
+                }
+
+                // 🔹 3 → INCOMPLETO
+                if (revisionId == 3)
+                {
+                    return Json(new
+                    {
+                        ok = true,
+                        abrirModalRevision = true,
+                        requiereFaltantes = true
+                    });
+                }
+
+                // 🔹 4 → CONTENIDO VERIFICADO
+                if (revisionId == 4)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 5 → PRIORIDAD DE PROCESO
+                if (revisionId == 5)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 6 → DECONTAMINADO
+                if (revisionId == 6)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 7 → --
+                if (revisionId == 7)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 8 → CODIGO DE PRODUCTO
+                if (revisionId == 8)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 9 → ENVOLTORIO VERIFICADO
+                if (revisionId == 9)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 10 → MATERIAL REPROCESADO SIN USO
+                if (revisionId == 10)
+                {
+                    return Json(new
+                    {
+                        ok = true,
+                        txt3 = "MATERIAL REPROCESADO SIN USO",
+                        mem1 = "NO REGISTRADO"
+                    });
+                }
+
+                // 🔹 11 → VERIFICACION OPERATIVA
+                if (revisionId == 11)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 12 → ENVOLTORIO DETERIORADO
+                if (revisionId == 12)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 13 → REPROCESO ENVOLTORIO HUMEDO
+                if (revisionId == 13)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 14 → MATERIAL CON REGISTRO DE PACIENTE
+                if (revisionId == 14)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 15 → PRODUCTO LIMPIO
+                if (revisionId == 15)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 16 → PRODUCTO SUCIO
+                if (revisionId == 16)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 17 → --
+                if (revisionId == 17)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 18 → --
+                if (revisionId == 18)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 19 → --
+                if (revisionId == 19)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 20 → --
+                if (revisionId == 20)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 21 → --
+                if (revisionId == 21)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 22 → --
+                if (revisionId == 22)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 23 → --
+                if (revisionId == 23)
+                {
+                    return Json(new { ok = true, continuarFlujo = true });
+                }
+
+                // 🔹 24 → REGISTRO CONTROL DE ARMADO
+                if (revisionId == 24)
+                {
+                    return Json(new
+                    {
+                        ok = true,
+                        abrirModalRca = true,
+                        requiereControlAdicional = true
+                    });
+                }
+
+                // 🔹 DEFAULT
+                return Json(new { ok = true, continuarFlujo = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    ok = false,
+                    mensaje = "Error: " + ex.Message
+                });
+            }
+        }
+
         //valida q rama va dependiendo de sector
         private ResultadoValidacionReuso ValidarReuso(TbRecDetDto detalle, TbRec tbRec, TbReu reuso, IbMat material)
         {
@@ -834,7 +1018,7 @@ namespace ConexionSql.Controllers
                     TbRecDetDat = "NO REGISTRA",
                     TbRecDetTxt1 = "NO REGISTRA",
                     TbRecDetTxt2 = "NO REGISTRA",
-                    TbRecDetObs = registro?.FaltantesObservaciones,
+                    TbRecDetObs = detalle.TbRecDetObs,
                     TbRecDetMde = registro?.TbRecDetMde ?? false,
                     TbRecDetMort = 1,
                     TbRecDetCantMult = 1,
@@ -895,7 +1079,8 @@ namespace ConexionSql.Controllers
                     TbRecDetNum1 = 0,
                     TbRecDetNum2 = registro?.CantidadElementos ?? detalle.TB_REC_DET_NUM_2,
                     TbRecDetNum3 = detalle.TB_REC_DET_NUM_3,
-                    TbRecDetTxt3 = registro?.TbRecDetRev ?? detalle.TB_REC_DET_TXT_3,
+                    TbRecDetTxt3 = registro?.TbRecDetTxt3 ?? detalle.TB_REC_DET_TXT_3,
+                    TbRecDetMem1 = registro?.TbRecDetMem1 ?? detalle.TB_REC_DET_MEM_1,
                     TbRecDetDti1 = detalle.TB_REC_DET_DTI_1,
                     TbRecDetVen = detalle.TB_REC_DET_VEN,
 
@@ -1247,7 +1432,7 @@ namespace ConexionSql.Controllers
 
                 int reuIni = reu.TbReuMatOpcReg ?? 0;
                 int reuMax = reu.TbReuMatOpcCant;
-                int reuFin = reuIni + 1;
+                int reuFin = reuIni + (detalle.TB_REC_DET_REP_ID == 10 ? 0 : 1);
 
                 // 🔥 CORRECCIÓN CLAVE
                 if (reuFin > reuMax && !detalle.ConfirmarReusoExcedido)

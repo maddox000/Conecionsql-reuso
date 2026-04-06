@@ -80,14 +80,9 @@ namespace ConexionSql.Controllers
         {
             try
             {
-                // 🔍 Buscar datos reales
-                var personal = await _context.IbPers
-                    .FirstOrDefaultAsync(p => p.IbPerId == dto.TB_ENT_PER_ID);
-
                 var sector = await _context.IbSectores
                     .FirstOrDefaultAsync(s => s.IbSecId == dto.TB_ENT_SEC_ID);
 
-                // 🔥 CAMBIO: usar UsuarioId como en Recepción
                 var usuarioIdSesion = HttpContext.Session.GetString("UsuarioId");
 
                 if (string.IsNullOrEmpty(usuarioIdSesion))
@@ -102,29 +97,117 @@ namespace ConexionSql.Controllers
                 var usuario = await _context.IbPers
                     .FirstOrDefaultAsync(p => p.IbPerId == int.Parse(usuarioIdSesion));
 
+                if (usuario == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        mensaje = "❌ Usuario no encontrado."
+                    });
+                }
+
                 var nueva = new TbEnt
                 {
+                    // 📅 FECHA / HORA
                     TbEntFec = DateTime.Today,
+                    TbEntHorIni = DateTime.Now,
                     TbEntHorFin = null,
 
-                    // 👤 USUARIO (igual que Recepción)
-                    TbEntPerId = int.Parse(usuarioIdSesion),
-                    TbEntPerNom = usuario != null
-                        ? $"{usuario.IbPerApe}, {usuario.IbPerNom}"
-                        : dto.TB_ENT_PER_NOM,
+                    // 👤 PERSONAL
+                    TbEntPerId = usuario.IbPerId,
+                    TbEntPerNom = usuario.IbPerNom,
+                    TbEntPerApe = usuario.IbPerApe,
+                    TbEntPerCarId = usuario.IbPerCarId,
+                    TbEntPerCarDen = usuario.IbPerCarDen,
 
-                    // 🏢 Sector
+                    // 🏢 SECTOR DESTINO
                     TbEntSecId = dto.TB_ENT_SEC_ID,
                     TbEntSecDen = sector?.IbSecDen ?? dto.TB_ENT_SEC_DEN,
 
-                    TbEntCantTot = 0,
-                    TbEntPcLog = Environment.MachineName,
+                    // 🔥 CAMPOS COMPLETOS
+                    TbEntSecPer = string.IsNullOrWhiteSpace(dto.TB_ENT_SEC_PER)
+         ? "NO REGISTRADO"
+         : dto.TB_ENT_SEC_PER,
 
-                    // 👤 Usuario sistema (NO tocar)
+                    TbEntObs = string.IsNullOrWhiteSpace(dto.TB_ENT_OBS)
+         ? ""
+         : dto.TB_ENT_OBS,
+
+                    // 📦 TOTAL
+                    TbEntCantTot = 0,
+
+                    // 🔧 NUMÉRICOS
+                    TbEntNum1 = 0,
+                    TbEntNum2 = 0,
+                    TbEntNum3 = 0,
+                    TbEntNum4 = 0,
+                    TbEntNum5 = 0,
+
+                    // 🔧 TEXTOS
+                    TbEntTxt1 = null,
+                    TbEntTxt2 = null,
+                    TbEntTxt3 = null,
+                    TbEntTxt4 = null,
+                    TbEntTxt5 = null,
+
+                    // 🔧 FECHAS AUX
+                    TbEntDti1 = null,
+                    TbEntDti2 = null,
+                    TbEntDti3 = null,
+                    TbEntDti4 = null,
+                    TbEntDti5 = null,
+
+                    // 🔧 MEMOS
+                    TbEntMem1 = null,
+                    TbEntMem2 = null,
+                    TbEntMem3 = null,
+
+                    // 🔧 CHECKS
+                    TbEntCk1 = false,
+                    TbEntCk2 = false,
+                    TbEntCk3 = false,
+                    TbEntCk4 = false,
+                    TbEntCk5 = false,
+
+                    // 🔧 BITS
+                    TbEntBit1 = false,
+                    TbEntBit2 = false,
+                    TbEntBit3 = false,
+
+                    // 🔧 CHECKLIST
+                    TbEntCkl1 = false,
+                    TbEntCkl2 = false,
+                    TbEntCkl3 = false,
+                    TbEntCkl4 = false,
+                    TbEntCkl5 = false,
+                    TbEntCkl6 = false,
+
+                    // 🔧 OTROS
+                    TbEntPac = "NO REGISTRADO",
+                    TbEntCliId = 0,
+                    TbEntCliDen = "NO REGISTRADO",
+                    TbEntSecOriId = 1,
+                    TbEntSecOriDen = "NO REGISTRADO",
+                    TbEntTranspOpcId = 0,
+                    TbEntTranspOpcDen = "NO REGISTRADO",
+
+                    // ✏️ EDICIÓN
+                    TbEntPerIdEdit = null,
+                    TbEntPerNomEdit = null,
+                    TbEntPerApeEdit = null,
+                    TbEntFecEdit = null,
+                    TbEntHorEdit = null,
+
+                    // 🖥️ SISTEMA
+                    TbEntPcLog = Environment.MachineName,
                     TbEntPcUsr = User.Identity?.Name ?? "Usuario"
                 };
 
                 _context.TbEnt.Add(nueva);
+                await _context.SaveChangesAsync();
+
+                // 🔁 Igualar ID_FORM al ID generado
+                nueva.TbEntIdForm = nueva.TbEntId;
                 await _context.SaveChangesAsync();
 
                 return Json(new

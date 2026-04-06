@@ -9,6 +9,7 @@ using ConexionSql.Models.Materiales;
 using ConexionSql.Models.Procesos;
 using ConexionSql.Models.Recepciones;
 using ConexionSql.Models.Reuso;
+using ConexionSql.Models.Reusos;
 using ConexionSql.Models.Sectores;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,8 +52,10 @@ namespace ConexionSql.Data
         public DbSet<TbReu> TbReu { get; set; }
         public DbSet<APanOpc> APanOpc { get; set; }
 
+        public DbSet<IbProEst> IbProEst { get; set; }
 
-
+        public DbSet<IbEstPro> IbEstPro { get; set; }
+        public DbSet<TbReuPac> TbReuPac { get; set; }
 
 
 

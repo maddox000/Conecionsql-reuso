@@ -60,27 +60,63 @@ namespace ConexionSql.Controllers
                 var nuevoDet = new TbProAcoDet
                 {
                     TbProAcoDetAcoId = tbProAcoId,
-                    TbProAcoDetRecDetId = recDet.TbRecDetId,
-                    TbProAcoDetMatId = recDet.TbRecDetMatId,
-                    TbProAcoDetMatDen = recDet.TbRecDetMatDen,
-                    TbProAcoDetCant = cantidad,
 
-                    // Extras seguros
-                    TbProAcoDetReuId = recDet.TbRecDetReuId,
-                    TbProAcoDetMatEtiId = recDet.TbRecDetMatEtiId,
-                    TbProAcoDetMatEtiDen = recDet.TbRecDetMatEtiDen,
+                    // Origen TB_REC_DET
+                    TbProAcoDetRecDetId = recDet.TbRecDetId,
                     TbProAcoDetRecDetCant = recDet.TbRecDetCant,
 
-                    // Estos los dejamos fijos para no romper
-                    TbProAcoDetSecDesId = 0,
-                    TbProAcoDetMatVol = 0,
+                    // Material
+                    TbProAcoDetMatId = recDet.TbRecDetMatId,
+                    TbProAcoDetMatDen = recDet.TbRecDetMatDen,
+                    TbProAcoDetMatVol = recDet.IbMatVol,
 
-                    // Stock
+                    // Mantenimiento / tipo material
+                    TbProAcoDetMatMtiId = recDet.TbRecDetMatMtiId,
+                    TbProAcoDetMatMtiDen = recDet.TbRecDetMatMtiDen,
+
+                    // Etiqueta / envoltorio
+                    TbProAcoDetMatEtiId = recDet.TbRecDetMatEtiId,
+                    TbProAcoDetMatEtiDen = recDet.TbRecDetMatEtiDen,
+
+                    // Reuso
+                    TbProAcoDetReuId = recDet.TbRecDetReuId,
+
+                    // Sector destino
+                    TbProAcoDetSecDesId = recDet.TbRecSecDesId,
+                    TbProAcoDetSecDesDen = recDet.TbRecSecDesDen,
+
+                    // Sector origen
+                    TbProAcoDetSecOriId = recDet.TbRecSecOriId,
+                    TbProAcoDetSecOriDen = recDet.TbRecSecOriDen,
+
+                    // Cantidades
+                    TbProAcoDetCant = cantidad,
                     TbProAcoDetEmpStock = stockDisponible,
                     TbProAcoDetEmpCant = cantidad,
                     TbProAcoDetEmpTot = cantidad,
                     TbProAcoDetProStock = cantidad,
 
+                    // NUM
+                    TbProAcoDetNum1 = 0,
+                    TbProAcoDetNum2 = 0,
+                    TbProAcoDetNum3 = 0,
+
+                    // TXT
+                    TbProAcoDetTxt1 = "TXT",
+                    TbProAcoDetTxt2 = "TXT",
+                    TbProAcoDetTxt3 = "TXT",
+
+                    // MEM
+                    TbProAcoDetMem1 = "MEM",
+                    TbProAcoDetMem2 = "MEM",
+                    TbProAcoDetMem3 = "MEM",
+
+                    // Otros
+                    TbProAcoDetCantMult = 1,
+                    TbProAcoDetCantElim = 0,
+                    TbProAcoDetDat = "NO REGISTRADO",
+
+                    // Auditoría
                     TbProAcoDetPcLog = Environment.MachineName,
                     TbProAcoDetPcUsr = Environment.UserName,
                     TbProAcoDetHor = DateTime.Now

@@ -1,12 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
 
 namespace ConexionSql.Models.Procesos
 {
     public class TbProFormDto
     {
-
         public int TbProId { get; set; }
+
+        // FECHA / HORA
+        public string? TbProFec { get; set; }
+        public string? TbProHorIni { get; set; }
 
         // 🔧 Tipo de Proceso
         public int TipoProcesoId { get; set; }
@@ -24,7 +28,14 @@ namespace ConexionSql.Models.Procesos
         public List<SelectListItem> TiposProceso { get; set; } = new();
         public List<SelectListItem> Equipos { get; set; } = new();
         public List<SelectListItem> TiposCiclo { get; set; } = new();
+
+        public int UsuarioId { get; set; }
+        public string? UsuarioNom { get; set; }
+        public string? UsuarioApe { get; set; }
+        public int? UsuarioCarId { get; set; }
+        public string? UsuarioCarDen { get; set; }
+
+        public int? ProveedorId { get; set; }
+        public string? ProveedorDen { get; set; }
     }
 }
-
-

@@ -7,7 +7,7 @@ namespace ConexionSql.Models.Procesos
     public class TbPro
     {
         [Column("TB_PRO_ID")]
-        public int TbProId { get; set; } 
+        public int TbProId { get; set; }
 
         [Column("TB_PRO_ID_FORM")]
         public int? TbProIdForm { get; set; }
@@ -102,14 +102,113 @@ namespace ConexionSql.Models.Procesos
         [Column("TB_PRO_HOR_EDIT")]
         public DateTime? TbProHorEdit { get; set; }
 
-        [Column("TB_PRO_MEM_1")]
-        public string? TbProMem1 { get; set; }
+        [Column("TB_PRO_PTE_IB_PTE_ID_1")]
+        public int? TbProPteIbPteId1 { get; set; }
 
-        [Column("TB_PRO_MEM_2")]
-        public string? TbProMem2 { get; set; }
+        [Column("TB_PRO_PTE_IB_PTE_DEN_1")]
+        public string? TbProPteIbPteDen1 { get; set; }
 
-        [Column("TB_PRO_MEM_3")]
-        public string? TbProMem3 { get; set; }
+        [Column("TB_PRO_PTE_IB_PTE_CANT_1")]
+        public int? TbProPteIbPteCant1 { get; set; }
+
+        [Column("TB_PRO_PTE_IB_PTE_ID_2")]
+        public int? TbProPteIbPteId2 { get; set; }
+
+        [Column("TB_PRO_PTE_IB_PTE_DEN_2")]
+        public string? TbProPteIbPteDen2 { get; set; }
+
+        [Column("TB_PRO_PTE_IB_PTE_CANT_2")]
+        public int? TbProPteIbPteCant2 { get; set; }
+
+        [Column("TB_PRO_PTE_IB_PTE_ID_3")]
+        public int? TbProPteIbPteId3 { get; set; }
+
+        [Column("TB_PRO_PTE_IB_PTE_DEN_3")]
+        public string? TbProPteIbPteDen3 { get; set; }
+
+        [Column("TB_PRO_PTE_IB_PTE_CANT_3")]
+        public int? TbProPteIbPteCant3 { get; set; }
+
+        [Column("TB_PRO_PTE_IB_PTE_ID_4")]
+        public int? TbProPteIbPteId4 { get; set; }
+
+        [Column("TB_PRO_PTE_IB_PTE_DEN_4")]
+        public string? TbProPteIbPteDen4 { get; set; }
+
+        [Column("TB_PRO_PTE_IB_PTE_CANT_4")]
+        public int? TbProPteIbPteCant4 { get; set; }
+
+        [Column("TB_PRO_PTE_IB_PTE_ID_5")]
+        public int? TbProPteIbPteId5 { get; set; }
+
+        [Column("TB_PRO_PTE_IB_PTE_DEN_5")]
+        public string? TbProPteIbPteDen5 { get; set; }
+
+        [Column("TB_PRO_PTE_IB_PTE_CANT_5")]
+        public int? TbProPteIbPteCant5 { get; set; }
+
+        [Column("TB_PRO_PTE_IB_PTE_ID_6")]
+        public int? TbProPteIbPteId6 { get; set; }
+
+        [Column("TB_PRO_PTE_IB_PTE_DEN_6")]
+        public string? TbProPteIbPteDen6 { get; set; }
+
+        [Column("TB_PRO_PTE_IB_PTE_CANT_6")]
+        public int? TbProPteIbPteCant6 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_ID_1")]
+        public int? TbProMteIbPteId1 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_DEN_1")]
+        public string? TbProMteIbPteDen1 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_CANT_1")]
+        public int? TbProMteIbPteCant1 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_ID_2")]
+        public int? TbProMteIbPteId2 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_DEN_2")]
+        public string? TbProMteIbPteDen2 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_CANT_2")]
+        public int? TbProMteIbPteCant2 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_ID_3")]
+        public int? TbProMteIbPteId3 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_DEN_3")]
+        public string? TbProMteIbPteDen3 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_CANT_3")]
+        public int? TbProMteIbPteCant3 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_ID_4")]
+        public int? TbProMteIbPteId4 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_DEN_4")]
+        public string? TbProMteIbPteDen4 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_CANT_4")]
+        public int? TbProMteIbPteCant4 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_ID_5")]
+        public int? TbProMteIbPteId5 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_DEN_5")]
+        public string? TbProMteIbPteDen5 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_CANT_5")]
+        public int? TbProMteIbPteCant5 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_ID_6")]
+        public int? TbProMteIbPteId6 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_DEN_6")]
+        public string? TbProMteIbPteDen6 { get; set; }
+
+        [Column("TB_PRO_MTE_IB_PTE_CANT_6")]
+        public int? TbProMteIbPteCant6 { get; set; }
 
         [Column("IB_PRO_EST_ID")]
         public int? IbProEstId { get; set; }
@@ -141,6 +240,90 @@ namespace ConexionSql.Models.Procesos
         [Column("TB_PRO_PROV_DEN")]
         public string? TbProProvDen { get; set; }
 
+        [Column("TB_PRO_1")]
+        public int? TbPro1 { get; set; }
+
+        [Column("TB_PRO_2")]
+        public int? TbPro2 { get; set; }
+
+        [Column("TB_PRO_3")]
+        public int? TbPro3 { get; set; }
+
+        [Column("TB_PRO_4")]
+        public int? TbPro4 { get; set; }
+
+        [Column("TB_PRO_5")]
+        public int? TbPro5 { get; set; }
+
+        [Column("TB_PRO_6")]
+        public int? TbPro6 { get; set; }
+
+        [Column("TB_PRO_7")]
+        public int? TbPro7 { get; set; }
+
+        [Column("TB_PRO_8")]
+        public int? TbPro8 { get; set; }
+
+        [Column("TB_PRO_9")]
+        public int? TbPro9 { get; set; }
+
+        [Column("TB_PRO_10")]
+        public int? TbPro10 { get; set; }
+
+        [Column("TB_PRO_11")]
+        public int? TbPro11 { get; set; }
+
+        [Column("TB_PRO_12")]
+        public int? TbPro12 { get; set; }
+
+        [Column("TB_PRO_13")]
+        public int? TbPro13 { get; set; }
+
+        [Column("TB_PRO_14")]
+        public int? TbPro14 { get; set; }
+
+        [Column("TB_PRO_15")]
+        public int? TbPro15 { get; set; }
+
+        [Column("TB_PRO_16")]
+        public int? TbPro16 { get; set; }
+
+        [Column("TB_PRO_17")]
+        public int? TbPro17 { get; set; }
+
+        [Column("TB_PRO_18")]
+        public int? TbPro18 { get; set; }
+
+        [Column("TB_PRO_19")]
+        public int? TbPro19 { get; set; }
+
+        [Column("TB_PRO_20")]
+        public int? TbPro20 { get; set; }
+
+        [Column("TB_PRO_21")]
+        public int? TbPro21 { get; set; }
+
+        [Column("TB_PRO_22")]
+        public int? TbPro22 { get; set; }
+
+        [Column("TB_PRO_23")]
+        public int? TbPro23 { get; set; }
+
+        [Column("TB_PRO_24")]
+        public int? TbPro24 { get; set; }
+
+        [Column("TB_PRO_25")]
+        public int? TbPro25 { get; set; }
+
+        [Column("TB_PRO_26")]
+        public int? TbPro26 { get; set; }
+
+        [Column("TB_PRO_27")]
+        public int? TbPro27 { get; set; }
+
+        [Column("TB_PRO_28")]
+        public int? TbPro28 { get; set; }
+
         [Column("TB_PRO_NUM_1")]
         public int? TbProNum1 { get; set; }
 
@@ -167,6 +350,15 @@ namespace ConexionSql.Models.Procesos
 
         [Column("TB_PRO_DTI_3")]
         public DateTime? TbProDti3 { get; set; }
+
+        [Column("TB_PRO_MEM_1")]
+        public string? TbProMem1 { get; set; }
+
+        [Column("TB_PRO_MEM_2")]
+        public string? TbProMem2 { get; set; }
+
+        [Column("TB_PRO_MEM_3")]
+        public string? TbProMem3 { get; set; }
 
         [Column("TB_PRO_INI")]
         public DateTime? TbProIni { get; set; }
@@ -307,4 +499,3 @@ namespace ConexionSql.Models.Procesos
         public string? TbProCliDen { get; set; }
     }
 }
-
