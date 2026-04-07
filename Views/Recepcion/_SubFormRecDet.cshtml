@@ -229,78 +229,80 @@
         indiceRevision = -1;
 
         // 🔥 NUEVO BLOQUE (NO ROMPE LO EXISTENTE)
-        const matId = parseInt(document.getElementById("IB_MAT_ID")?.value) || 0;
+            const matId = parseInt(document.getElementById("IB_MAT_ID")?.value) || 0;
 
-        try {
-            const response = await fetch("/TbRecDet/EvaluarRevision", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    IB_MAT_ID: matId,
-                    TB_REC_DET_REP_ID: rev.id
-                })
-            });
+    try {
+        const response = await fetch("/TbRecDet/EvaluarRevision", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                IB_MAT_ID: matId,
+                TB_REC_DET_REP_ID: rev.id
+            })
+        });
 
-            const data = await response.json();
+        const data = await response.json();
 
-            if (!data.ok) {
-                mostrarError(data.mensaje || "Error al evaluar revisión");
-                return;
+        if (!data.ok) {
+            mostrarError(data.mensaje || "Error al evaluar revisión");
+            return;
+        }
+
+        // 🔹 CASO 1 → usar flujo actual (NO TOCA NADA)
+        if (data.usarFlujoActual) {
+            revisionSelect.dispatchEvent(new Event("change", { bubbles: true }));
+
+            if (estadoBusqueda) {
+                estadoBusqueda.focus();
+                estadoBusqueda.select?.();
+            }
+            return;
+        }
+
+        // 🔹 CASO 2 → modal revisión (NO TOCAR)
+        if (data.abrirModalRevision) {
+            if (grupoFaltantes) {
+                grupoFaltantes.style.display = data.requiereFaltantes ? "block" : "none";
             }
 
-            // 🔹 CASO 1 → usar flujo actual (NO TOCA NADA)
-            if (data.usarFlujoActual) {
-                revisionSelect.dispatchEvent(new Event("change", { bubbles: true }));
+            if (modalRevision) {
+                modalRevision.show();
+            }
+            return;
+        }
 
-                if (estadoBusqueda) {
-                    estadoBusqueda.focus();
-                    estadoBusqueda.select?.();
-                }
-                return;
+        // 🔹 CASO 3 → modal control armado (NO TOCAR)
+        if (data.abrirModalRca) {
+            requiereControlAdicional = true;
+            modalControlCompleto = false;
+            datosControlAdicional = null;
+
+            if (hiddenNum2) hiddenNum2.value = "0";
+            if (hiddenNum3) hiddenNum3.value = "24";
+            if (hiddenTxt3) hiddenTxt3.value = "REGISTRO CONTROL DE ARMADO";
+            if (hiddenMem1) hiddenMem1.value = "NO REGISTRADO";
+            if (hiddenDti1) hiddenDti1.value = new Date().toISOString();
+
+            if (revisionSelect) {
+                revisionSelect.value = "24";
             }
 
-            // 🔹 CASO 2 → modal revisión
-            if (data.abrirModalRevision) {
-                if (grupoFaltantes) {
-                    grupoFaltantes.style.display = data.requiereFaltantes ? "block" : "none";
-                }
-
-                if (modalRevision) {
-                    modalRevision.show();
-                }
-                return;
+            if (revisionBusqueda) {
+                revisionBusqueda.value = "REGISTRO CONTROL DE ARMADO";
             }
 
-            //🔹 CASO 3 → modal control armado
-                if (data.abrirModalRca) {
-                requiereControlAdicional = true;
-                modalControlCompleto = false;
-                datosControlAdicional = null;
-
-                if (hiddenNum2) hiddenNum2.value = "0";
-                if (hiddenNum3) hiddenNum3.value = "24";
-                if (hiddenTxt3) hiddenTxt3.value = "REGISTRO CONTROL DE ARMADO";
-                if (hiddenMem1) hiddenMem1.value = "NO REGISTRADO";
-                if (hiddenDti1) hiddenDti1.value = new Date().toISOString();
-
-                if (revisionSelect) {
-                    revisionSelect.value = "24";
-                }
-
-                if (revisionBusqueda) {
-                    revisionBusqueda.value = "REGISTRO CONTROL DE ARMADO";
-                }
-
-                if (modalRegistroControlArmado) {
-                    limpiarModalRegistroControlArmado();
-                    actualizarEstadoModalRegistroControlArmado();
-                    modalRegistroControlArmado.show();
-                }
-                return;
+            if (modalRegistroControlArmado) {
+                limpiarModalRegistroControlArmado();
+                actualizarEstadoModalRegistroControlArmado();
+                modalRegistroControlArmado.show();
             }
+            return;
+        }
 
-                    // 🔹 CASO 4 → modal paciente
-            if (data.abrirModalPaciente) {
+        // 🔥 CASO 4 → PACIENTE (CAMBIO ACÁ SOLAMENTE)
+        if (data.abrirModalPaciente) {
+
+            // ✔ mantener todos los datos (NO TOCAR)
             if (hiddenNum2) hiddenNum2.value = "0";
             if (hiddenNum3) hiddenNum3.value = rev.id;
             if (hiddenTxt3) hiddenTxt3.value = data.txt3 || "";
@@ -311,7 +313,7 @@
                 const inputPacReuso = document.getElementById("pacienteCodigoReuso");
                 inputPacReuso.value = data.codigoReuso || "";
                 inputPacReuso.dataset.reuId = data.tbReuId || 0;
-    }
+            }
 
             if (document.getElementById("pacienteDenominacion")) {
                 document.getElementById("pacienteDenominacion").value = data.denominacion || "";
@@ -325,46 +327,34 @@
                 document.getElementById("pacienteFecha").value = data.fecha || "";
             }
 
-            const modalPacienteMaterialElement = document.getElementById("modalPacienteMaterial");
-            const modalPacienteMaterial = modalPacienteMaterialElement
-                ? bootstrap.Modal.getOrCreateInstance(modalPacienteMaterialElement)
-                : null;
+            // 🔥 CAMBIO CLAVE:
+            // ❌ ANTES: abría el modal acá (cortaba flujo)
+            // ✔ AHORA: solo marcamos que se debe abrir después del reuso
 
-            if (modalPacienteMaterial) {
-                modalPacienteMaterial.show();
-            }
-                // 👉 foco automático en Historia Clínica
-            setTimeout(() => {
-                const historia = document.getElementById("pacienteHistoriaClinica");
-                if (historia) {
-                    historia.focus();
-                    historia.select?.();
-                }
-            },200);
+            requiereRegistroPaciente = true;
 
             return;
         }
 
-            // 🔹 CASO 4 → aplicar directo
-            if (hiddenNum2) hiddenNum2.value = "0";
-            if (hiddenNum3) hiddenNum3.value = rev.id;
-            if (hiddenTxt3) hiddenTxt3.value = data.txt3 || "";
-            if (hiddenMem1) hiddenMem1.value = data.mem1 || "NO REGISTRADO";
-            if (hiddenDti1) hiddenDti1.value = new Date().toISOString();
+        // 🔹 CASO FINAL → aplicar directo (NO TOCAR)
+        if (hiddenNum2) hiddenNum2.value = "0";
+        if (hiddenNum3) hiddenNum3.value = rev.id;
+        if (hiddenTxt3) hiddenTxt3.value = data.txt3 || "";
+        if (hiddenMem1) hiddenMem1.value = data.mem1 || "NO REGISTRADO";
+        if (hiddenDti1) hiddenDti1.value = new Date().toISOString();
 
-            fijarRevisionYBloquear(rev.id);
+        fijarRevisionYBloquear(rev.id);
 
-            if (estadoBusqueda) {
-                estadoBusqueda.focus();
-                estadoBusqueda.select?.();
-            }
-
-        } catch (error) {
-            console.error(error);
-            mostrarError("Error al evaluar revisión");
+        if (estadoBusqueda) {
+            estadoBusqueda.focus();
+            estadoBusqueda.select?.();
         }
-    }
 
+    } catch (error) {
+        console.error(error);
+        mostrarError("Error al evaluar revisión");
+    }
+}
 
 
     function renderizarListaRevisiones() {
@@ -642,7 +632,8 @@
             indiceMaterial = -1;
 
             if (mat.id && parseInt(mat.id) > 0) {
-                await controlarReusoMaterial(parseInt(mat.id));
+            codigoProductoInput.value = mat.id;
+            await buscarMaterialPorCodigo();
             }
         }
 
@@ -835,7 +826,7 @@
         let confirmarReusoExcedido = false;
         let requiereRegistroPaciente = false;
 
-            if (inputReuVisible) {
+        if (inputReuVisible) {
         inputReuVisible.addEventListener("keydown", async function (e) {
             if (e.key === "Enter") {
                 e.preventDefault();
@@ -933,7 +924,7 @@
                                 : null;
 
                             if (modalPacienteMaterial) {
-                                modalPacienteMaterial.show();
+                                //modalPacienteMaterial.show();
                             }
 
                             requiereRegistroPaciente = false;
@@ -1245,7 +1236,7 @@
             }
         }
 
-            async function buscarMaterialPorCodigo() {
+        async function buscarMaterialPorCodigo() {
         const codigoOriginal = (codigoProductoInput?.value || "").trim();
 
         if (!codigoOriginal) {
@@ -1352,7 +1343,7 @@
                 datosControlAdicional = null;
                 requiereRegistroPaciente = true;
 
-                mostrarError("⚠️ Este material requiere registro de paciente. Primero valide el reuso.");
+                // mostrarError("⚠️ Este material requiere registro de paciente. Primero valide el reuso.");
             }
             else {
                 requiereControlAdicional = false;
@@ -1511,44 +1502,89 @@
             }
         }
 
-        document.getElementById("btnSiReuso")?.addEventListener("click", async function () {
-            confirmarReusoExcedido = true;
+        //boton aceptar para validar reuso exedido
+            document.getElementById("btnSiReuso")?.addEventListener("click", async function () {
+        confirmarReusoExcedido = true;
 
-            const modal = bootstrap.Modal.getInstance(document.getElementById("modalConfirmarReuso"));
-            if (modal) modal.hide();
+        const modal = bootstrap.Modal.getInstance(document.getElementById("modalConfirmarReuso"));
+        if (modal) modal.hide();
 
-            if (!window.reusoPendiente) return;
+        if (!window.reusoPendiente) return;
 
-            const codigo = window.reusoPendiente.codigo;
+        const codigo = window.reusoPendiente.codigo;
 
-            document.getElementById("TB_REC_DET_REU_ID_VISIBLE").value = codigo;
-            document.getElementById("TB_REC_DET_REU_ID").value = codigo;
+        document.getElementById("TB_REC_DET_REU_ID_VISIBLE").value = codigo;
+        document.getElementById("TB_REC_DET_REU_ID").value = codigo;
 
-            const response = await fetch("/TbRecDet/ValidarCodigoReuso", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    TB_REC_ID: parseInt(document.getElementById("Detalle_TB_REC_ID")?.value) || 0,
-                    IB_MAT_ID: parseInt(document.getElementById("IB_MAT_ID")?.value) || 0,
-                    TB_REC_DET_REU_ID: codigo,
-                    IB_EST_ID: parseInt(document.getElementById("IB_EST_ID")?.value) || 0,
-                    TB_REC_DET_REP_ID: parseInt(document.getElementById("TB_REC_DET_REP_ID")?.value) || 0,
-                    ConfirmarReusoExcedido: true
-                })
-            });
+        const response = await fetch("/TbRecDet/ValidarCodigoReuso", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                TB_REC_ID: parseInt(document.getElementById("Detalle_TB_REC_ID")?.value) || 0,
+                IB_MAT_ID: parseInt(document.getElementById("IB_MAT_ID")?.value) || 0,
+                TB_REC_DET_REU_ID: codigo,
+                IB_EST_ID: parseInt(document.getElementById("IB_EST_ID")?.value) || 0,
+                TB_REC_DET_REP_ID: parseInt(document.getElementById("TB_REC_DET_REP_ID")?.value) || 0,
+                ConfirmarReusoExcedido: true
+            })
+        });
 
-            const result = await response.json();
+        const result = await response.json();
 
-            if (!result.ok) {
-                alert(result.mensaje);
-                confirmarReusoExcedido = false;
-                return;
+        if (!result.ok) {
+            alert(result.mensaje);
+            confirmarReusoExcedido = false;
+            return;
+        }
+
+        window.reusoPendiente = null;
+
+        // 🔥 LIMPIAMOS EL MENSAJE VIEJO
+        limpiarMensaje();
+
+        // 🔥 OPCIONAL (mejor UX)
+        mostrarOk(result.mensaje || "Reuso confirmado correctamente.");
+
+        if (requiereRegistroPaciente) {
+
+            if (document.getElementById("pacienteCodigoReuso")) {
+                const inputPacReuso = document.getElementById("pacienteCodigoReuso");
+                inputPacReuso.value = codigo || "";
+                inputPacReuso.dataset.reuId = result.tbReuId || 0;
             }
 
-            window.reusoPendiente = null;
-        });
+            if (document.getElementById("pacienteDenominacion")) {
+                document.getElementById("pacienteDenominacion").value =
+                    materialBusqueda?.value || result.ibMatDen || "";
+            }
+
+            if (document.getElementById("pacienteRecepcion")) {
+                document.getElementById("pacienteRecepcion").value =
+                    document.getElementById("Detalle_TB_REC_ID")?.value || "";
+            }
+
+            if (document.getElementById("pacienteFecha")) {
+                const hoy = new Date();
+                const yyyy = hoy.getFullYear();
+                const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+                const dd = String(hoy.getDate()).padStart(2, "0");
+                document.getElementById("pacienteFecha").value = `${yyyy}-${mm}-${dd}`;
+            }
+
+            const modalPacienteMaterialElement = document.getElementById("modalPacienteMaterial");
+            const modalPacienteMaterial = modalPacienteMaterialElement
+                ? bootstrap.Modal.getOrCreateInstance(modalPacienteMaterialElement)
+                : null;
+
+            if (modalPacienteMaterial) {
+                modalPacienteMaterial.show();
+            }
+
+            requiereRegistroPaciente = false;
+        }
+    });
 
         document.getElementById("btnNoReuso")?.addEventListener("click", function () {
             confirmarReusoExcedido = false;

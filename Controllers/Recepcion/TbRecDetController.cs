@@ -483,7 +483,7 @@ namespace ConexionSql.Controllers
                 // =========================================================
                 // 🔥 7️⃣ VALIDACIÓN DE LÍMITE DE REUSOS
                 // =========================================================
-                var resultadoReusos = ValidarReusos(detalle, reuso, material);
+                var resultadoReusos = ValidarLimiteReuso(detalle, reuso, material);
 
                 if (!resultadoReusos.Ok)
                 {
@@ -533,7 +533,9 @@ namespace ConexionSql.Controllers
             return opcion?.Valor ?? valorPorDefecto;
         }
 
-        private ResultadoValidacionReuso ValidarReusos(
+
+        //Valida baja de reuso x cantidad
+        private ResultadoValidacionReuso ValidarLimiteReuso(
             TbRecDetDto detalle,
             TbReu reuso,
             IbMat material
@@ -956,8 +958,8 @@ namespace ConexionSql.Controllers
                     TbRecPerId = tbRec.TbRecPerId,
                     TbRecPerNom = tbRec.TbRecPerNom,
                     TbRecPerApe = !string.IsNullOrWhiteSpace(tbRec.TbRecPerApe)
-        ? tbRec.TbRecPerApe
-        : "NO REGISTRA",
+                    ? tbRec.TbRecPerApe
+                    : "NO REGISTRA",
                     TbRecPerCarId = tbRec.TbRecPerCarId,
                     TbRecPerCarDen = tbRec.TbRecPerCarDen,
                     TbRecSecOriId = tbRec.TbRecSecOriId,
@@ -995,13 +997,13 @@ namespace ConexionSql.Controllers
                     TbRecDetRepId = registro?.TbRecDetRevId ?? detalle.TB_REC_DET_REP_ID ?? 1,
                     TbRecDetReuOpc = detalle.TB_REC_DET_REU_OPC,
 
-                    TbRecDetReuId = !string.IsNullOrWhiteSpace(detalle.TB_REC_DET_REU_ID)
-        ? detalle.TB_REC_DET_REU_ID
-        : "1",
+                                TbRecDetReuId = !string.IsNullOrWhiteSpace(detalle.TB_REC_DET_REU_ID)
+                    ? detalle.TB_REC_DET_REU_ID
+                    : "1",
 
-                    TbRecDetReuDen = !string.IsNullOrWhiteSpace(detalle.TB_REC_DET_REU_DEN)
-        ? detalle.TB_REC_DET_REU_DEN
-        : "NO REGISTRADO",
+                                TbRecDetReuDen = !string.IsNullOrWhiteSpace(detalle.TB_REC_DET_REU_DEN)
+                    ? detalle.TB_REC_DET_REU_DEN
+                    : "NO REGISTRADO",
 
                     TbRecDetReuCant = detalle.TB_REC_DET_REU_CANT ?? 0,
                     TbRecDetOrtId = 0,
@@ -1100,13 +1102,13 @@ namespace ConexionSql.Controllers
                     TbRecDetAcajOpc = registro?.ArmadoCaja ?? false,
 
                     TbRecDetIvisOpcNom = !string.IsNullOrWhiteSpace(registro?.ControladaPor)
-        ? registro.ControladaPor
-        : "NO REGISTRADO",
+                    ? registro.ControladaPor
+                    : "NO REGISTRADO",
 
-                    TbRecDetAcajOpcNom = !string.IsNullOrWhiteSpace(registro?.ArmadaPor)
-        ? registro.ArmadaPor
-        : "NO REGISTRA",
-                };
+                                TbRecDetAcajOpcNom = !string.IsNullOrWhiteSpace(registro?.ArmadaPor)
+                    ? registro.ArmadaPor
+                    : "NO REGISTRA",
+                            };
 
 
                 _context.TbRecDet.Add(entidad);
