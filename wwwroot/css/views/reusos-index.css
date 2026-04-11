@@ -1,0 +1,253 @@
+.reus-live-shell {
+    border-left: 0;
+    padding: 1rem;
+}
+
+.reus-live-banner {
+    background: linear-gradient(90deg, #2f3e46 0%, #3a4f58 100%);
+    color: #fff;
+    border-radius: 8px;
+    padding: 0.58rem 1rem;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.95rem;
+    font-size: 0.9rem;
+}
+
+.reus-live-warning {
+    border: 1px solid #ffd46b;
+    background: #fff7dd;
+    color: #725502;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    padding: 0.52rem 0.72rem;
+    margin-bottom: 0.8rem;
+}
+
+.reus-live-search {
+    border: 1px solid #d8dee2;
+    border-radius: 8px;
+    background: #fff;
+    padding: 0.7rem 0.8rem;
+    margin-bottom: 0.85rem;
+}
+
+.reus-live-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(170px, 1fr));
+    gap: 0.6rem;
+    align-items: end;
+}
+
+.reus-live-grid label {
+    font-size: 0.72rem;
+    color: #2f3e46;
+    margin-bottom: 0.18rem;
+    display: block;
+    font-weight: 600;
+}
+
+.reus-live-grid .form-control {
+    font-size: 0.78rem;
+    min-height: 31px;
+}
+
+.reus-live-inline-actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.reus-live-table-wrap,
+.reus-live-history-wrap {
+    border: 1px solid #d8dee2;
+    border-radius: 6px;
+    overflow: auto;
+    margin-bottom: 0.75rem;
+    background: #fff;
+}
+
+.reus-live-table-title,
+.reus-live-history-title {
+    background: #2f3e46;
+    color: #fff;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.2rem 0.45rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reus-live-count {
+    font-size: 0.7rem;
+    font-weight: 400;
+    opacity: 0.85;
+}
+
+.reus-live-table,
+.reus-live-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.74rem;
+    min-width: 880px;
+}
+
+.reus-live-table th,
+.reus-live-history-table th {
+    background: #3a4f58;
+    color: #dfe4e8;
+    font-weight: 600;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.2rem 0.24rem;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.reus-live-table td,
+.reus-live-history-table td {
+    border-top: 1px solid #d8dee2;
+    padding: 0.23rem 0.28rem;
+    color: #243238;
+    white-space: nowrap;
+}
+
+.reus-live-table tbody tr:nth-child(even) td,
+.reus-live-history-table tbody tr:nth-child(even) td {
+    background: #f9f9f9;
+}
+
+.reus-live-empty {
+    text-align: center;
+    color: #6c757d;
+    padding: 1.2rem !important;
+    font-style: italic;
+}
+
+.reus-live-link {
+    color: #2f3e46;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.reus-live-link:hover {
+    text-decoration: underline;
+}
+
+.reus-live-footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.reus-live-detail-card {
+    border: 1px solid #d8dee2;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+    margin-bottom: 0.75rem;
+}
+
+.reus-live-detail-banner {
+    background: #2f3e46;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.24rem 0.5rem;
+    text-align: center;
+}
+
+.reus-live-detail-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding: 0.6rem 0.7rem 0.4rem;
+}
+
+.reus-live-detail-left,
+.reus-live-detail-right {
+    display: grid;
+    gap: 0.22rem;
+}
+
+.reus-live-kv {
+    display: grid;
+    grid-template-columns: 145px 1fr;
+    gap: 0.25rem;
+    font-size: 0.74rem;
+    align-items: center;
+}
+
+.reus-live-kv span {
+    border: 1px solid #b0bec5;
+    background: #f0f5f5;
+    color: #2f3e46;
+    padding: 0.09rem 0.28rem;
+    font-weight: 600;
+}
+
+.reus-live-kv strong {
+    border-bottom: 1px solid #d8dee2;
+    color: #243238;
+    font-weight: 500;
+    min-height: 1.12rem;
+    padding: 0.1rem 0.16rem;
+}
+
+.reus-live-material-box {
+    margin: 0 0.7rem 0.6rem;
+    border: 1px solid #d8dee2;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.reus-live-material-title {
+    background: #2f3e46;
+    color: #fff;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.2rem 0.45rem;
+}
+
+.reus-live-material-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.9rem;
+    padding: 0.55rem;
+}
+
+.reus-live-kv-double {
+    grid-template-columns: 145px 52px 145px 1fr;
+}
+
+.reus-live-history-wrap {
+    margin: 0 0.7rem 0.7rem;
+}
+
+@media (max-width: 980px) {
+    .reus-live-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .reus-live-detail-top,
+    .reus-live-material-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .reus-live-kv,
+    .reus-live-kv-double {
+        grid-template-columns: 1fr;
+    }
+
+    .reus-live-footer-actions,
+    .reus-live-inline-actions {
+        justify-content: stretch;
+    }
+
+    .reus-live-footer-actions .btn,
+    .reus-live-inline-actions .btn {
+        width: 100%;
+    }
+}

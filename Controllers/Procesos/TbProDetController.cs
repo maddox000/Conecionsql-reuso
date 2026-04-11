@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ConexionSql.Data;
+﻿using ConexionSql.Data;
 using ConexionSql.Models.Procesos;
+using ConexionSql.Models.Procesos.Controles;
+using ConexionSql.Utilidades;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using ConexionSql.Utilidades;
 
 namespace ConexionSql.Controllers.Procesos
 {
@@ -231,6 +232,36 @@ namespace ConexionSql.Controllers.Procesos
                 materialDen = recDet.TbRecDetMatDen,
                 stockDisponible = recDet.TbRecDetProStock ?? 0
             });
+        }
+
+        [HttpGet]
+        public IActionResult ObtenerTiposControl()
+        {
+            var lista = _context.TbProPte
+                .Where(x => !x.IbPtePtiOcu)
+                .Select(x => new TbProPteDto
+                {
+                    IB_PTE_ID = x.IbPteId,
+                    IB_PTE_DEN = x.IbPteDen
+                })
+                .ToList();
+
+            return Ok(lista);
+        }
+
+        [HttpGet]
+        public IActionResult ObtenerUbicacionesControl()
+        {
+            var lista = _context.TbProPteUbi
+                .Where(x => !x.IbPtesUbiOcu)
+                .Select(x => new
+                {
+                    IB_PTES_UBI_ID = x.IbPtesUbiId,
+                    IB_PTES_UBI_DEN = x.IbPtesUbiDen
+                })
+                .ToList();
+
+            return Ok(lista);
         }
     }
 }

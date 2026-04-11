@@ -7,6 +7,7 @@ using ConexionSql.Models.IbPer;
 using ConexionSql.Models.Lavado;
 using ConexionSql.Models.Materiales;
 using ConexionSql.Models.Procesos;
+using ConexionSql.Models.Procesos.Controles;
 using ConexionSql.Models.Recepciones;
 using ConexionSql.Models.Reuso;
 using ConexionSql.Models.Reusos;
@@ -45,19 +46,16 @@ namespace ConexionSql.Data
         public DbSet<TbProLavDet> TbProLavDet { get; set; }
         public DbSet<IbLavLti> IbLavLti { get; set; }
         public DbSet<IbLavTci> IbLavTci { get; set; }
-
         public DbSet<IbMatRev> IbMatRevisiones { get; set; }
         public DbSet<IbMatEti> IbMatEti { get; set; }
-
         public DbSet<TbReu> TbReu { get; set; }
         public DbSet<APanOpc> APanOpc { get; set; }
-
         public DbSet<IbProEst> IbProEst { get; set; }
-
         public DbSet<IbEstPro> IbEstPro { get; set; }
         public DbSet<TbReuPac> TbReuPac { get; set; }
-
-
+        public DbSet<TbProPte> TbProPte { get; set; }
+        public DbSet<TbProPteUbi> TbProPteUbi { get; set; }
+        public DbSet<TbProDetPte> TbProDetPte { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

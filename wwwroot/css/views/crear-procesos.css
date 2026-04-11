@@ -1,0 +1,495 @@
+.proceso-demo {
+    border-left: 0;
+    padding: 1rem;
+}
+
+.proceso-banner {
+    background: linear-gradient(90deg, #2f3e46 0%, #3a4f58 100%);
+    color: #fff;
+    border-radius: 8px;
+    padding: 0.58rem 1rem;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.95rem;
+    font-size: 0.9rem;
+}
+
+.proceso-warning {
+    border: 1px solid #ffd46b;
+    background: #fff7dd;
+    color: #725502;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    padding: 0.52rem 0.72rem;
+    margin-bottom: 0.8rem;
+}
+
+.proceso-operativo {
+    border: 1px solid #d8dee2;
+    border-radius: 8px;
+    background: #fff;
+    padding: 0.6rem;
+    margin-bottom: 0.8rem;
+}
+
+.proceso-operativo-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(120px, 1fr));
+    gap: 0.45rem;
+    align-items: end;
+}
+
+.proceso-operativo .bx-form-group {
+    margin-bottom: 0;
+}
+
+.proceso-operativo label {
+    font-size: 0.72rem;
+    color: #2f3e46;
+    margin-bottom: 0.18rem;
+    display: block;
+    font-weight: 600;
+}
+
+.proceso-operativo .form-control,
+.proceso-operativo .form-select {
+    font-size: 0.78rem;
+    min-height: 31px;
+}
+
+.proceso-operativo-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.4rem;
+}
+
+#mensajeProceso {
+    margin-top: 0.35rem;
+    font-size: 0.78rem;
+    color: #ab2f2f;
+    display: none;
+}
+
+.proceso-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.proceso-panel {
+    border: 1px solid #d8dee2;
+    border-radius: 8px;
+    background: #fff;
+    padding: 0.66rem;
+}
+
+.proceso-title {
+    background: #2f3e46;
+    color: #fff;
+    font-size: 0.78rem;
+    border-radius: 5px;
+    padding: 0.2rem 0.5rem;
+    margin: 0 0 0.5rem 0;
+}
+
+.proceso-title-offset {
+    margin-top: 0.55rem;
+}
+
+.proceso-kv {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0.3rem;
+    margin-bottom: 0.24rem;
+    font-size: 0.79rem;
+}
+
+    .proceso-kv .k {
+        border: 1px solid #b0bec5;
+        background: #f0f5f5;
+        color: #2f3e46;
+        padding: 0.09rem 0.3rem;
+    }
+
+    .proceso-kv .v {
+        border-bottom: 1px solid #d8dee2;
+        color: #243238;
+        padding: 0.09rem 0.2rem;
+        min-height: 1.25rem;
+    }
+
+.proceso-observ {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0.3rem;
+    margin: 0.2rem 0 0.7rem 0;
+}
+
+    .proceso-observ textarea {
+        min-height: 42px;
+        border: 1px solid #d8dee2;
+        border-radius: 5px;
+        font-size: 0.8rem;
+        color: #243238;
+        padding: 0.3rem 0.45rem;
+        resize: none;
+        background: #fff;
+    }
+
+.proceso-observ-label {
+    border: 1px solid #b0bec5;
+    background: #f0f5f5;
+    color: #2f3e46;
+    padding: 0.1rem 0.3rem;
+    font-size: 0.79rem;
+}
+
+.proceso-tabs {
+    display: flex;
+    gap: 0.22rem;
+    margin-bottom: 0.45rem;
+}
+
+.proceso-tab {
+    border: 1px solid #d8dee2;
+    border-bottom: 0;
+    border-radius: 6px 6px 0 0;
+    background: #f4f8fc;
+    color: #546e7a;
+    font-size: 0.74rem;
+    padding: 0.22rem 0.7rem;
+    cursor: pointer;
+}
+
+    .proceso-tab.is-active {
+        background: #2f3e46;
+        color: #fff;
+        border-color: #2f3e46;
+    }
+
+.proceso-tab-panel {
+    display: none;
+}
+
+    .proceso-tab-panel.is-active {
+        display: block;
+    }
+
+.proceso-materiales-wrap {
+    border: 1px solid #d8dee2;
+    border-radius: 0 6px 6px 6px;
+    background: #fff;
+    min-height: 126px;
+    padding: 0.35rem;
+    margin-bottom: 0.72rem;
+}
+
+.proceso-work {
+    border: 1px solid #d8dee2;
+    background: #fff;
+    border-radius: 0 6px 6px 6px;
+    min-height: 128px;
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 0.8rem;
+    padding: 0.35rem;
+    margin-bottom: 0.72rem;
+}
+
+.proceso-mini-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.76rem;
+}
+
+    .proceso-mini-table th {
+        background: #2f3e46;
+        color: #fff;
+        font-weight: 600;
+        padding: 0.2rem 0.25rem;
+    }
+
+    .proceso-mini-table td {
+        border-top: 1px solid #e1e8f3;
+        padding: 0.25rem;
+    }
+
+.proceso-diagram {
+    position: relative;
+    width: 290px;
+    max-width: 100%;
+    height: 110px;
+    min-height: 110px;
+    margin: 0 auto;
+    font-size: 0.74rem;
+    color: #6a7280;
+}
+
+.node {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    background: #f7f7f7;
+    border: 2px solid #d4d9df;
+    color: #48515d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+.proceso-diagram svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.proceso-bd {
+    position: absolute;
+    left: 50%;
+    top: 52%;
+    transform: translate(-50%, -50%);
+    border: 1px solid #c5ceda;
+    border-radius: 4px;
+    padding: 0.16rem 0.58rem;
+    color: #2f3f57;
+    font-weight: 700;
+    background: #f8fbff;
+}
+
+.proceso-node-1 {
+    left: 40px;
+    top: 3px;
+}
+
+.proceso-node-2 {
+    left: 72px;
+    top: 24px;
+}
+
+.proceso-node-3 {
+    left: 40px;
+    top: 56px;
+}
+
+.proceso-node-4 {
+    left: 72px;
+    top: 84px;
+}
+
+.proceso-node-5 {
+    left: 136px;
+    top: 46px;
+}
+
+.proceso-node-6 {
+    left: 200px;
+    top: 3px;
+}
+
+.proceso-node-7 {
+    left: 232px;
+    top: 24px;
+}
+
+.proceso-node-8 {
+    left: 200px;
+    top: 56px;
+}
+
+.proceso-node-9 {
+    left: 232px;
+    top: 84px;
+}
+
+.proceso-door-label {
+    position: absolute;
+    top: 50px;
+}
+
+.proceso-door-label-left {
+    left: 0;
+}
+
+.proceso-door-label-right {
+    right: 0;
+}
+
+.proceso-table-wrap {
+    border: 1px solid #d8dee2;
+    border-radius: 7px;
+    overflow: hidden;
+    margin-bottom: 0.8rem;
+    background: #fff;
+}
+
+.proceso-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.77rem;
+}
+
+    .proceso-table th {
+        background: #2f3e46;
+        color: #ecf4ff;
+        font-weight: 600;
+        border-right: 1px solid rgba(255,255,255,0.2);
+        padding: 0.22rem 0.32rem;
+    }
+
+    .proceso-table td {
+        border-top: 1px solid #e2eaf5;
+        padding: 0.25rem 0.3rem;
+        color: #243238;
+    }
+
+.proceso-print-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.proceso-row-icon-btn {
+    min-width: 30px;
+    padding: 0.15rem 0.4rem;
+    line-height: 1;
+}
+
+.proceso-table-empty-note {
+    text-align: center;
+    color: #8a9bb5;
+}
+
+.proceso-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+    .proceso-actions .btn {
+        min-width: 100px;
+        font-size: 0.81rem;
+    }
+
+.proceso-icon-btn {
+    min-width: 38px !important;
+    padding: 0.25rem 0.5rem;
+}
+
+/* agregado para nodos clickeables */
+.proceso-diagram .node,
+.proceso-bd {
+    cursor: pointer;
+}
+
+/* modal de controles de proceso */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.modal-box {
+    width: 12cm;
+    height: 12cm;
+    background: #f4f6f8;
+    border: 1px solid #cfd6dc;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    background: #2c3e50;
+    color: #fff;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 10px 14px;
+}
+
+.modal-body {
+    flex: 1;
+    padding: 12px 14px;
+    overflow-y: auto;
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+    .form-row label {
+        width: 150px;
+        margin: 0;
+        font-size: 13px;
+        color: #223042;
+        font-weight: 500;
+    }
+
+    .form-row .form-control {
+        flex: 1;
+        height: 30px;
+        font-size: 13px;
+        padding: 4px 8px;
+    }
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 10px 14px;
+    border-top: 1px solid #d8dde3;
+    background: #eef2f5;
+}
+
+    .modal-footer .btn {
+        min-width: 100px;
+    }
+
+@media (max-width: 992px) {
+    .proceso-operativo-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .proceso-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .proceso-work {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .proceso-operativo-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .proceso-kv,
+    .proceso-observ {
+        grid-template-columns: 1fr;
+    }
+
+    .proceso-actions {
+        justify-content: stretch;
+    }
+
+        .proceso-actions .btn {
+            flex: 1 1 46%;
+        }
+}

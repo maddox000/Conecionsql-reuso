@@ -1,0 +1,72 @@
+.area-sistema-shell {
+    border-left: 0;
+    padding: 1rem;
+}
+
+.area-sistema-banner {
+    background: linear-gradient(90deg, #2f3e46 0%, #3a4f58 100%);
+    color: #fff;
+    border-radius: 8px;
+    padding: 0.58rem 1rem;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.95rem;
+    font-size: 0.9rem;
+}
+
+.area-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(120px, 1fr));
+    gap: 0.55rem;
+    margin-bottom: 0.8rem;
+}
+
+.area-kpi {
+    border: 1px solid #d8dee2;
+    border-radius: 8px;
+    background: #f5f5f5;
+    padding: 0.55rem 0.65rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.area-kpi span {
+    color: #2f3e46;
+    font-size: 0.8rem;
+}
+
+.area-kpi strong {
+    color: #2f3e46;
+    font-size: 1.1rem;
+}
+
+.area-actions {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+}
+
+.area-table-wrap {
+    border: 1px solid #d8dee2;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.area-table-wrap thead th {
+    background: #2f3e46;
+    color: #dfe4e8;
+    border-color: #3a4f58;
+}
+
+@media (max-width: 900px) {
+    .area-kpi-grid {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+    }
+
+    .area-actions .btn {
+        flex: 1 1 100%;
+    }
+}

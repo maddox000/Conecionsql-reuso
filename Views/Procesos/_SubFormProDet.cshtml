@@ -3,48 +3,332 @@
 <div class="subform-proceso mt-4">
     <h4>➕ Agregar Detalle desde Etiqueta</h4>
 
-    <!-- Cabecera del proceso -->
-    <!-- Cabecera del proceso -->
-    <table class="table table-bordered mt-3">
-        <tr><th>🆔 ID</th><td>@Model.Cabecera.TbProId</td></tr>
-        <tr><th>👤 Personal</th><td>@Model.Cabecera.TbProPerNom</td></tr>
-        <tr><th>⚙️ Tipo de Proceso</th><td>@Model.Cabecera.TbProPtiDen</td></tr>
-        <tr><th>🔧 Equipo</th><td>@Model.Cabecera.TbProEquDen</td></tr>
-        <tr><th>🔁 Tipo de Ciclo</th><td>@Model.Cabecera.TbProTciDen</td></tr>
-        <tr><th>📅 Fecha</th><td>@Model.Cabecera.TbProFec?.ToString("yyyy-MM-dd")</td></tr>
-        <tr><th>🕐 Hora Inicio</th><td>@Model.Cabecera.TbProHorIni?.ToString(@"hh\:mm")</td></tr>
-    </table>
+    <link rel="stylesheet" href="~/css/views/crear-procesos.css" asp-append-version="true" />
 
+    <div class="bx-card proceso-demo mt-3">
+        <div class="proceso-banner">Proceso de Esterilizacion</div>
 
-    <form id="formProDetalle" onsubmit="return false;">
-        <input type="hidden" id="tbProId" value="@Model.Detalle?.TB_PRO_ID ?? 0" />
+        <div class="proceso-grid">
+            <div class="proceso-panel">
+                <div class="proceso-kv">
+                    <div class="k">Numero de proceso</div>
+                    <div class="v">@Model.Cabecera.TbProId</div>
+                </div>
 
-        <div class="form-group">
-            <label for="tbRecDetId">Código de etiqueta</label>
-            <input type="number" class="form-control" id="tbRecDetId" autocomplete="off" required />
+                <div class="proceso-kv">
+                    <div class="k">Usuario</div>
+                    <div class="v">@Model.Cabecera.TbProPerNom</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Cargo</div>
+                    <div class="v">-</div>
+                </div>
+
+                <div class="proceso-title">Datos del proceso</div>
+
+                <div class="proceso-kv">
+                    <div class="k">Tipo de proceso</div>
+                    <div class="v">@Model.Cabecera.TbProPtiDen</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Estado del ciclo</div>
+                    <div class="v">EN PROCESO</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Tipo de ciclo</div>
+                    <div class="v">@Model.Cabecera.TbProTciDen</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Numero de proceso</div>
+                    <div class="v">@Model.Cabecera.TbProId</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Unidades procesadas</div>
+                    <div class="v">0</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Volumen procesado</div>
+                    <div class="v">0</div>
+                </div>
+            </div>
+
+            <div class="proceso-panel">
+                <div class="proceso-kv">
+                    <div class="k">Fecha</div>
+                    <div class="v">
+                        @Model.Cabecera.TbProFec?.ToString("yyyy-MM-dd")
+                        @Model.Cabecera.TbProHorIni?.ToString(@"hh\:mm")
+                    </div>
+                </div>
+
+                <div class="proceso-title proceso-title-offset">Datos del equipo</div>
+
+                <div class="proceso-kv">
+                    <div class="k">Marca</div>
+                    <div class="v">@Model.Cabecera.TbProEquDen</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Numero de serie</div>
+                    <div class="v">@Model.Cabecera.TbProEquId</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Modelo</div>
+                    <div class="v">@Model.Cabecera.TbProEquDen</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Numero de equipo</div>
+                    <div class="v">@Model.Cabecera.TbProEquId</div>
+                </div>
+            </div>
         </div>
 
-        <div class="form-group mt-2">
-            <label>Material</label>
-            <input type="text" class="form-control" id="materialNombre" readonly />
+        <div class="proceso-observ">
+            <div class="k proceso-observ-label">Observaciones</div>
+            <textarea readonly>NO REGISTRA</textarea>
         </div>
 
-        <div class="form-group mt-2">
-            <label for="cantidad">Cantidad a procesar</label>
-            <input type="number" class="form-control" id="cantidad" min="1" required />
+        <div class="proceso-tabs" role="tablist" aria-label="Secciones del proceso">
+            <button type="button" class="proceso-tab is-active" data-tab-target="proceso-tab-materiales">Materiales procesados</button>
+            <button type="button" class="proceso-tab" data-tab-target="proceso-tab-cancelados">Materiales cancelados</button>
+            <button type="button" class="proceso-tab" data-tab-target="proceso-tab-controles">Controles de proceso</button>
         </div>
 
-        <div id="mensajeOk" class="text-success mt-2" style="display:none;"></div>
-        <div id="mensajeError" class="text-danger mt-2" style="display:none;"></div>
+        <div id="proceso-tab-materiales" class="proceso-tab-panel is-active">
+            <form id="formProDetalle" onsubmit="return false;" class="mt-3">
+                <input type="hidden" id="tbProId" value="@Model.Detalle?.TB_PRO_ID ?? 0" />
 
-        <button type="submit" class="btn btn-primary mt-3">Guardar</button>
-    </form>
+                <div class="proceso-panel">
+                    <div class="proceso-title">Ingreso de etiqueta</div>
+
+                    <div class="proceso-operativo">
+                        <div class="proceso-operativo-grid">
+                            <div class="bx-form-group">
+                                <label for="tbRecDetId">Código de etiqueta</label>
+                                <input type="number"
+                                       class="form-control form-control-sm"
+                                       id="tbRecDetId"
+                                       autocomplete="off"
+                                       required />
+                            </div>
+
+                            <div class="bx-form-group">
+                                <label for="materialNombre">Material</label>
+                                <input type="text"
+                                       class="form-control form-control-sm"
+                                       id="materialNombre"
+                                       readonly />
+                            </div>
+
+                            <div class="bx-form-group">
+                                <label for="cantidad">Cantidad a procesar</label>
+                                <input type="number"
+                                       class="form-control form-control-sm"
+                                       id="cantidad"
+                                       min="1"
+                                       required />
+                            </div>
+                        </div>
+
+                        <div id="mensajeOk" class="text-success mt-2" style="display:none;"></div>
+                        <div id="mensajeError" class="text-danger mt-2" style="display:none;"></div>
+
+                        <div class="proceso-operativo-actions mt-2">
+                            <button type="submit" class="btn btn-primary btn-sm">Guardar</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <div class="proceso-materiales-wrap mt-3">
+                <div id="detalleTabla">
+                    @await Html.PartialAsync("~/Views/Procesos/_DetalleTabla.cshtml", Model.Detalles)
+                </div>
+            </div>
+        </div>
+
+        <div id="proceso-tab-cancelados" class="proceso-tab-panel">
+            <div class="proceso-materiales-wrap">
+                <table class="proceso-table">
+                    <thead>
+                        <tr>
+                            <th>Codigo etiqueta</th>
+                            <th>Denominacion</th>
+                            <th>Sector</th>
+                            <th>Codigo reuso</th>
+                            <th>Recibidos</th>
+                            <th>En proceso</th>
+                            <th>Sin procesar</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="8" class="proceso-table-empty-note">Sin materiales cancelados</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="proceso-tab-controles" class="proceso-tab-panel">
+            <div class="proceso-work">
+                <div>
+                    <table class="proceso-mini-table">
+                        <thead>
+                            <tr>
+                                <th>Tipo de control</th>
+                                <th>Identificacion</th>
+                                <th>Ubicacion</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td>1</td>
+                                <td></td>
+                                <td>1</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="proceso-diagram" aria-label="Mapa de camara">
+                    <svg viewBox="0 0 290 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <line x1="50" y1="13" x2="210" y2="13" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="50" y1="13" x2="50" y2="66" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="210" y1="13" x2="210" y2="66" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="50" y1="66" x2="210" y2="66" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="82" y1="34" x2="242" y2="34" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="82" y1="34" x2="82" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="242" y1="34" x2="242" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="82" y1="94" x2="242" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="50" y1="13" x2="82" y2="34" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="210" y1="13" x2="242" y2="34" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="50" y1="66" x2="82" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="210" y1="66" x2="242" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                    </svg>
+
+                    <div class="node proceso-node-1 js-camara-node" data-ubicacion="1">1</div>
+                    <div class="node proceso-node-2 js-camara-node" data-ubicacion="2">2</div>
+                    <div class="node proceso-node-3 js-camara-node" data-ubicacion="3">3</div>
+                    <div class="node proceso-node-4 js-camara-node" data-ubicacion="4">4</div>
+                    <div class="node proceso-node-5 js-camara-node" data-ubicacion="5">5</div>
+                    <div class="node proceso-node-6 js-camara-node" data-ubicacion="6">6</div>
+                    <div class="node proceso-node-7 js-camara-node" data-ubicacion="7">7</div>
+                    <div class="node proceso-node-8 js-camara-node" data-ubicacion="8">8</div>
+                    <div class="node proceso-node-9 js-camara-node" data-ubicacion="9">9</div>
+
+                    <div class="node proceso-bd js-camara-node" data-ubicacion="28">BD</div>
+                    <div class="proceso-door-label proceso-door-label-left">Puerta de carga</div>
+                    <div class="proceso-door-label proceso-door-label-right">Puerta de descarga</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="proceso-actions">
+            <button type="button" class="btn btn-primary" onclick="window.location.reload()">Nuevo</button>
+            <button type="button" class="btn btn-outline-primary" onclick="alert('Accion de demostracion')">Controles de proceso</button>
+            <button type="button" class="btn btn-outline-primary" onclick="alert('Accion de demostracion')">Editar</button>
+            <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cerrar</button>
+        </div>
+    </div>
 </div>
 
-<!-- 📋 Tabla de detalles -->
-<div id="detalleTabla" class="mt-4">
-    @await Html.PartialAsync("~/Views/Procesos/_DetalleTabla.cshtml", Model.Detalles)
+<div id="modalControlProceso" class="modal-overlay">
+    <div class="modal-box">
+
+        <input type="hidden" id="tbProDetPteId" />
+        <input type="hidden" id="ubicacionOriginal" />
+        <input type="hidden" id="modoModal" />
+
+        <div class="modal-header">
+            Datos de controles de proceso
+        </div>
+
+        <div class="modal-body">
+            <div class="form-row">
+                <label for="tipoControl">Tipo de control</label>
+                <select id="tipoControl" class="form-control">
+                    <option value="">-- Seleccionar --</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label for="identificacion">Identificación</label>
+                <input type="text" id="identificacion" class="form-control" />
+            </div>
+
+            <div class="form-row">
+                <label for="marca">Marca</label>
+                <input type="text" id="marca" value="TERRAGENE" class="form-control" readonly />
+            </div>
+
+            <div class="form-row">
+                <label for="producto">Producto</label>
+                <input type="text" id="producto" value="NO REGISTRA" class="form-control" readonly />
+            </div>
+
+            <div class="form-row">
+                <label for="lote">Lote</label>
+                <input type="text" id="lote" value="0" class="form-control" readonly />
+            </div>
+
+            <div class="form-row">
+                <label for="vencimiento">Vencimiento</label>
+                <input type="text" id="vencimiento" value="" class="form-control" readonly />
+            </div>
+
+            <div class="form-row">
+                <label for="ubicacion">Ubicación encámara</label>
+                <select id="ubicacion" class="form-control">
+                    <option value="">-- Seleccionar --</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label for="codigoBarras">Escanear código de barras</label>
+                <input type="text" id="codigoBarras" value="NO REGISTRA" class="form-control" readonly />
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" id="btnGuardarControl" class="btn btn-primary">Registrar</button>
+            <button type="button" id="btnCancelarControl" class="btn btn-secondary">Cancelar</button>
+        </div>
+    </div>
 </div>
+
+<div class="modal fade" id="procesoPrinterTypeModal" tabindex="-1" aria-labelledby="procesoPrinterTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-primary" style="max-width:420px;">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="procesoPrinterTypeModalLabel">Seleccione el tipo de impresión</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p id="procesoPrinterRowInfo" class="mb-2 small text-muted">Etiqueta seleccionada: -</p>
+                <div class="d-flex gap-2 justify-content-end">
+                    <button type="button" class="btn btn-primary" id="btnProcesoPrintDocument">Impresora</button>
+                    <button type="button" class="btn btn-outline-primary" id="btnProcesoPrintLabel">Etiqueta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="formProcesoPrintLabel" method="post" action="@Url.Action("ImprimirEtiqueta", "Home")" class="d-none">
+    <input type="hidden" name="codigoEtiqueta" id="procesoEtiquetaCodigo" />
+</form>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -55,24 +339,107 @@
         const msgOk = document.getElementById("mensajeOk");
         const msgErr = document.getElementById("mensajeError");
 
+        const btnPrintDocument = document.getElementById('btnProcesoPrintDocument');
+        const btnPrintLabel = document.getElementById('btnProcesoPrintLabel');
+        const labelForm = document.getElementById('formProcesoPrintLabel');
+        const labelCodeInput = document.getElementById('procesoEtiquetaCodigo');
+        const printerRowInfo = document.getElementById('procesoPrinterRowInfo');
+        const modalEl = document.getElementById('procesoPrinterTypeModal');
+        const printerTypeModal = modalEl ? new bootstrap.Modal(modalEl) : null;
+
+        const btnGuardarControl = document.getElementById("btnGuardarControl");
+        const btnCancelarControl = document.getElementById("btnCancelarControl");
+
         let etiquetaId = 0;
         let materialId = 0;
         let materialNombre = "";
         let stockDisponible = 0;
+        let selectedEtiqueta = "";
 
-        inputEtiqueta.focus();
+        function abrirModalControlProceso(posicion = null) {
+        const modal = document.getElementById("modalControlProceso");
+        if (!modal) return;
 
-        inputEtiqueta.addEventListener("keydown", function (e) {
-            if (e.key === "Enter") {
+        cargarTiposControl();
+        cargarUbicacionesControl(posicion);
+        modal.style.display = "flex";
+
+        document.getElementById("modoModal").value = "alta";
+        document.getElementById("tbProDetPteId").value = "";
+        document.getElementById("identificacion").value = "";
+
+        if (posicion !== null) {
+            document.getElementById("ubicacionOriginal").value = posicion;
+        } else {
+            document.getElementById("ubicacionOriginal").value = "";
+        }
+            // 🔥 FOCO AUTOMÁTICO
+        setTimeout(() => {
+        const tipoControl = document.getElementById("tipoControl");
+        if (tipoControl) {
+            tipoControl.focus();
+        }
+    }, 100);
+    }
+
+        function cerrarModalControlProceso() {
+            const modal = document.getElementById("modalControlProceso");
+            if (!modal) return;
+
+            modal.style.display = "none";
+            document.getElementById("tbProDetPteId").value = "";
+            document.getElementById("identificacion").value = "";
+            document.getElementById("ubicacionOriginal").value = "";
+            document.getElementById("modoModal").value = "";
+        }
+
+        if (btnCancelarControl) {
+            btnCancelarControl.addEventListener("click", function () {
+                cerrarModalControlProceso();
+            });
+        }
+
+        if (btnGuardarControl) {
+        btnGuardarControl.addEventListener("click", function () {
+            guardarControlProceso();
+        });
+    }
+
+        document.querySelectorAll(".js-camara-node").forEach(function (nodo) {
+            nodo.addEventListener("dblclick", function () {
+                const ubicacion = this.dataset.ubicacion;
+                abrirModalControlProceso(ubicacion);
+            });
+        });
+
+        if (inputEtiqueta) {
+            inputEtiqueta.focus();
+
+            inputEtiqueta.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    buscarEtiqueta();
+                }
+            });
+        }
+
+        const form = document.getElementById("formProDetalle");
+        if (form) {
+            form.addEventListener("submit", function (e) {
                 e.preventDefault();
-                buscarEtiqueta();
-            }
-        });
+                guardarDetalle();
+            });
+        }
 
-        document.getElementById("formProDetalle").addEventListener("submit", function (e) {
-            e.preventDefault();
-            guardarDetalle();
-        });
+        function setSelectedEtiqueta(codigoEtiqueta) {
+            selectedEtiqueta = codigoEtiqueta || '';
+            if (labelCodeInput) {
+                labelCodeInput.value = selectedEtiqueta;
+            }
+            if (printerRowInfo) {
+                printerRowInfo.textContent = `Etiqueta seleccionada: ${selectedEtiqueta || '-'}`;
+            }
+        }
 
         function buscarEtiqueta() {
             etiquetaId = parseInt(inputEtiqueta.value);
@@ -148,6 +515,59 @@
                 .catch(() => mostrarError("❌ Error inesperado."));
         }
 
+            function guardarControlProceso() {
+        const tbProId = parseInt(document.getElementById("tbProId")?.value) || 0;
+        const tipoControl = parseInt(document.getElementById("tipoControl")?.value) || 0;
+        const tipoControlTexto = document.getElementById("tipoControl")?.selectedOptions[0]?.text || "";
+        const identificacion = document.getElementById("identificacion")?.value?.trim() || "";
+        const ubicacion = parseInt(document.getElementById("ubicacion")?.value) || 0;
+        const ubicacionTexto = document.getElementById("ubicacion")?.selectedOptions[0]?.text || "";
+        const codigoBarras = document.getElementById("codigoBarras")?.value?.trim() || "";
+
+        if (!tbProId) {
+            alert("Falta el número de proceso.");
+            return;
+        }
+
+        if (!tipoControl) {
+            alert("Seleccione un tipo de control.");
+            return;
+        }
+
+        if (!ubicacion) {
+            alert("Seleccione una ubicación.");
+            return;
+        }
+
+        const datos = {
+            TB_PRO_ID: tbProId,
+            TB_PRO_PTE_ID: tipoControl,
+            TB_PRO_PTE_DEN: tipoControlTexto,
+            TB_PRO_PTE_IDE: identificacion,
+            TB_PRO_DET_TES_UBI_ID: ubicacion,
+            TB_PRO_DET_TES_UBI_DEN: ubicacionTexto,
+            TB_PRO_DET_TES_TXT_1: codigoBarras
+        };
+
+        fetch("/TbProControl/Insertar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.mensaje || "Control guardado correctamente.");
+                cerrarModalControlProceso();
+            } else {
+                alert(data.mensaje || "Error al guardar el control.");
+            }
+        })
+        .catch(() => {
+            alert("Error inesperado al guardar el control.");
+        });
+    }
+
         function mostrarOk(texto) {
             msgOk.innerText = texto;
             msgOk.style.display = "block";
@@ -164,5 +584,103 @@
             msgOk.style.display = "none";
             msgErr.style.display = "none";
         }
+
+        const tabs = document.querySelectorAll('.proceso-tab[data-tab-target]');
+        const panels = document.querySelectorAll('.proceso-tab-panel');
+
+        tabs.forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                const targetId = tab.getAttribute('data-tab-target');
+
+                tabs.forEach(function (t) { t.classList.remove('is-active'); });
+                panels.forEach(function (p) { p.classList.remove('is-active'); });
+
+                tab.classList.add('is-active');
+                const panel = document.getElementById(targetId);
+                if (panel) {
+                    panel.classList.add('is-active');
+                }
+            });
+        });
+
+        document.addEventListener('click', function (event) {
+            const btnPdfRow = event.target.closest('.js-pro-row-print-pdf');
+            if (btnPdfRow) {
+                setSelectedEtiqueta(btnPdfRow.getAttribute('data-etiqueta'));
+                window.print();
+                return;
+            }
+
+            const btnPrinterRow = event.target.closest('.js-pro-row-print-printer');
+            if (btnPrinterRow) {
+                setSelectedEtiqueta(btnPrinterRow.getAttribute('data-etiqueta'));
+                if (printerTypeModal) {
+                    printerTypeModal.show();
+                }
+            }
+        });
+
+        if (btnPrintDocument) {
+            btnPrintDocument.addEventListener('click', function () {
+                if (printerTypeModal) {
+                    printerTypeModal.hide();
+                }
+                window.print();
+            });
+        }
+
+        if (btnPrintLabel) {
+            btnPrintLabel.addEventListener('click', function () {
+                if (printerTypeModal) {
+                    printerTypeModal.hide();
+                }
+                if (labelForm) {
+                    labelForm.submit();
+                }
+            });
+        }
+
+                function cargarTiposControl() {
+                    fetch('/TbProDet/ObtenerTiposControl')
+                        .then(res => res.json())
+                        .then(data => {
+                            const combo = document.getElementById("tipoControl");
+                            if (!combo) return;
+
+                            combo.innerHTML = '<option value="">-- Seleccionar --</option>';
+
+                            data.forEach(item => {
+                                const option = document.createElement("option");
+                                option.value = item.iB_PTE_ID;
+                                option.text = item.iB_PTE_DEN;
+                                combo.appendChild(option);
+                            });
+                        })
+                        .catch(err => console.error("Error:", err));
+                }
+
+                   function cargarUbicacionesControl(posicionSeleccionada = null) {
+        fetch('/TbProDet/ObtenerUbicacionesControl')
+            .then(res => res.json())
+            .then(data => {
+                const combo = document.getElementById("ubicacion");
+                if (!combo) return;
+
+                combo.innerHTML = '<option value="">-- Seleccionar --</option>';
+
+                data.forEach(item => {
+                    const option = document.createElement("option");
+                    option.value = item.iB_PTES_UBI_ID;
+                    option.text = item.iB_PTES_UBI_DEN;
+                    combo.appendChild(option);
+                });
+
+                if (posicionSeleccionada !== null && posicionSeleccionada !== "") {
+                    combo.value = String(posicionSeleccionada);
+                }
+            })
+            .catch(err => console.error("Error:", err));
+    }
+
     });
 </script>

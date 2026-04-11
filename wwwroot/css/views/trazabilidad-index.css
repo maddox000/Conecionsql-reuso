@@ -1,0 +1,143 @@
+.traza-live-shell {
+    border-left: 0;
+    padding: 1rem;
+}
+
+.traza-live-banner {
+    background: linear-gradient(90deg, #2f3e46 0%, #3a4f58 100%);
+    color: #fff;
+    border-radius: 8px;
+    padding: 0.58rem 1rem;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.95rem;
+    font-size: 0.9rem;
+}
+
+.traza-live-warning {
+    border: 1px solid #ffd46b;
+    background: #fff7dd;
+    color: #725502;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    padding: 0.52rem 0.72rem;
+    margin-bottom: 0.8rem;
+}
+
+.traza-live-search {
+    border: 1px solid #d8dee2;
+    border-radius: 8px;
+    background: #fff;
+    padding: 0.7rem 0.8rem;
+    margin-bottom: 0.85rem;
+}
+
+.traza-live-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(170px, 1fr));
+    gap: 0.6rem;
+    align-items: end;
+}
+
+.traza-live-grid label {
+    font-size: 0.72rem;
+    color: #2f3e46;
+    margin-bottom: 0.18rem;
+    display: block;
+    font-weight: 600;
+}
+
+.traza-live-grid .form-control {
+    font-size: 0.78rem;
+    min-height: 31px;
+}
+
+.traza-live-actions-inline {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.traza-live-table-wrap {
+    border: 1px solid #d8dee2;
+    border-radius: 6px;
+    overflow: auto;
+    margin-bottom: 0.75rem;
+    background: #fff;
+}
+
+.traza-live-table-title {
+    background: #2f3e46;
+    color: #fff;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.2rem 0.45rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.traza-live-count {
+    font-size: 0.7rem;
+    font-weight: 400;
+    opacity: 0.85;
+}
+
+.traza-live-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.74rem;
+    min-width: 1050px;
+}
+
+.traza-live-table th {
+    background: #3a4f58;
+    color: #dfe4e8;
+    font-weight: 600;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.2rem 0.24rem;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.traza-live-table td {
+    border-top: 1px solid #d8dee2;
+    padding: 0.23rem 0.28rem;
+    color: #243238;
+    white-space: nowrap;
+}
+
+.traza-live-table tbody tr:nth-child(even) td {
+    background: #f9f9f9;
+}
+
+.traza-live-empty {
+    text-align: center;
+    color: #6c757d;
+    padding: 1.2rem !important;
+    font-style: italic;
+}
+
+.traza-live-footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 980px) {
+    .traza-live-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .traza-live-footer-actions,
+    .traza-live-actions-inline {
+        justify-content: stretch;
+    }
+
+    .traza-live-footer-actions .btn,
+    .traza-live-actions-inline .btn {
+        width: 100%;
+    }
+}

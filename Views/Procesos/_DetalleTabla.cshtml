@@ -1,15 +1,17 @@
 ﻿@model List<ConexionSql.Models.Procesos.TbProDetDto>
 
-<table class="table table-sm table-bordered table-striped">
-    <thead class="thead-dark">
+<table class="proceso-table">
+    <thead>
         <tr>
-            <th>ID</th>
-            <th>Etiqueta</th>
-            <th>Material</th>
+            <th>Codigo etiqueta</th>
+            <th>Denominacion</th>
+            <th>Sector</th>
+            <th>Codigo reuso</th>
+            <th>Recibidos</th>
+            <th>En proceso</th>
+            <th>Sin procesar</th>
             <th>Cantidad</th>
-            <th>Usuario</th>
-            <th>Fecha</th>
-            <th>Acción</th>
+            <th>Imprimir</th>
         </tr>
     </thead>
     <tbody>
@@ -18,14 +20,32 @@
             foreach (var item in Model)
             {
                 <tr>
-                    <td>@item.TB_PRO_DET_ID</td>
                     <td>@item.TB_PRO_DET_REC_DET_ID</td>
                     <td>@item.TB_PRO_DET_REC_DET_MAT_DEN</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
                     <td>@item.TB_PRO_DET_CANT</td>
-                    <td>@item.TB_PRO_DET_PC_USR</td>
-                    <td>@item.TB_PRO_FEC?.ToString("dd/MM/yyyy")</td>
                     <td>
-                        <button class="btn btn-sm btn-danger" onclick="eliminarDetalle(@item.TB_PRO_DET_ID)">🗑️</button>
+                        <div class="proceso-print-actions" role="group" aria-label="Acciones de impresion por etiqueta">
+                            <button type="button"
+                                    class="btn btn-outline-primary proceso-row-icon-btn js-pro-row-print-pdf"
+                                    data-etiqueta="@item.TB_PRO_DET_REC_DET_ID"
+                                    title="Imprimir etiqueta @item.TB_PRO_DET_REC_DET_ID en PDF"
+                                    aria-label="Imprimir etiqueta @item.TB_PRO_DET_REC_DET_ID en PDF">
+                                <i class="bi bi-file-earmark-pdf-fill"></i>
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-outline-primary proceso-row-icon-btn js-pro-row-print-printer"
+                                    data-etiqueta="@item.TB_PRO_DET_REC_DET_ID"
+                                    title="Opciones de impresora para @item.TB_PRO_DET_REC_DET_ID"
+                                    aria-label="Opciones de impresora para @item.TB_PRO_DET_REC_DET_ID">
+                                <i class="bi bi-printer-fill"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             }
@@ -33,7 +53,7 @@
         else
         {
             <tr>
-                <td colspan="7" class="text-center text-muted">⚠️ No hay detalles cargados.</td>
+                <td colspan="9" class="proceso-table-empty-note">Sin materiales cargados</td>
             </tr>
         }
     </tbody>

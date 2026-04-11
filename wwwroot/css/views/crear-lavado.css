@@ -1,0 +1,284 @@
+.lavado-demo {
+    border-left: 0;
+    padding: 1rem;
+}
+
+.lavado-banner {
+    background: linear-gradient(90deg, #2f3e46 0%, #3a4f58 100%);
+    color: #fff;
+    border-radius: 8px;
+    padding: 0.58rem 1rem;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.95rem;
+    font-size: 0.9rem;
+}
+
+.lavado-warning {
+    border: 1px solid #ffd46b;
+    background: #fff7dd;
+    color: #725502;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    padding: 0.52rem 0.72rem;
+    margin-bottom: 0.8rem;
+}
+
+.lavado-operativo {
+    border: 1px solid #d8dee2;
+    border-radius: 8px;
+    background: #fff;
+    padding: 0.6rem;
+    margin-bottom: 0.8rem;
+}
+
+.lavado-operativo-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(120px, 1fr));
+    gap: 0.45rem;
+    align-items: end;
+}
+
+.lavado-operativo .bx-form-group {
+    margin-bottom: 0;
+}
+
+.lavado-operativo label {
+    font-size: 0.72rem;
+    color: #2f3e46;
+    margin-bottom: 0.18rem;
+    display: block;
+    font-weight: 600;
+}
+
+.lavado-operativo .form-control,
+.lavado-operativo .form-select {
+    font-size: 0.78rem;
+    min-height: 31px;
+}
+
+.lavado-operativo-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+}
+
+#mensajeLavado {
+    margin-top: 0.35rem;
+    font-size: 0.78rem;
+    color: #ab2f2f;
+    display: none;
+}
+
+.lavado-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.lavado-panel {
+    border: 1px solid #d8dee2;
+    border-radius: 8px;
+    background: #fff;
+    padding: 0.66rem;
+}
+
+.lavado-title {
+    background: #2f3e46;
+    color: #fff;
+    font-size: 0.78rem;
+    border-radius: 5px;
+    padding: 0.2rem 0.5rem;
+    margin: 0 0 0.5rem 0;
+}
+
+.lavado-kv {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0.3rem;
+    margin-bottom: 0.24rem;
+    font-size: 0.79rem;
+}
+
+.lavado-kv .k {
+    border: 1px solid #b0bec5;
+    background: #f0f5f5;
+    color: #2f3e46;
+    padding: 0.09rem 0.3rem;
+}
+
+.lavado-kv .v {
+    border-bottom: 1px solid #d8dee2;
+    color: #243238;
+    padding: 0.09rem 0.2rem;
+    min-height: 1.25rem;
+}
+
+.lavado-kv .v select {
+    width: 100%;
+    border: 1px solid #d8dee2;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    color: #243238;
+    padding: 0.08rem 0.2rem;
+    background: #fff;
+}
+
+.lavado-observ {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0.3rem;
+    margin: 0.2rem 0 0.7rem 0;
+}
+
+.lavado-observ textarea {
+    min-height: 42px;
+    border: 1px solid #d8dee2;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    color: #243238;
+    padding: 0.3rem 0.45rem;
+    resize: none;
+    background: #fff;
+}
+
+.lavado-observ-label {
+    border: 1px solid #b0bec5;
+    background: #f0f5f5;
+    color: #2f3e46;
+    padding: 0.1rem 0.3rem;
+    font-size: 0.79rem;
+}
+
+.lavado-tabs {
+    display: flex;
+    gap: 0.22rem;
+    margin-bottom: 0.45rem;
+}
+
+.lavado-tab {
+    border: 1px solid #d8dee2;
+    border-bottom: 0;
+    border-radius: 6px 6px 0 0;
+    background: #f4f8fc;
+    color: #546e7a;
+    font-size: 0.74rem;
+    padding: 0.22rem 0.7rem;
+    cursor: pointer;
+}
+
+.lavado-tab.is-active {
+    background: #2f3e46;
+    color: #fff;
+    border-color: #2f3e46;
+}
+
+.lavado-tab-panel {
+    display: none;
+}
+
+.lavado-tab-panel.is-active {
+    display: block;
+}
+
+.lavado-table-wrap {
+    border: 1px solid #d8dee2;
+    border-radius: 0 6px 6px 6px;
+    overflow: hidden;
+    margin-bottom: 0.8rem;
+    background: #fff;
+    min-height: 180px;
+}
+
+.lavado-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.77rem;
+}
+
+.lavado-table th {
+    background: #2f3e46;
+    color: #ecf4ff;
+    font-weight: 600;
+    border-right: 1px solid rgba(255,255,255,0.2);
+    padding: 0.22rem 0.32rem;
+}
+
+.lavado-table td {
+    border-top: 1px solid #e2eaf5;
+    padding: 0.25rem 0.3rem;
+    color: #243238;
+}
+
+.lavado-print-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.lavado-row-icon-btn {
+    min-width: 30px;
+    padding: 0.15rem 0.4rem;
+    line-height: 1;
+}
+
+.lavado-table-spacer {
+    height: 108px;
+}
+
+.lavado-table-note {
+    text-align: center;
+    color: #8a9bb5;
+}
+
+.lavado-table-wrap-auto {
+    min-height: auto;
+}
+
+.lavado-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.lavado-actions .btn {
+    min-width: 104px;
+    font-size: 0.81rem;
+}
+
+.lavado-icon-btn {
+    min-width: 38px !important;
+    padding: 0.25rem 0.5rem;
+}
+
+@media (max-width: 992px) {
+    .lavado-operativo-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .lavado-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .lavado-operativo-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .lavado-kv,
+    .lavado-observ {
+        grid-template-columns: 1fr;
+    }
+
+    .lavado-actions {
+        justify-content: stretch;
+    }
+
+    .lavado-actions .btn {
+        flex: 1 1 46%;
+    }
+}

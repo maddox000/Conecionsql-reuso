@@ -6,63 +6,306 @@
     var horaInicio = DateTime.Now.ToString("HH:mm");
 }
 
-<h4 class="mt-4">⚙️ Crear Nuevo Proceso</h4>
+<link rel="stylesheet" href="~/css/views/crear-procesos.css" asp-append-version="true" />
 
-<form id="formCrearProceso" onsubmit="return false;" class="mt-4">
-    <div class="form-group">
-        <label>Fecha</label>
-        <input type="text" class="form-control" id="fechaProceso" value="@fechaHoy" readonly />
+<div class="bx-card proceso-demo">
+    <div class="proceso-banner">Proceso de Esterilizacion</div>
+
+    <div class="proceso-operativo">
+        <form id="formCrearProceso" onsubmit="return false;">
+            <div class="proceso-operativo-grid">
+                <div class="bx-form-group">
+                    <label for="fechaProceso">Fecha</label>
+                    <input type="text" class="form-control form-control-sm" id="fechaProceso" value="@fechaHoy" readonly />
+                </div>
+
+                <div class="bx-form-group">
+                    <label for="horaInicio">Hora Inicio</label>
+                    <input type="text" class="form-control form-control-sm" id="horaInicio" value="@horaInicio" readonly />
+                </div>
+
+                <div class="bx-form-group">
+                    <label for="TipoProcesoId">Tipo de Proceso</label>
+                    <select class="form-select form-select-sm" asp-for="TipoProcesoId" asp-items="Model.TiposProceso" id="TipoProcesoId" required>
+                        <option value="">-- Seleccionar tipo --</option>
+                    </select>
+                </div>
+
+                <div class="bx-form-group">
+                    <label for="EquipoId">Equipo</label>
+                    <select class="form-select form-select-sm" asp-for="EquipoId" asp-items="Model.Equipos" id="EquipoId" required>
+                        <option value="">-- Seleccionar equipo --</option>
+                    </select>
+                </div>
+
+                <div class="bx-form-group">
+                    <label for="TipoCicloId">Tipo de Ciclo</label>
+                    <select class="form-select form-select-sm" asp-for="TipoCicloId" asp-items="Model.TiposCiclo" id="TipoCicloId" required>
+                        <option value="">-- Seleccionar ciclo --</option>
+                    </select>
+                </div>
+
+                <div class="bx-form-group" id="grupoProveedor" style="display:none;">
+                    <label for="ProveedorId">Proveedor</label>
+                    <select class="form-select form-select-sm" id="ProveedorId">
+                        <option value="">-- Seleccionar proveedor --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="proceso-operativo-actions mt-2">
+                <button type="button" class="btn btn-primary btn-sm" onclick="guardarProceso()">Guardar Proceso</button>
+            </div>
+
+            <div id="mensajeProceso"></div>
+        </form>
     </div>
 
-    <div class="form-group mt-3">
-        <label>Hora Inicio</label>
-        <input type="text" class="form-control" id="horaInicio" value="@horaInicio" readonly />
+    <div class="proceso-grid">
+        <div class="proceso-panel">
+            <div class="proceso-kv">
+                <div class="k">Numero de proceso</div>
+                <div class="v" id="panelNumeroProceso">0</div>
+            </div>
+
+            <div class="proceso-kv">
+                <div class="k">Usuario</div>
+                <div class="v" id="panelUsuario">-</div>
+            </div>
+
+            <div class="proceso-kv">
+                <div class="k">Cargo</div>
+                <div class="v" id="panelCargo">-</div>
+            </div>
+
+            <div class="proceso-title">Datos del proceso</div>
+
+            <div class="proceso-kv">
+                <div class="k">Tipo de proceso</div>
+                <div class="v" id="panelTipoProceso">-</div>
+            </div>
+
+            <div class="proceso-kv">
+                <div class="k">Estado del ciclo</div>
+                <div class="v" id="panelEstadoCiclo">EN PROCESO</div>
+            </div>
+
+            <div class="proceso-kv">
+                <div class="k">Tipo de ciclo</div>
+                <div class="v" id="panelTipoCiclo">-</div>
+            </div>
+
+            <div class="proceso-kv">
+                <div class="k">Numero de proceso</div>
+                <div class="v" id="panelNumeroInterno">0</div>
+            </div>
+
+            <div class="proceso-kv">
+                <div class="k">Unidades procesadas</div>
+                <div class="v" id="panelUnidadesProcesadas">0</div>
+            </div>
+
+            <div class="proceso-kv">
+                <div class="k">Volumen procesado</div>
+                <div class="v" id="panelVolumenProcesado">0</div>
+            </div>
+        </div>
+
+        <div class="proceso-panel">
+            <div class="proceso-kv">
+                <div class="k">Fecha</div>
+                <div class="v" id="panelFechaCompleta">@DateTime.Now.ToString("dd/MM/yyyy") @horaInicio</div>
+            </div>
+
+            <div class="proceso-title proceso-title-offset">Datos del equipo</div>
+
+            <div class="proceso-kv">
+                <div class="k">Marca</div>
+                <div class="v" id="panelMarcaEquipo">-</div>
+            </div>
+
+            <div class="proceso-kv">
+                <div class="k">Numero de serie</div>
+                <div class="v" id="panelSerieEquipo">-</div>
+            </div>
+
+            <div class="proceso-kv">
+                <div class="k">Modelo</div>
+                <div class="v" id="panelModeloEquipo">-</div>
+            </div>
+
+            <div class="proceso-kv">
+                <div class="k">Numero de equipo</div>
+                <div class="v" id="panelNumeroEquipo">-</div>
+            </div>
+        </div>
     </div>
 
-    <div class="form-group mt-4">
-        <label for="TipoProcesoId">Tipo de Proceso</label>
-        <select class="form-control" asp-for="TipoProcesoId" asp-items="Model.TiposProceso" id="TipoProcesoId" required>
-            <option value="">-- Seleccionar tipo --</option>
-        </select>
+    <div class="proceso-observ">
+        <div class="k proceso-observ-label">Observaciones</div>
+        <textarea id="panelObservaciones" readonly>NO REGISTRA</textarea>
     </div>
 
-    <div class="form-group mt-3">
-        <label for="EquipoId">Equipo</label>
-        <select class="form-control" asp-for="EquipoId" asp-items="Model.Equipos" id="EquipoId" required>
-            <option value="">-- Seleccionar equipo --</option>
-        </select>
+    <div class="proceso-tabs" role="tablist" aria-label="Secciones del proceso">
+        <button type="button" class="proceso-tab is-active" data-tab-target="proceso-tab-materiales">Materiales procesados</button>
+        <button type="button" class="proceso-tab" data-tab-target="proceso-tab-cancelados">Materiales cancelados</button>
+        <button type="button" class="proceso-tab" data-tab-target="proceso-tab-controles">Controles de proceso</button>
     </div>
 
-    <div class="form-group mt-3">
-        <label for="TipoCicloId">Tipo de Ciclo</label>
-        <select class="form-control" asp-for="TipoCicloId" asp-items="Model.TiposCiclo" id="TipoCicloId" required>
-            <option value="">-- Seleccionar ciclo --</option>
-        </select>
+    <div id="proceso-tab-materiales" class="proceso-tab-panel is-active">
+        <div class="proceso-materiales-wrap">
+            <table class="proceso-table">
+                <thead>
+                    <tr>
+                        <th>Codigo etiqueta</th>
+                        <th>Denominacion</th>
+                        <th>Sector</th>
+                        <th>Codigo reuso</th>
+                        <th>Recibidos</th>
+                        <th>En proceso</th>
+                        <th>Sin procesar</th>
+                        <th>Cantidad</th>
+                        <th>Imprimir</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaMaterialesProcesados">
+                    <tr>
+                        <td colspan="9" class="proceso-table-empty-note">Sin materiales cargados</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="form-group mt-3" id="grupoProveedor" style="display:none;">
-        <label for="ProveedorId">Proveedor</label>
-        <select class="form-control" id="ProveedorId">
-            <option value="">-- Seleccionar proveedor --</option>
-        </select>
+    <div id="proceso-tab-cancelados" class="proceso-tab-panel">
+        <div class="proceso-materiales-wrap">
+            <table class="proceso-table">
+                <thead>
+                    <tr>
+                        <th>Codigo etiqueta</th>
+                        <th>Denominacion</th>
+                        <th>Sector</th>
+                        <th>Codigo reuso</th>
+                        <th>Recibidos</th>
+                        <th>En proceso</th>
+                        <th>Sin procesar</th>
+                        <th>Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="8" class="proceso-table-empty-note">Sin materiales cancelados</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="form-group mt-3">
-        <label>Unidades Procesadas</label>
-        <input type="text" class="form-control" id="unidadesProcesadas" value="0" readonly />
+    <div id="proceso-tab-controles" class="proceso-tab-panel">
+        <div class="proceso-work">
+            <div>
+                <table class="proceso-mini-table">
+                    <thead>
+                        <tr>
+                            <th>Tipo de control</th>
+                            <th>Identificacion</th>
+                            <th>Ubicacion</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td>1</td>
+                            <td></td>
+                            <td>1</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="proceso-diagram" aria-label="Mapa de camara">
+                <svg viewBox="0 0 290 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <line x1="50" y1="13" x2="210" y2="13" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="50" y1="13" x2="50" y2="66" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="210" y1="13" x2="210" y2="66" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="50" y1="66" x2="210" y2="66" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="82" y1="34" x2="242" y2="34" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="82" y1="34" x2="82" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="242" y1="34" x2="242" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="82" y1="94" x2="242" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="50" y1="13" x2="82" y2="34" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="210" y1="13" x2="242" y2="34" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="50" y1="66" x2="82" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="210" y1="66" x2="242" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                </svg>
+
+                <div class="node proceso-node-1">1</div>
+                <div class="node proceso-node-2">2</div>
+                <div class="node proceso-node-3">3</div>
+                <div class="node proceso-node-4">4</div>
+                <div class="node proceso-node-5">5</div>
+                <div class="node proceso-node-6">6</div>
+                <div class="node proceso-node-7">7</div>
+                <div class="node proceso-node-8">8</div>
+                <div class="node proceso-node-9">9</div>
+                <div class="proceso-bd">BD</div>
+                <div class="proceso-door-label proceso-door-label-left">Puerta de carga</div>
+                <div class="proceso-door-label proceso-door-label-right">Puerta de descarga</div>
+            </div>
+        </div>
     </div>
 
-    <div class="form-group mt-3">
-        <label>Estado</label>
-        <input type="text" class="form-control" value="EN PROCESO" readonly />
+    <div class="proceso-table-wrap">
+        <table class="proceso-table">
+            <thead>
+                <tr>
+                    <th>Codigo etiqueta</th>
+                    <th>Denominacion</th>
+                    <th>Sector</th>
+                    <th>Codigo reuso</th>
+                    <th>Recibidos</th>
+                    <th>En proceso</th>
+                    <th>Sin procesar</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="7"></td>
+                    <td id="panelTotalTablaInferior">0</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
-    <div class="form-group mt-4">
-        <button type="button" class="btn btn-success" onclick="guardarProceso()">💾 Guardar Proceso</button>
+    <div class="proceso-actions">
+        <button type="button" class="btn btn-primary" onclick="guardarProceso()">Nuevo</button>
+        <button type="button" class="btn btn-outline-primary" onclick="alert('Accion de demostracion')">Controles de proceso</button>
+        <button type="button" class="btn btn-outline-primary" onclick="alert('Accion de demostracion')">Editar</button>
+        <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cerrar</button>
     </div>
+</div>
 
-    <div id="mensajeProceso" class="mt-3 text-danger"></div>
-</form>
+<div id="contenedorSubform" class="mt-5"></div>
+
+<div class="modal fade" id="procesoPrinterTypeModal" tabindex="-1" aria-labelledby="procesoPrinterTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-primary" style="max-width:420px;">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="procesoPrinterTypeModalLabel">Seleccione el tipo de impresión</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p id="procesoPrinterRowInfo" class="mb-2 small text-muted">Etiqueta seleccionada: -</p>
+                <div class="d-flex gap-2 justify-content-end">
+                    <button type="button" class="btn btn-primary" id="btnProcesoPrintDocument">Impresora</button>
+                    <button type="button" class="btn btn-outline-primary" id="btnProcesoPrintLabel">Etiqueta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div id="contenedorSubform" class="mt-5"></div>
 
@@ -207,6 +450,7 @@
             try {
                 console.log("Payload enviado:", data);
                 debugger;
+
                 const resp = await fetch('/Proceso/Insertar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -233,82 +477,197 @@
             }
         }
 
-        document.getElementById("TipoProcesoId").addEventListener("change", async function () {
-            const ptiId = this.value;
+        function textoSeleccionado(selectId, fallback = "-") {
+            const select = document.getElementById(selectId);
+            if (!select) return fallback;
+            return select.selectedOptions?.[0]?.text?.trim() || fallback;
+        }
 
-            const grupoEquipo = document.getElementById("EquipoId").parentElement;
-            const grupoCiclo = document.getElementById("TipoCicloId").parentElement;
-            const grupoProveedor = document.getElementById("grupoProveedor");
+        function valorSeleccionado(selectId, fallback = "-") {
+            const select = document.getElementById(selectId);
+            if (!select) return fallback;
+            return select.value?.trim() || fallback;
+        }
 
-            const comboEquipo = document.getElementById("EquipoId");
-            const comboCiclo = document.getElementById("TipoCicloId");
-            const comboProveedor = document.getElementById("ProveedorId");
+        function setText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        }
 
-            document.getElementById("mensajeProceso").innerText = "";
+        function sincronizarResumenProceso() {
+            const usuarioNom = localStorage.getItem("usuarioNom") || "";
+            const usuarioApe = localStorage.getItem("usuarioApe") || "";
+            const usuarioCarDen = localStorage.getItem("usuarioCarDen") || "-";
 
-            comboEquipo.innerHTML = '<option value="">-- Seleccionar equipo --</option>';
-            comboCiclo.innerHTML = '<option value="">-- Seleccionar ciclo --</option>';
-            comboProveedor.innerHTML = '<option value="">-- Seleccionar proveedor --</option>';
+            const nombreCompleto = `${usuarioApe}${usuarioApe && usuarioNom ? ", " : ""}${usuarioNom}`.trim() || "-";
 
-            if (!ptiId) {
-                grupoEquipo.style.display = "block";
-                grupoCiclo.style.display = "block";
-                grupoProveedor.style.display = "none";
-                return;
-            }
+            setText("panelUsuario", nombreCompleto);
+            setText("panelCargo", usuarioCarDen);
+            setText("panelTipoProceso", textoSeleccionado("TipoProcesoId"));
+            setText("panelTipoCiclo", textoSeleccionado("TipoCicloId"));
+            setText("panelNumeroEquipo", valorSeleccionado("EquipoId"));
+            setText("panelMarcaEquipo", textoSeleccionado("EquipoId"));
+            setText("panelSerieEquipo", valorSeleccionado("EquipoId"));
+            setText("panelModeloEquipo", textoSeleccionado("EquipoId"));
 
-            if (ptiId === "5") {
-                grupoEquipo.style.display = "none";
-                grupoCiclo.style.display = "none";
-                grupoProveedor.style.display = "block";
+            const fecha = document.getElementById("fechaProceso")?.value || "";
+            const hora = document.getElementById("horaInicio")?.value || "";
+            setText("panelFechaCompleta", `${fecha} ${hora}`.trim());
+        }
 
-                comboEquipo.innerHTML = '<option value="1">1</option>';
-                comboEquipo.value = "1";
+        document.addEventListener("DOMContentLoaded", function () {
+            const tipoProceso = document.getElementById("TipoProcesoId");
 
-                comboCiclo.innerHTML = '<option value="1">1</option>';
-                comboCiclo.value = "1";
+            tipoProceso?.addEventListener("change", async function () {
+                const ptiId = this.value;
 
-                comboProveedor.innerHTML = '<option value="">-- Cargando proveedores... --</option>';
+                const grupoEquipo = document.getElementById("EquipoId")?.parentElement;
+                const grupoCiclo = document.getElementById("TipoCicloId")?.parentElement;
+                const grupoProveedor = document.getElementById("grupoProveedor");
 
-                try {
-                    const respProv = await fetch('/Proceso/ObtenerProveedores');
-                    const proveedores = await respProv.json();
+                const comboEquipo = document.getElementById("EquipoId");
+                const comboCiclo = document.getElementById("TipoCicloId");
+                const comboProveedor = document.getElementById("ProveedorId");
 
-                    comboProveedor.innerHTML = '<option value="">-- Seleccionar proveedor --</option>';
+                document.getElementById("mensajeProceso").innerText = "";
 
-                    if (Array.isArray(proveedores) && proveedores.length > 0) {
-                        proveedores.forEach(p => {
-                            const opt = document.createElement("option");
-                            opt.value = p.id;
-                            opt.text = p.nombre;
-                            comboProveedor.appendChild(opt);
-                        });
-                    } else {
-                        comboProveedor.innerHTML = '<option value="">-- Sin proveedores disponibles --</option>';
-                    }
+                if (comboEquipo) comboEquipo.innerHTML = '<option value="">-- Seleccionar equipo --</option>';
+                if (comboCiclo) comboCiclo.innerHTML = '<option value="">-- Seleccionar ciclo --</option>';
+                if (comboProveedor) comboProveedor.innerHTML = '<option value="">-- Seleccionar proveedor --</option>';
 
-                } catch (error) {
-                    console.error("Error cargando proveedores:", error);
-                    comboProveedor.innerHTML = '<option value="">-- Error al cargar proveedores --</option>';
+                if (!ptiId) {
+                    if (grupoEquipo) grupoEquipo.style.display = "block";
+                    if (grupoCiclo) grupoCiclo.style.display = "block";
+                    if (grupoProveedor) grupoProveedor.style.display = "none";
+                    sincronizarResumenProceso();
+                    return;
                 }
 
-                return;
-            }
+                if (ptiId === "5") {
+                    if (grupoEquipo) grupoEquipo.style.display = "none";
+                    if (grupoCiclo) grupoCiclo.style.display = "none";
+                    if (grupoProveedor) grupoProveedor.style.display = "block";
 
-            grupoEquipo.style.display = "block";
-            grupoCiclo.style.display = "block";
-            grupoProveedor.style.display = "none";
+                    if (comboEquipo) {
+                        comboEquipo.innerHTML = '<option value="1">1</option>';
+                        comboEquipo.value = "1";
+                    }
 
-            await cargarEquipos(ptiId, comboEquipo);
-            await cargarTiposCiclo(ptiId, comboCiclo);
-        });
-    </script>
+                    if (comboCiclo) {
+                        comboCiclo.innerHTML = '<option value="1">1</option>';
+                        comboCiclo.value = "1";
+                    }
 
-    <script>
-        localStorage.setItem("modulo_24_abierto", "1");
+                    if (comboProveedor) {
+                        comboProveedor.innerHTML = '<option value="">-- Cargando proveedores... --</option>';
 
-        window.addEventListener("unload", function () {
-            localStorage.removeItem("modulo_24_abierto");
+                        try {
+                            const respProv = await fetch('/Proceso/ObtenerProveedores');
+                            const proveedores = await respProv.json();
+
+                            comboProveedor.innerHTML = '<option value="">-- Seleccionar proveedor --</option>';
+
+                            if (Array.isArray(proveedores) && proveedores.length > 0) {
+                                proveedores.forEach(p => {
+                                    const opt = document.createElement("option");
+                                    opt.value = p.id;
+                                    opt.text = p.nombre;
+                                    comboProveedor.appendChild(opt);
+                                });
+                            } else {
+                                comboProveedor.innerHTML = '<option value="">-- Sin proveedores disponibles --</option>';
+                            }
+                        } catch (error) {
+                            console.error("Error cargando proveedores:", error);
+                            comboProveedor.innerHTML = '<option value="">-- Error al cargar proveedores --</option>';
+                        }
+                    }
+
+                    sincronizarResumenProceso();
+                    return;
+                }
+
+                if (grupoEquipo) grupoEquipo.style.display = "block";
+                if (grupoCiclo) grupoCiclo.style.display = "block";
+                if (grupoProveedor) grupoProveedor.style.display = "none";
+
+                if (comboEquipo) await cargarEquipos(ptiId, comboEquipo);
+                if (comboCiclo) await cargarTiposCiclo(ptiId, comboCiclo);
+
+                sincronizarResumenProceso();
+            });
+
+            sincronizarResumenProceso();
+
+            document.getElementById("EquipoId")?.addEventListener("change", sincronizarResumenProceso);
+            document.getElementById("TipoCicloId")?.addEventListener("change", sincronizarResumenProceso);
+            document.getElementById("ProveedorId")?.addEventListener("change", sincronizarResumenProceso);
+
+            document.querySelectorAll(".proceso-tab").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const targetId = this.dataset.tabTarget;
+
+                    document.querySelectorAll(".proceso-tab").forEach(x => x.classList.remove("is-active"));
+                    document.querySelectorAll(".proceso-tab-panel").forEach(x => x.classList.remove("is-active"));
+
+                    this.classList.add("is-active");
+                    document.getElementById(targetId)?.classList.add("is-active");
+                });
+            });
+
+            document.querySelectorAll(".js-pro-row-print-printer").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const etiqueta = this.dataset.etiqueta || "-";
+                    const info = document.getElementById("procesoPrinterRowInfo");
+                    if (info) info.textContent = `Etiqueta seleccionada: ${etiqueta}`;
+
+                    const modalEl = document.getElementById("procesoPrinterTypeModal");
+                    if (modalEl && window.bootstrap) {
+                        const modal = new bootstrap.Modal(modalEl);
+                        modal.show();
+                    }
+                });
+            });
+
+            document.querySelectorAll(".js-pro-row-print-pdf").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const etiqueta = this.dataset.etiqueta || "-";
+                    alert(`Imprimir PDF de etiqueta ${etiqueta}`);
+                });
+            });
+
+            document.getElementById("btnProcesoPrintDocument")?.addEventListener("click", function () {
+                alert("Impresion por impresora");
+            });
+
+            document.getElementById("btnProcesoPrintLabel")?.addEventListener("click", function () {
+                alert("Impresion de etiqueta");
+            });
+
+            // abrirModalControlProceso modal de controles de proceso
+
+            const nodos = document.querySelectorAll(".proceso-diagram .node");
+
+                nodos.forEach(nodo => {
+                    nodo.addEventListener("dblclick", function () {
+                        const posicion = this.textContent.trim();
+                        abrirModalControlProceso(posicion);
+                    });
+                });
+
+            const bd = document.querySelector(".proceso-bd");
+
+                if (bd) {
+                    bd.addEventListener("dblclick", function () {
+                        abrirModalControlProceso(28);
+                    });
+                }
+
+            localStorage.setItem("modulo_24_abierto", "1");
+
+            window.addEventListener("unload", function () {
+                localStorage.removeItem("modulo_24_abierto");
+            });
         });
     </script>
 }

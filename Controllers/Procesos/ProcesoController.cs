@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ConexionSql.Data;
+using ConexionSql.Models.Equipos;
+using ConexionSql.Models.Procesos;
+using ConexionSql.Models.Procesos.Controles;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using ConexionSql.Data;
-using ConexionSql.Models.Procesos;
-using ConexionSql.Models.Equipos;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace ConexionSql.Controllers
 {
@@ -87,6 +88,7 @@ namespace ConexionSql.Controllers
             Console.WriteLine($"TipoCicloDen: {dto.TipoCicloDen}");
 
             try
+            
             {
                 var esExterno = dto.TipoProcesoId == 5;
                 var equipoIdReal = esExterno ? 1 : dto.EquipoId;
@@ -278,5 +280,7 @@ namespace ConexionSql.Controllers
 
             return Json(proveedores);
         }
+
+
     }
 }
