@@ -18,7 +18,7 @@ namespace ConexionSql.Controllers.Procesos.Controles
 
 
         [HttpPost]
-        public IActionResult Insertar([FromBody] JsonElement dto)
+        public async Task<IActionResult> Insertar([FromBody] JsonElement dto)
         {
             try
             {
@@ -78,63 +78,47 @@ namespace ConexionSql.Controllers.Procesos.Controles
 
                 var nuevo = new TbProDetPte
                 {
-                    // 🔹 RELACIÓN
                     TbProId = tbProId,
-
-                    // 🔹 FECHA
                     TbProFec = DateTime.Now,
 
-                    // 🔹 TIPO CONTROL
                     TbProPteId = GetInt("TB_PRO_PTE_ID"),
                     TbProPteDen = GetString("TB_PRO_PTE_DEN"),
 
-                    // 🔹 TIPO PROCESO DESDE CABECERA
                     TbProPtePtiId = cabecera.TbProPtiId,
                     TbProPtePtiDen = cabecera.TbProPtiDen,
 
-                    // 🔹 EQUIPO DESDE CABECERA
                     TbProPteEquId = cabecera.TbProEquId,
                     TbProPteEquDen = cabecera.TbProEquDen,
 
-                    // 🔹 IDENTIFICACIÓN
                     TbProPteIde = GetString("TB_PRO_PTE_IDE"),
 
-                    // 🔹 UBICACIÓN
                     TbProDetTesUbiId = GetInt("TB_PRO_DET_TES_UBI_ID"),
                     TbProDetTesUbiDen = GetString("TB_PRO_DET_TES_UBI_DEN"),
 
-                    // 🔹 CANTIDAD
                     TbProPteCant = GetInt("TB_PRO_PTE_CANT", 1),
 
-                    // 🔹 RESULTADO
                     TbProPteResId = 1,
                     TbProPteResDen = "EN PROCESO",
 
-                    // 🔹 NUMÉRICOS
                     TbProDetTesNum1 = GetInt("TB_PRO_DET_TES_NUM_1"),
                     TbProDetTesNum2 = GetInt("TB_PRO_DET_TES_NUM_2"),
                     TbProDetTesNum3 = GetInt("TB_PRO_DET_TES_NUM_3"),
 
-                    // 🔹 TEXTOS
                     TbProDetTesTxt1 = GetString("TB_PRO_DET_TES_TXT_1"),
                     TbProDetTesTxt2 = GetString("TB_PRO_DET_TES_TXT_2"),
                     TbProDetTesTxt3 = GetString("TB_PRO_DET_TES_TXT_3"),
 
-                    // 🔹 FECHAS DETALLE
                     TbProDetTesDti1 = GetDateTime("TB_PRO_DET_TES_DTI_1"),
                     TbProDetTesDti2 = GetDateTime("TB_PRO_DET_TES_DTI_2"),
                     TbProDetTesDti3 = GetDateTime("TB_PRO_DET_TES_DTI_3"),
 
-                    // 🔹 MEMOS
                     TbProDetTesMem1 = GetString("TB_PRO_DET_TES_MEM_1"),
                     TbProDetTesMem2 = GetString("TB_PRO_DET_TES_MEM_2"),
                     TbProDetTesMem3 = GetString("TB_PRO_DET_TES_MEM_3"),
 
-                    // 🔹 LOTE / VENCIMIENTO
                     TbProPteLot = GetString("TB_PRO_PTE_LOT") ?? "0",
                     TbProPteVen = GetDateTime("TB_PRO_PTE_VEN"),
 
-                    // 🔹 OTROS
                     TbProDetPteCantElim = GetInt("TB_PRO_DET_PTE_CANT_ELIM"),
                     TbProDetPteProdBrand = GetString("TB_PRO_DET_PTE_PROD_BRAND") ?? "NO REGISTRADO",
                     TbProDetPteProdName = GetString("TB_PRO_DET_PTE_PROD_NAME") ?? "NO REGISTRADO",
@@ -212,6 +196,30 @@ namespace ConexionSql.Controllers.Procesos.Controles
             return Ok(lista);
         }
 
+        [HttpGet]
+        public IActionResult ObtenerControlesPorProceso(int tbProId)
+        {
+            try
+            {
+                var lista = _context.TbProDetPte
+                    .Where(x => x.TbProId == tbProId)
+                    .OrderBy(x => x.TbProDetPteId)
+                    .Select(x => new
+                    {
+                        tbProPteDen = x.TbProPteDen,
+                        tbProPteIde = x.TbProPteIde,
+                        tbProDetTesUbiDen = x.TbProDetTesUbiDen,
+                        tbProPteCant = x.TbProPteCant
+                    })
+                    .ToList();
+
+                return Json(new { success = true, data = lista });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, mensaje = ex.Message });
+            }
+        }
 
     }
 }

@@ -1114,6 +1114,39 @@ namespace ConexionSql.Controllers
                 _context.TbRecDet.Add(entidad);
                 await _context.SaveChangesAsync();
 
+                //para imprimir etiqueta completo
+                bool esCompleto = entidad.TbRecDetRepId == 2;
+                // para imprimir etiqueta incompleto
+                bool esIncompleto = entidad.TbRecDetRepId == 3;
+
+                string zplCompleto = null;
+                string zplIncompleto = null;
+
+                if (esCompleto)
+                {
+                    zplCompleto = Etiquetas.RecepcionDetalleCompleto(
+                        sector: tbRec.TbRecSecOriDen,
+                        material: nombreMaterial,
+                        fechaRecepcion: tbRec.TbRecFec ?? DateTime.Now,
+                        nroRecepcion: tbRec.TbRecId,
+                        idDetalle: entidad.TbRecDetId,
+                        cantidad: entidad.TbRecDetNum2 ?? 0
+                    );
+                }
+
+                if (esIncompleto)
+                {
+                    zplIncompleto = Etiquetas.RecepcionDetalleIncompleto(
+                        sector: tbRec.TbRecSecOriDen,
+                        material: nombreMaterial,
+                        fechaRecepcion: tbRec.TbRecFec ?? DateTime.Now,
+                        nroRecepcion: tbRec.TbRecId,
+                        idDetalle: entidad.TbRecDetId,
+                        cantidad: entidad.TbRecDetNum2 ?? 0,
+                        detalleFaltante: entidad.TbRecDetMem1 ?? ""
+                    );
+                }
+
                 // 🔢 CONSULTAR TOTAL ACTUAL Y SUMAR CANTIDAD INSERTADA
                 var totalActual = await _context.TbRec
                     .Where(r => r.TbRecId == detalle.TB_REC_ID)
@@ -1127,15 +1160,34 @@ namespace ConexionSql.Controllers
 
 
                 string zpl = Etiquetas.RecepcionDetalle(
+                    sector: tbRec.TbRecSecOriDen,
                     material: nombreMaterial,
-                    cantidad: detalle.TB_REC_DET_CANT,
-                    fecha: tbRec.TbRecFec ?? DateTime.Now,
-                    hora: tbRec.TbRecHorIni?.TimeOfDay ?? DateTime.Now.TimeOfDay,
+                    fechaRecepcion: tbRec.TbRecFec ?? DateTime.Now,
+                    vencimiento: DateTime.Now.AddMonths(6),
                     nroRecepcion: tbRec.TbRecId,
-                    idDetalle: entidad.TbRecDetId
+                    idDetalle: entidad.TbRecDetId,
+                    codigoReuso: entidad.TbRecDetReuId,
+                    tipoMaterial: entidad.TbRecDetMatMtiDen
+
                 );
 
-                ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zpl);
+                for (int i = 0; i < detalle.TB_REC_DET_CANT; i++)
+                {
+                    // 🔹 siempre imprime etiqueta normal
+                    ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zpl);
+
+                    // 🔹 si es COMPLETO, imprime adicional
+                    if (esCompleto && zplCompleto != null)
+                    {
+                        ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zplCompleto);
+                    }
+
+                    // 🔹 si es INCOMPLETO, imprime adicional
+                    if (esIncompleto && zplIncompleto != null)
+                    {
+                        ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zplIncompleto);
+                    }
+                }
 
                 var lista = await _context.TbRecDet
                     .Where(d => d.TbRecId == detalle.TB_REC_ID)

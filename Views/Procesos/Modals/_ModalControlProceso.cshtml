@@ -79,7 +79,7 @@
 </div>
 
 <script>
-        let tiposControlData = [];
+    let tiposControlData = [];
 
     function cargarTiposControl() {
         fetch('/TbProControl/ObtenerTiposControl')
@@ -100,7 +100,7 @@
             .catch(err => console.error("Error cargando tipos de control:", err));
     }
 
-        function filtrarTiposControl(texto) {
+    function filtrarTiposControl(texto) {
         const lista = document.getElementById("listaTipoControl");
         const input = document.getElementById("tipoControl");
 
@@ -184,11 +184,11 @@
         document.getElementById("identificacion").value = "";
 
         setTimeout(() => {
-        document.getElementById("tipoControl")?.focus();
+            document.getElementById("tipoControl")?.focus();
         }, 100);
     }
 
-        function cerrarModalControlProceso() {
+    function cerrarModalControlProceso() {
         document.getElementById("modalControlProceso").style.display = "none";
 
         document.getElementById("tbProDetPteId").value = "";
@@ -196,14 +196,12 @@
         document.getElementById("ubicacionOriginal").value = "";
         document.getElementById("modoModal").value = "";
 
-        // 🔥 LIMPIAR tipoControl (nuevo)
         const tipoControl = document.getElementById("tipoControl");
         if (tipoControl) {
             tipoControl.value = "";
             tipoControl.dataset.id = "";
         }
 
-        // 🔥 LIMPIAR lista de búsqueda (nuevo)
         const lista = document.getElementById("listaTipoControl");
         if (lista) {
             lista.innerHTML = "";
@@ -211,59 +209,70 @@
         }
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-            const btnGuardarControl = document.getElementById("btnGuardarControl");
-            const tipoControl = document.getElementById("tipoControl");
-            const identificacion = document.getElementById("identificacion");
-            const ubicacion = document.getElementById("ubicacion");
+    function marcarNodo(posicion) {
+        document.querySelectorAll(".proceso-diagram .node")
+            .forEach(n => {
+                if (n.textContent.trim() === String(posicion)) {
+                    n.classList.add("activo");
+                }
+            });
 
-                const listaTipoControl = document.getElementById("listaTipoControl");
-
-    if (tipoControl) {
-        tipoControl.addEventListener("input", function () {
-            filtrarTiposControl(tipoControl.value);
-        });
-
-    tipoControl.addEventListener("keydown", function (e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
-
-            const primerItem = listaTipoControl?.querySelector(".item-busqueda");
-            if (primerItem) {
-                primerItem.click();
-                identificacion?.focus();
-            }
+        if (String(posicion) === "28") {
+            document.querySelector(".proceso-bd")?.classList.add("activo");
         }
-    });
-
-        tipoControl.addEventListener("focus", function () {
-            if (tipoControl.value.trim()) {
-                filtrarTiposControl(tipoControl.value);
-            }
-        });
     }
 
-    document.addEventListener("click", function (e) {
-        if (!e.target.closest("#tipoControl") && !e.target.closest("#listaTipoControl")) {
-            if (listaTipoControl) {
-                listaTipoControl.innerHTML = "";
-                listaTipoControl.style.display = "none";
-            }
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const btnGuardarControl = document.getElementById("btnGuardarControl");
+        const tipoControl = document.getElementById("tipoControl");
+        const identificacion = document.getElementById("identificacion");
+        const ubicacion = document.getElementById("ubicacion");
+        const listaTipoControl = document.getElementById("listaTipoControl");
+
+        if (tipoControl) {
+            tipoControl.addEventListener("input", function () {
+                filtrarTiposControl(tipoControl.value);
+            });
+
+            tipoControl.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    const primerItem = listaTipoControl?.querySelector(".item-busqueda");
+                    if (primerItem) {
+                        primerItem.click();
+                        identificacion?.focus();
+                    }
+                }
+            });
+
+            tipoControl.addEventListener("focus", function () {
+                if (tipoControl.value.trim()) {
+                    filtrarTiposControl(tipoControl.value);
+                }
+            });
         }
-    });
+
+        document.addEventListener("click", function (e) {
+            if (!e.target.closest("#tipoControl") && !e.target.closest("#listaTipoControl")) {
+                if (listaTipoControl) {
+                    listaTipoControl.innerHTML = "";
+                    listaTipoControl.style.display = "none";
+                }
+            }
+        });
 
         if (identificacion) {
-        identificacion.addEventListener("keydown", function (e) {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                ubicacion?.focus();
-            }
-        });
-    }
+            identificacion.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    ubicacion?.focus();
+                }
+            });
+        }
 
         async function guardarControlProceso() {
             try {
-                console.log("CLICK OK");
 
                 const tipoControl = document.getElementById("tipoControl");
                 const ubicacion = document.getElementById("ubicacion");
@@ -277,72 +286,59 @@
                 const codigoBarrasInput = document.getElementById("codigoBarras");
                 const modoModalInput = document.getElementById("modoModal");
 
-                if (!tipoControl || !ubicacion || !tbProIdInput) {
-                    console.error("Faltan elementos del formulario");
-                    alert("❌ Error en el formulario.");
-                    return;
-                }
-
                 const tbProId = parseInt(tbProIdInput.value || "0");
-
-                if (tbProId <= 0) {
-                    console.error("TB_PRO_ID inválido");
-                    alert("❌ No hay proceso asociado.");
-                    return;
-                }
 
                 const data = {
                     TB_PRO_ID: tbProId,
                     TB_PRO_DET_PTE_ID: parseInt(tbProDetPteIdInput?.value || "0"),
-
                     TB_PRO_PTE_ID: parseInt(tipoControl.dataset.id || "0"),
                     TB_PRO_PTE_DEN: tipoControl.value || "",
-
                     TB_PRO_PTE_IDE: identificacionInput?.value || "",
-
                     TB_PRO_DET_TES_UBI_ID: parseInt(ubicacion.value || "0"),
                     TB_PRO_DET_TES_UBI_DEN: ubicacion.value
                         ? ubicacion.options[ubicacion.selectedIndex].text
                         : "",
-
                     TB_PRO_DET_PTE_PROD_BRAND: marcaInput?.value || "",
                     TB_PRO_DET_PTE_PROD_NAME: productoInput?.value || "",
                     TB_PRO_PTE_LOT: loteInput?.value || "0",
                     TB_PRO_PTE_VEN: vencimientoInput?.value || null,
                     TB_PRO_DET_PTE_TICKET_NUMB: codigoBarrasInput?.value || "NO REGISTRA",
-
                     TB_PRO_PTE_CANT: 1,
                     MODO_MODAL: modoModalInput?.value || "alta"
                 };
 
-                if (!parseInt(tipoControl.dataset.id || "0")) {
-                    alert("❌ Seleccione un tipo de control válido.");
-                    tipoControl.focus();
-                    return;
-    }
-
-                console.log("DATA:", data);
-
-                const response = await fetch("/TbProControl/Insertar", {
+            const response = await fetch("/TbProControl/Insertar", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(data)
                 });
 
                 const result = await response.json();
-
-                console.log("RESP:", result);
 
                 if (!result.ok && !result.success) {
                     alert(result.mensaje || "❌ Error al guardar.");
                     return;
                 }
 
+            if (result.ok || result.success) {
                 cerrarModalControlProceso();
+
+                const tbProId = document.getElementById("tbProId").value;
+
+                const response = await fetch(`/TbProControl/ObtenerControlesPorProceso?tbProId=${tbProId}`);
+                const json = await response.json();
+
+                console.log("CONTROLES:", json);
             }
-            catch (error) {
+
+
+        // 🔥 LLAMAMOS A LA VISTA PRINCIPAL
+        if (window.cargarControlesProceso) {
+            window.cargarControlesProceso();
+        }
+    }
+
+            } catch (error) {
                 console.error("Error al guardar control:", error);
                 alert("❌ Error inesperado al guardar.");
             }

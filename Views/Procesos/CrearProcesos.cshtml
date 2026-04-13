@@ -213,12 +213,9 @@
                             <th>Cantidad</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="tablaControlesProceso">
                         <tr>
-                            <td></td>
-                            <td>1</td>
-                            <td></td>
-                            <td>1</td>
+                            <td colspan="4" class="proceso-table-empty-note">Sin controles cargados</td>
                         </tr>
                     </tbody>
                 </table>
@@ -307,7 +304,6 @@
     </div>
 </div>
 
-<div id="contenedorSubform" class="mt-5"></div>
 
 @section Scripts {
     <script>
@@ -449,7 +445,7 @@
 
             try {
                 console.log("Payload enviado:", data);
-                debugger;
+                //debugger;
 
                 const resp = await fetch('/Proceso/Insertar', {
                     method: 'POST',
@@ -493,6 +489,31 @@
             const el = document.getElementById(id);
             if (el) el.textContent = value;
         }
+
+        function limpiarNodosControl() {
+            document.querySelectorAll(".proceso-diagram .node").forEach(n => {
+                n.classList.remove("activo");
+            });
+
+            document.querySelector(".proceso-bd")?.classList.remove("activo");
+        }
+
+
+
+
+        window.marcarNodo = function (posicion) {
+            document.querySelectorAll(".proceso-diagram .node")
+                .forEach(n => {
+                    if (n.textContent.trim() === String(posicion)) {
+                        n.classList.add("activo");
+                    }
+                });
+
+            if (String(posicion) === "28") {
+                document.querySelector(".proceso-bd")?.classList.add("activo");
+            }
+        };
+
 
         function sincronizarResumenProceso() {
             const usuarioNom = localStorage.getItem("usuarioNom") || "";
@@ -644,30 +665,76 @@
                 alert("Impresion de etiqueta");
             });
 
-            // abrirModalControlProceso modal de controles de proceso
+            //abrirModalControlProceso modal de controles de proceso
 
-            const nodos = document.querySelectorAll(".proceso-diagram .node");
+        const nodos = document.querySelectorAll(".proceso-diagram .node");
 
-                nodos.forEach(nodo => {
-                    nodo.addEventListener("dblclick", function () {
-                        const posicion = this.textContent.trim();
-                        abrirModalControlProceso(posicion);
-                    });
-                });
+        nodos.forEach(nodo => {
+            nodo.addEventListener("dblclick", function () {
+                const posicion = this.textContent.trim();
+                const tbProId = parseInt(document.getElementById("panelNumeroProceso")?.textContent || "0");
+                abrirModalControlProceso(tbProId, posicion);
+            });
+        });
 
-            const bd = document.querySelector(".proceso-bd");
+        const bd = document.querySelector(".proceso-bd");
 
-                if (bd) {
-                    bd.addEventListener("dblclick", function () {
-                        abrirModalControlProceso(28);
-                    });
-                }
+        if (bd) {
+            bd.addEventListener("dblclick", function () {
+                const tbProId = parseInt(document.getElementById("panelNumeroProceso")?.textContent || "0");
+                abrirModalControlProceso(tbProId, 28);
+            });
+        }
 
             localStorage.setItem("modulo_24_abierto", "1");
 
             window.addEventListener("unload", function () {
                 localStorage.removeItem("modulo_24_abierto");
             });
+            
         });
+
+                async function cargarControlesProceso() {
+            const tbProId = document.getElementById("panelNumeroProceso")?.textContent?.trim();
+
+            if (!tbProId || tbProId === "0") return;
+
+            try {
+                const response = await fetch(`/TbProControl/ObtenerPorProceso?tbProId=${tbProId}`);
+                const data = await response.json();
+
+                const tbody = document.getElementById("tablaControlesProceso");
+                if (!tbody) return;
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="proceso-table-empty-note">Sin controles cargados</td>
+                        </tr>`;
+                    limpiarNodosControl();
+                    return;
+                }
+
+                tbody.innerHTML = data.map(x => `
+                    <tr>
+                        <td>${x.tipoControl ?? ""}</td>
+                        <td>${x.identificacion ?? ""}</td>
+                        <td>${x.ubicacion ?? ""}</td>
+                        <td>${x.cantidad ?? ""}</td>
+                    </tr>
+                `).join("");
+
+                limpiarNodosControl();
+
+                data.forEach(x => {
+                    if (x.ubicacion) {
+                        marcarNodo(x.ubicacion);
+                    }
+                });
+            }
+            catch (error) {
+                console.error("Error al cargar controles:", error);
+            }
+        }
     </script>
 }

@@ -1674,7 +1674,7 @@
         }
 
         //registro control armado
-                 if (btnAceptarRegistroControlArmado) {
+                     if (btnAceptarRegistroControlArmado) {
         btnAceptarRegistroControlArmado.addEventListener("click", function () {
             const estadoCajaId = parseInt(rcaAcajRev?.value) || 1;
             const estadoCajaDen = rcaAcajRev?.options[rcaAcajRev.selectedIndex]?.text || "NO REGISTRADO";
@@ -1706,8 +1706,8 @@
                 faltantesObservaciones: faltantesObservaciones,
 
                 // revisión principal
-                tbRecDetRevId: 24,
-                tbRecDetRev: "REGISTRO CONTROL DE ARMADO",
+                tbRecDetRevId: estadoCajaId,
+                tbRecDetRev: estadoCajaDen,
 
                 // campos reales del detalle
                 tbRecDetTxt3: estadoCajaDen,
@@ -1722,10 +1722,15 @@
             modalControlCompleto = true;
 
             if (revisionSelect) {
-                revisionSelect.value = "24";
+                revisionSelect.value = String(estadoCajaId);
             }
 
-            if (hiddenNum3) hiddenNum3.value = "24";
+            if (revisionBusqueda) {
+                revisionBusqueda.value = estadoCajaDen;
+            }
+
+            if (hiddenNum2) hiddenNum2.value = String(cantidadElementos);
+            if (hiddenNum3) hiddenNum3.value = String(estadoCajaId);
             if (hiddenTxt3) hiddenTxt3.value = estadoCajaDen;
             if (hiddenMem1) hiddenMem1.value = faltantesObservaciones;
             if (hiddenDti1) hiddenDti1.value = new Date().toISOString();
@@ -1808,4 +1813,32 @@
             }
         }
     });
+
+        if (btnAceptarRegistroControlArmado) {
+        btnAceptarRegistroControlArmado.addEventListener("click", function () {
+
+            // 🔹 leer valores del modal
+            const revision = parseInt(rcaAcajRev?.value || "1");
+            const cantidad = parseInt(rcaAcajCant?.value || "0");
+            const faltantes = (rcaAcajFalt?.value || "NO REGISTRADO");
+
+            // 🔹 actualizar el form principal (CLAVE)
+            if (revisionSelect) {
+                revisionSelect.value = revision;
+            }
+
+            if (hiddenNum2) hiddenNum2.value = cantidad;
+            if (hiddenMem1) hiddenMem1.value = faltantes;
+
+            // 🔹 actualizar lo visual (esto es lo que te falta)
+            if (revisionBusqueda) {
+                if (revision === 2) revisionBusqueda.value = "COMPLETO";
+                else if (revision === 3) revisionBusqueda.value = "INCOMPLETO";
+                else revisionBusqueda.value = "NO REGISTRA";
+            }
+
+            // 🔹 cerrar modal
+            modalRegistroControlArmado.hide();
+        });
+    }
 </script>

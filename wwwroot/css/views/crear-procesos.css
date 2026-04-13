@@ -493,3 +493,15 @@
             flex: 1 1 46%;
         }
 }
+
+.proceso-diagram .node.activo {
+    background-color: #198754;
+    color: #fff;
+    border: 2px solid #198754;
+}
+
+.proceso-diagram .proceso-bd.activo {
+    background-color: #198754;
+    color: #fff;
+    border: 2px solid #198754;
+}

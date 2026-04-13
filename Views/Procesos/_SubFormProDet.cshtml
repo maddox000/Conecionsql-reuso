@@ -191,7 +191,7 @@
                                 <th>Cantidad</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tablaControlesProceso">
                             <tr>
                                 <td></td>
                                 <td>1</td>
@@ -555,14 +555,37 @@
             body: JSON.stringify(datos)
         })
         .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                alert(data.mensaje || "Control guardado correctamente.");
-                cerrarModalControlProceso();
-            } else {
-                alert(data.mensaje || "Error al guardar el control.");
+    .then(async data => {
+        if (data.success) {
+            cerrarModalControlProceso();
+
+            const tbProId = document.getElementById("tbProId").value;
+
+            const response = await fetch(`/TbProControl/ObtenerControlesPorProceso?tbProId=${tbProId}`);
+            const json = await response.json();
+
+            const tbody = document.getElementById("tablaControlesProceso");
+
+            if (!json.success || !json.data || json.data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4">Sin controles cargados</td>
+                    </tr>`;
+                return;
             }
-        })
+
+            tbody.innerHTML = json.data.map(x => `
+                <tr>
+                    <td>${x.tbProPteDen ?? ""}</td>
+                    <td>${x.tbProPteIde ?? ""}</td>
+                    <td>${x.tbProDetTesUbiDen ?? ""}</td>
+                    <td>${x.tbProPteCant ?? ""}</td>
+                </tr>
+            `).join("");
+        } else {
+            alert(data.mensaje || "Error al guardar el control.");
+        }
+    })
         .catch(() => {
             alert("Error inesperado al guardar el control.");
         });
@@ -681,6 +704,10 @@
             })
             .catch(err => console.error("Error:", err));
     }
-
+   
     });
+
+    
+
+        
 </script>
