@@ -1,7 +1,7 @@
 ﻿@model ConexionSql.Models.Procesos.TbProDetFormDto
 
 <div class="subform-proceso mt-4">
-    <h4>➕ Agregar Detalle desde Etiqueta</h4>
+    
 
     <link rel="stylesheet" href="~/css/views/crear-procesos.css" asp-append-version="true" />
 
@@ -193,10 +193,7 @@
                         </thead>
                         <tbody id="tablaControlesProceso">
                             <tr>
-                                <td></td>
-                                <td>1</td>
-                                <td></td>
-                                <td>1</td>
+                                <td colspan="4" class="proceso-table-empty-note">Sin controles cargados</td>
                             </tr>
                         </tbody>
                     </table>
@@ -238,7 +235,7 @@
         <div class="proceso-actions">
             <button type="button" class="btn btn-primary" onclick="window.location.reload()">Nuevo</button>
             <button type="button" class="btn btn-outline-primary" onclick="alert('Accion de demostracion')">Controles de proceso</button>
-            <button type="button" class="btn btn-outline-primary" onclick="alert('Accion de demostracion')">Editar</button>
+            <button type="button" class="btn btn-outline-primary" id="btnEditarProceso">Editar</button>
             <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cerrar</button>
         </div>
     </div>
@@ -329,7 +326,6 @@
 <form id="formProcesoPrintLabel" method="post" action="@Url.Action("ImprimirEtiqueta", "Home")" class="d-none">
     <input type="hidden" name="codigoEtiqueta" id="procesoEtiquetaCodigo" />
 </form>
-
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const inputEtiqueta = document.getElementById("tbRecDetId");
@@ -356,7 +352,17 @@
         let stockDisponible = 0;
         let selectedEtiqueta = "";
 
-        function abrirModalControlProceso(posicion = null) {
+            function abrirModalControlProceso(posicion = null) {
+        if (posicion !== null && posicion !== "") {
+            const nodo = document.querySelector(`.js-camara-node[data-ubicacion="${posicion}"]`);
+            const bloqueado = nodo?.getAttribute("data-bloqueado") === "1";
+
+            if (bloqueado) {
+                alert("Esa ubicación ya tiene un control cargado.");
+                return;
+            }
+        }
+
         const modal = document.getElementById("modalControlProceso");
         if (!modal) return;
 
@@ -373,13 +379,14 @@
         } else {
             document.getElementById("ubicacionOriginal").value = "";
         }
-            // 🔥 FOCO AUTOMÁTICO
+
+        // 🔥 FOCO AUTOMÁTICO
         setTimeout(() => {
-        const tipoControl = document.getElementById("tipoControl");
-        if (tipoControl) {
-            tipoControl.focus();
-        }
-    }, 100);
+            const tipoControl = document.getElementById("tipoControl");
+            if (tipoControl) {
+                tipoControl.focus();
+            }
+        }, 100);
     }
 
         function cerrarModalControlProceso() {
@@ -515,6 +522,43 @@
                 .catch(() => mostrarError("❌ Error inesperado."));
         }
 
+        //Carga los controles
+
+                async function cargarControlesProceso() {
+        const tbProId = parseInt(document.getElementById("tbProId")?.value) || 0;
+        const tbody = document.getElementById("tablaControlesProceso");
+
+        if (!tbProId || !tbody) return;
+
+        try {
+            const response = await fetch(`/TbProControl/ObtenerControlesPorProceso?tbProId=${tbProId}`);
+            const json = await response.json();
+
+            if (!json.success || !json.data || json.data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="proceso-table-empty-note">Sin controles cargados</td>
+                    </tr>`;
+                actualizarEstadoNodosControles([]);
+                return;
+            }
+
+            tbody.innerHTML = json.data.map(x => `
+                <tr>
+                    <td>${x.tbProPteDen ?? ""}</td>
+                    <td>${x.tbProPteIde ?? ""}</td>
+                    <td>${x.tbProDetTesUbiDen ?? ""}</td>
+                    <td>${x.tbProPteCant ?? ""}</td>
+                </tr>
+            `).join("");
+
+            console.log("CONTROLES PARA BLOQUEAR:", json.data);
+            actualizarEstadoNodosControles(json.data);
+        } catch (error) {
+            console.error("Error al cargar controles:", error);
+        }
+    }
+
             function guardarControlProceso() {
         const tbProId = parseInt(document.getElementById("tbProId")?.value) || 0;
         const tipoControl = parseInt(document.getElementById("tipoControl")?.value) || 0;
@@ -555,37 +599,14 @@
             body: JSON.stringify(datos)
         })
         .then(res => res.json())
-    .then(async data => {
-        if (data.success) {
-            cerrarModalControlProceso();
-
-            const tbProId = document.getElementById("tbProId").value;
-
-            const response = await fetch(`/TbProControl/ObtenerControlesPorProceso?tbProId=${tbProId}`);
-            const json = await response.json();
-
-            const tbody = document.getElementById("tablaControlesProceso");
-
-            if (!json.success || !json.data || json.data.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="4">Sin controles cargados</td>
-                    </tr>`;
-                return;
+        .then(async data => {
+            if (data.success) {
+                cerrarModalControlProceso();
+                await cargarControlesProceso();
+            } else {
+                alert(data.mensaje || "Error al guardar el control.");
             }
-
-            tbody.innerHTML = json.data.map(x => `
-                <tr>
-                    <td>${x.tbProPteDen ?? ""}</td>
-                    <td>${x.tbProPteIde ?? ""}</td>
-                    <td>${x.tbProDetTesUbiDen ?? ""}</td>
-                    <td>${x.tbProPteCant ?? ""}</td>
-                </tr>
-            `).join("");
-        } else {
-            alert(data.mensaje || "Error al guardar el control.");
-        }
-    })
+        })
         .catch(() => {
             alert("Error inesperado al guardar el control.");
         });
@@ -682,10 +703,10 @@
                         .catch(err => console.error("Error:", err));
                 }
 
-                   function cargarUbicacionesControl(posicionSeleccionada = null) {
-        fetch('/TbProDet/ObtenerUbicacionesControl')
-            .then(res => res.json())
-            .then(data => {
+            function cargarUbicacionesControl(posicionSeleccionada = null) {
+                fetch('/TbProDet/ObtenerUbicacionesControl')
+                .then(res => res.json())
+                .then(data => {
                 const combo = document.getElementById("ubicacion");
                 if (!combo) return;
 
@@ -704,10 +725,47 @@
             })
             .catch(err => console.error("Error:", err));
     }
-   
+        cargarControlesProceso();
     });
 
-    
+            function actualizarEstadoNodosControles(controles) {
+        document.querySelectorAll(".js-camara-node").forEach(nodo => {
+            nodo.classList.remove("activo");
+            nodo.removeAttribute("data-bloqueado");
 
+            const circulo = nodo.querySelector("circle");
+            if (circulo) {
+                circulo.setAttribute("fill", "transparent");
+                circulo.setAttribute("stroke", "#1f2937");
+            }
+        });
+
+        controles.forEach(x => {
+            const ubicacion = String(x.tbProDetTesUbiDen ?? "").trim();
+            if (!ubicacion) return;
+
+            const nodo = document.querySelector(`.js-camara-node[data-ubicacion="${ubicacion}"]`);
+            if (nodo) {
+                nodo.classList.add("activo");
+                nodo.setAttribute("data-bloqueado", "1");
+
+                const circulo = nodo.querySelector("circle");
+                if (circulo) {
+                    circulo.setAttribute("fill", "#2563eb");
+                    circulo.setAttribute("stroke", "#2563eb");
+                }
+            }
+        });
+    }
+        document.getElementById("btnEditarProceso")?.addEventListener("click", function () {
+        const tbProId = document.getElementById("tbProId")?.value;
+
+        if (!tbProId || tbProId === "0") {
+            alert("No hay proceso para editar.");
+            return;
+        }
+
+        window.location.href = `/TbProDet/SubFormulario/${tbProId}`;
+    });
         
 </script>

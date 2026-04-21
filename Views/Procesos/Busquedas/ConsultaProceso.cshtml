@@ -1,0 +1,528 @@
+﻿@model ConexionSql.Models.Procesos.TbProDetFormDto
+
+<div class="subform-proceso mt-4">
+
+    <link rel="stylesheet" href="~/css/views/crear-procesos.css" asp-append-version="true" />
+
+    <div class="bx-card proceso-demo mt-3">
+        <div class="proceso-banner">Proceso de Esterilizacion</div>
+
+        <div class="proceso-grid">
+            <div class="proceso-panel">
+                <div class="proceso-kv">
+                    <div class="k">Numero de proceso</div>
+                    <div class="v">@Model.Cabecera.TbProId</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Usuario</div>
+                    <div class="v">@Model.Cabecera.TbProPerNom</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Cargo</div>
+                    <div class="v">-</div>
+                </div>
+
+                <div class="proceso-title">Datos del proceso</div>
+
+                <div class="proceso-kv">
+                    <div class="k">Tipo de proceso</div>
+                    <div class="v">@Model.Cabecera.TbProPtiDen</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Estado del ciclo</div>
+                    <div class="v" id="panelEstadoCiclo">@Model.Cabecera.IbProEstDen</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Tipo de ciclo</div>
+                    <div class="v">@Model.Cabecera.TbProTciDen</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Numero de proceso</div>
+                    <div class="v">@Model.Cabecera.TbProId</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Unidades procesadas</div>
+                    <div class="v">0</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Volumen procesado</div>
+                    <div class="v">0</div>
+                </div>
+            </div>
+
+            <div class="proceso-panel">
+                <div class="proceso-kv">
+                    <div class="k">Fecha</div>
+                    <div class="v">
+                        @Model.Cabecera.TbProFec?.ToString("yyyy-MM-dd")
+                        @Model.Cabecera.TbProHorIni?.ToString(@"hh\:mm")
+                    </div>
+                </div>
+
+                <div class="proceso-title proceso-title-offset">Datos del equipo</div>
+
+                <div class="proceso-kv">
+                    <div class="k">Marca</div>
+                    <div class="v">@Model.Cabecera.TbProEquDen</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Numero de serie</div>
+                    <div class="v">@Model.Cabecera.TbProEquId</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Modelo</div>
+                    <div class="v">@Model.Cabecera.TbProEquDen</div>
+                </div>
+
+                <div class="proceso-kv">
+                    <div class="k">Numero de equipo</div>
+                    <div class="v">@Model.Cabecera.TbProEquId</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="proceso-observ">
+            <div class="k proceso-observ-label">Observaciones</div>
+            <textarea readonly>NO REGISTRA</textarea>
+        </div>
+
+        <div class="proceso-tabs" role="tablist" aria-label="Secciones del proceso">
+            <button type="button" class="proceso-tab is-active" data-tab-target="proceso-tab-materiales">Materiales procesados</button>
+            <button type="button" class="proceso-tab" data-tab-target="proceso-tab-cancelados">Materiales cancelados</button>
+            <button type="button" class="proceso-tab" data-tab-target="proceso-tab-controles">Controles de proceso</button>
+        </div>
+
+        <div id="proceso-tab-materiales" class="proceso-tab-panel is-active">
+            <input type="hidden" id="tbProId" value="@Model.Cabecera.TbProId" />
+
+            <div class="proceso-materiales-wrap mt-3">
+                <div id="detalleTabla">
+                    @await Html.PartialAsync("~/Views/Procesos/_DetalleTabla.cshtml", Model.Detalles)
+                </div>
+            </div>
+        </div>
+
+        <div id="proceso-tab-cancelados" class="proceso-tab-panel">
+            <div class="proceso-materiales-wrap">
+                <table class="proceso-table">
+                    <thead>
+                        <tr>
+                            <th>Codigo etiqueta</th>
+                            <th>Denominacion</th>
+                            <th>Sector</th>
+                            <th>Codigo reuso</th>
+                            <th>Recibidos</th>
+                            <th>En proceso</th>
+                            <th>Sin procesar</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="8" class="proceso-table-empty-note">Sin materiales cancelados</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="proceso-tab-controles" class="proceso-tab-panel">
+            <div class="proceso-work">
+                <div>
+                    <table class="proceso-mini-table">
+                        <thead>
+                            <tr>
+                                <th>Tipo de control</th>
+                                <th>Identificacion</th>
+                                <th>Ubicacion</th>
+                                <th>Cantidad</th>
+                                <th>Resultado</th>
+                                <th>Editar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaControlesProceso">
+                            <tr>
+                                <td colspan="6" class="proceso-table-empty-note">Sin controles cargados</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="proceso-diagram" aria-label="Mapa de camara">
+                    <svg viewBox="0 0 290 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <line x1="50" y1="13" x2="210" y2="13" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="50" y1="13" x2="50" y2="66" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="210" y1="13" x2="210" y2="66" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="50" y1="66" x2="210" y2="66" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="82" y1="34" x2="242" y2="34" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="82" y1="34" x2="82" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="242" y1="34" x2="242" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="82" y1="94" x2="242" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="50" y1="13" x2="82" y2="34" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="210" y1="13" x2="242" y2="34" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="50" y1="66" x2="82" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="210" y1="66" x2="242" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                    </svg>
+
+                    <div class="node proceso-node-1 js-camara-node" data-ubicacion="1">1</div>
+                    <div class="node proceso-node-2 js-camara-node" data-ubicacion="2">2</div>
+                    <div class="node proceso-node-3 js-camara-node" data-ubicacion="3">3</div>
+                    <div class="node proceso-node-4 js-camara-node" data-ubicacion="4">4</div>
+                    <div class="node proceso-node-5 js-camara-node" data-ubicacion="5">5</div>
+                    <div class="node proceso-node-6 js-camara-node" data-ubicacion="6">6</div>
+                    <div class="node proceso-node-7 js-camara-node" data-ubicacion="7">7</div>
+                    <div class="node proceso-node-8 js-camara-node" data-ubicacion="8">8</div>
+                    <div class="node proceso-node-9 js-camara-node" data-ubicacion="9">9</div>
+
+                    <div class="node proceso-bd js-camara-node" data-ubicacion="28">BD</div>
+                    <div class="proceso-door-label proceso-door-label-left">Puerta de carga</div>
+                    <div class="proceso-door-label proceso-door-label-right">Puerta de descarga</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="proceso-actions">
+            <button type="button" class="btn btn-primary" onclick="window.location.reload()">Nuevo</button>
+            <button type="button" class="btn btn-outline-primary" onclick="alert('Accion de demostracion')">Controles de proceso</button>
+            <button type="button" class="btn btn-outline-primary" id="btnEditarProceso">Editar</button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='/Home/Index'">Cerrar</button>
+        </div>
+    </div>
+</div>
+@await Html.PartialAsync("~/Views/Procesos/Modals/_ModalReproceso.cshtml")
+<div class="modal fade" id="procesoPrinterTypeModal" tabindex="-1" aria-labelledby="procesoPrinterTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-primary" style="max-width:420px;">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="procesoPrinterTypeModalLabel">Seleccione el tipo de impresión</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p id="procesoPrinterRowInfo" class="mb-2 small text-muted">Etiqueta seleccionada: -</p>
+                <div class="d-flex gap-2 justify-content-end">
+                    <button type="button" class="btn btn-primary" id="btnProcesoPrintDocument">Impresora</button>
+                    <button type="button" class="btn btn-outline-primary" id="btnProcesoPrintLabel">Etiqueta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="formProcesoPrintLabel" method="post" action="@Url.Action("ImprimirEtiqueta", "Home")" class="d-none">
+    <input type="hidden" name="codigoEtiqueta" id="procesoEtiquetaCodigo" />
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const btnPrintDocument = document.getElementById('btnProcesoPrintDocument');
+        const btnPrintLabel = document.getElementById('btnProcesoPrintLabel');
+        const labelForm = document.getElementById('formProcesoPrintLabel');
+        const labelCodeInput = document.getElementById('procesoEtiquetaCodigo');
+        const printerRowInfo = document.getElementById('procesoPrinterRowInfo');
+        const modalEl = document.getElementById('procesoPrinterTypeModal');
+        const printerTypeModal = modalEl ? new bootstrap.Modal(modalEl) : null;
+
+        let selectedEtiqueta = "";
+
+        function setSelectedEtiqueta(codigoEtiqueta) {
+            selectedEtiqueta = codigoEtiqueta || '';
+            if (labelCodeInput) {
+                labelCodeInput.value = selectedEtiqueta;
+            }
+            if (printerRowInfo) {
+                printerRowInfo.textContent = `Etiqueta seleccionada: ${selectedEtiqueta || '-'}`;
+            }
+        }
+
+        async function cargarControlesProceso() {
+            const tbProId = parseInt(document.getElementById("tbProId")?.value) || 0;
+            const tbody = document.getElementById("tablaControlesProceso");
+
+            if (!tbProId || !tbody) return;
+
+            try {
+                const response = await fetch(`/TbProControl/ObtenerControlesPorProceso?tbProId=${tbProId}`);
+                const json = await response.json();
+
+                if (!json.success || !json.data || json.data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="proceso-table-empty-note">Sin controles cargados</td>
+                        </tr>`;
+                    actualizarEstadoNodosControles([]);
+                    return;
+                }
+
+                        tbody.innerHTML = json.data.map(x => `
+                        <tr>
+                            <td>${x.tbProPteDen ?? ""}</td>
+                            <td>${x.tbProPteIde ?? ""}</td>
+                            <td>${x.tbProDetTesUbiDen ?? x.tbProDetTesUbiId ?? ""}</td>
+                            <td>${x.tbProPteCant ?? ""}</td>
+
+                            <!-- RESULTADO -->
+                                <td class="resultado-valor" data-id="${x.tbProDetPteId}">
+                                    ${x.tbProPteResDen ?? ""}
+                                </td>
+
+                            <!-- COMBO -->
+                            <td>
+                                <select class="form-select form-select-sm combo-resultado d-none"
+                                        data-id="${x.tbProDetPteId}">
+                                    <option value="">Seleccione...</option>
+                                    ${listaResultados.map(r => `
+                                        <option value="${r.tB_PRO_PTE_RES_ID}"
+                                            ${r.tB_PRO_PTE_RES_ID == x.tbProPteResId ? "selected" : ""}>
+                                            ${r.tB_PRO_PTE_RES_DEN}
+                                        </option>
+                                    `).join("")}
+                                </select>
+                            </td>
+                        </tr>
+                    `).join("");
+                //mostrarCombosResultado();
+                actualizarEstadoNodosControles(json.data);
+            } catch (error) {
+                console.error("Error al cargar controles:", error);
+            }
+        }
+
+
+
+            function mostrarCombosResultado() {
+                document.querySelectorAll(".combo-resultado").forEach(select => {
+                    select.classList.remove("d-none");
+                });
+            }
+
+            // document.getElementById("btnEditarProceso")?.addEventListener("click", async function () {
+            //     console.log("CLICK EDITAR");
+
+            //     await cargarResultados();
+            //     await cargarControlesProceso();
+
+            //     document.querySelectorAll(".combo-resultado").forEach(x => {
+            //         x.classList.remove("d-none");
+            //         x.style.display = "block";
+            //     });
+            // });
+
+        const tabs = document.querySelectorAll('.proceso-tab[data-tab-target]');
+        const panels = document.querySelectorAll('.proceso-tab-panel');
+
+        tabs.forEach(function (tab) {
+            tab.addEventListener('click', async function () {
+                const targetId = tab.getAttribute('data-tab-target');
+
+                tabs.forEach(function (t) { t.classList.remove('is-active'); });
+                panels.forEach(function (p) { p.classList.remove('is-active'); });
+
+                tab.classList.add('is-active');
+                const panel = document.getElementById(targetId);
+                if (panel) {
+                    panel.classList.add('is-active');
+                }
+
+                if (targetId === "proceso-tab-controles") {
+                    await cargarResultados();
+                    await cargarControlesProceso();
+
+                    if (sessionStorage.getItem("editarProceso") === "1") {
+                        document.querySelectorAll(".combo-resultado").forEach(x => {
+                            x.classList.remove("d-none");
+                            x.style.display = "block";
+                        });
+                    }
+                }
+            });
+        });
+
+        document.addEventListener('click', function (event) {
+            const btnPdfRow = event.target.closest('.js-pro-row-print-pdf');
+            if (btnPdfRow) {
+                setSelectedEtiqueta(btnPdfRow.getAttribute('data-etiqueta'));
+                window.print();
+                return;
+            }
+
+            const btnPrinterRow = event.target.closest('.js-pro-row-print-printer');
+            if (btnPrinterRow) {
+                setSelectedEtiqueta(btnPrinterRow.getAttribute('data-etiqueta'));
+                if (printerTypeModal) {
+                    printerTypeModal.show();
+                }
+            }
+        });
+
+        if (btnPrintDocument) {
+            btnPrintDocument.addEventListener('click', function () {
+                if (printerTypeModal) {
+                    printerTypeModal.hide();
+                }
+                window.print();
+            });
+        }
+
+        if (btnPrintLabel) {
+            btnPrintLabel.addEventListener('click', function () {
+                if (printerTypeModal) {
+                    printerTypeModal.hide();
+                }
+                if (labelForm) {
+                    labelForm.submit();
+                }
+            });
+        }
+
+
+
+        // ACA VA LA RUTA DE LA VISTA NUEVA
+        // window.location.href = `/Procesos/ConsultaProceso/${tbProId}`;
+
+            cargarControlesProceso().then(() => {
+        if (sessionStorage.getItem("editarProceso") === "1") {
+            document.querySelectorAll(".combo-resultado").forEach(x => {
+                x.classList.remove("d-none");
+                x.style.display = "block";
+            });
+
+            //sessionStorage.removeItem("editarProceso");
+        }
+    });
+});
+
+    function actualizarEstadoNodosControles(controles) {
+        document.querySelectorAll(".js-camara-node").forEach(nodo => {
+            nodo.classList.remove("activo");
+            nodo.removeAttribute("data-bloqueado");
+            nodo.style.backgroundColor = "";
+            nodo.style.borderColor = "";
+            nodo.style.color = "";
+        });
+
+        controles.forEach(x => {
+            const ubicacion = String(
+                x.tbProDetTesUbiId ??
+                x.tbProDetTesUbiDen ??
+                ""
+            ).trim();
+
+            if (!ubicacion) return;
+
+            const nodo = document.querySelector(`.js-camara-node[data-ubicacion="${ubicacion}"]`);
+            if (nodo) {
+                nodo.classList.add("activo");
+                nodo.setAttribute("data-bloqueado", "1");
+                nodo.style.backgroundColor = "#2563eb";
+                nodo.style.borderColor = "#2563eb";
+                nodo.style.color = "#ffffff";
+            }
+        });
+    }
+
+        let listaResultados = [];
+
+    async function cargarResultados() {
+        try {
+            const url = '@Url.Action("ObtenerResultados", "TbProBusqueda")';
+
+            const response = await fetch(url);
+            const json = await response.json();
+
+            if (json.success) {
+                listaResultados = json.data;
+                console.log("Resultados cargados:", listaResultados);
+                console.log(listaResultados[0]);
+            }
+        } catch (error) {
+            console.error("Error al cargar resultados:", error);
+        }
+
+    }
+
+
+        document.addEventListener("change", async function (e) {
+
+        if (!e.target.classList.contains("combo-resultado")) return;
+
+        const select = e.target;
+
+        const tbProDetPteId = select.dataset.id;
+        const tbProPteResId = select.value;
+        const tbProPteResDen = select.options[select.selectedIndex].text;
+
+        if (!tbProPteResId) return;
+
+        try {
+            const response = await fetch('@Url.Action("ActualizarResultadoControl", "TbProBusqueda")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    TB_PRO_DET_PTE_ID: parseInt(tbProDetPteId),
+                    TB_PRO_PTE_RES_ID: parseInt(tbProPteResId),
+                    TB_PRO_PTE_RES_DEN: tbProPteResDen
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Error HTTP " + response.status);
+            }
+
+            const json = await response.json();
+
+            if (!json.success) {
+                alert(json.mensaje);
+            } else {
+
+             if (json.dispararReproceso) {
+                        const modal = document.getElementById("modalReproceso");
+                        if (!modal) return;
+
+                        const txtMensaje = document.getElementById("txtMensajeReproceso");
+                        if (txtMensaje) {
+                            txtMensaje.value = json.mensajeReproceso || "";
+                        }
+
+                        modal.style.display = "flex";
+                    }
+
+                // 👉 actualizar estado del ciclo
+                document.getElementById("panelEstadoCiclo").textContent = json.estadoDen;
+
+                // 👉 actualizar texto de la fila
+                // const span = document.querySelector(`.resultado-texto[data-id='${tbProDetPteId}']`);
+                // if (span) span.textContent = tbProPteResDen;
+
+                // 👉 ocultar combos si finaliza
+                // if (json.estadoDen === "FINALIZADO") {
+                //     document.querySelectorAll(".combo-resultado").forEach(c => c.classList.add("d-none"));
+                //     document.querySelectorAll(".resultado-texto").forEach(t => t.classList.remove("d-none"));
+                // }
+            const celdaResultado = document.querySelector(`.resultado-valor[data-id='${tbProDetPteId}']`);
+                if (celdaResultado) {
+                    celdaResultado.textContent = tbProPteResDen;
+                }
+
+            } 
+
+            //aca pongo?
+
+        } catch (error) {
+            console.error("Error al actualizar:", error);
+            alert("Error al actualizar el resultado del control.");
+        }
+    });
+
+
+</script>

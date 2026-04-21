@@ -39,6 +39,24 @@ document.getElementById('btnProcesos')?.addEventListener('click', function (e) {
     );
 });
 
+document.getElementById('btnEditarProceso')?.addEventListener('click', function (e) {
+    e.preventDefault();
+
+    const tbProId = document.getElementById('tbProId')?.value;
+
+    if (!tbProId || tbProId === "0") {
+        alert("No hay proceso para editar.");
+        return;
+    }
+
+    sessionStorage.setItem("editarProceso", "1");
+
+    const modal = new bootstrap.Modal(document.getElementById('loginTareasModal'));
+    modal.show();
+
+    localStorage.setItem("loginDestino", window.location.pathname + window.location.search);
+});
+
 // ==========================================
 // ENTREGA - 25
 // ==========================================

@@ -464,6 +464,8 @@
     let estadosBusqueda = [];
     let indiceEstado = -1;
 
+            const estadoDefaultId = @(ViewBag.EstadoDefaultId ?? "null");
+
     const estadosOriginales = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
                 Model.Estados.Select(x => new
                 {
@@ -472,7 +474,13 @@
                 }).ToList()
         ));
 
-    function seleccionarEstado(est) {
+        function seleccionarEstado(est) {
+        if (!est && typeof estadoDefaultId !== "undefined" && estadoDefaultId !== null) {
+            est = estadosOriginales.find(x => x.id == estadoDefaultId);
+        }
+
+        if (!est) return;
+
         estadoBusqueda.value = est.denominacion;
         estadoSelect.value = est.id;
 
@@ -485,6 +493,8 @@
             cantidadInput.select?.();
         }
     }
+
+    seleccionarEstado();
 
     function renderizarListaEstados() {
         if (!listaEstados) return;
@@ -509,14 +519,20 @@
         });
     }
 
-    if (estadoBusqueda && listaEstados) {
+            if (estadoBusqueda && listaEstados) {
 
         estadoBusqueda.addEventListener("click", function () {
-            if ((this.value || "").trim() !== "") return;
 
-            estadosBusqueda = [...estadosOriginales];
+            const texto = this.value.trim().toLowerCase();
+            estadosBusqueda = estadosOriginales.filter(e =>
+                (e.denominacion || "").toLowerCase().includes(texto)
+            );
+
             indiceEstado = -1;
+
             renderizarListaEstados();
+
+            listaEstados.style.display = "block"; // 🔥 clave
         });
 
         estadoBusqueda.addEventListener("input", function () {
@@ -527,13 +543,18 @@
             estadosBusqueda = [];
             indiceEstado = -1;
 
-            if (texto.length < 1) return;
+            if (texto.length < 1) {
+                listaEstados.style.display = "none"; // 🔥 clave
+                return;
+            }
 
             estadosBusqueda = estadosOriginales.filter(e =>
                 (e.denominacion || "").toLowerCase().includes(texto)
             );
 
             renderizarListaEstados();
+
+            listaEstados.style.display = "block"; // 🔥 clave
         });
 
         estadoBusqueda.addEventListener("keydown", function (e) {
@@ -543,7 +564,12 @@
 
                 if (!estadosBusqueda.length) return;
 
-                indiceEstado = (indiceEstado + 1) % estadosBusqueda.length;
+                if (indiceEstado < estadosBusqueda.length - 1) {
+                    indiceEstado++;
+                } else {
+                    indiceEstado = 0;
+                }
+
                 renderizarListaEstados();
             }
 
@@ -552,24 +578,32 @@
 
                 if (!estadosBusqueda.length) return;
 
-                indiceEstado = (indiceEstado - 1 + estadosBusqueda.length) % estadosBusqueda.length;
+                if (indiceEstado > 0) {
+                    indiceEstado--;
+                } else {
+                    indiceEstado = estadosBusqueda.length - 1;
+                }
+
                 renderizarListaEstados();
             }
 
             if (e.key === "Enter") {
                 e.preventDefault();
 
-                if (indiceEstado >= 0) {
+                if (indiceEstado >= 0 && indiceEstado < estadosBusqueda.length) {
                     seleccionarEstado(estadosBusqueda[indiceEstado]);
+                    listaEstados.style.display = "none"; // 🔥 clave
                     return;
                 }
 
                 if (estadosBusqueda.length === 1) {
                     seleccionarEstado(estadosBusqueda[0]);
+                    listaEstados.style.display = "none"; // 🔥 clave
                     return;
                 }
 
                 listaEstados.innerHTML = "";
+                listaEstados.style.display = "none"; // 🔥 clave
 
                 if (cantidadInput) {
                     cantidadInput.focus();

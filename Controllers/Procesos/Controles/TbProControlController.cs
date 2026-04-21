@@ -206,6 +206,7 @@ namespace ConexionSql.Controllers.Procesos.Controles
                     .OrderBy(x => x.TbProDetPteId)
                     .Select(x => new
                     {
+                        tbProDetPteId = x.TbProDetPteId,
                         tbProPteDen = x.TbProPteDen,
                         tbProPteIde = x.TbProPteIde,
                         tbProDetTesUbiDen = x.TbProDetTesUbiDen,

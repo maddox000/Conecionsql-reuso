@@ -1,0 +1,91 @@
+﻿<div id="modalReproceso" class="modal-overlay">
+    <div class="modal-box">
+
+        <!-- HEADER -->
+        <div class="modal-header">
+            Reproceso requerido
+        </div>
+
+        <!-- BODY -->
+        <div class="modal-body">
+            <div class="form-row">
+                <label>Mensaje</label>
+                <textarea id="txtMensajeReproceso"
+                          class="form-control"
+                          readonly></textarea>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="modal-footer">
+            <button type="button"
+                    class="btn btn-secondary"
+                    onclick="cerrarModalReproceso()">
+                Cancelar
+            </button>
+
+            <button type="button"
+                    class="btn btn-warning"
+                    id="btnAceptarReproceso">
+                Aceptar
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const btnAceptar = document.getElementById("btnAceptarReproceso");
+
+        if (!btnAceptar) return;
+
+        btnAceptar.addEventListener("click", function () {
+            try {
+                const tbProId = document.getElementById("tbProId")?.value;
+
+                ejecutarReproceso(tbProId);
+            } catch (error) {
+                console.error("ERROR EN CLICK REPROCESO:", error);
+            }
+        });
+
+    });
+
+        async function ejecutarReproceso(tbProId) {
+        try {
+            const response = await fetch('/TbProReproceso/EjecutarReproceso', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(parseInt(tbProId))
+            });
+
+            const json = await response.json();
+
+            console.log("RESPUESTA REPROCESO:", json);
+
+            if (json.success) {
+                cerrarModalReproceso();
+                alert(json.mensaje);
+
+                // opcional simple: refrescar
+                location.reload();
+            } else {
+                alert(json.mensaje);
+            }
+
+        } catch (error) {
+            console.error("ERROR EJECUTAR REPROCESO:", error);
+        }
+    }
+
+        function cerrarModalReproceso() {
+        const modal = document.getElementById("modalReproceso");
+        if (!modal) return;
+
+        modal.style.display = "none";
+    }
+</script>

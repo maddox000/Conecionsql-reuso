@@ -1121,6 +1121,8 @@ namespace ConexionSql.Controllers
 
                 string zplCompleto = null;
                 string zplIncompleto = null;
+                string zplPrioridad = null;
+                string zplReprocesado = null;
 
                 if (esCompleto)
                 {
@@ -1144,6 +1146,27 @@ namespace ConexionSql.Controllers
                         idDetalle: entidad.TbRecDetId,
                         cantidad: entidad.TbRecDetNum2 ?? 0,
                         detalleFaltante: entidad.TbRecDetMem1 ?? ""
+                    );
+                }
+
+                if (detalle.TB_REC_DET_REP_ID == 5)
+                {
+                    zplPrioridad = Etiquetas.RecepcionDetallePrioridadProceso(
+                        tbRec.TbRecSecDesDen,
+                        material.IB_MAT_DEN,
+                        tbRec.TbRecFec ?? DateTime.Now,
+                        tbRec.TbRecId,
+                        entidad.TbRecDetId
+                    );
+                }
+                if (detalle.TB_REC_DET_REP_ID == 10)
+                {
+                    zplReprocesado = Etiquetas.RecepcionDetalleReprocesadoSinUso(
+                        tbRec.TbRecSecDesDen,
+                        material.IB_MAT_DEN,
+                        tbRec.TbRecFec ?? DateTime.Now,
+                        tbRec.TbRecId,
+                        entidad.TbRecDetId
                     );
                 }
 
@@ -1187,8 +1210,19 @@ namespace ConexionSql.Controllers
                     {
                         ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zplIncompleto);
                     }
-                }
 
+                    // 🔹 si es PRIORIDAD DE PROCESO, imprime adicional
+                    if (detalle.TB_REC_DET_REP_ID == 5 && zplPrioridad != null)
+                    {
+                        ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zplPrioridad);
+                    }
+
+                    // 🔹 si es MATERIAL REPROCESADO SIN USO, imprime adicional
+                    if (detalle.TB_REC_DET_REP_ID == 10 && zplReprocesado != null)
+                    {
+                        ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zplReprocesado);
+                    }
+                }
                 var lista = await _context.TbRecDet
                     .Where(d => d.TbRecId == detalle.TB_REC_ID)
                     .Select(d => new TbRecDetDto

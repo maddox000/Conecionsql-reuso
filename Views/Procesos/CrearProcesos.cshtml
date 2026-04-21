@@ -694,47 +694,6 @@
             
         });
 
-                async function cargarControlesProceso() {
-            const tbProId = document.getElementById("panelNumeroProceso")?.textContent?.trim();
-
-            if (!tbProId || tbProId === "0") return;
-
-            try {
-                const response = await fetch(`/TbProControl/ObtenerPorProceso?tbProId=${tbProId}`);
-                const data = await response.json();
-
-                const tbody = document.getElementById("tablaControlesProceso");
-                if (!tbody) return;
-
-                if (!data || data.length === 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="4" class="proceso-table-empty-note">Sin controles cargados</td>
-                        </tr>`;
-                    limpiarNodosControl();
-                    return;
-                }
-
-                tbody.innerHTML = data.map(x => `
-                    <tr>
-                        <td>${x.tipoControl ?? ""}</td>
-                        <td>${x.identificacion ?? ""}</td>
-                        <td>${x.ubicacion ?? ""}</td>
-                        <td>${x.cantidad ?? ""}</td>
-                    </tr>
-                `).join("");
-
-                limpiarNodosControl();
-
-                data.forEach(x => {
-                    if (x.ubicacion) {
-                        marcarNodo(x.ubicacion);
-                    }
-                });
-            }
-            catch (error) {
-                console.error("Error al cargar controles:", error);
-            }
-        }
+            
     </script>
 }

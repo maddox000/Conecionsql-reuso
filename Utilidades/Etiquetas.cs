@@ -178,9 +178,9 @@ namespace ConexionSql.Utilidades
                 // =============================
                 // 🟦 RECUADRO COMPLETO (CORREGIDO)
                 // =============================
-                "^FO20,150^GB400,50,2^FS\n" +   // 🔹 más alto (antes 28 → ahora 50)
-                "^CF0,30\n" +                   // 🔹 texto más grande (antes 22)
-                "^FO60,165^FDCONTENIDO COMPLETO^FS\n" +
+                "^FO20,150^GB440,40,40^FS\n" +   // 🔹 fondo negro (relleno)
+                "^CF0,26\n" +
+                "^FO30,158^FR^FDPRIORIDAD DE PROCESO^FS\n" +  // 🔹 texto blanco
 
                 // =============================
                 // 🟦 ID
@@ -198,13 +198,13 @@ namespace ConexionSql.Utilidades
         }
 
         public static string RecepcionDetalleIncompleto(
-    string sector,
-    string material,
-    DateTime fechaRecepcion,
-    int nroRecepcion,
-    int idDetalle,
-    int cantidad,
-    string detalleFaltante)
+        string sector,
+        string material,
+        DateTime fechaRecepcion,
+        int nroRecepcion,
+        int idDetalle,
+        int cantidad,
+        string detalleFaltante)
         {
             return
                 "^XA\n" +
@@ -274,5 +274,130 @@ namespace ConexionSql.Utilidades
 
                 "^XZ";
         }
+
+
+        public static string RecepcionDetallePrioridadProceso(
+        string sector,
+        string material,
+        DateTime fechaRecepcion,
+        int nroRecepcion,
+        int idDetalle)
+        {
+            return
+                "^XA\n" +
+
+                "^CI28\n" +
+                "^PW480\n" +
+                "^LL360\n" +
+
+                "^LH20,0\n" +
+
+                // =============================
+                // 🟦 CABECERA
+                // =============================
+                "^CF0,22\n" +
+
+                "^FO20,30^FDRecepcion^FS\n" +
+                $"^FO150,30^FD{nroRecepcion}^FS\n" +
+                $"^FO320,30^FD{fechaRecepcion:dd/MM/yyyy}^FS\n" +
+
+                // =============================
+                // 🟦 SECTOR
+                // =============================
+                "^CF0,22\n" +
+                $"^FO20,60^FDSector {sector}^FS\n" +
+
+                // =============================
+                // 🟦 MATERIAL
+                // =============================
+                "^CF0,24\n" +
+                $"^FO20,90^FD{material}^FS\n" +
+
+                // =============================
+                // 🟦 FRANJA NEGRA PRIORIDAD
+                // =============================
+                "^FO20,150^GB410,80,80^FS\n" +     // 🔴 relleno completo (alto=grosor)
+                "^CF0,40\n" +                      // 🔴 texto más grande
+                "^FO20,180^FB410,1,0,C^FR^FDPRIORIDAD DE PROCESO^FS\n"+
+
+                // =============================
+                // 🟦 ID
+                // =============================
+                "^CF0,20\n" +
+                $"^FO190,300^FD{idDetalle}^FS\n" +
+
+                // =============================
+                // 🟦 BARCODE
+                // =============================
+                "^BY3,2,55\n" +
+                $"^FO60,320^BCN,45,N,N,N^FD{idDetalle}^FS\n" +
+
+                "^XZ";
+        }
+
+        public static string RecepcionDetalleReprocesadoSinUso(
+        string sector,
+        string material,
+        DateTime fechaRecepcion,
+        int nroRecepcion,
+        int idDetalle)
+        {
+            return
+                "^XA\n" +
+
+                "^CI28\n" +
+                "^PW480\n" +
+                "^LL360\n" +
+
+                "^LH20,0\n" +
+
+                // =============================
+                // 🟦 CABECERA
+                // =============================
+                "^CF0,22\n" +
+
+                "^FO20,30^FDRecepcion^FS\n" +
+                $"^FO150,30^FD{nroRecepcion}^FS\n" +
+                $"^FO320,30^FD{fechaRecepcion:dd/MM/yyyy}^FS\n" +
+
+                // =============================
+                // 🟦 SECTOR
+                // =============================
+                "^CF0,22\n" +
+                $"^FO20,60^FDSector {sector}^FS\n" +
+
+                // =============================
+                // 🟦 MATERIAL
+                // =============================
+                "^CF0,24\n" +
+                $"^FO20,90^FD{material}^FS\n" +
+
+                // =============================
+                // 🟦 FRANJA NEGRA (DOBLE TEXTO)
+                // =============================
+                "^FO20,150^GB410,80,80^FS\n" +   // 🔴 fondo negro grande
+
+                "^CF0,35\n" +
+                "^FO20,160^FB410,1,0,C^FR^FDMATERIAL^FS\n" +  // 🔴 línea 1
+
+                "^CF0,35\n" +
+                "^FO25,195^FB410,1,0,C^FR^FDREPROCESADO SIN USO^FS\n" +  // 🔴 línea 2
+
+                // =============================
+                // 🟦 ID
+                // =============================
+                "^CF0,20\n" +
+                $"^FO190,300^FD{idDetalle}^FS\n" +
+
+                // =============================
+                // 🟦 BARCODE
+                // =============================
+                "^BY3,2,55\n" +
+                $"^FO60,320^BCN,45,N,N,N^FD{idDetalle}^FS\n" +
+
+                "^XZ";
+        }
     }
+
+
 }

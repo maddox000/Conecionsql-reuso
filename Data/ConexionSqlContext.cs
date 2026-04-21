@@ -13,6 +13,7 @@ using ConexionSql.Models.Reuso;
 using ConexionSql.Models.Reusos;
 using ConexionSql.Models.Sectores;
 using Microsoft.EntityFrameworkCore;
+using ConexionSql.Models.Procesos.Controles;
 
 
 namespace ConexionSql.Data
@@ -56,6 +57,7 @@ namespace ConexionSql.Data
         public DbSet<TbProPte> TbProPte { get; set; }
         public DbSet<TbProPteUbi> TbProPteUbi { get; set; }
         public DbSet<TbProDetPte> TbProDetPte { get; set; }
+        public DbSet<TbProPteRes> TbProPteRes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
