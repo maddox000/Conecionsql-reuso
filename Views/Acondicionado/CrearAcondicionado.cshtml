@@ -1,36 +1,156 @@
 ﻿@model ConexionSql.Models.Acondicionado.TbProAco
+@using ConexionSql.Models.IbPer
 
-<form asp-action="CrearAcondicionado" method="post">
+@{
+    ViewData["Title"] = "Acondicionado de materiales";
+    var dataUnavailable = (bool?)ViewBag.DataUnavailable ?? false;
+}
 
-    <div class="form-group mb-3">
-        <label>👤 Usuario</label>
-        <input type="text" class="form-control" value="@ViewBag.UsuarioLogueado" readonly />
+<link rel="stylesheet" href="~/css/views/crear-acondicionado.css" asp-append-version="true" />
+
+<div class="aco-demo">
+    <div class="aco-banner">Acondicionado de materiales</div>
+
+    <!-- Cabecera en dos columnas -->
+    <div class="aco-grid">
+        <!-- Panel izquierdo -->
+        <div class="aco-panel">
+            <div class="aco-kv">
+                <div class="aco-k">Número de proceso</div>
+                <div class="aco-v">0001</div>
+            </div>
+            <div class="aco-kv">
+                <div class="aco-k">Usuario</div>
+                <div class="aco-v">@ViewBag.UsuarioLogueado</div>
+            </div>
+            <div class="aco-kv">
+                <div class="aco-k">Cargo</div>
+                <div class="aco-v">ADMINISTRADOR</div>
+            </div>
+            <div class="aco-kv">
+                <div class="aco-k">Total unidades</div>
+                <div class="aco-v">0</div>
+            </div>
+        </div>
+
+        <!-- Panel derecho -->
+        <div class="aco-panel">
+            <div class="aco-kv">
+                <div class="aco-k">Fecha</div>
+                <div class="aco-v">@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</div>
+            </div>
+
+            <!-- Botón Guardar Cabecera -->
+            <form asp-action="CrearAcondicionado" method="post" id="formCrearAcondicionado">
+                <div class="aco-actions mt-2 text-end">
+                    <button type="submit" class="btn btn-success btn-sm">💾 Guardar Cabecera</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div class="form-group mb-3">
-        <label>⏱ Hora inicio</label>
-        <input asp-for="TbProAcoHorIni"
-               type="datetime-local"
-               class="form-control"
-               value="@(Model?.TbProAcoHorIni?.ToString("yyyy-MM-ddTHH:mm") ?? DateTime.Now.ToString("yyyy-MM-ddTHH:mm"))" />
+    <!-- Observaciones -->
+    <div class="aco-observ">
+        <div class="aco-k">Observaciones</div>
+        <textarea readonly></textarea>
     </div>
 
-    <div class="form-group mb-3">
-        <label>⏱ Hora fin</label>
-        <input asp-for="TbProAcoHorFin"
-               type="datetime-local"
-               class="form-control"
-               value="@(Model?.TbProAcoHorFin?.ToString("yyyy-MM-ddTHH:mm") ?? DateTime.Now.ToString("yyyy-MM-ddTHH:mm"))" />
+    <!-- Tablas -->
+    <div class="aco-tabbar">
+        <div class="aco-tab">Materiales registrados</div>
     </div>
 
-    <div class="form-group mb-3">
-        <label>📦 Cantidad</label>
-        <input asp-for="TbProAcoUpro" type="number" class="form-control" />
+    <div class="aco-table-wrap">
+        <div class="aco-table-head-title">Materiales acondicionados</div>
+        <table class="aco-table">
+            <thead>
+                <tr>
+                    <th>Codigo etiqueta</th>
+                    <th>Denominacion</th>
+                    <th>Sector</th>
+                    <th>Codigo reuso</th>
+                    <th>Tipo de envoltorio</th>
+                    <th>Verificación</th>
+                    <th>Recibidos</th>
+                    <th>En proceso</th>
+                    <th>Sin procesar</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="9"></td>
+                    <td>x</td>
+                </tr>
+                <tr class="aco-row-fill">
+                    <td colspan="10"></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
-    <button type="submit" class="btn btn-success">💾 Guardar Cabecera</button>
+    <div class="aco-table-wrap aco-table-wrap-auto">
+        <div class="aco-table-head-title">Registro de materiales</div>
+        <table class="aco-table">
+            <thead>
+                <tr>
+                    <th>Codigo etiqueta</th>
+                    <th>Denominacion</th>
+                    <th>Sector</th>
+                    <th>Codigo reuso</th>
+                    <th>Tipo de envoltorio</th>
+                    <th>Recibidos</th>
+                    <th>En proceso</th>
+                    <th>Sin procesar</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="7"></td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-</form>
+    <!-- Acciones -->
+    <div class="aco-actions">
+        <button type="submit" form="formCrearAcondicionado" class="btn btn-primary" @(dataUnavailable ? "disabled" : "")>Registrar</button>
+        <button type="button" class="btn btn-outline-primary" onclick="alert('Accion de demostracion')">Nuevo</button>
+        <button type="button" class="btn btn-outline-primary aco-icon-btn" id="btnAcoPdf" title="Imprimir en PDF" aria-label="Imprimir en PDF">
+            <i class="bi bi-file-earmark-pdf-fill"></i>
+        </button>
+        <button type="button" class="btn btn-outline-primary aco-icon-btn" id="btnAcoPrinter" title="Opciones de impresora" aria-label="Opciones de impresora">
+            <i class="bi bi-printer-fill"></i>
+        </button>
+        <button type="button" class="btn btn-outline-primary" onclick="alert('Accion de demostracion')">Editar</button>
+        <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cerrar</button>
+    </div>
+</div>
+
+
+<!-- Modal impresión -->
+<div class="modal fade" id="acoPrinterTypeModal" tabindex="-1" aria-labelledby="acoPrinterTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-primary" style="max-width:420px;">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="acoPrinterTypeModalLabel">Seleccione el tipo de impresión</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex gap-2 justify-content-end">
+                    <button type="button" class="btn btn-primary" id="btnAcoPrintDocument">Impresora</button>
+                    <button type="button" class="btn btn-outline-primary" id="btnAcoPrintLabel">Etiqueta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="formAcoPrintLabel" method="post" action="@Url.Action("ImprimirEtiqueta", "Home")" class="d-none"></form>
+
 
 @section Scripts {
     @{
@@ -41,5 +161,42 @@
         window.addEventListener("beforeunload", function () {
             localStorage.removeItem("modulo_135_abierto");
         });
+
+        (function () {
+            const btnPdf = document.getElementById('btnAcoPdf');
+            const btnPrinter = document.getElementById('btnAcoPrinter');
+            const btnPrintDocument = document.getElementById('btnAcoPrintDocument');
+            const btnPrintLabel = document.getElementById('btnAcoPrintLabel');
+            const labelForm = document.getElementById('formAcoPrintLabel');
+            const printerTypeModal = new bootstrap.Modal(document.getElementById('acoPrinterTypeModal'));
+
+            if (btnPdf) {
+                btnPdf.addEventListener('click', function () {
+                    window.print();
+                });
+            }
+
+            if (btnPrinter) {
+                btnPrinter.addEventListener('click', function () {
+                    printerTypeModal.show();
+                });
+            }
+
+            if (btnPrintDocument) {
+                btnPrintDocument.addEventListener('click', function () {
+                    printerTypeModal.hide();
+                    window.print();
+                });
+            }
+
+            if (btnPrintLabel) {
+                btnPrintLabel.addEventListener('click', function () {
+                    printerTypeModal.hide();
+                    if (labelForm) {
+                        labelForm.submit();
+                    }
+                });
+            }
+        })();
     </script>
 }

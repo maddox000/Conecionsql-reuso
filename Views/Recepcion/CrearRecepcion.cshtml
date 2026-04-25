@@ -7,89 +7,242 @@
     ViewData["Title"] = "Nueva Recepción";
     var listaSectores = ViewBag.ListaSectores as List<IbSec>;
     var subFormModel = ViewBag.SubFormularioDetalle as TbRecDetFormDto;
+
+    var numeroRecepcion = Model != null && Model.TbRecId > 0 ? Model.TbRecId.ToString() : "Pendiente";
+    var fechaRecepcion = Model?.TbRecFec?.ToString("dd/MM/yyyy") ?? DateTime.Now.ToString("dd/MM/yyyy");
+    var horaRecepcion = Model?.TbRecHorIni?.ToString("HH:mm") ?? DateTime.Now.ToString("HH:mm");
+    var sectorOrigenTexto = listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecOriId)?.IbSecDen ?? "";
+    var sectorDestinoTexto = listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecDesId)?.IbSecDen ?? "";
+    var usuarioLogueado = ViewBag.UsuarioLogueado ?? "NO REGISTRADO";
+    var totalRecibido = Model?.TbRecCantTot ?? 0;
 }
 
-<h2>Nueva Recepción</h2>
+<link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
 
-<form asp-action="CrearRecepcion" method="post">
-    @Html.AntiForgeryToken()
+<div class="bx-card rec-screen">
+    <div class="rec-screen-banner">Recepcion de materiales</div>
 
-    <!-- 🔹 FILA SUPERIOR: NÚMERO + FECHA + HORA -->
-    <div class="row mb-3">
+    <form asp-action="CrearRecepcion" method="post">
+        @Html.AntiForgeryToken()
 
-        <div class="col-md-2">
-            <label>Número recepción</label>
-            <input type="text" class="form-control"
-                   value="@(Model != null && Model.TbRecId > 0 ? Model.TbRecId.ToString() : "")"
-                   readonly />
+        <div class="rec-screen-head">
+            <div class="rec-screen-panel">
+                <div class="rec-screen-kv">
+                    <div class="rec-screen-k">Numero de recepcion</div>
+                    <div class="rec-screen-v">@numeroRecepcion</div>
+                </div>
+
+                <div class="rec-screen-kv">
+                    <div class="rec-screen-k">Fecha</div>
+                    <div class="rec-screen-v">@fechaRecepcion</div>
+                </div>
+
+                <div class="rec-screen-kv">
+                    <div class="rec-screen-k">Hora</div>
+                    <div class="rec-screen-v">@horaRecepcion</div>
+                </div>
+
+                <div class="rec-screen-kv">
+                    <div class="rec-screen-k">Usuario</div>
+                    <div class="rec-screen-v">@usuarioLogueado</div>
+                </div>
+            </div>
+
+            <div class="rec-screen-panel">
+                <div class="rec-screen-kv">
+                    <div class="rec-screen-k">Sector Origen</div>
+
+                    <div class="rec-screen-v" style="flex-direction: column; align-items: stretch;">
+                        <input type="text"
+                               id="TbRecSecOriBusqueda"
+                               class="form-control"
+                               autocomplete="off"
+                               value="@(listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecOriId)?.IbSecDen ?? "")" />
+
+                        <div id="listaSectoresOrigen" class="list-group mt-2"></div>
+
+                        <input type="hidden" asp-for="TbRecSecOriId" id="TbRecSecOriId" />
+                    </div>
+                </div>
+
+                <div class="rec-screen-kv">
+                    <div class="rec-screen-k">Sector Destino</div>
+
+                    <div class="rec-screen-v" style="flex-direction: column; align-items: stretch;">
+                        <input type="text"
+                               id="TbRecSecDesBusqueda"
+                               class="form-control"
+                               autocomplete="off"
+                               value="@(listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecDesId)?.IbSecDen ?? "")" />
+
+                        <div id="listaSectoresDestino" class="list-group mt-2"></div>
+
+                        <input type="hidden" asp-for="TbRecSecDesId" id="TbRecSecDesId" />
+                    </div>
+                </div>
+
+                <div class="rec-screen-kv">
+                    <div class="rec-screen-k">Total recibido</div>
+                    <div class="rec-screen-v">
+                        <input type="text"
+                               id="TbRecCantTot"
+                               class="form-control form-control-sm"
+                               value="@totalRecibido"
+                               readonly />
+                    </div>
+                </div>
+            </div>
+
+            <div class="rec-screen-image">
+                imagen<br />no<br />disponible
+            </div>
         </div>
 
-        <div class="col-md-2">
-            <label>Fecha</label>
-            <input type="text" class="form-control"
-                   value="@(Model?.TbRecFec?.ToString("dd/MM/yyyy") ?? "")"
-                   readonly />
+        <div class="rec-screen-actions mt-3">
+            <button type="submit" class="btn btn-primary btn-sm">Guardar Recepción</button>
         </div>
+    </form>
+</div>
+<div class="mt-4">
 
-        <div class="col-md-2">
-            <label>Hora</label>
-            <input type="text" class="form-control"
-                   value="@(Model?.TbRecHorIni?.ToString("HH:mm") ?? "")"
-                   readonly />
+    @if (Model == null || Model.TbRecId <= 0)
+    {
+        <div class="rec-screen-table-wrap">
+            <div class="rec-screen-table-title">Carga de material</div>
+            <form id="formCargaMaterial" asp-action="AgregarMaterialSimple" asp-controller="Recepcion" method="post" class="p-3">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="tbRecId" value="@(Model != null && Model.TbRecId > 0 ? Model.TbRecId : 0)" />
+
+                <div class="alert alert-info py-2 mb-2" role="alert">
+                    Seleccione sector de entrega para generar el numero de recepcion y habilitar la carga de material.
+                </div>
+
+                <table class="rec-screen-table rec-screen-table-entry mb-3">
+                    <thead>
+                        <tr>
+                            <th>Codigo de Producto</th>
+                            <th>Denominacion</th>
+                            <th>Codigo reuso</th>
+                            <th>Revision</th>
+                            <th>Tarea a realizar</th>
+                            <th>Contenido</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <select id="ibMatId" name="ibMatId" class="form-select form-select-sm" @((Model != null && Model.TbRecId > 0) ? "required" : "disabled")>
+                                    <option value="">-- Seleccione --</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" id="matDenominacion" class="form-control form-control-sm" readonly placeholder="Denominacion" />
+                            </td>
+                            <td>
+                                <input type="text" id="codigoReuso" class="form-control form-control-sm" placeholder="Codigo reuso" @((Model != null && Model.TbRecId > 0) ? "" : "disabled") />
+                            </td>
+                            <td>
+                                <select id="revisionMaterial" class="form-select form-select-sm" @((Model != null && Model.TbRecId > 0) ? "" : "disabled")>
+                                    <option value="">-- Seleccione --</option>
+                                    <option value="OK">OK</option>
+                                    <option value="Pendiente">Pendiente</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select id="tareaMaterial" class="form-select form-select-sm" @((Model != null && Model.TbRecId > 0) ? "" : "disabled")>
+                                    <option value="">-- Seleccione --</option>
+                                    <option value="Lavado">Lavado</option>
+                                    <option value="Proceso">Proceso</option>
+                                    <option value="Entrega">Entrega</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" id="contenidoMaterial" class="form-control form-control-sm" min="0" step="1" placeholder="Numerico" @((Model != null && Model.TbRecId > 0) ? "" : "disabled") />
+                            </td>
+                            <td>
+                                <input type="number" id="cantidadMaterial" name="cantidad" min="1" step="1" class="form-control form-control-sm" placeholder="Numerico" @((Model != null && Model.TbRecId > 0) ? "required" : "disabled") />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
         </div>
+    }
 
-        <!-- 🏭 Sectores a la derecha -->
-        <div class="col-md-3">
-            <label for="TbRecSecOriBusqueda">Sector Origen</label>
+    @{
+        var detalles = ViewBag.Detalles as List<TbRecDetDto> ?? new List<TbRecDetDto>();
+    }
 
-            <input type="text"
-                   id="TbRecSecOriBusqueda"
-                   class="form-control"
-                   autocomplete="off"
-                   value="@(listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecOriId)?.IbSecDen ?? "")" />
-
-            <div id="listaSectoresOrigen" class="list-group mt-2"></div>
-
-            <input type="hidden" asp-for="TbRecSecOriId" id="TbRecSecOriId" />
+    @if (detalles.Count > 0)
+    {
+        <div class="rec-screen-table-wrap mt-3">
+            <div class="rec-screen-table-title">Materiales ingresados</div>
+            <table class="rec-screen-table">
+                <thead>
+                    <tr>
+                        <th>Codigo etiqueta</th>
+                        <th>Denominacion</th>
+                        <th>Codigo reuso</th>
+                        <th>Recibidos</th>
+                        <th>Pendientes</th>
+                        <th>Entregados</th>
+                        <th>Cantidad</th>
+                        <th style="width:72px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in detalles)
+                    {
+                        <tr id="fila-det-@item.TB_REC_DET_ID">
+                            <td>@item.TB_REC_DET_ID</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.TbRecDetMatDen) ? "SIN MATERIAL" : item.TbRecDetMatDen)</td>
+                            <td>-</td>
+                            <td>@item.TB_REC_DET_CANT</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>@item.TB_REC_DET_CANT</td>
+                            <td style="white-space:nowrap;">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger p-1 lh-1 ms-1"
+                                        title="Eliminar"
+                                        onclick="confirmarEliminarDetalle(@item.TB_REC_DET_ID, @(Model != null ? Model.TbRecId : 0))">
+                                    <i class="bi bi-trash-fill" style="font-size:0.7rem;"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
+    }
 
-        <div class="col-md-3">
-            <label for="TbRecSecDesBusqueda">Sector Destino</label>
+    <form id="formEliminarDetalle" asp-action="EliminarDetalleMaterial" asp-controller="Recepcion" method="post" style="display:none;">
+        @Html.AntiForgeryToken()
+        <input type="hidden" id="elimDetId" name="tbRecDetId" />
+        <input type="hidden" name="tbRecId" value="@(Model != null && Model.TbRecId > 0 ? Model.TbRecId : 0)" />
+    </form>
 
-            <input type="text"
-                   id="TbRecSecDesBusqueda"
-                   class="form-control"
-                   autocomplete="off"
-                   value="@(listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecDesId)?.IbSecDen ?? "")" />
+    <div class="rec-screen-actions rec-screen-actions-bottom mt-3">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="window.history.back()">Cerrar</button>
 
-            <div id="listaSectoresDestino" class="list-group mt-2"></div>
+        <button type="button"
+                class="btn btn-outline-danger btn-sm"
+                onclick="descargarRecepcionPdf(@(Model?.TbRecId ?? 0))"
+            @((Model == null || Model.TbRecId <= 0) ? "disabled" : "")
+                title="Descargar PDF">
+            <i class="bi bi-file-earmark-pdf-fill"></i>
+        </button>
 
-            <input type="hidden" asp-for="TbRecSecDesId" id="TbRecSecDesId" />
-        </div>
+        <button type="button"
+                class="btn btn-outline-primary btn-sm"
+                onclick="imprimirEnImpresora()"
+            @((Model == null || Model.TbRecId <= 0) ? "disabled" : "")
+                title="Imprimir">
+            <i class="bi bi-printer-fill"></i>
+        </button>
     </div>
-
-    <!-- 🔹 FILA 2: USUARIO + TOTAL -->
-    <div class="row mb-3">
-
-        <div class="col-md-4">
-            <label>Usuario</label>
-            <input type="text" class="form-control"
-                   value="@ViewBag.UsuarioLogueado"
-                   readonly />
-        </div>
-
-        <div class="col-md-2">
-            <label>Total recibido</label>
-            <input type="text" id="TbRecCantTot" class="form-control"
-                   value="@(Model?.TbRecCantTot ?? 0)"
-                   readonly />
-        </div>
-
-    </div>
-
-    <button type="submit" class="btn btn-primary mt-3">Guardar Recepción</button>
-</form>
-
+</div>
 
 @if (Model != null && Model.TbRecId > 0 && subFormModel != null)
 {

@@ -217,3 +217,21 @@
         flex: 1 1 46%;
     }
 }
+
+#contenedor-aco-detalles {
+    height: 250px;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+.aco-operativo {
+    margin-top: 180px;
+}
+
+    .aco-operativo .aco-botones-derecha {
+        display: flex !important;
+        justify-content: flex-end !important;
+        gap: 4px;
+        width: 100%;
+        flex-wrap: wrap;
+    }

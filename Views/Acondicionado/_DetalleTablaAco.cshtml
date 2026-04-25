@@ -1,36 +1,27 @@
 ﻿@model List<ConexionSql.Models.Acondicionado.TbProAcoDetDto>
 
-<table class="table table-sm table-bordered table-striped">
-    <thead class="thead-dark">
+@if (Model != null && Model.Any())
+{
+    foreach (var item in Model)
+    {
         <tr>
-            <th style="width: 10%;">ID</th>
-            <th style="width: 45%;">Material</th>
-            <th style="width: 20%;">Cantidad</th>
-            <th style="width: 25%;">Acción</th>
+            <td>@(item.TbProAcoDetRecDetId ?? 0)</td>
+            <td>@(item.TbProAcoDetMatDen ?? "")</td>
+            <td>@(item.TbProAcoDetSecDesDen ?? "")</td>
+            <td>@(item.TbProAcoDetReuId?.ToString() ?? "")</td>
+            <td>@(item.TbProAcoDetMatEtiDen ?? "")</td>
+            <td>@(item.TbProAcoDetRecDetCant ?? 0)</td>
+            <td>@(item.TbProAcoDetEmpTot ?? 0)</td>
+            <td>@(item.TbProAcoDetEmpStock ?? 0)</td>
+            <td>@(item.TbProAcoDetCant ?? 0)</td>
         </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Any())
-        {
-            foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.TbProAcoDetId</td>
-                    <td>@item.TbProAcoDetMatDen</td>
-                    <td>@item.TbProAcoDetCant</td>
-                    <td>
-                        <button class="btn btn-sm btn-danger" onclick="eliminarAcoDetalle(@item.TbProAcoDetId)">
-                            🗑️ Eliminar
-                        </button>
-                    </td>
-                </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="4" class="text-center text-muted">⚠️ No hay detalles cargados.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+    }
+}
+else
+{
+    <tr>
+        <td colspan="9" class="text-center text-muted">
+            ⚠️ No hay detalles cargados.
+        </td>
+    </tr>
+}

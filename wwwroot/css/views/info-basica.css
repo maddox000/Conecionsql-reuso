@@ -1,0 +1,45 @@
+﻿/* Tabla con scroll independiente */
+.rec-screen-table-wrap {
+    max-height: calc(100vh - 250px);
+    overflow-y: auto;
+}
+
+/* Pie de botones de Información Básica */
+.info-basica-footer {
+    position: fixed;
+    bottom: 60px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.info-basica-botones {
+    display: flex;
+    gap: 10px;
+}
+
+/* Botones Baxen */
+.btn-baxen {
+    background-color: #3a4f58;
+    color: #fff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    min-width: 96px;
+}
+
+    .btn-baxen:hover {
+        background-color: #2f3e46;
+        color: #fff;
+    }
+
+/* Botón deshabilitado */
+.btn-baxen-disabled {
+    background-color: #8a9ba3;
+    color: #fff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    min-width: 96px;
+}

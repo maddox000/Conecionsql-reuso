@@ -135,7 +135,7 @@ namespace ConexionSql.Controllers
                     TbProIbEquTeqDen = equipo.IbEquTeqDen,
                     TbProUpro = 0,
 
-                    IbEquCap = equipo.IbEquCap,
+                    IbEquCap = equipo.IbEquCap ?? 0,
                     IbEquCapu = equipo.IbEquCapu,
                     IbEquCapr = 0,
                     IbEquPco = equipo.IbEquPco,

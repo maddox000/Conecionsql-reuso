@@ -1,0 +1,56 @@
+﻿@model List<ConexionSql.Models.Equipos.IbEquDto>
+
+<link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+
+<div class="rec-screen">
+
+    <div class="rec-screen-banner">
+        Listado de Equipos
+    </div>
+
+    <div class="rec-screen-table-wrap">
+        <table class="rec-screen-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Denominación</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Número de serie</th>
+                    <th>Ocultar</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr style="cursor:pointer;"
+                            onclick="window.location.href='@Url.Action("ViewEquipo", "Equipos", new { id = item.IbEquId })'">
+
+                            <td>@item.IbEquId</td>
+                            <td>@item.IbEquTeqDen</td>
+                            <td>@item.IbEquMarDen</td>
+                            <td>@item.IbEquMod</td>
+                            <td>@item.IbEquSer</td>
+                            <td>
+                                <input type="checkbox"
+                                       disabled
+                                @(item.IbEquOcu == true ? "checked" : "") />
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="rec-screen-note">
+                            No hay equipos cargados.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

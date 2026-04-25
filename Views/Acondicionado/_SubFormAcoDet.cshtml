@@ -1,61 +1,153 @@
 ﻿@model ConexionSql.Models.Acondicionado.TbProAcoDetFormDto
 
+<link rel="stylesheet" href="~/css/views/crear-acondicionado.css" asp-append-version="true" />
+
 <div class="subform-acondicionado mt-4">
 
-    <!-- CABECERA -->
-    <table class="table table-bordered mt-3">
-        <tr><th>ID</th><td>@Model.Cabecera.TbProAcoId</td></tr>
-        <tr><th>Personal</th><td>@Model.Cabecera.TbProAcoPerNom</td></tr>
-        <tr><th>Hora inicio</th><td>@Model.Cabecera.TbProAcoHorIni</td></tr>
-        <tr><th>Hora fin</th><td>@Model.Cabecera.TbProAcoHorFin</td></tr>
-        <tr><th>Cantidad</th><td id="cabeceraCantidad">@Model.Cabecera.TbProAcoUpro</td></tr>
-    </table>
-
-    <form id="formAcoDetalle" onsubmit="return false;">
-
-        <input type="hidden" id="tbProAcoId" value="@Model.Cabecera.TbProAcoId" />
-
-        <div class="form-group">
-            <label for="tbRecDetId">Código de etiqueta</label>
-            <input type="number"
-                   class="form-control"
-                   id="tbRecDetId"
-                   name="tbRecDetId"
-                   placeholder="Ingrese código y presione Enter"
-                   required />
+    <!-- CABECERA (solo vista, copia exacta del estilo principal) -->
+    <div class="aco-grid">
+        <!-- Panel izquierdo -->
+        <div class="aco-panel">
+            <div class="aco-kv">
+                <div class="aco-k">Número de proceso</div>
+                <div class="aco-v" id="tbProAcoId">@Model.Cabecera.TbProAcoId</div>
+            </div>
+            <div class="aco-kv">
+                <div class="aco-k">Usuario</div>
+                <div class="aco-v">@Model.Cabecera.TbProAcoPerNom</div>
+            </div>
+            <div class="aco-kv">
+                <div class="aco-k">Cargo</div>
+                <div class="aco-v">ADMINISTRADOR</div>
+            </div>
+            <div class="aco-kv">
+                <div class="aco-k">Total unidades</div>
+                <div class="aco-v" id="cabeceraCantidad">@Model.Cabecera.TbProAcoUpro</div>
+            </div>
         </div>
 
-        <div class="form-group mt-2">
-            <label for="materialNombre">Material</label>
-            <input type="text"
-                   class="form-control"
-                   id="materialNombre"
-                   readonly />
+        <!-- Panel derecho -->
+        <div class="aco-panel">
+            <div class="aco-kv">
+                <div class="aco-k">Fecha</div>
+                <div class="aco-v">
+                    @Model.Cabecera.TbProAcoHorIni?.ToString("dd/MM/yyyy HH:mm")
+                </div>
+            </div>
         </div>
-
-        <div class="form-group mt-2">
-            <label for="cantidad">Cantidad a emplear</label>
-            <input type="number"
-                   class="form-control"
-                   id="cantidad"
-                   min="1"
-                   step="1"
-                   required />
-        </div>
-    </form>
-
-    <div id="mensajeAco" class="mt-3 text-success"></div>
-
-    <div id="contenedor-aco-detalles" class="mt-4">
-        @await Html.PartialAsync("~/Views/Acondicionado/_DetalleTablaAco.cshtml", Model.Detalles)
     </div>
-</div>
+
+    <!-- DETALLE (copia visual del estilo principal) -->
+    <!-- Bloque de DETALLE (arriba) -->
+    <div class="aco-table-wrap mt-4">
+        <div class="aco-table-head-title">Registro de materiales</div>
+
+        <div id="contenedor-aco-detalles">
+            <table class="aco-table">
+                <thead>
+                    <tr>
+                        <th>Código etiqueta</th>
+                        <th>Denominación</th>
+                        <th>Sector</th>
+                        <th>Código reuso</th>
+                        <th>Tipo de envoltorio</th>
+                        
+                        <th>Recibidos</th>
+                        <th>En proceso</th>
+                        <th>Sin procesar</th>
+                        <th>Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tbody id="tbody-aco-detalles">
+                        @await Html.PartialAsync("~/Views/Acondicionado/_DetalleTablaAco.cshtml", Model.Detalles)
+                    </tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Bloque de INGRESO DE DATOS (abajo) -->
+
+
+    <div class="aco-operativo">
+        <form id="formAcoDetalle" onsubmit="return false;">
+            <input type="hidden" id="tbProAcoIdHidden" value="@Model.Cabecera.TbProAcoId" />
+            <table class="aco-table">
+                <thead>
+                    <tr>
+                        <th>Código etiqueta</th>
+                        <th>Denominación</th>
+                        <th>Sector</th>
+                        <th>Código reuso</th>
+                        <th>Tipo de envoltorio</th>
+                        <th>Recibidos</th>
+                        <th>En proceso</th>
+                        <th>Sin procesar</th>
+                        <th>Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <!-- Input editable -->
+                        <td>
+                            <input type="text"
+                                   id="tbRecDetId"
+                                   name="tbRecDetId"
+                                   class="form-control form-control-sm"
+                                   placeholder="Ingrese código"
+                                   required />
+                        </td>
+                        <!-- Campos que se completan automáticamente -->
+                        <td><input type="text" id="materialNombre" class="form-control form-control-sm" readonly /></td>
+                        <td><input type="text" id="sector" class="form-control form-control-sm" readonly /></td>
+                        <td><input type="text" id="codigoReuso" class="form-control form-control-sm" readonly /></td>
+                        <td><input type="text" id="tipoEnvoltorio" class="form-control form-control-sm" readonly /></td>
+                        <td><input type="number" id="recibidos" class="form-control form-control-sm" readonly /></td>
+                        <td><input type="number" id="enProceso" class="form-control form-control-sm" readonly /></td>
+                        <td><input type="number" id="sinProcesar" class="form-control form-control-sm" readonly /></td>
+                        <!-- Input editable -->
+                        <td>
+                            <input type="text"
+                                   id="cantidad"
+                                   name="cantidad"
+                                   class="form-control form-control-sm"
+                                   inputmode="numeric"
+                                   pattern="[0-9]*"
+                                   required />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="mt-2 aco-botones-derecha">
+                <button type="submit" class="btn btn-primary btn-sm">Guardar detalle</button>
+                <button type="reset" class="btn btn-outline-primary btn-sm">Limpiar</button>
+                <button type="button" class="btn btn-primary btn-sm">Registrar</button>
+                <button type="button" class="btn btn-outline-primary btn-sm">Nuevo</button>
+                <button type="button" class="btn btn-outline-primary btn-sm">Editar</button>
+                <button type="button" class="btn btn-secondary btn-sm">Cerrar</button>
+            </div>
+        </form>
+        <div id="mensajeAco" class="mt-3"></div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const inputEtiqueta = document.getElementById("tbRecDetId");
         const inputCantidad = document.getElementById("cantidad");
-        const inputCabecera = document.getElementById("tbProAcoId");
+        const inputCabecera = document.getElementById("tbProAcoIdHidden");
         const inputMaterial = document.getElementById("materialNombre");
         const mensaje = document.getElementById("mensajeAco");
         const cabeceraCantidad = document.getElementById("cabeceraCantidad");
@@ -77,17 +169,39 @@
                     inputEtiqueta.focus();
                     return;
                 }
+            fetch(`/TbProAcoDet/ObtenerMaterial?tbRecDetId=${idEtiqueta}`)
+            .then(res => res.json())
+             .then(data => {
+                if (data.success) {
+                    inputMaterial.value = data.nombre ?? "";
+                    document.getElementById("sector").value = data.sector ?? "";
+                    document.getElementById("codigoReuso").value = data.codigoReuso ?? "";
+                    document.getElementById("tipoEnvoltorio").value = data.tipoEnvoltorio ?? "";
+                    document.getElementById("recibidos").value = data.recibidos ?? 0;
+                    document.getElementById("enProceso").value = data.enProceso ?? 0;
+                    document.getElementById("sinProcesar").value = data.sinProcesar ?? 0;
+                } else {
+                    inputMaterial.value = "No encontrado";
+                    document.getElementById("sector").value = "";
+                    document.getElementById("codigoReuso").value = "";
+                    document.getElementById("tipoEnvoltorio").value = "";
+                    document.getElementById("recibidos").value = "";
+                    document.getElementById("enProceso").value = "";
+                    document.getElementById("sinProcesar").value = "";
+                }
 
-                fetch(`/TbProAcoDet/ObtenerMaterial?tbRecDetId=${idEtiqueta}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        inputMaterial.value = data.success ? data.nombre : "No encontrado";
-                        inputCantidad.focus();
-                    })
-                    .catch(() => {
-                        inputMaterial.value = "Error";
-                        inputCantidad.focus();
-                    });
+                inputCantidad.focus();
+            })
+            .catch(() => {
+                inputMaterial.value = "Error";
+                document.getElementById("sector").value = "";
+                document.getElementById("codigoReuso").value = "";
+                document.getElementById("tipoEnvoltorio").value = "";
+                document.getElementById("recibidos").value = "";
+                document.getElementById("enProceso").value = "";
+                document.getElementById("sinProcesar").value = "";
+                inputCantidad.focus();
+            });
             }
         });
 
@@ -118,7 +232,7 @@
                         inputMaterial.value = "";
 
                         if (result.html) {
-                            document.getElementById("contenedor-aco-detalles").innerHTML = result.html;
+                             document.getElementById("tbody-aco-detalles").innerHTML = result.html;
                         }
 
                         if (cabeceraCantidad) {

@@ -1,0 +1,236 @@
+@* @model ConexionSql.Models.Equipos.IbEquDto
+
+@{
+    ViewData["Title"] = "Editar Equipo";
+}
+
+<link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+
+<div class="bx-card rec-screen">
+    <div class="rec-screen-banner">Administración de Equipos - Editar Equipo</div>
+
+    <form id="formEditarEquipo" asp-action="GuardarEquipo" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.IbEquId" />
+        <input type="hidden" id="hiddenUserId" name="TbRecPerId" value="" />
+        <input type="hidden" id="hiddenUserNom" name="TbRecPerNom" value="" />
+        <input type="hidden" id="hiddenUserCarDen" name="TbRecPerCarDen" value="" />
+
+        <div class="rec-screen-head">
+            <div class="rec-screen-panel">
+                <div class="rec-screen-kv"><div class="rec-screen-k">Código de sistema</div><div class="rec-screen-v">@Model.IbEquId</div></div>
+                <div class="rec-screen-kv"><div class="rec-screen-k">Usuario</div><div class="rec-screen-v" id="displayUsuario">NO REGISTRADO</div></div>
+                <div class="rec-screen-kv"><div class="rec-screen-k">Cargo</div><div class="rec-screen-v" id="displayCargo">NO REGISTRADO</div></div>
+            </div>
+
+            <div class="rec-screen-panel">
+                <div class="rec-screen-kv">
+                    <div class="rec-screen-k">Denominación</div>
+                    <div class="rec-screen-v">
+                        <input type="text" id="denominacion" name="denominacion" class="form-control form-control-sm" value="@Model.IbEquTeqDen" required />
+                    </div>
+                </div>
+                <div class="rec-screen-kv">
+                    <div class="rec-screen-k">Marca</div>
+                    <div class="rec-screen-v">
+                        <input type="text" id="marca" name="marca" class="form-control form-control-sm" value="@Model.IbEquMarDen" />
+                    </div>
+                </div>
+                <div class="rec-screen-kv">
+                    <div class="rec-screen-k">Modelo</div>
+                    <div class="rec-screen-v">
+                        <input type="text" id="modelo" name="modelo" class="form-control form-control-sm" value="@Model.IbEquMod" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rec-screen-head">
+            <div class="rec-screen-panel">
+                <div class="rec-screen-kv"><div class="rec-screen-k">Número de Serie</div><div class="rec-screen-v"><input type="text" id="numeroSerie" name="numeroSerie" class="form-control form-control-sm" value="@Model.IbEquSer" /></div></div>
+                <div class="rec-screen-kv"><div class="rec-screen-k">Número</div><div class="rec-screen-v"><input type="number" id="numero" name="numero" class="form-control form-control-sm" value="@Model.IbEquNum" /></div></div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; margin-top: 0.5rem;">
+
+            <!-- Columna 1: Características -->
+            <div style="overflow: hidden;">
+                <div class="rec-screen-head" style="margin: 0 !important; padding: 0 !important; border-right: 1px solid #ddd !important; display: block !important;">
+                    <div class="rec-screen-table-wrap" style="margin: 0 !important; padding: 0 !important; display: block !important;">
+                        <div class="rec-screen-table-title" style="font-size: 0.95rem; margin: 0 !important; padding: 6px !important; display: block !important;">Características</div>
+                        <table class="rec-screen-table" style="font-size:0.85rem; border-collapse: collapse; width: 100%; margin: 0 !important; padding: 0 !important; display: table !important;">
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #e0e0e0;">
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">Altura cámara</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" id="alturaCamara" name="alturaCamara" min="0" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquAlt" /> CM</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e0e0e0;">
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">Ancho cámara</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" id="anchoCamara" name="anchoCamara" min="0" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquAnc" /> CM</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e0e0e0;">
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">Profundidad</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" id="profundidad" name="profundidad" min="0" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquPro" /> CM</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e0e0e0;">
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">Capacidad carga</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" id="capacidadCarga" name="capacidadCarga" min="0" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquCap" /> Band.</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e0e0e0;">
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">Capacidad total</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" id="capacidadTotal" name="capacidadTotal" min="0" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquCapu" /> Cm3</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e0e0e0;">
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">% de cámara</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" id="porcentajeCamara" name="porcentajeCamara" min="0" max="100" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquPorc" /> %</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">Capacidad útil</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" id="capacidadUtil" name="capacidadUtil" min="0" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquCapu" /> Cm3</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna 2: Consumos del equipo -->
+            <div style="overflow: hidden;">
+                <div class="rec-screen-head" style="margin: 0 !important; padding: 0 !important; border-right: 1px solid #ddd !important; display: block !important;">
+                    <div class="rec-screen-table-wrap" style="margin: 0 !important; padding: 0 !important; display: block !important;">
+                        <div class="rec-screen-table-title" style="font-size: 0.95rem; margin: 0 !important; padding: 6px !important; display: block !important;">Consumos del equipo</div>
+                        <table class="rec-screen-table" style="font-size:0.85rem; border-collapse: collapse; width: 100%; margin: 0 !important; padding: 0 !important; display: table !important;">
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #e0e0e0;">
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">Agua</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" name="consumoAgua" min="0" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquCag" /> LTS</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e0e0e0;">
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">Aire</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" name="consumoAire" min="0" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquCaiCant" /> LTS</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e0e0e0;">
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">Electricidad</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" name="consumoElectricidad" min="0" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquCel" /> KW</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e0e0e0;">
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">Esterilizante</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" name="consumoEsterilizante" min="0" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquCes" /> UNID</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e0e0e0;">
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">Controles</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" name="consumoControles" min="0" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquPte" /> UNID</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e0e0e0;">
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">Lbs/Hora</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" name="valoresLbs" min="0" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquCagCant" /> $</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e0e0e0;">
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">Li/Hora</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" name="valoresLi" min="0" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquCaiCant" /> $</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">KW/H</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" name="valoresKw" min="0" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquCelCant" /> $</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna 3: Valores del proceso -->
+            <div style="overflow: hidden;">
+                <div class="rec-screen-head" style="margin: 0 !important; padding: 0 !important; border: 0 !important; display: block !important;">
+                    <div class="rec-screen-table-wrap" style="margin: 0 !important; padding: 0 !important; display: block !important;">
+                        <div class="rec-screen-table-title" style="font-size: 0.95rem; margin: 0 !important; padding: 6px !important; display: block !important;">Valores del proceso</div>
+                        <table class="rec-screen-table" style="font-size:0.85rem; border-collapse: collapse; width: 100%; margin: 0 !important; padding: 0 !important; display: table !important;">
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #e0e0e0;">
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">Costo proceso</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" name="costoProceso" min="0" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquPco" /> $</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e0e0e0;">
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">Coef. ganancia</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" name="coefGanancia" min="0" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquPcoCoef" /> %</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4px 6px;"><label style="margin:0; font-size:0.82rem;">Precio venta</label></td>
+                                    <td style="padding: 4px 6px;"><input type="number" name="precioVenta" min="0" step="1" class="form-control form-control-sm" style="display:inline-block; width:70px;" value="@Model.IbEquPve" /> $</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="rec-screen-actions mt-3">
+            <button type="button" id="btnConfirmarModificacion" class="btn btn-primary btn-sm px-4">Confirmar Modificación</button>
+            <a href="/Home/AreaSistema?tipo=equipos" class="btn btn-secondary btn-sm px-4"
+               onclick="if(window.BaxenShell&&window.BaxenShell.navigate){event.preventDefault();window.BaxenShell.navigate('/Home/AreaSistema?tipo=equipos',true);}">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var hiddenId = document.getElementById('hiddenUserId');
+            var hiddenNom = document.getElementById('hiddenUserNom');
+            var hiddenCarDen = document.getElementById('hiddenUserCarDen');
+            var displayUsuario = document.getElementById('displayUsuario');
+            var displayCargo = document.getElementById('displayCargo');
+
+            var userId = sessionStorage.getItem('baxen-user-id') || localStorage.getItem('baxen-user-id');
+            var userName = sessionStorage.getItem('baxen-user-name') || localStorage.getItem('baxen-user-name');
+            var userRole = sessionStorage.getItem('baxen-user-role') || localStorage.getItem('baxen-user-role');
+
+            if (userId && hiddenId && !hiddenId.value) hiddenId.value = userId;
+            if (userName && hiddenNom && !hiddenNom.value) hiddenNom.value = userName;
+            if (userRole && hiddenCarDen && !hiddenCarDen.value) hiddenCarDen.value = userRole;
+
+            if (displayUsuario && userName && (displayUsuario.textContent || '').trim() === 'NO REGISTRADO') {
+                displayUsuario.textContent = userName;
+            }
+            if (displayCargo && userRole && (displayCargo.textContent || '').trim() === 'NO REGISTRADO') {
+                displayCargo.textContent = userRole;
+            }
+
+            // Submit via fetch para compatibilidad con SPA shell
+            var btnConfirmar = document.getElementById('btnConfirmarModificacion');
+            if (btnConfirmar) {
+                btnConfirmar.addEventListener('click', function () {
+                    var form = document.getElementById('formEditarEquipo');
+                    var formData = new FormData(form);
+                    btnConfirmar.disabled = true;
+                    btnConfirmar.textContent = 'Guardando...';
+
+                    fetch('/Home/GuardarEquipo', { method: 'POST', body: formData })
+                        .then(function (r) { return r.json(); })
+                        .then(function (data) {
+                            if (data.success) {
+                                if (window.BaxenShell && window.BaxenShell.navigate) {
+                                    window.BaxenShell.navigate('/Home/AreaSistema?tipo=equipos', true);
+                                } else {
+                                    window.location.href = '/Home/AreaSistema?tipo=equipos';
+                                }
+                            } else {
+                                alert(data.message || 'Error al guardar.');
+                                btnConfirmar.disabled = false;
+                                btnConfirmar.textContent = 'Confirmar Modificación';
+                            }
+                        })
+                        .catch(function () {
+                            alert('Error de conexión. Intente nuevamente.');
+                            btnConfirmar.disabled = false;
+                            btnConfirmar.textContent = 'Confirmar Modificación';
+                        });
+                });
+            }
+        });
+    </script>
+}
+ *@

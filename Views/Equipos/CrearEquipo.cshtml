@@ -1,0 +1,161 @@
+@{
+    ViewData["Title"] = "Crear Equipo";
+}
+
+<link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+
+<div class="bx-card rec-screen">
+    <div class="rec-screen-banner">Administración de Equipos - Crear Nuevo Equipo</div>
+
+    <form id="formCrearEquipo" asp-action="GuardarEquipo" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" id="hiddenUserId" name="TbRecPerId" value="" />
+        <input type="hidden" id="hiddenUserNom" name="TbRecPerNom" value="" />
+        <input type="hidden" id="hiddenUserCarDen" name="TbRecPerCarDen" value="" />
+
+        <div class="rec-screen-head">
+            <div class="rec-screen-panel">
+                <div class="rec-screen-kv"><div class="rec-screen-k">Código de sistema</div><div class="rec-screen-v">0</div></div>
+                <div class="rec-screen-kv"><div class="rec-screen-k">Usuario</div><div class="rec-screen-v" id="displayUsuario">NO REGISTRADO</div></div>
+                <div class="rec-screen-kv"><div class="rec-screen-k">Cargo</div><div class="rec-screen-v" id="displayCargo">NO REGISTRADO</div></div>
+            </div>
+
+            <div class="rec-screen-panel">
+                <div class="rec-screen-kv">
+                    <div class="rec-screen-k">Denominación</div>
+                    <div class="rec-screen-v">
+                        <input type="text" id="denominacion" name="denominacion" class="form-control form-control-sm" required />
+                    </div>
+                </div>
+                <div class="rec-screen-kv">
+                    <div class="rec-screen-k">Marca</div>
+                    <div class="rec-screen-v">
+                        <input type="text" id="marca" name="marca" class="form-control form-control-sm" />
+                    </div>
+                </div>
+                <div class="rec-screen-kv">
+                    <div class="rec-screen-k">Modelo</div>
+                    <div class="rec-screen-v">
+                        <input type="text" id="modelo" name="modelo" class="form-control form-control-sm" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rec-screen-head">
+            <div class="rec-screen-panel">
+                <div class="rec-screen-kv"><div class="rec-screen-k">Número de Serie</div><div class="rec-screen-v"><input type="text" id="numeroSerie" name="numeroSerie" class="form-control form-control-sm" /></div></div>
+                <div class="rec-screen-kv"><div class="rec-screen-k">Número</div><div class="rec-screen-v"><input type="text" id="numero" name="numero" class="form-control form-control-sm" /></div></div>
+            </div>
+        </div>
+
+        <div class="rec-screen-head mt-3">
+            <div class="rec-screen-table-wrap">
+                <div class="rec-screen-table-title">Características</div>
+                <table class="rec-screen-table" style="font-size:0.85rem;">
+                    <tbody>
+                        <tr>
+                            <td><label>Altura de cámara</label></td>
+                            <td><input type="number" id="alturaCamara" name="alturaCamara" min="0" step="0.01" class="form-control form-control-sm" /> CM</td>
+                            <td style="width:40%;"><label>Capacidad de carga</label></td>
+                            <td><input type="number" id="capacidadCarga" name="capacidadCarga" min="0" step="0.01" class="form-control form-control-sm" /> Bandejas</td>
+                        </tr>
+                        <tr>
+                            <td><label>Ancho de cámara</label></td>
+                            <td><input type="number" id="anchoCamara" name="anchoCamara" min="0" step="0.01" class="form-control form-control-sm" /> CM</td>
+                            <td><label>Profundidad</label></td>
+                            <td><input type="number" id="profundidad" name="profundidad" min="0" step="0.01" class="form-control form-control-sm" /> CM</td>
+                        </tr>
+                        <tr>
+                            <td><label>Profundidad</label></td>
+                            <td><input type="number" id="profundidad2" name="profundidad2" min="0" step="0.01" class="form-control form-control-sm" /> CM</td>
+                            <td><label>Capacidad total</label></td>
+                            <td><input type="number" id="capacidadTotal" name="capacidadTotal" min="0" step="0.01" class="form-control form-control-sm" /> Cm3</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"></td>
+                            <td><label>Porcentaje de cámara</label></td>
+                            <td><input type="number" id="porcentajeCamara" name="porcentajeCamara" min="0" max="100" step="0.01" class="form-control form-control-sm" /> %</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"></td>
+                            <td><label>Capacidad útil</label></td>
+                            <td><input type="number" id="capacidadUtil" name="capacidadUtil" min="0" step="0.01" class="form-control form-control-sm" /> Cm3</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="rec-screen-head mt-3">
+            <div class="rec-screen-table-wrap">
+                <div class="rec-screen-table-title">Consumos del equipo</div>
+                <div class="row p-3">
+                    <div class="col-md-6">
+                        <div class="mb-2"><label>Agua</label> <input type="number" name="consumoAgua" min="0" step="0.01" class="form-control form-control-sm" /> LTS</div>
+                        <div class="mb-2"><label>Aire</label> <input type="number" name="consumoAire" min="0" step="0.01" class="form-control form-control-sm" /> LTS</div>
+                        <div class="mb-2"><label>Electricidad</label> <input type="number" name="consumoElectricidad" min="0" step="0.01" class="form-control form-control-sm" /> KW</div>
+                        <div class="mb-2"><label>Esterilizante</label> <input type="number" name="consumoEsterilizante" min="0" step="0.01" class="form-control form-control-sm" /> UNID</div>
+                        <div><label>Controles de proceso</label> <input type="number" name="consumoControles" min="0" step="0.01" class="form-control form-control-sm" /> UNID</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div style="border-left:1px solid #ddd; padding-left:15px;">
+                            <div class="mb-2"><label>Lbs/Hora</label> <input type="number" name="valoresLbs" min="0" step="0.01" class="form-control form-control-sm" /> $ 0</div>
+                            <div class="mb-2"><label>Li/Hora</label> <input type="number" name="valoresLi" min="0" step="0.01" class="form-control form-control-sm" /> $ 0</div>
+                            <div class="mb-2"><label>KW/H</label> <input type="number" name="valoresKw" min="0" step="0.01" class="form-control form-control-sm" /> $ 0</div>
+                            <div class="mb-2"><label>Unitario</label> <input type="number" name="valoresUnitario" min="0" step="0.01" class="form-control form-control-sm" /> $ 0</div>
+                            <div><label>Unitario</label> <input type="number" name="valoresUnitario2" min="0" step="0.01" class="form-control form-control-sm" /> $ 0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rec-screen-head mt-3">
+            <div class="rec-screen-table-wrap">
+                <div class="rec-screen-table-title">Valores del proceso</div>
+                <div class="row p-3">
+                    <div class="col-md-6">
+                        <div class="mb-2"><label>Costo de proceso</label> <input type="number" name="costoProceso" min="0" step="0.01" class="form-control form-control-sm" /> $ 0</div>
+                        <div class="mb-2"><label>Coeficiente de ganancia</label> <input type="number" name="coefGanancia" min="0" step="0.01" class="form-control form-control-sm" /> % 1</div>
+                        <div><label>Precio de venta</label> <input type="number" name="precioVenta" min="0" step="0.01" class="form-control form-control-sm" /> $ 0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rec-screen-actions mt-3">
+            <button type="submit" class="btn btn-primary btn-sm px-4">Guardar</button>
+            <button type="reset" class="btn btn-secondary btn-sm px-4">Limpiar</button>
+            <a href="/Home/AreaSistema?tipo=equipos" class="btn btn-outline-primary btn-sm px-4">Cerrar</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const hiddenId = document.getElementById('hiddenUserId');
+            const hiddenNom = document.getElementById('hiddenUserNom');
+            const hiddenCarDen = document.getElementById('hiddenUserCarDen');
+            const displayUsuario = document.getElementById('displayUsuario');
+            const displayCargo = document.getElementById('displayCargo');
+
+            const userId = sessionStorage.getItem('baxen-user-id') || localStorage.getItem('baxen-user-id');
+            const userName = sessionStorage.getItem('baxen-user-name') || localStorage.getItem('baxen-user-name');
+            const userRole = sessionStorage.getItem('baxen-user-role') || localStorage.getItem('baxen-user-role');
+
+            if (userId && hiddenId && !hiddenId.value) hiddenId.value = userId;
+            if (userName && hiddenNom && !hiddenNom.value) hiddenNom.value = userName;
+            if (userRole && hiddenCarDen && !hiddenCarDen.value) hiddenCarDen.value = userRole;
+
+            if (displayUsuario && userName && (displayUsuario.textContent || '').trim() === 'NO REGISTRADO') {
+                displayUsuario.textContent = userName;
+            }
+
+            if (displayCargo && userRole && (displayCargo.textContent || '').trim() === 'NO REGISTRADO') {
+                displayCargo.textContent = userRole;
+            }
+        });
+    </script>
+}

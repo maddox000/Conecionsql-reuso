@@ -1,42 +1,47 @@
 ﻿@model List<ConexionSql.Models.Recepciones.TbRecDetDto>
 
-<!-- _DetalleTabla -->
-<!-- Tabla que muestra los detalles de la recepción -->
-<table class="table table-bordered table-sm">
-    <thead class="thead-dark">
-        <tr>
-            <th style="width: 20%;">Código Etiqueta</th> <!-- Antes: Código Material -->
-            <th style="width: 50%;">Denominación / Estado</th> <!-- Se mantiene, pero se agrega estado -->
-            <th style="width: 15%;">Cantidad</th>
-            <th style="width: 15%;">Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Count > 0)
-        {
-            foreach (var item in Model)
+<div class="rec-screen-table-wrap mt-3">
+    <div class="rec-screen-table-title">Materiales ingresados</div>
+
+    <table class="rec-screen-table">
+        <thead>
+            <tr>
+                <th>Codigo etiqueta</th>
+                <th>Denominacion</th>
+                <th>Estado</th>
+                <th>Cantidad</th>
+                <th style="width:72px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                foreach (var item in Model)
+                {
+                    <tr id="fila-det-@item.TB_REC_DET_ID">
+                        <td>@item.TB_REC_DET_ID</td>
+                        <td>@item.TbRecDetMatDen</td>
+                        <td>@item.IB_EST_DEN</td>
+                        <td>@item.TB_REC_DET_CANT</td>
+                        <td style="white-space:nowrap;">
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger p-1 lh-1 ms-1"
+                                    title="Eliminar"
+                                    onclick="confirmarEliminarDetalle(@item.TB_REC_DET_ID, 0)">
+                                <i class="bi bi-trash-fill" style="font-size:0.7rem;"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-                    <td>@item.TB_REC_DET_ID</td> <!-- Mostrar ID del detalle (etiqueta) -->
-                    <td>
-                        <div><strong>@item.TbRecDetMatDen</strong></div>
-                        <div class="text-muted" style="font-size: 0.85em;">@item.IB_EST_DEN</div>
-                    </td>
-                    <td>@item.TB_REC_DET_CANT</td>
-                    <td>
-                        <!-- Botón de eliminar usando el ID real del detalle -->
-                        <button type="button" class="btn btn-danger btn-sm" onclick="eliminarDetalle(@item.TB_REC_DET_ID)">
-                            Eliminar
-                        </button>
+                    <td colspan="5" class="text-center text-muted">
+                        No hay detalles cargados.
                     </td>
                 </tr>
             }
-        }
-        else
-        {
-            <tr>
-                <td colspan="4" class="text-center text-muted">No hay detalles cargados.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>

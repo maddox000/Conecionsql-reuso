@@ -1,0 +1,63 @@
+﻿@model IEnumerable<ConexionSql.Models.IbPer.IbPerDto>
+
+<link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+
+<div class="rec-screen">
+
+    <div class="rec-screen-banner">
+        Información Básica - Personal
+    </div>
+
+    <div class="rec-screen-actions mb-2">
+        <a asp-controller="IbPer" asp-action="InsertIbPer" class="btn btn-success btn-sm">
+            Nuevo personal
+        </a>
+
+        <a asp-controller="IbPer" asp-action="IbPerEdit" class="btn btn-primary btn-sm">
+            Editar lista
+        </a>
+    </div>
+
+    <div class="rec-screen-table-wrap">
+        <table class="rec-screen-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Apellido</th>
+                    <th>Nombre</th>
+                    <th>Cargo</th>
+                    <th>Sector</th>
+                    <th>Inhabilitado</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var p in Model)
+                    {
+                        <tr>
+                            <td>@p.IbPerId.ToString("D5")</td>
+                            <td>@p.IbPerApe</td>
+                            <td>@p.IbPerNom</td>
+                            <td>@(string.IsNullOrEmpty(p.IbPerCarDen) ? "-" : p.IbPerCarDen)</td>
+                            <td>@(string.IsNullOrEmpty(p.IbSecDen) ? "-" : p.IbSecDen)</td>
+                            <td style="text-align:center;">
+                                <input type="checkbox" disabled @(p.IbPerOcu == true ? "checked" : "") />
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="rec-screen-note">
+                            No hay registros disponibles.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

@@ -190,3 +190,31 @@
         flex: 1 1 46%;
     }
 }
+
+.rec-screen-table-entry th {
+    font-size: 0.73rem;
+}
+
+.rec-screen-table-entry td {
+    background: #fff;
+}
+
+.rec-screen-table-entry .form-control[readonly] {
+    background: #f5f7f9;
+}
+
+.rec-screen-actions-bottom {
+    justify-content: flex-end;
+}
+
+#contenedor-detalles {
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+#contenedor-detalles {
+    max-height: 260px;
+    overflow-y: auto;
+    overflow-x: auto;
+    margin-bottom: 15px;
+}

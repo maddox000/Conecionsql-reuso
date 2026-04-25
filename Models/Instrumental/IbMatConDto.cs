@@ -1,0 +1,70 @@
+﻿namespace ConexionSql.Models.Instrumental
+{
+    public class IbMatConDto
+    {
+        public int IbMatIntId { get; set; }
+        public string? IbMatIntDen { get; set; }
+        public int? IbMatIntIdForm { get; set; }
+        public string? IbMatIntPcLog { get; set; }
+        public string? IbMatIntPcUsr { get; set; }
+        public DateTime? IbMatIntRegFec { get; set; }
+        public DateTime? IbMatIntRegHor { get; set; }
+        public DateTime? IbMatIntActFec { get; set; }
+        public string? IbMatIntPr { get; set; }
+        public int? IbMatIntMgrId { get; set; }
+        public string? IbMatIntMgrDen { get; set; }
+        public int? IbMatIntMarId { get; set; }
+        public string? IbMatIntMarDen { get; set; }
+        public string? IbMatIntMarCat { get; set; }
+        public int? IbMatIntProId { get; set; }
+        public string? IbMatIntProDen { get; set; }
+        public string? IbMatIntProCat { get; set; }
+        public int? IbMatIntMan { get; set; }
+        public DateTime? IbMatIntManFec { get; set; }
+        public DateTime? IbMatIntManPro { get; set; }
+        public bool IbMatIntOcu { get; set; }
+        public int? IbMatIntCos { get; set; }
+        public DateTime? IbMatIntCosFec { get; set; }
+        public string? IbMatIntImg1 { get; set; }
+        public string? IbMatIntImg2 { get; set; }
+        public string? IbMatIntImg3 { get; set; }
+        public string? IbMatIntImg4 { get; set; }
+        public string? IbMatIntImg5 { get; set; }
+        public int? IbMatIntImgTot { get; set; }
+        public int? IbMatIntCcoId { get; set; }
+        public string? IbMatIntCcoDen { get; set; }
+        public int? IbMatIntLavId { get; set; }
+        public string? IbMatIntLavDen { get; set; }
+        public int? IbMatIntLavTciId { get; set; }
+        public string? IbMatIntLavTciDen { get; set; }
+        public string? IbMatIntLavTxt { get; set; }
+        public string? IbMatIntLavTim { get; set; }
+        public string? IbMatIntAcoTxt { get; set; }
+        public string? IbMatIntAcoTim { get; set; }
+        public string? IbMatIntTimTot { get; set; }
+        public bool IbMatIntUdeOpc { get; set; }
+        public string? IbMatIntEdiNivId { get; set; }
+        public string? IbMatIntEdiNivDen { get; set; }
+        public string? IbMatIntEdiId { get; set; }
+        public string? IbMatIntEdiNom { get; set; }
+        public string? IbMatIntEdiApe { get; set; }
+        public string? IbMatIntUsrPc { get; set; }
+        public string? IbMatIntUsrId { get; set; }
+        public DateTime? IbMatIntUsrFec { get; set; }
+        public DateTime? IbMatIntUsrHor { get; set; }
+        public string? IbMatIntCant { get; set; }
+        public string? Codigo { get; set; }
+        public int? IbMatIntNum1 { get; set; }
+        public int? IbMatIntNum2 { get; set; }
+        public int? IbMatIntNum3 { get; set; }
+        public string? IbMatIntTxt1 { get; set; }
+        public string? IbMatIntTxt2 { get; set; }
+        public string? IbMatIntTxt3 { get; set; }
+        public DateTime? IbMatIntDti1 { get; set; }
+        public DateTime? IbMatIntDti2 { get; set; }
+        public DateTime? IbMatIntDti3 { get; set; }
+        public string? IbMatIntMem1 { get; set; }
+        public string? IbMatIntMem2 { get; set; }
+        public string? IbMatIntMen3 { get; set; }
+    }
+}

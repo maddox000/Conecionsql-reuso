@@ -16,5 +16,6 @@
         public string? IbPerLeg { get; set; }     // ← FALTABA
         public string? IbPerPas { get; set; }     // ← FALTABA
         public string? IbPsw { get; set; }
+        public bool IbPerOcu { get; set; }
     }
 }

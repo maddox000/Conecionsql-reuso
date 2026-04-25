@@ -164,8 +164,18 @@ namespace ConexionSql.Controllers.Lavado
                 {
                     TB_PRO_LAV_DET_ID = d.TB_PRO_LAV_DET_ID,
                     TB_PRO_LAV_ID = d.TB_PRO_LAV_DET_PRO_LAV_ID ?? 0,
-                    TB_PRO_LAV_DET_CANT = d.TB_PRO_LAV_DET_CANT,
-                    TB_PRO_LAV_DET_REC_DET_MAT_DEN = d.TB_PRO_LAV_DET_IB_MAT_DEN
+
+                    TB_PRO_LAV_DET_REC_DET_ID = d.TB_PRO_LAV_DET_REC_DET_ID ?? 0,
+                    TB_PRO_LAV_DET_REC_DET_MAT_DEN = d.TB_PRO_LAV_DET_IB_MAT_DEN,
+
+                    TB_REC_SEC_DES_DEN = d.TB_PRO_LAV_DET_SEC_DES_DEN,
+                    TB_PRO_LAV_DET_REC_DET_REU_ID = d.TB_PRO_LAV_DET_REU_ID,
+
+                    TB_PRO_LAV_DET_REC_DET_CANT = d.TB_PRO_LAV_DET_REC_DET_CANT,
+                    TB_PRO_LAV_DET_REC_DET_PRO_TOT = d.TB_PRO_LAV_DET_TOT,
+                    TB_PRO_LAV_DET_REC_DET_PRO_STOCK = d.TB_PRO_LAV_DET_STOCK,
+
+                    TB_PRO_LAV_DET_CANT = d.TB_PRO_LAV_DET_CANT
                 })
                 .ToListAsync();
 
@@ -186,19 +196,33 @@ namespace ConexionSql.Controllers.Lavado
         }
 
         [HttpGet]
-        public async Task<IActionResult> BuscarPorId(int id)
+        public async Task<IActionResult> ObtenerMaterial(int tbRecDetId)
         {
-            var recDet = await _context.TbRecDet.FindAsync(id);
-            if (recDet == null)
-                return Json(new { success = false, mensaje = "Etiqueta no encontrada." });
-
-            return Json(new
+            try
             {
-                success = true,
-                materialId = recDet.TbRecDetMatId,
-                materialDen = recDet.TbRecDetMatDen,
-                stockDisponible = recDet.TbRecDetLavStock ?? 0
-            });
+                var recDet = await _context.TbRecDet
+                    .FirstOrDefaultAsync(r => r.TbRecDetId == tbRecDetId);
+
+                if (recDet == null)
+                    return Json(new { success = false, mensaje = "Etiqueta no encontrada." });
+
+                return Json(new
+                {
+                    success = true,
+                    materialId = recDet.TbRecDetMatId,
+                    nombre = recDet.TbRecDetMatDen,
+                    sector = recDet.TbRecSecDesDen,
+                    codigoReuso = recDet.TbRecDetReuId,
+                    recibidos = recDet.TbRecDetRecStock ?? 0,
+                    enProceso = recDet.TbRecDetLavTot ?? 0,
+                    sinProcesar = recDet.TbRecDetLavStock ?? 0
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("❌ Error en ObtenerMaterial Lavado: " + ex.Message);
+                return Json(new { success = false, mensaje = "❌ Error interno al obtener material." });
+            }
         }
     }
 }

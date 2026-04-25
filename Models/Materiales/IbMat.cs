@@ -582,7 +582,158 @@ namespace ConexionSql.Models.Materiales
         [Column("IB_MAT_ETI_DEN")]
         public string? IB_MAT_ETI_DEN { get; set; }
 
-        
+        // =============================
+        // CAMPOS FALTANTES DE IB_MAT
+        // =============================
+
+        [Column("IB_MAT_TCE_HMD")]
+        public int? IB_MAT_TCE_HMD { get; set; }
+
+        [Column("IB_MAT_CES")]
+        public int? IB_MAT_CES { get; set; }
+
+        [Column("IB_MAT_CER")]
+        public int? IB_MAT_CER { get; set; }
+
+        [Column("IB_MAT_CEL")]
+        public int? IB_MAT_CEL { get; set; }
+
+        [Column("IB_MAT_CET")]
+        public int? IB_MAT_CET { get; set; }
+
+        [Column("IB_MAT_CEA")]
+        public int? IB_MAT_CEA { get; set; }
+
+        [Column("IB_MAT_CEP")]
+        public int? IB_MAT_CEP { get; set; }
+
+        [Column("IB_MAT_CEX")]
+        public int? IB_MAT_CEX { get; set; }
+
+        [Column("IB_MAT_CED")]
+        public int? IB_MAT_CED { get; set; }
+
+        [Column("IB_MAT_CED_PROC_1")]
+        public int? IB_MAT_CED_PROC_1 { get; set; }
+
+        [Column("IB_MAT_CED_PROC_2")]
+        public int? IB_MAT_CED_PROC_2 { get; set; }
+
+        [Column("IB_MAT_CED_PROC_3")]
+        public int? IB_MAT_CED_PROC_3 { get; set; }
+
+        [Column("IB_MAT_CEE")]
+        public int? IB_MAT_CEE { get; set; }
+
+        [Column("IB_MAT_QST")]
+        public int? IB_MAT_QST { get; set; }
+
+        [Column("IB_MAT_BCO")]
+        public int? IB_MAT_BCO { get; set; }
+
+        [Column("IB_MAT_COS")]
+        public int? IB_MAT_COS { get; set; }
+
+        [Column("IB_MAT_COS_FEC")]
+        public DateTime? IB_MAT_COS_FEC { get; set; }
+
+        // 🔥 ESTE ES EL QUE TE ROMPÍA
+        [Column("IB_MAT_UBI_ID")]
+        public int? IB_MAT_UBI_ID { get; set; }
+
+        [Column("IB_MAT_UBI_DEN")]
+        public string? IB_MAT_UBI_DEN { get; set; }
+
+        [Column("IB_MAT_EST_ING_ID")]
+        public int? IB_MAT_EST_ING_ID { get; set; }
+
+        [Column("IB_MAT_EST_ING_DEN")]
+        public string? IB_MAT_EST_ING_DEN { get; set; }
+
+
+        [Column("IB_MAT_ETI_CTR")]
+        public int? IB_MAT_ETI_CTR { get; set; }
+
+        [Column("IB_MAT_ETI_CAN")]
+        public int? IB_MAT_ETI_CAN { get; set; }
+
+        [Column("IB_MAT_ETI_CEN")]
+        public int? IB_MAT_ETI_CEN { get; set; }
+
+        [Column("IB_MAT_ETI_CTO")]
+        public int? IB_MAT_ETI_CTO { get; set; }
+
+        [Column("IB_MAT_CQ_TIM_TOT")]
+        public int? IB_MAT_CQ_TIM_TOT { get; set; }
+
+        [Column("IB_MAT_TIM_TOT")]
+        public int? IB_MAT_TIM_TOT { get; set; }
+
+        [Column("IB_MAT_UDE_OPC")]
+        public bool IB_MAT_UDE_OPC { get; set; }
+
+        [Column("IB_MAT_STOCK_CQ_OPC")]
+        public bool IB_MAT_STOCK_CQ_OPC { get; set; }
+
+        [Column("IB_MAT_STOCK_CQ_MIN")]
+        public int? IB_MAT_STOCK_CQ_MIN { get; set; }
+
+        [Column("IB_MAT_STOCK_CQ_CRIT")]
+        public int? IB_MAT_STOCK_CQ_CRIT { get; set; }
+
+        [Column("IB_MAT_STOCK_DEPO")]
+        public int? IB_MAT_STOCK_DEPO { get; set; }
+
+        [Column("IB_MAT_STOCK_IDE")]
+        public int? IB_MAT_STOCK_IDE { get; set; }
+
+        [Column("IB_MAT_STOCK_HMD_IDE")]
+        public int? IB_MAT_STOCK_HMD_IDE { get; set; }
+
+        [Column("IB_MAT_STOCK_DEPO_IDE")]
+        public int? IB_MAT_STOCK_DEPO_IDE { get; set; }
+
+        [Column("IB_MAT_STOCK_DEPO_MIN")]
+        public int? IB_MAT_STOCK_DEPO_MIN { get; set; }
+
+        [Column("IB_MAT_STOCK_DEPO_CRIT")]
+        public int? IB_MAT_STOCK_DEPO_CRIT { get; set; }
+
+        [Column("IB_MAT_UDE")]
+        public int? IB_MAT_UDE { get; set; }
+
+        [Column("IB_MAT_STOCK_ENDO")]
+        public int? IB_MAT_STOCK_ENDO { get; set; }
+
+        [Column("IB_MAT_CANT_ENDO")]
+        public int? IB_MAT_CANT_ENDO { get; set; }
+
+        [Column("IB_MAT_TEMP_ENDO")]
+        public int? IB_MAT_TEMP_ENDO { get; set; }
+
+        [Column("IB_MAT_LAV_ENDO")]
+        public int? IB_MAT_LAV_ENDO { get; set; }
+
+        [Column("IB_MAT_ACO_ENDO")]
+        public int? IB_MAT_ACO_ENDO { get; set; }
+
+        [Column("IB_MAT_TCE_ENDO")]
+        public int? IB_MAT_TCE_ENDO { get; set; }
+
+        [Column("IB_MAT_CES_ENDO")]
+        public int? IB_MAT_CES_ENDO { get; set; }
+
+        [Column("IB_MAT_STOCK_FENT")]
+        public int? IB_MAT_STOCK_FENT { get; set; }
+
+        [Column("IB_MAT_CANT_CCV")]
+        public int? IB_MAT_CANT_CCV { get; set; }
+
+        [Column("IB_MAT_STOCK_CCV")]
+        public int? IB_MAT_STOCK_CCV { get; set; }
+
+        [Column("IB_MAT_TEMP_CCV")]
+        public int? IB_MAT_TEMP_CCV { get; set; }
 
     }
 }

@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ConexionSql.Controllers
+namespace ConexionSql.Controllers.Personal
 {
     public class IbPerController : Controller
     {
@@ -31,7 +31,7 @@ namespace ConexionSql.Controllers
                 })
                 .ToListAsync();
 
-            return View(ibPers);
+            return View("~/Views/IbPer/ListaPersonal.cshtml", ibPers);
         }
 
         // GET: IbPer/IbPerEdit

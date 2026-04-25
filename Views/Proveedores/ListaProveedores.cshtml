@@ -1,0 +1,47 @@
+﻿@model List<ConexionSql.Models.Proveedores.IbOrtDto>
+
+<link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+
+<div class="rec-screen">
+
+    <div class="rec-screen-banner">
+        Listado de Proveedores
+    </div>
+
+    <div class="rec-screen-table-wrap">
+        <table class="rec-screen-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Denominación</th>
+                    <th>Inhabilitado</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.IbOrtId</td>
+                            <td>@item.IbOrtDen</td>
+                            <td style="text-align:center;">
+                                <input type="checkbox" disabled @(item.IbOrtOcu ? "checked" : "") />
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" class="rec-screen-note">
+                            No hay proveedores cargados.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

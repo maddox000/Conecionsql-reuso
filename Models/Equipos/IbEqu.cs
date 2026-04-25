@@ -40,19 +40,19 @@ namespace ConexionSql.Models.Equipos
         public int? IbEquNum { get; set; }
 
         [Column("IB_EQU_ALT")]
-        public int IbEquAlt { get; set; }
+        public int? IbEquAlt { get; set; }
 
         [Column("IB_EQU_ANC")]
-        public int IbEquAnc { get; set; }
+        public int? IbEquAnc { get; set; }
 
         [Column("IB_EQU_PRO")]
-        public int IbEquPro { get; set; }
+        public int? IbEquPro { get; set; }
 
         [Column("IB_EQU_PORC")]
         public int? IbEquPorc { get; set; }
 
         [Column("IB_EQU_CAP")]
-        public int IbEquCap { get; set; }
+        public int? IbEquCap { get; set; }
 
         [Column("IB_EQU_CAPU")]
         public int? IbEquCapu { get; set; }

@@ -1,0 +1,56 @@
+﻿@model List<ConexionSql.Models.Instrumental.IbMatConDto>
+
+<link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
+
+<div class="rec-screen">
+
+    <div class="rec-screen-banner">
+        Listado de Instrumental
+    </div>
+
+    <div class="rec-screen-table-wrap">
+        <table class="rec-screen-table">
+            <thead>
+                <tr>
+                    <th>Código sistema</th>
+                    <th>Código producto</th>
+                    <th>Denominación</th>
+                    <th>Marca</th>
+                    <th>Catálogo</th>
+                    <th>Inhabilitado</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.IbMatIntId.ToString("D5")</td>
+                            <td>@item.IbMatIntPr</td>
+                            <td>@item.IbMatIntDen</td>
+                            <td>@item.IbMatIntMarDen</td>
+                            <td>@item.IbMatIntMarCat</td>
+                            <td style="text-align:center;">
+                                <input type="checkbox" disabled @(item.IbMatIntOcu ? "checked" : "") />
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="rec-screen-note">
+                            No hay instrumental cargado.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+@await Html.PartialAsync("~/Views/Shared/_BotonesInfoBasica.cshtml")

@@ -119,6 +119,8 @@ namespace ConexionSql.Models.Acondicionado
         // TB_PRO_ACO_CLI_DEN
         [Column("TB_PRO_ACO_CLI_DEN")]
         public string? TbProAcoCliDen { get; set; }
+
+
     }
 }
 

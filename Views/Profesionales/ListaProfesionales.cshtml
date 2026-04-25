@@ -1,0 +1,49 @@
+﻿@model List<ConexionSql.Models.Profesionales.IbProDto>
+
+<link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+
+<div class="rec-screen">
+
+    <div class="rec-screen-banner">
+        Listado de Profesionales
+    </div>
+
+    <div class="rec-screen-table-wrap">
+        <table class="rec-screen-table">
+            <thead>
+                <tr>
+                    <th>Código sistema</th>
+                    <th>Apellido</th>
+                    <th>Nombre</th>
+                    <th>Inhabilitado</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.IbProId.ToString("D5")</td>
+                            <td>@item.IbProApe</td>
+                            <td>@item.IbProNom</td>
+                            <td style="text-align:center;">
+                                <input type="checkbox" disabled @(item.IbProOcu ? "checked" : "") />
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="rec-screen-note">
+                            No hay profesionales cargados.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

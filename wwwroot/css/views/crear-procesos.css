@@ -540,3 +540,9 @@
 #tablaControlesProceso th {
     white-space: nowrap;
 }
+
+#formProDetalle .proceso-operativo-grid {
+    grid-template-columns: repeat(5, minmax(120px, 1fr));
+}
+
+/*--- ingreso etiqueta*/

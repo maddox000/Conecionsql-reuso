@@ -1,0 +1,49 @@
+﻿@model List<ConexionSql.Models.Sectores.IbSecDto>
+
+<link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+
+<div class="rec-screen">
+
+    <div class="rec-screen-banner">
+        Listado de Sectores
+    </div>
+
+    <div class="rec-screen-table-wrap">
+        <table class="rec-screen-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Denominación</th>
+                    <th>Destino</th>
+                    <th>Inhabilitado</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.IbSecId</td>
+                            <td>@item.IbSecDen</td>
+                            <td>@(string.IsNullOrEmpty(item.IbSecDesDen) ? "-" : item.IbSecDesDen)</td>
+                            <td style="text-align:center;">
+                                <input type="checkbox" disabled @(item.IbSecOcu ? "checked" : "") />
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="rec-screen-note">
+                            No hay sectores cargados.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

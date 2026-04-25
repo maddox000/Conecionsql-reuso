@@ -1,89 +1,104 @@
 ﻿@model ConexionSql.Models.Recepciones.TbRecDetFormDto
 
 <div class="subform-recepcion">
-    <h4>Agregar Detalle de Material</h4>
 
-    <form id="formDetalle" class="rec-det-form">
-        <div class="rec-det-fila">
+    <div id="contenedor-detalles" class="mt-4" style="height: 250px; overflow-y: auto;">
+    @await Html.PartialAsync("_DetalleTabla", ViewBag.Detalles as List<ConexionSql.Models.Recepciones.TbRecDetDto>)
+    </div>
 
-            <div class="rec-det-campo rec-det-codigo">
-                <label for="TB_REC_DET_MAT_PR">Código Producto</label>
-                <input asp-for="Detalle.TB_REC_DET_MAT_PR"
-                       id="TB_REC_DET_MAT_PR"
-                       class="form-control" />
+
+    <form id="formDetalle" class="rec-det-form mt-5">
+        <div class="rec-screen-table-wrap" style="margin-top: 180px;">
+            
+
+            <div class="p-3">
+                <table class="rec-screen-table rec-screen-table-entry mb-3">
+                    <thead>
+                        <tr>
+                            <th>Codigo Producto</th>
+                            <th>Material</th>
+                            <th>Codigo Reuso</th>
+                            <th>Revision</th>
+                            <th>Estado</th>
+                            <th>Cantidad</th>
+                            <th style="width:110px;">Accion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <input asp-for="Detalle.TB_REC_DET_MAT_PR"
+                                       id="TB_REC_DET_MAT_PR"
+                                       class="form-control form-control-sm" />
+                            </td>
+
+                            <td>
+                                <input type="text"
+                                       id="materialBusqueda"
+                                       class="form-control form-control-sm"
+                                       autocomplete="off" />
+
+                                <div id="listaMateriales" class="list-group mt-2"></div>
+
+                                <input type="hidden" id="IB_MAT_ID" name="Detalle.IB_MAT_ID" />
+                            </td>
+
+                            <td>
+                                <input id="TB_REC_DET_REU_ID_VISIBLE"
+                                       class="form-control form-control-sm" />
+                            </td>
+
+                            <td>
+                                <input type="text"
+                                       id="revisionBusqueda"
+                                       class="form-control form-control-sm"
+                                       autocomplete="off"
+                                       value="NO REGISTRA" />
+
+                                <div id="listaRevisiones" class="list-group mt-2"></div>
+
+                                <input asp-for="Detalle.TB_REC_DET_REP_ID"
+                                       type="hidden"
+                                       id="TB_REC_DET_REP_ID" />
+                            </td>
+
+                            <td>
+                                <input type="text"
+                                       id="estadoBusqueda"
+                                       class="form-control form-control-sm"
+                                       autocomplete="off" />
+
+                                <div id="listaEstados" class="list-group mt-2"></div>
+
+                                <input asp-for="Detalle.IB_EST_ID"
+                                       type="hidden"
+                                       id="IB_EST_ID" />
+                            </td>
+
+                            <td>
+                                <input asp-for="Detalle.TB_REC_DET_CANT"
+                                       id="TB_REC_DET_CANT"
+                                       class="form-control form-control-sm"
+                                       min="1"
+                                       type="text"
+                                       value="" />
+                            </td>
+
+                            <td>
+                                <button type="button" id="btnGuardar" class="btn btn-primary btn-sm w-100">Guardar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+        </div>
 
-            <!-- combo denominacion -->
-            <div class="rec-det-campo rec-det-material">
-                <label>Material</label>
-
-                <input type="text" id="materialBusqueda" class="form-control" autocomplete="off" />
-
-                <div id="listaMateriales" class="list-group mt-2"></div>
-
-                <input type="hidden" id="IB_MAT_ID" name="Detalle.IB_MAT_ID" />
-            </div>
-
-            <div class="rec-det-campo rec-det-reuso">
-                <label for="TB_REC_DET_REU_ID_VISIBLE">Código Reuso</label>
-                <input id="TB_REC_DET_REU_ID_VISIBLE"
-                       class="form-control"
-             />
-            </div>
-
-            <div class="rec-det-campo rec-det-revision">
-                <label>Revisión</label>
-
-                <input type="text"
-                       id="revisionBusqueda"
-                       class="form-control"
-                       autocomplete="off"
-                       value="NO REGISTRA" />
-
-                <div id="listaRevisiones" class="list-group mt-2"></div>
-
-                <input asp-for="Detalle.TB_REC_DET_REP_ID"
-                       type="hidden"
-                       id="TB_REC_DET_REP_ID" />
-            </div>
-
-            <div class="rec-det-campo rec-det-estado">
-                <label>Estado</label>
-
-                <input type="text"
-                       id="estadoBusqueda"
-                       class="form-control"
-                       autocomplete="off" />
-
-                <div id="listaEstados" class="list-group mt-2"></div>
-
-                <input asp-for="Detalle.IB_EST_ID"
-                       type="hidden"
-                       id="IB_EST_ID" />
-            </div>
-
-            <div class="rec-det-campo rec-det-cantidad">
-                <label for="TB_REC_DET_CANT">Cantidad</label>
-                <input asp-for="Detalle.TB_REC_DET_CANT"
-                       id="TB_REC_DET_CANT"
-                       class="form-control"
-                       min="1"
-                       type="number"
-                       value="" />
-            </div>
-
-            <div class="rec-det-campo" style="display:none !important;">
-                <label for="TB_REC_DET_VOL">Volumen</label>
-                <input asp-for="Detalle.TB_REC_DET_VOL"
-                       id="TB_REC_DET_VOL"
-                       class="form-control"
-                       readonly />
-            </div>
-
-            <div class="rec-det-campo rec-det-boton">
-                <label>&nbsp;</label>
-                <button type="button" id="btnGuardar" class="btn btn-primary">Guardar</button>
-            </div>
+        <div class="rec-det-campo" style="display:none !important;">
+            <label for="TB_REC_DET_VOL">Volumen</label>
+            <input asp-for="Detalle.TB_REC_DET_VOL"
+                   id="TB_REC_DET_VOL"
+                   class="form-control"
+                   readonly />
         </div>
 
         <input asp-for="Detalle.TB_REC_ID" type="hidden" />
@@ -108,9 +123,7 @@
     <div id="mensaje" class="mt-3 text-success"></div>
 </div>
 
-<div id="contenedor-detalles" class="mt-4">
-    @await Html.PartialAsync("_DetalleTabla", ViewBag.Detalles as List<ConexionSql.Models.Recepciones.TbRecDetDto>)
-</div>
+
 
 @await Html.PartialAsync("Modals/_ModalRevision")
 @await Html.PartialAsync("Modals/_ModalRegistroControlArmado")

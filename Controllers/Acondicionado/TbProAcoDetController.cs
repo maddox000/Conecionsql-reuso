@@ -91,7 +91,7 @@ namespace ConexionSql.Controllers
 
                     // Cantidades
                     TbProAcoDetCant = cantidad,
-                    TbProAcoDetEmpStock = stockDisponible,
+                    TbProAcoDetEmpStock = recDet.TbRecDetEmpStock,
                     TbProAcoDetEmpCant = cantidad,
                     TbProAcoDetEmpTot = cantidad,
                     TbProAcoDetProStock = cantidad,
@@ -134,8 +134,15 @@ namespace ConexionSql.Controllers
                     .Select(d => new TbProAcoDetDto
                     {
                         TbProAcoDetId = d.TbProAcoDetId,
+                        TbProAcoDetRecDetId = d.TbProAcoDetRecDetId,
+                        TbProAcoDetRecDetCant = d.TbProAcoDetRecDetCant,
                         TbProAcoDetMatId = d.TbProAcoDetMatId,
                         TbProAcoDetMatDen = d.TbProAcoDetMatDen,
+                        TbProAcoDetSecDesDen = d.TbProAcoDetSecDesDen,
+                        TbProAcoDetReuId = d.TbProAcoDetReuId,
+                        TbProAcoDetMatEtiDen = d.TbProAcoDetMatEtiDen,
+                        TbProAcoDetEmpTot = d.TbProAcoDetEmpTot,
+                        TbProAcoDetEmpStock = d.TbProAcoDetEmpStock,
                         TbProAcoDetCant = d.TbProAcoDetCant,
                         TbProAcoDetPcUsr = d.TbProAcoDetPcUsr,
                         TbProAcoDetPcLog = d.TbProAcoDetPcLog,
@@ -197,15 +204,33 @@ namespace ConexionSql.Controllers
         [HttpGet]
         public async Task<IActionResult> ObtenerMaterial(int tbRecDetId)
         {
-            var detalle = await _context.TbRecDet
-                .Where(r => r.TbRecDetId == tbRecDetId)
-                .Select(r => new { nombre = r.TbRecDetMatDen })
-                .FirstOrDefaultAsync();
+            try
+            {
+                var recDet = await _context.TbRecDet
+                    .FirstOrDefaultAsync(r => r.TbRecDetId == tbRecDetId);
 
-            if (detalle == null)
-                return Json(new { success = false, mensaje = "Etiqueta no encontrada." });
+                if (recDet == null)
+                    return Json(new { success = false, mensaje = "Etiqueta no encontrada." });
 
-            return Json(new { success = true, nombre = detalle.nombre });
+                return Json(new
+                {
+                    success = true,
+                    nombre = recDet.TbRecDetMatDen,
+                    sector = recDet.TbRecSecDesDen,
+                    codigoReuso = recDet.TbRecDetReuId,
+                    tipoEnvoltorio = recDet.TbRecDetMatEtiDen,
+                    recibidos = recDet.TbRecDetRecStock ?? 0,
+                    enProceso = recDet.TbRecDetEmpTot ?? 0,
+                    sinProcesar = recDet.TbRecDetEmpStock ?? 0
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("❌ Error en ObtenerMaterial: " + ex.Message);
+                return Json(new { success = false, mensaje = "❌ Error interno al obtener material." });
+            }
         }
+
+
     }
 }
