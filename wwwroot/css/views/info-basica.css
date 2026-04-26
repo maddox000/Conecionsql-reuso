@@ -6,10 +6,9 @@
 
 /* Pie de botones de Información Básica */
 .info-basica-footer {
-    position: fixed;
-    bottom: 60px;
-    right: 20px;
-    z-index: 1000;
+    margin-top: 12px;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .info-basica-botones {
@@ -42,4 +41,8 @@
     border-radius: 4px;
     font-size: 0.8rem;
     min-width: 96px;
+}
+
+.subform-recepcion {
+    padding-bottom: 0;
 }

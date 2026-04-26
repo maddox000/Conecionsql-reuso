@@ -1,0 +1,96 @@
+﻿@model ConexionSql.Models.Recepciones.TbRec
+@using ConexionSql.Models.Sectores
+
+@{
+    var listaSectores = ViewBag.ListaSectores as List<IbSec>;
+
+    var numeroRecepcion = Model != null && Model.TbRecId > 0 ? Model.TbRecId.ToString() : "Pendiente";
+    var fechaRecepcion = Model?.TbRecFec?.ToString("dd/MM/yyyy") ?? DateTime.Now.ToString("dd/MM/yyyy");
+    var horaRecepcion = Model?.TbRecHorIni?.ToString("HH:mm") ?? DateTime.Now.ToString("HH:mm");
+    var usuarioLogueado = ViewBag.UsuarioLogueado ?? "NO REGISTRADO";
+    var totalRecibido = Model?.TbRecCantTot ?? 0;
+}
+
+<div class="bx-card rec-screen">
+    <div class="rec-screen-banner">Recepcion de materiales</div>
+
+    <div class="rec-screen-head">
+
+        <!-- PANEL IZQUIERDO -->
+        <div class="rec-screen-panel">
+            <div class="rec-screen-kv">
+                <div class="rec-screen-k">Numero de recepcion</div>
+                <div class="rec-screen-v">@numeroRecepcion</div>
+            </div>
+
+            <div class="rec-screen-kv">
+                <div class="rec-screen-k">Fecha</div>
+                <div class="rec-screen-v">@fechaRecepcion</div>
+            </div>
+
+            <div class="rec-screen-kv">
+                <div class="rec-screen-k">Hora</div>
+                <div class="rec-screen-v">@horaRecepcion</div>
+            </div>
+
+            <div class="rec-screen-kv">
+                <div class="rec-screen-k">Usuario</div>
+                <div class="rec-screen-v">@usuarioLogueado</div>
+            </div>
+        </div>
+
+        <!-- PANEL DERECHO -->
+        <div class="rec-screen-panel">
+
+            <div class="rec-screen-kv">
+                <div class="rec-screen-k">Sector Origen</div>
+
+                <div class="rec-screen-v" style="flex-direction: column; align-items: stretch;">
+                    <input type="text"
+                           id="TbRecSecOriBusqueda"
+                           class="form-control"
+                           autocomplete="off"
+                           value="@(listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecOriId)?.IbSecDen ?? "")" />
+
+                    <div id="listaSectoresOrigen" class="list-group mt-2"></div>
+
+                    <input type="hidden" id="TbRecSecOriId" value="@Model?.TbRecSecOriId" />
+                </div>
+            </div>
+
+            <div class="rec-screen-kv">
+                <div class="rec-screen-k">Sector Destino</div>
+
+                <div class="rec-screen-v" style="flex-direction: column; align-items: stretch;">
+                    <input type="text"
+                           id="TbRecSecDesBusqueda"
+                           class="form-control"
+                           autocomplete="off"
+                           value="@(listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecDesId)?.IbSecDen ?? "")" />
+
+                    <div id="listaSectoresDestino" class="list-group mt-2"></div>
+
+                    <input type="hidden" id="TbRecSecDesId" value="@Model?.TbRecSecDesId" />
+                </div>
+            </div>
+
+            <div class="rec-screen-kv">
+                <div class="rec-screen-k">Total recibido</div>
+                <div class="rec-screen-v">
+                    <input type="text"
+                           id="TbRecCantTot"
+                           class="form-control form-control-sm"
+                           value="@totalRecibido"
+                           readonly />
+                </div>
+            </div>
+
+        </div>
+
+        <!-- IMAGEN -->
+        <div class="rec-screen-image">
+            imagen<br />no<br />disponible
+        </div>
+
+    </div>
+</div>

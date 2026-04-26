@@ -21,5 +21,9 @@ namespace ConexionSql.Models.A_PAN_OPC
 
         [Column("VALOR_ID")]
         public int? ValorId { get; set; }
+
+        // 👇 NUEVO CAMPO (ruta de imágenes)
+        [Column("VALOR_TXT")]
+        public string? ValorTxt { get; set; }
     }
 }

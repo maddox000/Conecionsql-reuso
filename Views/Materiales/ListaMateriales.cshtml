@@ -1,14 +1,87 @@
 ﻿@model List<ConexionSql.Models.Materiales.IbMatDto>
 
 <link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/area-sistema.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
 
+
+<!-- Panel de detalles -->
+<div style="display: grid; grid-template-columns: 300px 1fr; gap: 10px; padding: 10px; background: #f5f5f5; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
+
+    <!-- Imagen -->
+    <div style="display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #ddd; border-radius: 4px; min-height: 220px;">
+        <div id="productoImagenContainer" style="text-align: center;">
+            <div style="color: #999; font-size: 0.8rem;">Selecciona un producto</div>
+        </div>
+    </div>
+
+    <!-- Datos -->
+    <div style="display: grid; grid-template-columns: 180px 520px; gap: 6px; margin-left: 40px;">
+
+        <!-- Código producto -->
+        <div>
+            <label style="font-weight:600; font-size:0.7rem; color:#666; margin-bottom:2px; display:block;">Código Producto</label>
+            <div id="detalle-codigo-producto" style="padding:3px 5px; background:white; border:1px solid #ddd; border-radius:3px; font-size:0.78rem; line-height:1.1;">-</div>
+        </div>
+
+        <!-- Denominación -->
+        <div>
+            <label style="font-weight:600; font-size:0.7rem; color:#666; margin-bottom:2px; display:block;">Denominación</label>
+            <div id="detalle-denominacion" style="padding:3px 5px; background:white; border:1px solid #ddd; border-radius:3px; font-size:0.78rem; line-height:1.1;">-</div>
+        </div>
+
+        <!-- A partir de acá 2 columnas -->
+        <div style="grid-column: 1 / -1; display:grid; grid-template-columns: 1fr 1fr; gap:6px; width: 706px;">
+
+            <div>
+                <label style="font-weight:600; font-size:0.7rem; color:#666; margin-bottom:2px; display:block;">Código Sistema</label>
+                <div id="detalle-codigo-sistema" style="padding:3px 5px; background:white; border:1px solid #ddd; border-radius:3px; font-size:0.78rem; line-height:1.1;">-</div>
+            </div>
+
+            <div>
+                <label style="font-weight:600; font-size:0.7rem; color:#666; margin-bottom:2px; display:block;">Contenido</label>
+                <div id="detalle-contenido" style="padding:3px 5px; background:white; border:1px solid #ddd; border-radius:3px; font-size:0.78rem; line-height:1.1;">-</div>
+            </div>
+
+            <div>
+                <label style="font-weight:600; font-size:0.7rem; color:#666; margin-bottom:2px; display:block;">Catálogo</label>
+                <div id="detalle-catalogo" style="padding:3px 5px; background:white; border:1px solid #ddd; border-radius:3px; font-size:0.78rem; line-height:1.1;">-</div>
+            </div>
+
+            <div>
+                <label style="font-weight:600; font-size:0.7rem; color:#666; margin-bottom:2px; display:block;">Ubicación Depós</label>
+                <div id="detalle-ubicacion-depos" style="padding:3px 5px; background:white; border:1px solid #ddd; border-radius:3px; font-size:0.78rem; line-height:1.1;">-</div>
+            </div>
+
+            <div>
+                <label style="font-weight:600; font-size:0.7rem; color:#666; margin-bottom:2px; display:block;">Ubicación Actual</label>
+                <div id="detalle-ubicacion-actual" style="padding:3px 5px; background:white; border:1px solid #ddd; border-radius:3px; font-size:0.78rem; line-height:1.1;">-</div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
 <div class="rec-screen">
 
     <div class="rec-screen-banner">
         Listado de Productos Médicos
     </div>
 
-    <div class="rec-screen-table-wrap">
+    <div class="rec-screen-kv" style="max-width:500px; margin-bottom:10px;">
+    
+        <div class="rec-screen-k">Buscar</div>
+
+        <div class="rec-screen-v">
+            <input type="text"
+                   id="buscarDenominacion"
+                   class="form-control"
+                   placeholder="Por denominación..." />
+        </div>
+
+    </div>
+
+    <div class="rec-screen-table-wrap" style="height:400px; overflow:auto;">
         <table class="rec-screen-table">
             <thead>
                 <tr>
@@ -28,7 +101,16 @@
                 {
                     foreach (var item in Model)
                     {
-                        <tr>
+                        <tr class="fila-material"
+                            style="cursor:pointer;"
+                            data-id="@item.IbMatId"
+                            data-img-url="@Url.Action("Imagen", "Materiales", new { id = item.IbMatId })"
+                            data-codigo="@item.IbMatPr"
+                            data-denominacion="@item.IbMatDen"
+                            data-catalogo=""
+                            data-contenido="@item.IbMatConUnid"
+                            data-ubicacion="@item.IbMatEstIngDen">
+
                             <td>@item.IbMatId.ToString("D5")</td>
                             <td>@item.IbMatPr</td>
                             <td>@item.IbMatDen</td>
@@ -39,6 +121,7 @@
                             <td style="text-align:center;">
                                 <input type="checkbox" disabled @(item.IbMatOcu ? "checked" : "") />
                             </td>
+
                         </tr>
                     }
                 }
@@ -55,3 +138,66 @@
     </div>
 
 </div>
+
+<div class="info-basica-footer-fixed">
+    @await Html.PartialAsync("~/Views/Shared/_BotonesInfoBasica.cshtml")
+</div>
+
+<script>
+    document.querySelectorAll('.fila-material').forEach(function (fila) {
+        fila.addEventListener('click', function () {
+            console.time("clickFila");
+
+            // ✅ TU LÓGICA (NO SE TOCA)
+            document.getElementById('detalle-codigo-sistema').textContent = this.dataset.id || '-';
+            document.getElementById('detalle-codigo-producto').textContent = this.dataset.codigo || '-';
+            document.getElementById('detalle-denominacion').textContent = this.dataset.denominacion || '-';
+            document.getElementById('detalle-catalogo').textContent = this.dataset.catalogo || '-';
+            document.getElementById('detalle-contenido').textContent = this.dataset.contenido || '-';
+            document.getElementById('detalle-ubicacion-depos').textContent = this.dataset.ubicacion || '-';
+            document.getElementById('detalle-ubicacion-actual').textContent = this.dataset.ubicacion || '-';
+
+            document.querySelectorAll('.fila-material').forEach(function (f) {
+                f.style.backgroundColor = '';
+            });
+
+            this.style.backgroundColor = '#e8f4f8';
+
+            // ✅ NUEVO (IMAGEN)
+            const imgUrl = this.dataset.imgUrl;
+            const contenedorImagen = document.getElementById('productoImagenContainer');
+
+                if (imgUrl) {
+        contenedorImagen.innerHTML = `
+            <img src="${imgUrl}"
+                 alt="Imagen material"
+                 style="max-width:240px; max-height:240px; object-fit:contain;" />
+        `;
+            } else {
+                contenedorImagen.innerHTML = `
+                    <div style="color:#999; font-size:0.9rem;">Sin imagen</div>
+                `;
+            }
+            console.timeEnd("clickFila");
+                });
+                
+    });
+
+        document.getElementById('buscarDenominacion').addEventListener('keyup', function () {
+
+        const texto = this.value.toLowerCase();
+
+        document.querySelectorAll('.fila-material').forEach(function (fila) {
+
+            const denominacion = fila.dataset.denominacion.toLowerCase();
+
+            if (denominacion.includes(texto)) {
+                fila.style.display = '';
+            } else {
+                fila.style.display = 'none';
+            }
+
+        });
+
+    });
+</script>

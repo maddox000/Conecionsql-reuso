@@ -4,7 +4,10 @@
 @using ConexionSql.Models.Recepciones
 
 @{
-    ViewData["Title"] = "Nueva Recepción";
+    
+    
+
+    
     var listaSectores = ViewBag.ListaSectores as List<IbSec>;
     var subFormModel = ViewBag.SubFormularioDetalle as TbRecDetFormDto;
 
@@ -18,6 +21,7 @@
 }
 
 <link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
 
 <div class="bx-card rec-screen">
     <div class="rec-screen-banner">Recepcion de materiales</div>
@@ -93,8 +97,14 @@
                 </div>
             </div>
 
-            <div class="rec-screen-image">
-                imagen<br />no<br />disponible
+            <div class="rec-screen-image" style="display:flex; align-items:center; justify-content:center;">
+    
+                <div id="productoImagenContainer" style="text-align:center;">
+                    <div style="color:#999; font-size:0.8rem;">
+                        Sin imagen
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -223,7 +233,10 @@
         <input type="hidden" name="tbRecId" value="@(Model != null && Model.TbRecId > 0 ? Model.TbRecId : 0)" />
     </form>
 
-    <div class="rec-screen-actions rec-screen-actions-bottom mt-3">
+    
+
+    @* Botones viejos removidos. Se usan los botones del footer desde _BotonesInfoBasica.cshtml *@
+    @* <div class="rec-screen-actions rec-screen-actions-bottom mt-3">
         <button type="button" class="btn btn-secondary btn-sm" onclick="window.history.back()">Cerrar</button>
 
         <button type="button"
@@ -242,7 +255,7 @@
             <i class="bi bi-printer-fill"></i>
         </button>
     </div>
-</div>
+</div> *@
 
 @if (Model != null && Model.TbRecId > 0 && subFormModel != null)
 {
@@ -250,10 +263,11 @@
     subFormModel.Detalle.TB_REC_ID = Model.TbRecId;
 
     <div class="mt-4">
-        <h4>Agregar Material</h4>
         @await Html.PartialAsync("_SubFormRecDet.cshtml", subFormModel)
     </div>
 }
+
+    @await Html.PartialAsync("~/Views/Shared/_BotonesInfoBasica.cshtml")
 
 @section Scripts {
 

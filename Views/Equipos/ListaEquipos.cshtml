@@ -1,6 +1,7 @@
 ﻿@model List<ConexionSql.Models.Equipos.IbEquDto>
 
 <link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
 
 <div class="rec-screen">
 
@@ -26,7 +27,7 @@
                     foreach (var item in Model)
                     {
                         <tr style="cursor:pointer;"
-                            onclick="window.location.href='@Url.Action("ViewEquipo", "Equipos", new { id = item.IbEquId })'">
+                            ondblclick="window.location.href='@Url.Action("ViewEquipo", "Equipos", new { id = item.IbEquId })'">
 
                             <td>@item.IbEquId</td>
                             <td>@item.IbEquTeqDen</td>
@@ -54,3 +55,4 @@
     </div>
 
 </div>
+@await Html.PartialAsync("~/Views/Shared/_BotonesInfoBasica.cshtml")

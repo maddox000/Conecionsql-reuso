@@ -3,94 +3,135 @@
 @using ConexionSql.Models.Sectores
 @using ConexionSql.Models.Entrega
 
+
+
+
 @{
     ViewData["Title"] = "Crear Entrega";
     var listaPersonal = ViewBag.ListaPersonal as List<IbPerDto>;
     var listaSectores = ViewBag.ListaSectores as List<IbSec>;
-    var subFormModel = ViewBag.SubFormularioDetalle as TbEntDetFormDto;
 
     var usuarioId = ViewBag.UsuarioId;
     var usuarioLogueado = ViewBag.UsuarioLogueado as string;
 }
 
-<h4 class="mt-4">🚚 Entrega</h4>
+<link rel="stylesheet" href="~/css/views/crear-entrega.css" asp-append-version="true" />
 
-<form id="formCrearEntrega" onsubmit="return false;" class="mt-4">
-    <div class="form-group">
-        <label>Fecha</label>
-        <input type="text"
-               class="form-control"
-               id="fechaEntrega"
-               value="@DateTime.Today.ToString("yyyy-MM-dd")"
-               readonly />
-    </div>
+<div class="bx-card entrega-demo">
+    <div class="entrega-banner">Entrega de materiales</div>
 
-    <div class="form-group mt-3">
-        <label>Hora Inicio</label>
-        <input type="text"
-               class="form-control"
-               id="horaInicio"
-               value="@DateTime.Now.ToString("HH:mm")"
-               readonly />
-    </div>
+    <form id="formCrearEntrega" onsubmit="return false;">
+        <div class="entrega-grid">
 
-    <div class="form-group mt-4">
-        <label>Personal</label>
-        <input type="text"
-               class="form-control"
-               id="usuarioLogueado"
-               value="@usuarioLogueado"
-               readonly />
-    </div>
+            <div class="entrega-panel">
+                <div class="entrega-kv">
+                    <div class="k">Numero de entrega</div>
+                    <div class="v">-</div>
+                </div>
 
-    <div class="form-group mt-3">
-        <label for="TB_ENT_SEC_BUSQUEDA">Sector Destino</label>
+                <div class="entrega-kv">
+                    <div class="k">Usuario</div>
+                    <div class="v">
+                        <input type="text"
+                               class="form-control form-control-sm"
+                               id="usuarioLogueado"
+                               value="@usuarioLogueado"
+                               readonly />
+                    </div>
+                </div>
 
-        <input type="text"
-               class="form-control"
-               id="TB_ENT_SEC_BUSQUEDA"
-               autocomplete="off"
-               placeholder="Buscar sector..." />
+                <div class="entrega-kv">
+                    <div class="k">Cargo</div>
+                    <div class="v">-</div>
+                </div>
 
-        <div id="listaSectores" class="list-group mt-2"></div>
+                <div class="entrega-kv entrega-kv-total">
+                    <div class="k">Total entregado</div>
+                    <div class="v">0 Unidades</div>
+                </div>
 
-        <input type="hidden" id="TB_ENT_SEC_ID" />
-    </div>
+                <div class="entrega-checks compact">
+                    <label class="entrega-check"><input type="checkbox" /><span class="entrega-check-number">1.</span> Integridad envoltorios</label>
+                    <label class="entrega-check"><input type="checkbox" /><span class="entrega-check-number">2.</span> Ausencia de suciedad</label>
+                    <label class="entrega-check"><input type="checkbox" /><span class="entrega-check-number">3.</span> Control quimico virado</label>
+                    <label class="entrega-check"><input type="checkbox" /><span class="entrega-check-number">4.</span> Ausencia de humedad</label>
+                    <label class="entrega-check"><input type="checkbox" /><span class="entrega-check-number">5.</span> Envoltorios correctos</label>
+                </div>
+            </div>
 
-    <div class="form-group mt-3">
-        <label for="TB_ENT_SEC_PER">Personal de sector</label>
-        <input type="text"
-               class="form-control"
-               id="TB_ENT_SEC_PER"
-               placeholder="Ingrese personal del sector" />
-    </div>
+            <div class="entrega-panel">
+                <div class="entrega-kv">
+                    <div class="k">Fecha</div>
+                    <div class="v">
+                        <input type="text"
+                               class="form-control form-control-sm"
+                               id="fechaEntrega"
+                               value="@DateTime.Today.ToString("yyyy-MM-dd")"
+                               readonly />
+                    </div>
+                </div>
 
-    <div class="form-group mt-3">
-        <label for="TB_ENT_OBS">Observaciones</label>
-        <textarea class="form-control"
+                <div class="entrega-kv">
+                    <div class="k">Hora</div>
+                    <div class="v">
+                        <input type="text"
+                               class="form-control form-control-sm"
+                               id="horaInicio"
+                               value="@DateTime.Now.ToString("HH:mm")"
+                               readonly />
+                    </div>
+                </div>
+
+                <div class="entrega-kv">
+                    <div class="k">Sector de entrega</div>
+                    <div class="v">
+                        <input type="text"
+                               class="form-control form-control-sm"
+                               id="TB_ENT_SEC_BUSQUEDA"
+                               autocomplete="off"
+                               placeholder="Buscar sector..." />
+
+                        <div id="listaSectores" class="list-group mt-2"></div>
+
+                        <input type="hidden" id="TB_ENT_SEC_ID" />
+                    </div>
+                </div>
+
+                <div class="entrega-kv">
+                    <div class="k">Personal del sector</div>
+                    <div class="v">
+                        <input type="text"
+                               class="form-control form-control-sm"
+                               id="TB_ENT_SEC_PER"
+                               placeholder="Ingrese personal del sector" />
+                    </div>
+                </div>
+
+                <div class="entrega-kv">
+                    <div class="k">Horario conformidad</div>
+                    <div class="v">--:--</div>
+                </div>
+            </div>
+        </div>
+
+        <textarea class="entrega-observ"
                   id="TB_ENT_OBS"
                   rows="3"
                   placeholder="Ingrese observaciones"></textarea>
-    </div>
 
-    <div class="form-group mt-4">
-        <button type="button" class="btn btn-success" onclick="guardarEntrega()">💾 Guardar Entrega</button>
-    </div>
+        <div class="entrega-actions d-flex gap-2 align-items-center justify-content-end">
+            <button type="button" class="btn btn-primary" onclick="guardarEntrega()">
+                Guardar Entrega
+            </button>
 
-    <div id="mensajeEntrega" class="mt-3 text-danger"></div>
-</form>
+            <button type="button" class="btn btn-primary" onclick="window.history.back()">
+                Cerrar
+            </button>
+        </div>
 
-@if (subFormModel?.Cabecera?.TbEntId > 0)
-{
-    subFormModel.Detalle ??= new TbEntDetDto();
-    subFormModel.Detalle.TB_ENT_ID = subFormModel.Cabecera.TbEntId;
-
-    <div class="mt-4">
-        <h4>➕ Agregar Detalle</h4>
-        @await Html.PartialAsync("_SubFormEntDet", subFormModel)
-    </div>
-
-}
+        <div id="mensajeEntrega" class="mt-3 text-danger"></div>
+    </form>
+</div>
 
 @section Scripts {
     <script>

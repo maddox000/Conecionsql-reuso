@@ -1,0 +1,938 @@
+@model ConexionSql.Models.Busqueda.AreaSistemaIndexVm
+
+<link rel="stylesheet" href="~/css/views/area-sistema.css" asp-append-version="true" />
+
+<style media="print">
+    /* Ocultar elementos de navegación y chrome del sistema */
+    .page-wrapper > aside,
+    .page-wrapper > .sidebar,
+    .page-wrapper > nav,
+    #identificacionModal,
+    .modal,
+    .modal-backdrop,
+    .area-actions-footer,
+    footer {
+        display: none !important;
+    }
+    /* Expandir contenido al 100% */
+    .page-wrapper { display: block !important; }
+    .main-content { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+    #embedded-content { padding: 0 !important; }
+    .bx-card { box-shadow: none !important; border: none !important; }
+    /* Asegurar que la tabla se vea bien */
+    table { border-collapse: collapse !important; width: 100% !important; }
+    th, td { border: 1px solid #ccc !important; padding: 4px 6px !important; font-size: 0.85rem !important; }
+    thead tr { background-color: #2c3e50 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .col-no-print { display: none !important; }
+</style>
+
+<div class="bx-card area-sistema-shell">
+    <div class="area-sistema-banner">@Model.Titulo</div>
+
+    @if (Model.TipoSeleccionado == "productos")
+    {
+        <!-- Panel de detalles del producto para Productos Médicos -->
+        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 20px; padding: 20px; background: #f5f5f5; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
+            <!-- Imagen del producto -->
+            <div style="display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #ddd; border-radius: 4px; min-height: 200px;">
+                <div id="productoImagenContainer" style="text-align: center;">
+                    <div style="color: #999; font-size: 0.9rem;">Selecciona un producto</div>
+                </div>
+            </div>
+            
+            <!-- Datos del producto -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                    <label style="font-weight: 600; font-size: 0.85rem; color: #666;">Código de Sistema</label>
+                    <div id="detalle-codigo-sistema" style="padding: 8px; background: white; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">-</div>
+                </div>
+                <div>
+                    <label style="font-weight: 600; font-size: 0.85rem; color: #666;">Código Producto</label>
+                    <div id="detalle-codigo-producto" style="padding: 8px; background: white; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">-</div>
+                </div>
+                <div style="grid-column: 1/-1;">
+                    <label style="font-weight: 600; font-size: 0.85rem; color: #666;">Denominación</label>
+                    <div id="detalle-denominacion" style="padding: 8px; background: white; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">-</div>
+                </div>
+                <div>
+                    <label style="font-weight: 600; font-size: 0.85rem; color: #666;">Catálogo</label>
+                    <div id="detalle-catalogo" style="padding: 8px; background: white; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">-</div>
+                </div>
+                <div>
+                    <label style="font-weight: 600; font-size: 0.85rem; color: #666;">Contenido</label>
+                    <div id="detalle-contenido" style="padding: 8px; background: white; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">-</div>
+                </div>
+                <div>
+                    <label style="font-weight: 600; font-size: 0.85rem; color: #666;">Ubicación Depós</label>
+                    <div id="detalle-ubicacion-depos" style="padding: 8px; background: white; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">-</div>
+                </div>
+                <div>
+                    <label style="font-weight: 600; font-size: 0.85rem; color: #666;">Ubicación Actual</label>
+                    <div id="detalle-ubicacion-actual" style="padding: 8px; background: white; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista especializada para Productos Médicos - SIN columna Código sistema -->
+        <div class="area-table-wrap" style="margin: 0 !important; padding: 0 !important;">
+            <table class="table table-sm mb-0" style="font-size:0.9rem; border-collapse: collapse; width: 100%; margin: 0 !important; padding: 0 !important; display: table !important;">
+                <thead>
+                    <tr style="background-color: #2c3e50; color: white; font-weight: 600;">
+                        <th style="padding: 6px; font-size: 0.85rem; text-align: left;">@Model.ColumnaPrincipal</th>
+                        <th style="padding: 6px; font-size: 0.85rem; text-align: left;">@Model.ColumnaSecundaria</th>
+                        <th style="padding: 6px; font-size: 0.85rem; text-align: left;">@Model.ColumnaTerciaria</th>
+                        <th style="padding: 6px; font-size: 0.85rem; text-align: left;">@Model.ColumnaCuarta</th>
+                        <th style="padding: 6px; font-size: 0.85rem; text-align: left;">@Model.ColumnaQuinta</th>
+                        <th style="padding: 6px; font-size: 0.85rem; text-align: center; width: 10%;">Controlados</th>
+                        <th style="padding: 6px; font-size: 0.85rem; text-align: center; width: 10%;">Inhabilitado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Filas != null && Model.Filas.Count > 0)
+                    {
+                        foreach (var fila in Model.Filas)
+                        {
+                            <tr style="border-bottom: 1px solid #e0e0e0; cursor: pointer;" class="producto-fila" data-producto-id="@fila.Id" data-codigo="@fila.CodigoProducto" data-denominacion="@fila.Principal" data-tipo="@fila.Secundaria" data-ubicacion="@fila.UbicacionFisica" data-contenido="@fila.Contenido" data-catalogo="" data-controlado="@fila.Controlado" data-oculto="@fila.Ocultar">
+                                <td style="padding: 6px; font-size: 0.85rem;">
+                                    <a href="#" class="producto-id-link" data-producto-id="@fila.Id" style="text-decoration: underline; color: #0066cc; cursor: pointer; font-size: 0.85rem;">@fila.CodigoProducto</a>
+                                </td>
+                                <td style="padding: 6px; font-size: 0.85rem;">@fila.Principal</td>
+                                <td style="padding: 6px; font-size: 0.85rem;">@fila.Secundaria</td>
+                                <td style="padding: 6px; font-size: 0.85rem;">@fila.UbicacionFisica</td>
+                                <td style="padding: 6px; font-size: 0.85rem;">@fila.Contenido</td>
+                                <td style="padding: 6px; font-size: 0.85rem; text-align: center;">
+                                    <input type="checkbox" name="productoControlado_@fila.Id" value="true" @(fila.Controlado ? "checked" : "") style="width: 16px; height: 16px; cursor: pointer;" />
+                                </td>
+                                <td style="padding: 6px; font-size: 0.85rem; text-align: center; background-color: #e9ecef;">
+                                    <input type="checkbox" name="productoOculto_@fila.Id" value="true" @(fila.Ocultar ? "checked" : "") disabled style="width: 16px; height: 16px; cursor: not-allowed; opacity: 0.6;" />
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 12px; color: #999; font-size: 0.9rem;">@Model.MensajeSinDatos</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else if (Model.TipoSeleccionado == "profesionales")
+    {
+        <!-- Panel de detalle del profesional -->
+        <div style="display: grid; grid-template-columns: 1fr 200px auto; gap: 20px; padding: 20px; background: #f5f5f5; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
+            <!-- Campos del profesional -->
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div>
+                    <label style="font-weight: 600; font-size: 0.8rem; color: #2c3e50; background: #cfd8dc; padding: 2px 8px; display: inline-block; margin-bottom: 2px;">Código sistema</label>
+                    <div id="prof-codigo" style="padding: 6px 8px; background: white; border: 1px solid #aaa; font-size: 0.85rem; min-height: 28px;">-</div>
+                </div>
+                <div>
+                    <label style="font-weight: 600; font-size: 0.8rem; color: #2c3e50; background: #cfd8dc; padding: 2px 8px; display: inline-block; margin-bottom: 2px;">Apellido</label>
+                    <div id="prof-apellido" style="padding: 6px 8px; background: white; border: 1px solid #aaa; font-size: 0.85rem; min-height: 28px;">-</div>
+                </div>
+                <div>
+                    <label style="font-weight: 600; font-size: 0.8rem; color: #2c3e50; background: #cfd8dc; padding: 2px 8px; display: inline-block; margin-bottom: 2px;">Nombre</label>
+                    <div id="prof-nombre" style="padding: 6px 8px; background: white; border: 1px solid #aaa; font-size: 0.85rem; min-height: 28px;">-</div>
+                </div>
+                <div>
+                    <label style="font-weight: 600; font-size: 0.8rem; color: #2c3e50; background: #cfd8dc; padding: 2px 8px; display: inline-block; margin-bottom: 2px;">Sector entrega</label>
+                    <div id="prof-sector" style="padding: 6px 8px; background: white; border: 1px solid #aaa; font-size: 0.85rem; min-height: 28px;">-</div>
+                </div>
+                <div>
+                    <label style="font-weight: 600; font-size: 0.8rem; color: #2c3e50; background: #cfd8dc; padding: 2px 8px; display: inline-block; margin-bottom: 2px;">Inhabilitado</label>
+                    <div style="padding: 6px 8px; background: white; border: 1px solid #aaa; min-height: 28px;">
+                        <input type="checkbox" id="prof-inhabilitado" disabled style="width: 16px; height: 16px;" />
+                    </div>
+                </div>
+            </div>
+            <!-- Personal autorizado -->
+            <div style="border: 2px solid #2c3e50; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px; text-align: center;">
+                <div style="font-weight: 700; font-size: 0.9rem; color: #2c3e50;">Personal</div>
+                <div style="font-weight: 700; font-size: 0.9rem; color: #2c3e50;">autorizado</div>
+            </div>
+            <!-- Botones -->
+            <div style="display: flex; flex-direction: column; gap: 8px; justify-content: flex-start;">
+                <button id="btnNuevoProf" style="padding: 8px 18px; background-color: #2c3e50; color: white; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem; white-space: nowrap;"
+                        data-info-basica-auth="true"
+                        onclick="window.abrirModalAccesoInfoBasica('@Url.Action("InsertIbProf", "IbPer")', 'Nuevo profesional')">Nuevo</button>
+                <div style="position: relative; display: inline-block;">
+                    <button id="btnExportarProf" style="padding: 8px 18px; background-color: #2c3e50; color: white; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem; white-space: nowrap; width: 100%;">Exportar</button>
+                    <div id="menuExportarProf" style="display:none; position:absolute; top:100%; left:0; z-index:999; background:white; border:1px solid #ccc; box-shadow:0 4px 12px rgba(0,0,0,0.15); min-width:180px; margin-top:2px;">
+                        <button id="btnExportPdf" style="display:block; width:100%; padding:10px 16px; border:none; background:white; text-align:left; cursor:pointer; font-size:0.85rem; color:#2c3e50; font-weight:600;" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='white'">Descargar PDF</button>
+                        <button id="btnExportImpresora" style="display:block; width:100%; padding:10px 16px; border:none; background:white; text-align:left; cursor:pointer; font-size:0.85rem; color:#2c3e50; font-weight:600; border-top:1px solid #eee;" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='white'">Enviar a impresora</button>
+                    </div>
+                </div>
+                <button id="btnEditarProf" style="padding: 8px 18px; background-color: #2c3e50; color: white; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem; white-space: nowrap;"
+                        data-info-basica-auth="true"
+                        onclick="window.abrirModalAccesoInfoBasica('@Url.Action("IbProfEdit", "IbPer")', 'Editar profesionales')">Editar</button>
+                <button id="btnCerrarProf" style="padding: 8px 18px; background-color: #2c3e50; color: white; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem; white-space: nowrap;">Cerrar</button>
+            </div>
+        </div>
+
+        <!-- Tabla de profesionales -->
+        <div class="area-table-wrap" style="margin: 0 !important; padding: 0 !important;">
+            <table class="table table-sm mb-0" style="font-size:0.9rem; border-collapse: collapse; width: 100%; margin: 0 !important;">
+                <thead>
+                    <tr style="background-color: #2c3e50; color: white; font-weight: 600;">
+                        <th style="padding: 6px; font-size: 0.85rem; text-align: left;">Código sistema</th>
+                        <th style="padding: 6px; font-size: 0.85rem; text-align: left;">Apellido</th>
+                        <th style="padding: 6px; font-size: 0.85rem; text-align: left;">Nombre</th>
+                        <th style="padding: 6px; font-size: 0.85rem; text-align: center; width: 100px;">Inhabilitado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Filas != null && Model.Filas.Count > 0)
+                    {
+                        foreach (var fila in Model.Filas)
+                        {
+                            <tr class="profesional-fila @(fila.Ocultar ? "table-secondary text-muted" : "")"
+                                style="border-bottom: 1px solid #e0e0e0; cursor: pointer;"
+                                data-prof-id="@fila.Id"
+                                data-prof-apellido="@fila.Principal"
+                                data-prof-nombre="@fila.Secundaria"
+                                data-prof-sector="@fila.SectorEntrega"
+                                data-prof-ocultar="@fila.Ocultar">
+                                <td style="padding: 6px; font-size: 0.85rem;">
+                                    <a href="#" class="prof-id-link" data-prof-id="@fila.Id" style="text-decoration: underline; color: #0066cc; cursor: pointer; font-size: 0.85rem;">@fila.Id.PadLeft(5, '0')</a>
+                                </td>
+                                <td style="padding: 6px; font-size: 0.85rem;">@fila.Principal</td>
+                                <td style="padding: 6px; font-size: 0.85rem;">@fila.Secundaria</td>
+                                <td style="padding: 6px; font-size: 0.85rem; text-align: center; background-color: #e9ecef;">
+                                    <input type="checkbox"
+                                           class="chk-prof-inhabilitar"
+                                           data-id="@fila.Id"
+                                           @(fila.Ocultar ? "checked" : "")
+                                           disabled
+                                           style="width: 16px; height: 16px; cursor: not-allowed; opacity: 0.6;" />
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 12px; color: #999; font-size: 0.9rem;">@Model.MensajeSinDatos</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Barra inferior: búsqueda -->
+        <div style="display: flex; justify-content: flex-start; align-items: center; padding: 15px; background: #f5f5f5; border-top: 1px solid #ddd; margin-top: 20px;">
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <label style="font-size: 0.85rem; font-weight: 600; color: #2c3e50;">Texto de búsqueda</label>
+                <input type="text" id="profBusqueda" placeholder="" style="padding: 6px 10px; border: 1px solid #aaa; font-size: 0.85rem; width: 200px;" />
+                <label style="font-size: 0.85rem; font-weight: 600; color: #2c3e50;">Coincidencias</label>
+                <input type="text" id="profCoincidencias" readonly style="padding: 6px 10px; border: 1px solid #aaa; font-size: 0.85rem; width: 60px; text-align: center; background: #eee;" value="@Model.Filas.Count" />
+            </div>
+        </div>
+    }
+    else if (Model.TipoSeleccionado == "proveedores")
+    {
+        <!-- Vista especializada para Proveedores -->
+        <div class="area-table-wrap" style="margin: 0 !important; padding: 0 !important;">
+            <table class="table table-sm mb-0" style="font-size:0.9rem; border-collapse: collapse; width: 100%; margin: 0 !important;">
+                <thead>
+                    <tr style="background-color: #2c3e50; color: white; font-weight: 600;">
+                        <th style="padding: 6px; font-size: 0.85rem; text-align: left; width: 140px;">Código sistema</th>
+                        <th style="padding: 6px; font-size: 0.85rem; text-align: left;">Proveedor</th>
+                        <th style="padding: 6px; font-size: 0.85rem; text-align: center; width: 100px;">Ocultar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Filas != null && Model.Filas.Count > 0)
+                    {
+                        foreach (var fila in Model.Filas)
+                        {
+                            <tr class="proveedor-fila @(fila.Ocultar ? "table-secondary text-muted" : "")"
+                                style="border-bottom: 1px solid #e0e0e0; cursor: pointer;"
+                                data-prov-id="@fila.Id"
+                                data-prov-den="@fila.Principal"
+                                data-prov-ocultar="@fila.Ocultar">
+                                <td style="padding: 6px; font-size: 0.85rem;">@fila.Id.PadLeft(4, '0')</td>
+                                <td style="padding: 6px; font-size: 0.85rem;">@fila.Principal</td>
+                                <td style="padding: 6px; font-size: 0.85rem; text-align: center; background-color: #e9ecef;">
+                                    <input type="checkbox"
+                                           data-id="@fila.Id"
+                                           @(fila.Ocultar ? "checked" : "")
+                                           disabled
+                                           style="width: 16px; height: 16px; cursor: not-allowed; opacity: 0.6;" />
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="3" style="text-align: center; padding: 12px; color: #999; font-size: 0.9rem;">@Model.MensajeSinDatos</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Barra inferior: botones -->
+        <div style="display: flex; justify-content: flex-end; align-items: center; padding: 15px; background: #f5f5f5; border-top: 1px solid #ddd; margin-top: 20px;">
+            <div style="display: flex; gap: 8px;">
+                <button id="btnNuevoProv" style="padding: 8px 18px; background-color: #2c3e50; color: white; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem;"
+                        data-info-basica-auth="true"
+                        onclick="window.abrirModalAccesoInfoBasica('/Home/InsertProveedor', 'Nuevo proveedor')">Nuevo</button>
+                <button id="btnEditarProv" style="padding: 8px 18px; background-color: #2c3e50; color: white; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem;"
+                        data-info-basica-auth="true"
+                        onclick="window.abrirModalAccesoInfoBasica('/Home/EditarProveedores', 'Editar proveedores')">Editar</button>
+                <button id="btnCerrarProv" style="padding: 8px 18px; background-color: #2c3e50; color: white; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem;">Cerrar</button>
+            </div>
+        </div>
+    }
+    else if (Model.TipoSeleccionado == "sectores")
+    {
+        <!-- Vista especializada para Sectores -->
+        <div class="area-table-wrap" style="margin: 0 !important; padding: 0 !important;">
+            <table class="table table-sm mb-0" style="font-size:0.9rem; border-collapse: collapse; width: 100%; margin: 0 !important; table-layout: fixed;">
+                <thead>
+                    <tr style="background-color: #2c3e50; color: white; font-weight: 600;">
+                        <th style="padding: 8px 10px; font-size: 0.85rem; text-align: left; width: 12%; word-wrap: break-word;">Código sistema</th>
+                        <th style="padding: 8px 10px; font-size: 0.85rem; text-align: left; width: 28%; word-wrap: break-word;">Sector</th>
+                        <th style="padding: 8px 10px; font-size: 0.85rem; text-align: left; width: 35%; word-wrap: break-word;">Sector de destino</th>
+                        <th style="padding: 8px 10px; font-size: 0.85rem; text-align: center; width: 15%; word-wrap: break-word;">Activar Trasladados</th>
+                        <th style="padding: 8px 10px; font-size: 0.85rem; text-align: center; width: 10%; word-wrap: break-word;">Ocultar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Filas != null && Model.Filas.Count > 0)
+                    {
+                        foreach (var fila in Model.Filas)
+                        {
+                            <tr class="sector-fila @(fila.Ocultar ? "table-secondary text-muted" : "")"
+                                style="border-bottom: 1px solid #e0e0e0; cursor: pointer; height: 38px;"
+                                data-sec-id="@fila.Id"
+                                data-sec-den="@fila.Principal"
+                                data-sec-destino="@fila.SectorDestino"
+                                data-sec-trasladados="@fila.Trasladados"
+                                data-sec-ocultar="@fila.Ocultar">
+                                <td style="padding: 8px 10px; font-size: 0.85rem; word-wrap: break-word; overflow-wrap: break-word;">@fila.Id.PadLeft(4, '0')</td>
+                                <td style="padding: 8px 10px; font-size: 0.85rem; word-wrap: break-word; overflow-wrap: break-word;">@fila.Principal</td>
+                                <td style="padding: 8px 10px; font-size: 0.85rem; word-wrap: break-word; overflow-wrap: break-word;">@fila.SectorDestino</td>
+                                <td style="padding: 8px 10px; font-size: 0.85rem; text-align: center; background-color: #e9ecef; vertical-align: middle;">
+                                    <input type="checkbox"
+                                           data-id="@fila.Id"
+                                           @(fila.Trasladados ? "checked" : "")
+                                           disabled
+                                           style="width: 16px; height: 16px; cursor: not-allowed; opacity: 0.6;" />
+                                </td>
+                                <td style="padding: 8px 10px; font-size: 0.85rem; text-align: center; background-color: #e9ecef; vertical-align: middle;">
+                                    <input type="checkbox"
+                                           data-id="@fila.Id"
+                                           @(fila.Ocultar ? "checked" : "")
+                                           disabled
+                                           style="width: 16px; height: 16px; cursor: not-allowed; opacity: 0.6;" />
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 12px; color: #999; font-size: 0.9rem;">@Model.MensajeSinDatos</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Barra inferior: botones -->
+        <div style="display: flex; justify-content: flex-end; align-items: center; padding: 15px; background: #f5f5f5; border-top: 1px solid #ddd; margin-top: 20px;">
+            <div style="display: flex; gap: 8px;">
+                <button id="btnNuevoSec" 
+                        type="button"
+                        data-info-basica-auth="true"
+                        style="padding: 8px 18px; background-color: #2c3e50; color: white; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem; border-radius: 4px;"
+                        onclick="if(typeof window.abrirModalCrearSector === 'function') { window.abrirModalCrearSector(); } else { alert('Función no disponible'); }">
+                    Nuevo
+                </button>
+                <button id="btnEditarSec" style="padding: 8px 18px; background-color: #2c3e50; color: white; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem;"
+                        data-info-basica-auth="true"
+                        onclick="window.abrirModalAccesoInfoBasica('/Home/EditarSectores', 'Editar sectores')">Editar</button>
+                <button id="btnCerrarSec" style="padding: 8px 18px; background-color: #2c3e50; color: white; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem;">Cerrar</button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Vista genérica para otros tipos (Equipos, Personal, etc.) -->
+        <div class="area-kpi-grid">
+            @if (Model.Kpis != null && Model.Kpis.Count > 0)
+            {
+                foreach (var kpi in Model.Kpis)
+                {
+                    <div class="area-kpi"><span>@kpi.Etiqueta</span><strong>@kpi.Valor</strong></div>
+                }
+            }
+        </div>
+
+        <div class="area-table-wrap">
+            <table class="table table-sm table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>@Model.ColumnaPrincipal</th>
+                        <th>@Model.ColumnaSecundaria</th>
+                        <th>@Model.ColumnaTerciaria</th>
+                        <th>@Model.ColumnaCuarta</th>
+                        <th class="text-center col-no-print" style="width: 80px;">Ocultar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Filas != null && Model.Filas.Count > 0)
+                    {
+                        foreach (var fila in Model.Filas)
+                        {
+                            <tr class="equipo-fila" data-equipo-id="@fila.Id" style="cursor: pointer;">
+                                <td>
+                                    <a href="#" class="equipo-id-link" data-equipo-id="@fila.Id" style="text-decoration: underline; color: #0066cc; cursor: pointer;">@fila.Id</a>
+                                </td>
+                                <td>@fila.Principal</td>
+                                <td>@fila.Secundaria</td>
+                                <td>@fila.Terciaria</td>
+                                <td>@fila.NumeroSerie</td>
+                                <td class="text-center col-no-print">
+                                    <input type="checkbox" name="equipoOculto_@fila.Id" value="true" @(fila.Ocultar ? "checked" : "") />
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">@Model.MensajeSinDatos</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    @if (Model.TipoSeleccionado == "productos")
+    {
+        <!-- Botones para Productos Médicos -->
+        <div style="display: flex; gap: 10px; padding: 15px; background: #f5f5f5; border-top: 1px solid #ddd; margin-top: 20px;">
+            <button id="btnNuevoProducto" data-info-basica-auth="true" onclick="window.abrirModalCrearProducto(); return false;" style="padding: 10px 20px; background-color: #2c3e50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">+ Nuevo</button>
+            <button type="button" id="btnEditarProducto" data-info-basica-auth="true" onclick="window.editarProductoSeleccionado(); return false;" style="padding: 10px 20px; background-color: #2c3e50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.9rem; opacity: 0.6; pointer-events: none;">Editar</button>
+            <button id="btnControlReusos" style="padding: 10px 20px; background-color: #34495e; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Control reusos</button>
+            <button id="btnCerrarProductos" style="padding: 10px 20px; background-color: #7f8c8d; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cerrar</button>
+        </div>
+    }
+    else if (Model.TipoSeleccionado != "profesionales")
+    {
+        <div class="d-flex justify-content-end mt-3 gap-3">
+            <div class="area-actions-footer">
+                @if (Model.Acciones != null && Model.Acciones.Count > 0)
+                {
+                    @foreach (var accion in Model.Acciones)
+                    {
+                        @if (accion.Texto == "Nuevo")
+                        {
+                            <a class="@accion.CssClass" href="#" data-info-basica-auth="true" onclick="window.abrirModalCrearEquipo(); return false;">@accion.Texto</a>
+                        }
+                        else if (accion.Texto == "Exportar")
+                        {
+                            <a class="@accion.CssClass" href="#" id="btnExportarPDF">@accion.Texto</a>
+                        }
+                        else if (accion.Texto == "Editar")
+                        {
+                            <a class="@accion.CssClass" href="#" id="btnEditarEquipo" data-info-basica-auth="true" style="opacity: 0.6; pointer-events: none;"
+                               onclick="window.editarEquipoSeleccionado(); return false;">@accion.Texto</a>
+                        }
+                        else
+                        {
+                            <a class="@accion.CssClass" href="@accion.Href">@accion.Texto</a>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Modal para crear nuevo producto -->
+<div id="modalNuevoProducto" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 8px; padding: 30px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h3 style="margin-top: 0; margin-bottom: 20px; color: #2c3e50; font-weight: 600;">Crear Nuevo Producto</h3>
+        
+        <form id="formNuevoProducto" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.85rem; color: #666; margin-bottom: 5px;">Código Producto *</label>
+                <input type="text" id="nuevoProductoCodigo" name="codigo" value="@Model.SiguienteCodigoProducto" readonly required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; box-sizing: border-box; background-color: #e9ecef; cursor: not-allowed;"/>
+            </div>
+            
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.85rem; color: #666; margin-bottom: 5px;">Denominación *</label>
+                <input type="text" id="nuevoProductoDenominacion" name="denominacion" placeholder="Nombre del producto" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; box-sizing: border-box;"/>
+            </div>
+            
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.85rem; color: #666; margin-bottom: 5px;">Tipo *</label>
+                <input type="text" id="nuevoProductoTipo" name="tipo" placeholder="BANDEJA, CAJA, etc." required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; box-sizing: border-box;"/>
+            </div>
+            
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.85rem; color: #666; margin-bottom: 5px;">Ubicación</label>
+                <input type="text" id="nuevoProductoUbicacion" name="ubicacion" placeholder="Ubicación física" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; box-sizing: border-box;"/>
+            </div>
+            
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.85rem; color: #666; margin-bottom: 5px;">Contenido (Cantidad) *</label>
+                <input type="number" id="nuevoProductoContenido" name="contenido" placeholder="1" min="1" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; box-sizing: border-box;"/>
+            </div>
+            
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.85rem; color: #666; margin-bottom: 5px;">Catálogo</label>
+                <input type="text" id="nuevoProductoCatalogo" name="catalogo" placeholder="Referencia catálogo" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; box-sizing: border-box;"/>
+            </div>
+            
+            <div style="grid-column: 1/-1;">
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.85rem; color: #666; cursor: pointer;">
+                    <input type="checkbox" id="nuevoProductoControlado" name="controlado" style="width: 18px; height: 18px; cursor: pointer;"/>
+                    <span>Controlado</span>
+                </label>
+            </div>
+            
+            <div style="grid-column: 1/-1;">
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.85rem; color: #666; cursor: pointer;">
+                    <input type="checkbox" id="nuevoProductoOculto" name="oculto" style="width: 18px; height: 18px; cursor: pointer;"/>
+                    <span>Ocultar</span>
+                </label>
+            </div>
+            
+            <div style="grid-column: 1/-1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                <button type="submit" style="padding: 12px; background-color: #2c3e50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Guardar Producto</button>
+                <button type="button" id="btnCancelarProducto" onclick="document.getElementById('modalNuevoProducto').style.display='none';" style="padding: 12px; background-color: #7f8c8d; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para editar producto -->
+<div id="modalEditarProducto" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 8px; padding: 30px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h3 style="margin-top: 0; margin-bottom: 20px; color: #2c3e50; font-weight: 600;">Editar Producto</h3>
+        
+        <form id="formEditarProducto" onsubmit="return false;" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <input type="hidden" id="editarProductoId" />
+            
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.85rem; color: #666; margin-bottom: 5px;">Código Producto *</label>
+                <input type="text" id="editarProductoCodigo" name="codigo" placeholder="PR-0000" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; box-sizing: border-box;"/>
+            </div>
+            
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.85rem; color: #666; margin-bottom: 5px;">Denominación *</label>
+                <input type="text" id="editarProductoDenominacion" name="denominacion" placeholder="Nombre del producto" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; box-sizing: border-box;"/>
+            </div>
+            
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.85rem; color: #666; margin-bottom: 5px;">Tipo *</label>
+                <input type="text" id="editarProductoTipo" name="tipo" placeholder="BANDEJA, CAJA, etc." required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; box-sizing: border-box;"/>
+            </div>
+            
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.85rem; color: #666; margin-bottom: 5px;">Ubicación</label>
+                <input type="text" id="editarProductoUbicacion" name="ubicacion" placeholder="Ubicación física" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; box-sizing: border-box;"/>
+            </div>
+            
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.85rem; color: #666; margin-bottom: 5px;">Contenido (Cantidad) *</label>
+                <input type="number" id="editarProductoContenido" name="contenido" placeholder="1" min="1" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; box-sizing: border-box;"/>
+            </div>
+            
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.85rem; color: #666; margin-bottom: 5px;">Catálogo</label>
+                <input type="text" id="editarProductoCatalogo" name="catalogo" placeholder="Referencia catálogo" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; box-sizing: border-box;"/>
+            </div>
+            
+            <div style="grid-column: 1/-1;">
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.85rem; color: #666; cursor: pointer;">
+                    <input type="checkbox" id="editarProductoControlado" name="controlado" style="width: 18px; height: 18px; cursor: pointer;"/>
+                    <span>Controlado</span>
+                </label>
+            </div>
+            
+            <div style="grid-column: 1/-1;">
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.85rem; color: #666; cursor: pointer;">
+                    <input type="checkbox" id="editarProductoOculto" name="oculto" style="width: 18px; height: 18px; cursor: pointer;"/>
+                    <span>Ocultar</span>
+                </label>
+            </div>
+            
+            <div style="grid-column: 1/-1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                <button type="button" id="btnGuardarEdicion" data-info-basica-auth="true" onclick="guardarEdicion()" style="padding: 12px; background-color: #2c3e50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Guardar cambios</button>
+                <button type="button" id="btnCancelarEditar" style="padding: 12px; background-color: #7f8c8d; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    console.log('>> Script cargado');
+
+var productoSeleccionado = null;
+var btnEditarProductoHabilitado = false;
+
+// FUNCIÓN GLOBAL PARA GUARDAR EDICIÓN
+function guardarEdicion() {
+    console.log('>> guardarEdicion() llamada');
+    
+    const productoModificado = {
+        id: parseInt(document.getElementById('editarProductoId').value),
+        codigo: document.getElementById('editarProductoCodigo').value,
+        denominacion: document.getElementById('editarProductoDenominacion').value,
+        tipo: document.getElementById('editarProductoTipo').value,
+        ubicacion: document.getElementById('editarProductoUbicacion').value || '',
+        contenido: parseInt(document.getElementById('editarProductoContenido').value),
+        catalogo: document.getElementById('editarProductoCatalogo').value || '',
+        controlado: document.getElementById('editarProductoControlado').checked,
+        oculto: document.getElementById('editarProductoOculto').checked
+    };
+    
+    console.log('Enviando:', productoModificado);
+    
+    fetch('/Home/ModificarProducto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productoModificado)
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+        if (result.success) {
+            alert('Producto modificado exitosamente');
+            document.getElementById('modalEditarProducto').style.display = 'none';
+            window.location.href = '/Home/AreaSistema?tipo=productos';
+        } else {
+            alert('Error: ' + result.message);
+        }
+    })
+    .catch(function(e) { alert('Error de conexión: ' + e); });
+}
+
+// FUNCIÓN GLOBAL PARA ABRIR MODAL
+function abrirModalEditar() {
+    console.log('*** FUNCIÓN abrirModalEditar() EJECUTADA ***');
+    
+    const modalEditarProducto = document.getElementById('modalEditarProducto');
+    console.log('Modal exists:', !!modalEditarProducto);
+    
+    if (!btnEditarProductoHabilitado) {
+        alert('Por favor selecciona un producto primero');
+        return;
+    }
+    
+    if (!productoSeleccionado) {
+        alert('No hay producto seleccionado');
+        return;
+    }
+    
+    console.log('Llenando formulario con:', productoSeleccionado);
+    
+    // Fill form
+    document.getElementById('editarProductoId').value = productoSeleccionado.id || '';
+    document.getElementById('editarProductoCodigo').value = productoSeleccionado.codigo || '';
+    document.getElementById('editarProductoDenominacion').value = productoSeleccionado.denominacion || '';
+    document.getElementById('editarProductoTipo').value = productoSeleccionado.tipo || '';
+    document.getElementById('editarProductoUbicacion').value = productoSeleccionado.ubicacion || '';
+    document.getElementById('editarProductoContenido').value = productoSeleccionado.contenido || '';
+    document.getElementById('editarProductoCatalogo').value = productoSeleccionado.catalogo || '';
+    
+    const chk1 = document.getElementById('editarProductoControlado');
+    const chk2 = document.getElementById('editarProductoOculto');
+    if (chk1) chk1.checked = productoSeleccionado.controlado;
+    if (chk2) chk2.checked = productoSeleccionado.oculto;
+    
+    console.log('Abriendo modal...');
+    if (modalEditarProducto) {
+        modalEditarProducto.style.display = 'flex';
+        console.log('*** MODAL ABIERTO ***');
+    }
+}
+
+// INICIALIZAR (compatible con SPA shell re-ejecución)
+(function() {
+    console.log('>> Inicializando script productos');
+    
+    const modalEditarProducto = document.getElementById('modalEditarProducto');
+    const formEditarProducto = document.getElementById('formEditarProducto');
+    const btnCerrarProductos = document.getElementById('btnCerrarProductos');
+
+    // Product row selection
+    document.querySelectorAll('.producto-fila').forEach(fila => {
+        fila.addEventListener('click', function (e) {
+            if (e.target.type === 'checkbox') return;
+            
+            document.querySelectorAll('.producto-fila').forEach(f => f.style.backgroundColor = '');
+            this.style.backgroundColor = '#e8f4f8';
+            
+            productoSeleccionado = {
+                id: this.getAttribute('data-producto-id'),
+                codigo: this.getAttribute('data-codigo'),
+                denominacion: this.getAttribute('data-denominacion'),
+                tipo: this.getAttribute('data-tipo'),
+                ubicacion: this.getAttribute('data-ubicacion'),
+                contenido: this.getAttribute('data-contenido'),
+                catalogo: this.getAttribute('data-catalogo') || '',
+                controlado: this.getAttribute('data-controlado') === 'True',
+                oculto: this.getAttribute('data-oculto') === 'True'
+            };
+            
+            console.log('✓ Producto seleccionado:', productoSeleccionado);
+            
+            // Update detail panel
+            document.getElementById('detalle-codigo-sistema').textContent = productoSeleccionado.id;
+            document.getElementById('detalle-codigo-producto').textContent = productoSeleccionado.codigo;
+            document.getElementById('detalle-denominacion').textContent = productoSeleccionado.denominacion;
+            document.getElementById('detalle-catalogo').textContent = productoSeleccionado.tipo || '-';
+            document.getElementById('detalle-contenido').textContent = productoSeleccionado.contenido;
+            document.getElementById('detalle-ubicacion-depos').textContent = productoSeleccionado.ubicacion || '-';
+            document.getElementById('detalle-ubicacion-actual').textContent = productoSeleccionado.ubicacion || '-';
+            
+            // Enable Edit button
+            const btnEditarProducto = document.getElementById('btnEditarProducto');
+            if (btnEditarProducto) {
+                btnEditarProductoHabilitado = true;
+                btnEditarProducto.disabled = false;
+                btnEditarProducto.style.opacity = '1';
+                btnEditarProducto.style.cursor = 'pointer';
+                btnEditarProducto.style.pointerEvents = 'auto';
+                btnEditarProducto.style.backgroundColor = '#2c3e50';
+                btnEditarProducto.classList.remove('disabled');
+                btnEditarProducto.removeAttribute('aria-disabled');
+                console.log('✓ Botón Editar habilitado');
+            }
+        });
+    });
+
+    // Cancel edit
+    const btnCancelarEditar = document.getElementById('btnCancelarEditar');
+    if (btnCancelarEditar) {
+        btnCancelarEditar.addEventListener('click', function () {
+            if (modalEditarProducto) modalEditarProducto.style.display = 'none';
+            if (formEditarProducto) formEditarProducto.reset();
+        });
+    }
+
+    // Click outside modal
+    if (modalEditarProducto) {
+        modalEditarProducto.addEventListener('click', function (e) {
+            if (e.target === modalEditarProducto) {
+                modalEditarProducto.style.display = 'none';
+                if (formEditarProducto) formEditarProducto.reset();
+            }
+        });
+    }
+
+    // Close button
+    if (btnCerrarProductos) {
+        btnCerrarProductos.addEventListener('click', function () {
+            window.history.back();
+        });
+    }
+
+    // Control reusos button
+    var btnControlReusos = document.getElementById('btnControlReusos');
+    if (btnControlReusos) {
+        btnControlReusos.addEventListener('click', function () {
+            var den = productoSeleccionado ? productoSeleccionado.denominacion : '';
+            var url = '/Reusos' + (den ? '?denominacion=' + encodeURIComponent(den) : '');
+            window.location.href = url;
+        });
+    }
+    
+    console.log('>> Inicialización completada');
+})();
+
+// === EQUIPOS: selección de fila y editar ===
+(function() {
+    var equipoFilas = document.querySelectorAll('.equipo-fila');
+    if (!equipoFilas.length) return;
+
+    var equipoSeleccionadoId = null;
+
+    equipoFilas.forEach(function(fila) {
+        fila.addEventListener('click', function(e) {
+            if (e.target.type === 'checkbox' || e.target.tagName === 'A') return;
+            seleccionarEquipo(this);
+        });
+    });
+
+    document.querySelectorAll('.equipo-id-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            seleccionarEquipo(this.closest('tr'));
+        });
+    });
+
+    function seleccionarEquipo(fila) {
+        equipoFilas.forEach(function(f) { f.style.backgroundColor = ''; });
+        fila.style.backgroundColor = '#e8f4f8';
+        equipoSeleccionadoId = fila.getAttribute('data-equipo-id');
+
+        var btn = document.getElementById('btnEditarEquipo');
+        if (btn) {
+            btn.style.opacity = '1';
+            btn.style.pointerEvents = 'auto';
+        }
+    }
+
+    window.editarEquipoSeleccionado = function() {
+        if (!equipoSeleccionadoId) {
+            alert('Por favor seleccione un equipo primero.');
+            return;
+        }
+        var url = '/Home/EditarEquipo?id=' + encodeURIComponent(equipoSeleccionadoId);
+        window.abrirModalAccesoInfoBasica(url, 'Editar equipo');
+    };
+})();
+
+// === EXPORTAR / IMPRIMIR ===
+(function() {
+    var btnExportar = document.getElementById('btnExportarPDF');
+    if (!btnExportar) return;
+    btnExportar.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.print();
+    });
+})();
+
+// === PROFESIONALES ===
+(function() {
+    var profFilas = document.querySelectorAll('.profesional-fila');
+    if (!profFilas.length) return;
+
+    // Click en fila para autocompletar panel superior
+    profFilas.forEach(function(fila) {
+        fila.addEventListener('click', function(e) {
+            if (e.target.type === 'checkbox' || e.target.tagName === 'A') return;
+            seleccionarProfesional(this);
+        });
+    });
+
+    // Click en código de sistema (link)
+    document.querySelectorAll('.prof-id-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            seleccionarProfesional(this.closest('tr'));
+        });
+    });
+
+    function seleccionarProfesional(fila) {
+        profFilas.forEach(function(f) { f.style.backgroundColor = ''; });
+        fila.style.backgroundColor = '#e8f4f8';
+
+        var id = fila.getAttribute('data-prof-id');
+        var apellido = fila.getAttribute('data-prof-apellido');
+        var nombre = fila.getAttribute('data-prof-nombre');
+        var sector = fila.getAttribute('data-prof-sector');
+        var ocultar = fila.getAttribute('data-prof-ocultar') === 'True';
+
+        document.getElementById('prof-codigo').textContent = id.padStart(5, '0');
+        document.getElementById('prof-apellido').textContent = apellido;
+        document.getElementById('prof-nombre').textContent = nombre;
+        document.getElementById('prof-sector').textContent = sector;
+        document.getElementById('prof-inhabilitado').checked = ocultar;
+    }
+
+    // Búsqueda en tabla
+    var profBusqueda = document.getElementById('profBusqueda');
+    var profCoincidencias = document.getElementById('profCoincidencias');
+    if (profBusqueda) {
+        profBusqueda.addEventListener('input', function() {
+            var filtro = this.value.toLowerCase().trim();
+            var count = 0;
+            profFilas.forEach(function(fila) {
+                var texto = fila.textContent.toLowerCase();
+                if (!filtro || texto.indexOf(filtro) >= 0) {
+                    fila.style.display = '';
+                    count++;
+                } else {
+                    fila.style.display = 'none';
+                }
+            });
+            if (profCoincidencias) profCoincidencias.value = count;
+        });
+    }
+
+    // Exportar
+    var btnExportarProf = document.getElementById('btnExportarProf');
+    var menuExportarProf = document.getElementById('menuExportarProf');
+    if (btnExportarProf && menuExportarProf) {
+        btnExportarProf.addEventListener('click', function(e) {
+            e.stopPropagation();
+            menuExportarProf.style.display = menuExportarProf.style.display === 'none' ? 'block' : 'none';
+        });
+        document.addEventListener('click', function() {
+            menuExportarProf.style.display = 'none';
+        });
+        var exportUrl = '@Url.Action("ExportarProfesionales", "Home")';
+        document.getElementById('btnExportPdf').addEventListener('click', function() {
+            menuExportarProf.style.display = 'none';
+            window.open(exportUrl + '?modo=pdf', '_blank');
+        });
+        document.getElementById('btnExportImpresora').addEventListener('click', function() {
+            menuExportarProf.style.display = 'none';
+            window.open(exportUrl + '?modo=impresora', '_blank');
+        });
+    }
+
+    // Cerrar
+    var btnCerrarProf = document.getElementById('btnCerrarProf');
+    if (btnCerrarProf) {
+        btnCerrarProf.addEventListener('click', function() {
+            window.BaxenShell.navigate('/', true);
+        });
+    }
+})();
+
+// === PROVEEDORES ===
+(function() {
+    var provFilas = document.querySelectorAll('.proveedor-fila');
+    if (!provFilas.length) return;
+
+    provFilas.forEach(function(fila) {
+        fila.addEventListener('click', function(e) {
+            if (e.target.type === 'checkbox') return;
+            provFilas.forEach(function(f) { f.style.backgroundColor = ''; });
+            this.style.backgroundColor = '#e8f4f8';
+        });
+    });
+
+    var btnCerrarProv = document.getElementById('btnCerrarProv');
+    if (btnCerrarProv) {
+        btnCerrarProv.addEventListener('click', function() {
+            window.BaxenShell.navigate('/', true);
+        });
+    }
+})();
+
+// === SECTORES ===
+(function() {
+    var secFilas = document.querySelectorAll('.sector-fila');
+    if (!secFilas.length) return;
+
+    secFilas.forEach(function(fila) {
+        fila.addEventListener('click', function(e) {
+            if (e.target.type === 'checkbox') return;
+            secFilas.forEach(function(f) { f.style.backgroundColor = ''; });
+            this.style.backgroundColor = '#e8f4f8';
+        });
+    });
+
+    var btnCerrarSec = document.getElementById('btnCerrarSec');
+    if (btnCerrarSec) {
+        btnCerrarSec.addEventListener('click', function() {
+            window.BaxenShell.navigate('/', true);
+        });
+    }
+})();
+</script>

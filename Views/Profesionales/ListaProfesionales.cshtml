@@ -1,14 +1,27 @@
 ﻿@model List<ConexionSql.Models.Profesionales.IbProDto>
 
 <link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
 
 <div class="rec-screen">
 
     <div class="rec-screen-banner">
         Listado de Profesionales
     </div>
+    <div class="rec-screen-kv" style="max-width:500px; margin-bottom:10px;">
+    
+        <div class="rec-screen-k">Buscar</div>
 
-    <div class="rec-screen-table-wrap">
+        <div class="rec-screen-v">
+            <input type="text"
+                   id="buscarProfesional"
+                   class="form-control"
+                   placeholder="Por nombre o apellido..." />
+        </div>
+
+    </div>
+
+    <div class="rec-screen-table-wrap" style="height:550px; overflow:auto;">
         <table class="rec-screen-table">
             <thead>
                 <tr>
@@ -47,3 +60,21 @@
     </div>
 
 </div>
+
+<div class="info-basica-footer-fixed">
+    @await Html.PartialAsync("~/Views/Shared/_BotonesInfoBasica.cshtml")
+</div>
+
+<script>
+    document.getElementById('buscarProfesional').addEventListener('keyup', function () {
+
+        let filtro = this.value.toLowerCase();
+        let filas = document.querySelectorAll('.rec-screen-table tbody tr');
+
+        filas.forEach(function (fila) {
+            let texto = fila.innerText.toLowerCase();
+            fila.style.display = texto.includes(filtro) ? '' : 'none';
+        });
+
+    });
+</script>

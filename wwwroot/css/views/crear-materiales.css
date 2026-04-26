@@ -1,4 +1,4 @@
-.rec-screen {
+﻿.rec-screen {
     border-left: 0;
     padding: 1rem;
 }
@@ -53,16 +53,16 @@
     align-items: center;
 }
 
-.rec-screen-v .form-select,
-.rec-screen-v .form-control {
-    border: 0;
-    padding: 0;
-    min-height: auto;
-    box-shadow: none;
-    font-size: 0.77rem;
-    color: #243238;
-    background: transparent;
-}
+    .rec-screen-v .form-select,
+    .rec-screen-v .form-control {
+        border: 0;
+        padding: 0;
+        min-height: auto;
+        box-shadow: none;
+        font-size: 0.77rem;
+        color: #243238;
+        background: transparent;
+    }
 
 .rec-screen-image {
     border: 1px solid #d8dee2;
@@ -86,23 +86,25 @@
     margin-bottom: 0.7rem;
 }
 
-.rec-screen-observ textarea {
-    min-height: 48px;
-    border: 1px solid #d8dee2;
-    border-radius: 5px;
-    font-size: 0.78rem;
-    color: #243238;
-    padding: 0.25rem 0.35rem;
-    resize: vertical;
-    background: #fff;
-}
+    .rec-screen-observ textarea {
+        min-height: 48px;
+        border: 1px solid #d8dee2;
+        border-radius: 5px;
+        font-size: 0.78rem;
+        color: #243238;
+        padding: 0.25rem 0.35rem;
+        resize: vertical;
+        background: #fff;
+    }
 
 .rec-screen-table-wrap {
     border: 1px solid #d8dee2;
     border-radius: 6px;
-    overflow: hidden;
     margin-bottom: 0.75rem;
     background: #fff;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: auto;
 }
 
 .rec-screen-table-title {
@@ -119,14 +121,14 @@
     font-size: 0.74rem;
 }
 
-.rec-screen-table th {
-    background: #3a4f58;
-    color: #ecf4ff;
-    font-weight: 600;
-    border-right: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 0.2rem 0.24rem;
-    white-space: nowrap;
-}
+    .rec-screen-table th {
+        background: #3a4f58;
+        color: #ecf4ff;
+        font-weight: 600;
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.2rem 0.24rem;
+        white-space: nowrap;
+    }
 
     .rec-screen-table td {
         border-top: 1px solid #e2eaf5;
@@ -136,11 +138,11 @@
         vertical-align: middle;
     }
 
-.rec-screen-table .form-select,
-.rec-screen-table .form-control {
-    font-size: 0.72rem;
-    min-height: 28px;
-}
+    .rec-screen-table .form-select,
+    .rec-screen-table .form-control {
+        font-size: 0.72rem;
+        min-height: 28px;
+    }
 
 .rec-screen-actions {
     display: flex;
@@ -149,10 +151,10 @@
     flex-wrap: wrap;
 }
 
-.rec-screen-actions .btn {
-    min-width: 96px;
-    font-size: 0.8rem;
-}
+    .rec-screen-actions .btn {
+        min-width: 96px;
+        font-size: 0.8rem;
+    }
 
 .rec-screen-note {
     color: #8a9bb5;
@@ -186,9 +188,9 @@
         justify-content: stretch;
     }
 
-    .rec-screen-actions .btn {
-        flex: 1 1 46%;
-    }
+        .rec-screen-actions .btn {
+            flex: 1 1 46%;
+        }
 }
 
 .rec-screen-table-entry th {
