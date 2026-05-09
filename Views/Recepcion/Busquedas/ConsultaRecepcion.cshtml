@@ -1,0 +1,141 @@
+﻿@model ConexionSql.Models.Recepciones.TbRecDetFormDto
+
+@using ConexionSql.Models.Recepciones
+
+@{
+    var cabecera = ViewBag.Cabecera as TbRec;
+    var detalles = ViewBag.Detalles as List<TbRecDetDto> ?? new List<TbRecDetDto>();
+
+    var numeroRecepcion = cabecera != null && cabecera.TbRecId > 0
+        ? cabecera.TbRecId.ToString()
+        : "Pendiente";
+
+    var fechaRecepcion = cabecera?.TbRecFec?.ToString("dd/MM/yyyy") ?? "";
+    var horaRecepcion = cabecera?.TbRecHorIni?.ToString("HH:mm") ?? "";
+
+    var usuarioLogueado = cabecera?.TbRecPerNom ?? "NO REGISTRADO";
+
+    var sectorOrigen = cabecera?.TbRecSecOriDen ?? "";
+    var sectorDestino = cabecera?.TbRecSecDesDen ?? "";
+
+    var totalRecibido = cabecera?.TbRecCantTot ?? 0;
+}
+
+<link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
+
+<div class="bx-card rec-screen">
+
+    <div class="rec-screen-banner">Consulta de recepción</div>
+
+    <div class="rec-screen-head">
+
+        <!-- Panel izquierdo -->
+        <div class="rec-screen-panel">
+            <div class="rec-screen-kv">
+                <div class="rec-screen-k">Número de recepción</div>
+                <div class="rec-screen-v">@numeroRecepcion</div>
+            </div>
+
+            <div class="rec-screen-kv">
+                <div class="rec-screen-k">Fecha</div>
+                <div class="rec-screen-v">@fechaRecepcion</div>
+            </div>
+
+            <div class="rec-screen-kv">
+                <div class="rec-screen-k">Hora</div>
+                <div class="rec-screen-v">@horaRecepcion</div>
+            </div>
+
+            <div class="rec-screen-kv">
+                <div class="rec-screen-k">Usuario</div>
+                <div class="rec-screen-v">@usuarioLogueado</div>
+            </div>
+        </div>
+
+        <!-- Panel derecho -->
+        <div class="rec-screen-panel">
+            <div class="rec-screen-kv">
+                <div class="rec-screen-k">Sector origen</div>
+                <div class="rec-screen-v">@sectorOrigen</div>
+            </div>
+
+            <div class="rec-screen-kv">
+                <div class="rec-screen-k">Sector destino</div>
+                <div class="rec-screen-v">@sectorDestino</div>
+            </div>
+
+            <div class="rec-screen-kv">
+                <div class="rec-screen-k">Total recibido</div>
+                <div class="rec-screen-v">@totalRecibido</div>
+            </div>
+        </div>
+
+        <!-- Imagen / espacio libre -->
+        <div class="rec-screen-image" style="display:flex; align-items:center; justify-content:center;">
+            <div style="color:#999; font-size:0.8rem;">
+                Consulta
+            </div>
+        </div>
+
+    </div>
+
+    <div class="rec-screen-table-wrap mt-4">
+        <div class="rec-screen-table-title">Materiales recibidos</div>
+
+        <table class="rec-screen-table">
+            <thead>
+                <tr>
+                    <th>Código etiqueta</th>
+                    <th>Código producto</th>
+                    <th>Denominación</th>
+                    <th>Código reuso</th>
+                    <th>Estado</th>
+                    <th>Revisión</th>
+                    <th>Cantidad</th>
+                    <th>Stock lavado</th>
+                    <th>Stock acondicionado</th>
+                    <th>Stock proceso</th>
+                    <th>Stock entrega</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (detalles.Any())
+                {
+                    foreach (var item in detalles)
+                    {
+                        <tr>
+                            <td>@item.TB_REC_DET_ID</td>
+                            <td>@item.TB_REC_DET_MAT_PR</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.TbRecDetMatDen) ? "SIN MATERIAL" : item.TbRecDetMatDen)</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.TB_REC_DET_REU_ID) ? "-" : item.TB_REC_DET_REU_ID)</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.IB_EST_DEN) ? "-" : item.IB_EST_DEN)</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.TB_REC_DET_TXT_3) ? "-" : item.TB_REC_DET_TXT_3)</td>
+                            <td>@item.TB_REC_DET_CANT</td>
+                            <td>@item.TB_REC_DET_LAV_STOCK</td>
+                            <td>@item.TB_REC_DET_EMP_STOCK</td>
+                            <td>@item.TB_REC_DET_PRO_STOCK</td>
+                            <td>@item.TB_REC_DET_ENT_STOCK</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="11" style="text-align:center;">
+                            No hay materiales cargados para esta recepción.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="rec-screen-actions mt-3">
+        <a href="@Url.Action("Index", "Home")" class="btn-baxen">
+            Cerrar
+        </a>
+    </div>
+
+</div>

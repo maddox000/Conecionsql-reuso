@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ConexionSql.Data;
+﻿using ConexionSql.Data;
 using ConexionSql.Models.Entrega;
+using ConexionSql.Models.Procesos;
+using ConexionSql.Utilidades;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using ConexionSql.Utilidades;
 
 namespace ConexionSql.Controllers.Entrega
 {
@@ -84,6 +85,9 @@ namespace ConexionSql.Controllers.Entrega
                 // ✅ Descontar stock
                 recDet.TbRecDetEntStock = (recDet.TbRecDetEntStock ?? 0) - cantidad;
 
+                //pasa el stock
+                recDet.TbRecDetEntTot = (recDet.TbRecDetEntTot ?? 0) + cantidad;
+
                 // ✅ Acumular total en cabecera TB_ENT
                 cabecera.TbEntCantTot = (cabecera.TbEntCantTot ?? 0) + cantidad;
 
@@ -120,7 +124,7 @@ namespace ConexionSql.Controllers.Entrega
                     // 🔥 STOCK / ENTREGA
                     TbEntDetRecDetEntStock = recDet.TbRecDetEntStock,
                     TbEntDetRecDetEntCant = recDet.TbRecDetEntCant,
-                    TbEntDetRecDetEntTot = cantidad,
+                    TbEntDetRecDetEntTot = recDet.TbRecDetEntTot,
 
                     // 📦 CANTIDAD ENTREGADA AHORA
                     TbEntDetCant = cantidad,
@@ -190,9 +194,33 @@ namespace ConexionSql.Controllers.Entrega
                     .Select(d => new TbEntDetDto
                     {
                         TB_ENT_DET_ID = d.TbEntDetId,
+                        TbEntDetId = d.TbEntDetId,
+
                         TB_ENT_ID = d.TbEntId,
+                        TbEntId = d.TbEntId,
+
+                        TB_ENT_DET_REC_DET_ID = d.TbEntDetRecDetId,
+                        TbEntDetRecDetId = d.TbEntDetRecDetId,
+
+                        IB_MAT_ID = d.TbEntDetRecDetMatId,
+                        TbEntDetRecDetMatId = d.TbEntDetRecDetMatId,
+
+                        TbEntDetRecDetMatDen = d.TbEntDetRecDetMatDen,
+
+                        CodigoReuso = d.TbEntDetRecDetReuId,
+                        TbEntDetRecDetReuId = d.TbEntDetRecDetReuId,
+
+                        Recibidos = d.TbEntDetRecDetCant,
+                        TbEntDetRecDetCant = d.TbEntDetRecDetCant,
+
+                        Pendientes = d.TbEntDetRecDetEntStock,
+                        TbEntDetRecDetEntStock = d.TbEntDetRecDetEntStock,
+
+                        Entregados = d.TbEntDetRecDetEntTot,
+                        TbEntDetRecDetEntTot = d.TbEntDetRecDetEntTot,
+
                         TB_ENT_DET_CANT = d.TbEntDetCant,
-                        TbEntDetRecDetMatDen = d.TbEntDetRecDetMatDen
+                        TbEntDetCant = d.TbEntDetCant
                     })
                     .ToListAsync();
 
@@ -224,12 +252,51 @@ namespace ConexionSql.Controllers.Entrega
             if (recDet == null)
                 return Json(new { success = false, mensaje = "No se encontró la etiqueta." });
 
+            int stockDisponible = recDet.TbRecDetEntStock ?? 0;
+
             return Json(new
             {
                 success = true,
+
                 materialId = recDet.TbRecDetMatId,
                 materialDen = recDet.TbRecDetMatDen,
-                stockDisponible = recDet.TbRecDetEntStock ?? 0
+
+                codigoReuso = recDet.TbRecDetReuId,
+                recibidos = recDet.TbRecDetCant,
+                pendientes = stockDisponible,
+                entregados = recDet.TbRecDetEntTot ?? 0,
+
+                stockDisponible = stockDisponible,
+
+                autoInsertar = stockDisponible == 1,
+                cantidadAuto = 1
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ValidarProcesoPendiente(int id)
+        {
+            var pendientes = await _context.Set<TbProPendienteDto>()
+                .FromSqlRaw($@"
+            EXEC SP_BUSCAR_PROCESO_PENDIENTE_POR_ETIQUETA 
+            @TB_REC_DET_ID = {id}")
+                .ToListAsync();
+
+            if (pendientes.Any())
+            {
+                return Json(new
+                {
+                    success = false,
+                    requiereFinalizarProceso = true,
+                    tbProId = pendientes.First().TbProId,
+                    mensaje = "Aún existen procesos sin finalizar para este elemento. ¿Desea finalizar los procesos incompletos?"
+                });
+            }
+
+            return Json(new
+            {
+                success = true,
+                requiereFinalizarProceso = false
             });
         }
     }

@@ -37,6 +37,19 @@
         </div>
     </div>
 
+    <div class="aco-tabbar mt-4">
+        
+        <button type="button" class="aco-tab is-active" data-tab-target="aco-tab-registrados">
+            Materiales registrados
+        </button>
+
+        <button type="button" class="aco-tab" data-tab-target="aco-tab-pendientes">
+            Materiales pendientes
+        </button>
+    </div>
+
+    <div id="aco-tab-registrados" class="aco-tab-panel is-active">
+
     <!-- DETALLE (copia visual del estilo principal) -->
     <!-- Bloque de DETALLE (arriba) -->
     <div class="aco-table-wrap mt-4">
@@ -66,6 +79,37 @@
             </table>
         </div>
     </div>
+    </div>
+    <!-- pestana materiales pendientes -->
+    <div id="aco-tab-pendientes" class="aco-tab-panel">
+        <div class="aco-table-wrap mt-4">
+            <div class="aco-table-head-title">Materiales pendientes</div>
+
+            <div id="contenedor-aco-pendientes">
+                <table class="aco-table">
+                    <thead>
+                        <tr>
+                            <th>Código etiqueta</th>
+                            <th>Denominación</th>
+                            <th>Sector</th>
+                            <th>Código reuso</th>
+                            <th>Recibidos</th>
+                            <th>Registrados</th>
+                            <th>Pendientes</th>
+                            <th>Seleccionar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-aco-pendientes">
+                        <tr>
+                            <td colspan="8">Sin materiales pendientes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
 
     <!-- Bloque de INGRESO DE DATOS (abajo) -->
 
@@ -120,10 +164,10 @@
                 </tbody>
             </table>
 
-            <div class="mt-2 aco-botones-derecha">
-                <button type="submit" class="btn btn-primary btn-sm">Guardar detalle</button>
-                <button type="reset" class="btn btn-outline-primary btn-sm">Limpiar</button>
-                <button type="button" class="btn btn-primary btn-sm">Registrar</button>
+            <div class="aco-actions">
+                <button type="button" id="btnRegistrarMasivoAco" class="btn btn-baxen btn-sm">
+                    Registrar
+                </button>
                 <button type="button" class="btn btn-outline-primary btn-sm">Nuevo</button>
                 <button type="button" class="btn btn-outline-primary btn-sm">Editar</button>
                 <button type="button" class="btn btn-secondary btn-sm">Cerrar</button>
@@ -131,16 +175,6 @@
         </form>
         <div id="mensajeAco" class="mt-3"></div>
     </div>
-
-
-
-
-
-
-
-
-
-
 
 
 <script>
@@ -152,6 +186,54 @@
         const mensaje = document.getElementById("mensajeAco");
         const cabeceraCantidad = document.getElementById("cabeceraCantidad");
         const formAcoDetalle = document.getElementById("formAcoDetalle");
+
+                    const btnRegistrarMasivo = document.getElementById("btnRegistrarMasivoAco");
+
+            if (btnRegistrarMasivo) {
+                btnRegistrarMasivo.addEventListener("click", function () {
+
+                    console.log("CLICK REGISTRAR"); // para verificar
+
+                    const tbProAcoId = parseInt(inputCabecera.value);
+
+                    const etiquetas = Array.from(document.querySelectorAll(".chk-aco-pendiente:checked"))
+                        .map(x => parseInt(x.value))
+                        .filter(x => Number.isInteger(x));
+
+                    if (etiquetas.length === 0) {
+                        mensaje.innerText = "⚠️ Debe seleccionar al menos un material.";
+                        mensaje.className = "text-danger mt-3";
+                        return;
+                    }
+
+                    fetch("/TbProAcoDet/InsertarMasivo", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            tbProAcoId: tbProAcoId,
+                            etiquetas: etiquetas
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(result => {
+                        mensaje.innerText = result.success ? result.mensaje : "❌ " + result.mensaje;
+                        mensaje.className = result.success ? "text-success mt-3" : "text-danger mt-3";
+
+                   if (result.success) {
+                        cargarDetallesAco(tbProAcoId);
+                        cargarPendientesAco();
+            }
+                    })
+                    .catch(err => {
+                        mensaje.innerText = "❌ Error: " + err.message;
+                        mensaje.className = "text-danger mt-3";
+                    });
+                });
+            }
+
+                cargarPendientesAco();
 
         if (!inputEtiqueta || !inputCantidad || !inputCabecera || !inputMaterial || !mensaje || !formAcoDetalle) {
             return;
@@ -169,9 +251,9 @@
                     inputEtiqueta.focus();
                     return;
                 }
-            fetch(`/TbProAcoDet/ObtenerMaterial?tbRecDetId=${idEtiqueta}`)
+                        fetch(`/TbProAcoDet/ObtenerMaterial?tbRecDetId=${idEtiqueta}`)
             .then(res => res.json())
-             .then(data => {
+            .then(data => {
                 if (data.success) {
                     inputMaterial.value = data.nombre ?? "";
                     document.getElementById("sector").value = data.sector ?? "";
@@ -180,6 +262,44 @@
                     document.getElementById("recibidos").value = data.recibidos ?? 0;
                     document.getElementById("enProceso").value = data.enProceso ?? 0;
                     document.getElementById("sinProcesar").value = data.sinProcesar ?? 0;
+
+                    if (data.autoInsertar === true) {
+                        inputCantidad.value = data.cantidadAuto ?? 1;
+
+                        const tbProAcoId = parseInt(inputCabecera.value);
+
+                        fetch(`/TbProAcoDet/Insertar?tbRecDetId=${idEtiqueta}&cantidad=${inputCantidad.value}&tbProAcoId=${tbProAcoId}`, {
+                            method: "POST"
+                        })
+                        .then(res => res.json())
+                        .then(result => {
+                            mensaje.innerText = result.success ? result.mensaje : "❌ " + result.mensaje;
+                            mensaje.className = result.success ? "text-success mt-3" : "text-danger mt-3";
+
+                            if (result.success) {
+                                formAcoDetalle.reset();
+                                inputMaterial.value = "";
+
+                                if (result.html) {
+                                    document.getElementById("tbody-aco-detalles").innerHTML = result.html;
+                                }
+
+                                if (cabeceraCantidad) {
+                                    const actual = parseInt(cabeceraCantidad.innerText || "0");
+                                    cabeceraCantidad.innerText = actual + 1;
+                                }
+
+                                inputEtiqueta.focus();
+                            }
+                        })
+                        .catch(err => {
+                            mensaje.innerText = "❌ Error al guardar: " + err.message;
+                            mensaje.className = "text-danger mt-3";
+                        });
+                    } else {
+                        inputCantidad.focus();
+                    }
+
                 } else {
                     inputMaterial.value = "No encontrado";
                     document.getElementById("sector").value = "";
@@ -188,9 +308,9 @@
                     document.getElementById("recibidos").value = "";
                     document.getElementById("enProceso").value = "";
                     document.getElementById("sinProcesar").value = "";
-                }
 
-                inputCantidad.focus();
+                    inputCantidad.focus();
+                }
             })
             .catch(() => {
                 inputMaterial.value = "Error";
@@ -250,4 +370,90 @@
             }
         });
     });
+
+                document.querySelectorAll(".aco-tab").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const targetId = this.dataset.tabTarget;
+
+                    document.querySelectorAll(".aco-tab").forEach(x => x.classList.remove("is-active"));
+                    document.querySelectorAll(".aco-tab-panel").forEach(x => x.classList.remove("is-active"));
+
+                    this.classList.add("is-active");
+                    document.getElementById(targetId)?.classList.add("is-active");
+                });
+            });
+
+            // funcion cargar pendientes
+
+            function cargarPendientesAco() {
+                const tbody = document.getElementById("tbody-aco-pendientes");
+                if (!tbody) return;
+
+                fetch("/TbProAcoDet/ObtenerPendientes")
+                    .then(res => res.json())
+                    .then(json => {
+                        console.log(json);
+
+                        if (!json.success || !Array.isArray(json.data) || json.data.length === 0) {
+                            tbody.innerHTML = `
+                                <tr>
+                                    <td colspan="8">Sin materiales pendientes</td>
+                                </tr>`;
+                            return;
+                        }
+
+                        tbody.innerHTML = "";
+
+                        json.data.forEach(item => {
+                            tbody.innerHTML += `
+                                <tr>
+                                    <td>${item.id}</td>
+                                    <td>${item.material ?? ""}</td>
+                                    <td>${item.sector ?? ""}</td>
+                                    <td>${item.codigoReuso ?? ""}</td>
+                                    <td>${item.recibidos ?? 0}</td>
+                                    <td>${item.registrados ?? 0}</td>
+                                    <td>${item.pendientes ?? 0}</td>
+                                    <td style="text-align:center;">
+                                        <input type="checkbox" class="chk-aco-pendiente" value="${item.id}" />
+                                    </td>
+                                </tr>`;
+                        });
+
+           inicializarEventosCheckboxPendientes();
+                    })
+                    .catch(() => {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="8">Error al cargar datos</td>
+                            </tr>`;
+                    });
+            }
+
+            function inicializarEventosCheckboxPendientes() {
+                const mensaje = document.getElementById("mensajeAco");
+
+                document.querySelectorAll(".chk-aco-pendiente").forEach(chk => {
+                    chk.addEventListener("change", () => {
+                        if (mensaje) {
+                            mensaje.innerText = "";
+                            mensaje.className = "";
+                        }
+                    });
+                });
+            }
+
+            function cargarDetallesAco(tbProAcoId) {
+                fetch(`/TbProAcoDet/ObtenerDetallesAco?tbProAcoId=${tbProAcoId}`)
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.success && result.html) {
+                            document.getElementById("tbody-aco-detalles").innerHTML = result.html;
+                        }
+                    });
+            }
+                                
 </script>
+
+
+  

@@ -1,0 +1,37 @@
+﻿<div id="modalBuscarReuso"
+     style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:5000; align-items:center; justify-content:center;">
+
+    <div class="reu-screen-panel"
+         style="width:360px; padding:0; box-shadow:0 10px 30px rgba(0,0,0,.25); margin:auto; margin-top:10%;">
+
+        <div class="reu-screen-table-title">
+            Buscar código de reuso
+        </div>
+
+        <div style="padding:0.75rem;">
+
+            <div class="reu-screen-kv">
+                <div class="reu-screen-k">Código</div>
+                <div class="reu-screen-v">
+                    <input type="text"
+                           id="txtBuscarCodigoReuso"
+                           class="form-control"
+                           autocomplete="off" />
+                </div>
+            </div>
+
+            <div id="msgBuscarReuso" class="reu-screen-error" style="display:none;"></div>
+
+            <div class="reu-screen-actions" style="margin-top:0.75rem;">
+                <button type="button" class="btn btn-secondary" id="btnCerrarModalReuso">
+                    Cerrar
+                </button>
+
+                <button type="button" class="btn btn-primary" id="btnBuscarCodigoReuso">
+                    Buscar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

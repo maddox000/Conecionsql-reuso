@@ -1,46 +1,185 @@
 ﻿@model ConexionSql.Models.Entrega.TbEntDetFormDto
 
-<div class="subform-entrega mt-4">
-    <h4>Agregar Detalle</h4>
+<div class="subform-entrega">
 
     <!-- Cabecera de la entrega -->
-    <table class="table table-bordered mt-3">
-        <tr><th>ID</th><td>@Model.Cabecera.TbEntId</td></tr>
-        <tr><th>Personal</th><td>@Model.Cabecera.TbEntPerNom</td></tr>
-        <tr><th>Sector</th><td>@Model.Cabecera.TbEntSecDen</td></tr>
-        <tr><th>Cantidad</th><td id="cabeceraCantidad">@Model.Cabecera.TbEntCantTot</td></tr>
-    </table>
+    <link rel="stylesheet" href="~/css/views/crear-entrega.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
+
+    <div class="bx-card entrega-demo">
+        <div class="entrega-banner">Entrega de materiales</div>
+
+        <div class="entrega-grid">
+
+            <div class="entrega-panel">
+                <div class="entrega-kv">
+                    <div class="k">Numero de entrega</div>
+                    <div class="v">@Model.Cabecera.TbEntId</div>
+                </div>
+
+                <div class="entrega-kv">
+                    <div class="k">Usuario</div>
+                    <div class="v">@Model.Cabecera.TbEntPerNom</div>
+                </div>
+
+                <div class="entrega-kv">
+                    <div class="k">Cargo</div>
+                    <div class="v">-</div>
+                </div>
+
+                <div class="entrega-kv entrega-kv-total">
+                    <div class="k">Total entregado</div>
+                    <div class="v" id="cabeceraCantidad">@Model.Cabecera.TbEntCantTot Unidades</div>
+                </div>
+
+                <div class="entrega-checks compact">
+                    <label class="entrega-check"><input type="checkbox" /><span class="entrega-check-number">1.</span> Integridad envoltorios</label>
+                    <label class="entrega-check"><input type="checkbox" /><span class="entrega-check-number">2.</span> Ausencia de suciedad</label>
+                    <label class="entrega-check"><input type="checkbox" /><span class="entrega-check-number">3.</span> Control quimico virado</label>
+                    <label class="entrega-check"><input type="checkbox" /><span class="entrega-check-number">4.</span> Ausencia de humedad</label>
+                    <label class="entrega-check"><input type="checkbox" /><span class="entrega-check-number">5.</span> Envoltorios correctos</label>
+                </div>
+            </div>
+
+            <div class="entrega-panel">
+                <div class="entrega-kv">
+                    <div class="k">Fecha</div>
+                    <div class="v">@Model.Cabecera.TbEntFec?.ToString("yyyy-MM-dd")</div>
+                </div>
+
+                <div class="entrega-kv">
+                    <div class="k">Hora</div>
+                    <div class="v">@Model.Cabecera.TbEntHorIni?.ToString(@"hh\:mm")</div>
+                </div>
+
+                <div class="entrega-kv">
+                    <div class="k">Sector de entrega</div>
+                    <div class="v">@Model.Cabecera.TbEntSecDen</div>
+                </div>
+
+                <div class="entrega-kv">
+                    <div class="k">Personal del sector</div>
+                    <div class="v">@Model.Cabecera.TbEntSecPer</div>
+                </div>
+
+                <div class="entrega-kv">
+                    <div class="k">Horario conformidad</div>
+                    <div class="v">--:--</div>
+                </div>
+            </div>
+        </div>
+
+        <textarea class="entrega-observ" readonly>@(Model.Cabecera.TbEntObs ?? "NO REGISTRA")</textarea>
+    </div>
+
+    @* termina cabecera *@
+
+    <!-- 📋 Tabla de detalles -->
+    <div id="detalleTabla">
+        @await Html.PartialAsync("~/Views/Entrega/_DetalleTabla.cshtml", Model.Detalles)
+    </div>
+    <!-- 📋terina Tabla de detalles -->
 
     <form id="formEntDetalle" onsubmit="return false;">
         <input type="hidden" id="tbEntId" value="@Model.Detalle?.TB_ENT_ID ?? 0" />
 
-        <div class="form-group">
-            <label for="codigoEtiqueta">Código de etiqueta</label>
-            <input type="number" class="form-control" id="codigoEtiqueta" autocomplete="off" required />
-        </div>
+        <div class="entrega-table-wrap">
+            <table class="entrega-table">
+                <thead>
+                    <tr>
+                        <th>Código etiqueta</th>
+                        <th>Denominación</th>
+                        <th>Código reuso</th>
+                        <th>Recibidos</th>
+                        <th>Pendientes</th>
+                        <th>Entregados</th>
+                        <th>Cantidad</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
 
-        <div class="form-group mt-2">
-            <label>Material</label>
-            <input type="text" class="form-control" id="materialNombre" readonly />
-        </div>
+                <tbody>
+                    <tr>
+                        <td>
+                            <input type="text"
+                                   id="codigoEtiqueta"
+                                   class="form-control form-control-sm"
+                                   placeholder="Codigo etiqueta"
+                                   autocomplete="off"
+                                   required />
+                        </td>
 
-        <div class="form-group mt-2">
-            <label for="cantidad">Cantidad a entregar</label>
-            <input type="number" class="form-control" id="cantidad" min="1" required />
+                        <td>
+                            <input type="text"
+                                   id="materialNombre"
+                                   class="form-control form-control-sm"
+                                   placeholder="Denominacion"
+                                   readonly />
+                        </td>
+
+                        <td>
+                            <input type="text"
+                                   id="codigoReuso"
+                                   class="form-control form-control-sm"
+                                   placeholder="Codigo reuso"
+                                   readonly />
+                        </td>
+
+                        <td>
+                            <input type="number"
+                                   id="recibidos"
+                                   class="form-control form-control-sm"
+                                   placeholder="Recibidos"
+                                   readonly />
+                        </td>
+
+                        <td>
+                            <input type="number"
+                                   id="pendientes"
+                                   class="form-control form-control-sm"
+                                   placeholder="Pendientes"
+                                   readonly />
+                        </td>
+
+                        <td>
+                            <input type="number"
+                                   id="entregados"
+                                   class="form-control form-control-sm"
+                                   placeholder="Entregados"
+                                   readonly />
+                        </td>
+
+                        <td>
+                            <input type="text"
+                                   id="cantidad"
+                                   class="form-control form-control-sm"
+                                   placeholder="Cantidad"
+                                   min="1"
+                                   required />
+                        </td>
+
+                        <td>
+                            <button type="submit"
+                                    class="btn btn-primary btn-sm"
+                                    style="display:none;">
+                                Guardar
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
         <div id="mensajeOk" class="text-success mt-2" style="display:none;"></div>
         <div id="mensajeError" class="text-danger mt-2" style="display:none;"></div>
-
-        <button type="submit" class="btn btn-primary mt-3">Guardar</button>
     </form>
 </div>
 
-<!-- 📋 Tabla de detalles -->
-<div id="detalleTabla" class="mt-4">
-    @await Html.PartialAsync("~/Views/Entrega/_DetalleTabla.cshtml", Model.Detalles)
+<div class="info-basica-footer-fixed">
+    @await Html.PartialAsync("~/Views/Shared/_BotonesInfoBasica.cshtml")
 </div>
 
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const inputEtiqueta = document.getElementById("codigoEtiqueta");
@@ -79,148 +218,56 @@
 
             ocultarMensajes();
 
-            fetch(`/TbEntDet/BuscarPorId?id=${etiquetaId}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        materialId = data.materialId;
-                        materialNombre = data.materialDen;
-                        stockDisponible = data.stockDisponible ?? 0;
+            fetch(`/TbEntDet/ValidarProcesoPendiente?id=${etiquetaId}`)
+    .then(res => res.json())
+    .then(validacion => {
 
-                        inputMaterial.value = materialNombre;
-                        inputCantidad.value = "";
-                        inputCantidad.focus();
-                    } else {
-                        mostrarError(data.mensaje || "❌ No se encontró la etiqueta.");
-                    }
-                })
-                .catch(() => mostrarError("❌ Error al buscar la etiqueta."));
+        if (validacion.requiereFinalizarProceso === true) {
+
+            const confirmar = confirm(validacion.mensaje);
+
+        window.open(
+                    `/TbProBusqueda/VerProceso?tbProId=${validacion.tbProId}`,
+                    '_blank'
+                );
+
+            return;
         }
 
-        function guardarDetalle() {
-            ocultarMensajes();
+        // 👇 TU CÓDIGO ORIGINAL, SIN CAMBIAR
+        fetch(`/TbEntDet/BuscarPorId?id=${etiquetaId}`)
+            .then(res => res.json())
+            .then(data => {
+            if (data.success) {
+                            materialId = data.materialId;
+                            materialNombre = data.materialDen;
+                            stockDisponible = data.stockDisponible ?? 0;
 
-            const cantidad = parseInt(inputCantidad.value);
-            const entId = parseInt(inputCabecera.value);
+                            inputMaterial.value = materialNombre;
 
-            if (!etiquetaId || !materialId || !cantidad || cantidad < 1 || !entId) {
-                mostrarError("⚠️ Todos los campos son obligatorios.");
-                return;
-            }
+                            document.getElementById("codigoReuso").value = data.codigoReuso ?? "";
+                            document.getElementById("recibidos").value = data.recibidos ?? 0;
+                            document.getElementById("pendientes").value = data.pendientes ?? 0;
+                            document.getElementById("entregados").value = data.entregados ?? 0;
 
-            if (cantidad > stockDisponible) {
-                mostrarError(`❌ Stock insuficiente. Disponible: ${stockDisponible}`);
-                return;
-            }
-
-            const datos = {
-                TB_ENT_ID: entId,
-                TB_ENT_DET_REC_DET_ID: etiquetaId,
-                IB_MAT_ID: materialId,
-                TbEntDetMatDen: materialNombre,
-                TB_ENT_DET_CANT: cantidad
-            };
-
-            fetch("/TbEntDet/Insertar", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(datos)
+                            if (data.autoInsertar === true) {
+                                inputCantidad.value = data.cantidadAuto ?? 1;
+                                guardarDetalle();
+                            } else {
+                                inputCantidad.value = "";
+                                inputCantidad.focus();
+                            }
+                        } else {
+                    mostrarError(data.mensaje || "❌ No se encontró la etiqueta.");
+                }
             })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        mostrarOk(data.mensaje || "✅ Detalle agregado correctamente.");
-                        inputEtiqueta.value = "";
-                        inputMaterial.value = "";
-                        inputCantidad.value = "";
-                        etiquetaId = 0;
-                        materialId = 0;
-                        document.getElementById("detalleTabla").innerHTML = data.html;
-                        inputEtiqueta.focus();
-                    } else {
-                        mostrarError(data.mensaje || "❌ Error al guardar.");
-                    }
-                })
-                .catch(() => mostrarError("❌ Error inesperado."));
-        }
-
-        function mostrarOk(texto) {
-            msgOk.innerText = texto;
-            msgOk.style.display = "block";
-            msgErr.style.display = "none";
-        }
-
-        function mostrarError(texto) {
-            msgErr.innerText = texto;
-            msgErr.style.display = "block";
-            msgOk.style.display = "none";
-        }
-
-        function ocultarMensajes() {
-            msgOk.style.display = "none";
-            msgErr.style.display = "none";
-        }
+            .catch(() => {
+                mostrarError("❌ Error al buscar la etiqueta.");
+            });
+    })
+    .catch(() => {
+        mostrarError("❌ Error al validar proceso pendiente.");
     });
-</script>
-
-
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const inputEtiqueta = document.getElementById("codigoEtiqueta");
-        const inputMaterial = document.getElementById("materialNombre");
-        const inputCantidad = document.getElementById("cantidad");
-        const inputCabecera = document.getElementById("tbEntId");
-        const msgOk = document.getElementById("mensajeOk");
-        const msgErr = document.getElementById("mensajeError");
-        const cabeceraCantidad = document.getElementById("cabeceraCantidad");
-
-        let etiquetaId = 0;
-        let materialId = 0;
-        let materialNombre = "";
-        let stockDisponible = 0;
-
-        inputEtiqueta.focus();
-
-        inputEtiqueta.addEventListener("keydown", function (e) {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                buscarEtiqueta();
-            }
-        });
-
-        document.getElementById("formEntDetalle").addEventListener("submit", function (e) {
-            e.preventDefault();
-            guardarDetalle();
-        });
-
-        function buscarEtiqueta() {
-            etiquetaId = parseInt(inputEtiqueta.value);
-            if (!etiquetaId || etiquetaId <= 0) {
-                mostrarError("⚠️ Código inválido.");
-                return;
-            }
-
-            ocultarMensajes();
-
-            fetch(`/TbEntDet/BuscarPorId?id=${etiquetaId}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        materialId = data.materialId;
-                        materialNombre = data.materialDen;
-                        stockDisponible = data.stockDisponible ?? 0;
-
-                        inputMaterial.value = materialNombre;
-                        inputCantidad.value = "";
-                        inputCantidad.focus();
-                    } else {
-                        mostrarError(data.mensaje || "❌ No se encontró la etiqueta.");
-                    }
-                })
-                .catch(() => {
-                    mostrarError("❌ Error al buscar la etiqueta.");
-                });
         }
 
         function guardarDetalle() {

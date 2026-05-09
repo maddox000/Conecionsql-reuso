@@ -1,6 +1,6 @@
 ﻿using ConexionSql.Data;
 using ConexionSql.Models.Procesos;
-using ConexionSql.Models.Recepciones;
+using ConexionSql.Models.reuepciones;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -94,8 +94,15 @@ namespace ConexionSql.Controllers.Procesos
                         });
                     }
 
-                    detalleRecepcion.TbRecDetProStock = (detalleRecepcion.TbRecDetProStock ?? 0) + cantidadAbortada;
-                    detalle.TbProDetNum3 = (detalle.TbProDetNum3 ?? 0) + cantidadAbortada;
+                    detalleRecepcion.TbRecDetProStock =
+                        (detalleRecepcion.TbRecDetProStock ?? 0) + cantidadAbortada;
+
+                    detalleRecepcion.TbRecDetEntStock =
+                        (detalleRecepcion.TbRecDetEntStock ?? 0) - cantidadAbortada;
+
+                    detalle.TbProDetNum3 =
+                        (detalle.TbProDetNum3 ?? 0) + cantidadAbortada;
+
                     detalle.TbProDetCantAbo = 0;
                 }
 

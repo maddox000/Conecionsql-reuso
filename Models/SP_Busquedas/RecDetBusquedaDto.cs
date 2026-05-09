@@ -1,0 +1,58 @@
+﻿using System;
+
+namespace ConexionSql.Models.SP_Busquedas
+{
+    public class RecDetBusquedaDto
+    {
+        // TB_REC
+        public int? TB_REC_ID { get; set; }
+        public DateTime? TB_REC_FEC { get; set; }
+        public DateTime? TB_REC_HOR_INI { get; set; }
+        public int? TB_REC_SEC_ORI_ID { get; set; }
+        public string TB_REC_SEC_ORI_DEN { get; set; }
+        public int? TB_REC_SEC_DES_ID { get; set; }
+        public string TB_REC_SEC_DES_DEN { get; set; }
+        public int? TB_REC_ORT_ID { get; set; }
+        public string TB_REC_ORT_DEN { get; set; }
+        public int? TB_REC_CANT_TOT { get; set; }
+        public string TB_REC_LOT { get; set; }
+
+        // TB_REC_DET
+        public int? TB_REC_DET_ID { get; set; }
+        public int? TB_REC_DET_MAT_ID { get; set; }
+        public string TB_REC_DET_MAT_PR { get; set; }
+        public string TB_REC_DET_MAT_DEN { get; set; }
+        public int? TB_REC_DET_CANT_MULT { get; set; }
+        public int? TB_REC_DET_CANT { get; set; }
+        public bool? TB_REC_DET_MDE { get; set; }
+        public bool? TB_REC_DET_MCO { get; set; }
+        public bool? TB_REC_DET_VOP_OPC { get; set; }
+        public bool? TB_REC_DET_REU_OPC { get; set; }
+        public int? TB_REC_DET_EST_ID { get; set; }
+        public string TB_REC_DET_EST_DEN { get; set; }
+        public int? TB_REC_DET_EST_ING_ID { get; set; }
+        public string TB_REC_DET_EST_ING_DEN { get; set; }
+        public string TB_REC_DET_LOT { get; set; }
+        public DateTime? TB_REC_DET_VEN { get; set; }
+        public int? TB_REC_DET_NUM_3 { get; set; }
+        public string TB_REC_DET_TXT_3 { get; set; }
+        public string TB_REC_DET_REU_ID { get; set; }
+        public int? TB_REC_DET_REU_CANT { get; set; }
+        public string TB_REC_DET_PAC { get; set; }
+        public int? TB_REC_DET_PRO_ID { get; set; }
+        public string TB_REC_DET_PRO_NOM { get; set; }
+        public string TB_REC_DET_REM { get; set; }
+        public DateTime? TB_REC_DET_FEN { get; set; }
+        public DateTime? TB_REC_DET_HEN { get; set; }
+        public string TB_REC_DET_OBS { get; set; }
+        public double? TB_REC_DET_PMAT { get; set; }
+        public int? TB_REC_DET_MORT { get; set; }
+        public bool? TB_REC_DET_IVIS_OPC { get; set; }
+        public string TB_REC_DET_IVIS_OPC_NOM { get; set; }
+        public bool? TB_REC_DET_ACAJ_OPC { get; set; }
+        public string TB_REC_DET_ACAJ_OPC_NOM { get; set; }
+
+        // Parámetro de búsqueda nuevo
+        public int? BUS_CET { get; set; }
+    }
+}

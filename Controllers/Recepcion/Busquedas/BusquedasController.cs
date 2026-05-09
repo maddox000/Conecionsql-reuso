@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using ConexionSql.Data;
+﻿using ConexionSql.Data;
+using ConexionSql.Models.Recepciones;
 using ConexionSql.Models.Recepciones.Busquedas;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
+using ConexionSql.Models.reuepciones;
 
 
-namespace ConexionSql.Controllers.Recepcion.Busquedas
+namespace ConexionSql.Controllers.reuepcion.Busquedas
 {
     public class BusquedasController : Controller
     {
@@ -37,6 +39,39 @@ namespace ConexionSql.Controllers.Recepcion.Busquedas
                          }).ToList();
 
             return View("~/Views/Recepcion/Busquedas/BusquedaMaterialesFecha.cshtml", lista);
+        }
+
+        public IActionResult ConsultaRecepcion(int id)
+        {
+            var cabecera = _context.TbRec
+                .FirstOrDefault(x => x.TbRecId == id);
+
+            if (cabecera == null)
+            {
+                return NotFound();
+            }
+
+            var detalles = _context.TbRecDet
+                .Where(x => x.TbRecId == id)
+                .Select(x => new TbRecDetDto
+                {
+                    TB_REC_DET_ID = x.TbRecDetId,
+                    TB_REC_DET_MAT_PR = x.TbRecDetMatPr,
+                    TbRecDetMatDen = x.TbRecDetMatDen,
+                    TB_REC_DET_REU_ID = x.TbRecDetReuId,
+                    TB_REC_DET_CANT = x.TbRecDetCant,
+                    TB_REC_DET_LAV_STOCK = x.TbRecDetLavStock ?? 0,
+                    TB_REC_DET_EMP_STOCK = x.TbRecDetEmpStock ?? 0,
+                    TB_REC_DET_PRO_STOCK = x.TbRecDetProStock ?? 0,
+                    TB_REC_DET_ENT_STOCK = x.TbRecDetEntStock ?? 0,
+                    TB_REC_DET_TXT_3 = x.TbRecDetTxt3
+                })
+                .ToList();
+
+            ViewBag.Cabecera = cabecera;
+            ViewBag.Detalles = detalles;
+
+            return View("~/Views/Recepcion/Busquedas/ConsultaRecepcion.cshtml");
         }
     }
 

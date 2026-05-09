@@ -1194,33 +1194,39 @@ namespace ConexionSql.Controllers
 
                 );
 
-                for (int i = 0; i < detalle.TB_REC_DET_CANT; i++)
+                var cfgImpresion = await _context.APanOpc
+                         .FirstOrDefaultAsync(x => x.IdDenominacion == "A_PAN_IMP_ETI_EN" && x.Valor == true);
+
+                if (cfgImpresion?.ValorTxt == "RECEPCION")
                 {
-                    // 🔹 siempre imprime etiqueta normal
-                    ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zpl);
-
-                    // 🔹 si es COMPLETO, imprime adicional
-                    if (esCompleto && zplCompleto != null)
+                    for (int i = 0; i < detalle.TB_REC_DET_CANT; i++)
                     {
-                        ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zplCompleto);
-                    }
+                        // 🔹 siempre imprime etiqueta normal
+                        ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zpl);
 
-                    // 🔹 si es INCOMPLETO, imprime adicional
-                    if (esIncompleto && zplIncompleto != null)
-                    {
-                        ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zplIncompleto);
-                    }
+                        // 🔹 si es COMPLETO, imprime adicional
+                        if (esCompleto && zplCompleto != null)
+                        {
+                            ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zplCompleto);
+                        }
 
-                    // 🔹 si es PRIORIDAD DE PROCESO, imprime adicional
-                    if (detalle.TB_REC_DET_REP_ID == 5 && zplPrioridad != null)
-                    {
-                        ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zplPrioridad);
-                    }
+                        // 🔹 si es INCOMPLETO, imprime adicional
+                        if (esIncompleto && zplIncompleto != null)
+                        {
+                            ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zplIncompleto);
+                        }
 
-                    // 🔹 si es MATERIAL REPROCESADO SIN USO, imprime adicional
-                    if (detalle.TB_REC_DET_REP_ID == 10 && zplReprocesado != null)
-                    {
-                        ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zplReprocesado);
+                        // 🔹 si es PRIORIDAD DE PROCESO, imprime adicional
+                        if (detalle.TB_REC_DET_REP_ID == 5 && zplPrioridad != null)
+                        {
+                            ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zplPrioridad);
+                        }
+
+                        // 🔹 si es MATERIAL REPROCESADO SIN USO, imprime adicional
+                        if (detalle.TB_REC_DET_REP_ID == 10 && zplReprocesado != null)
+                        {
+                            ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zplReprocesado);
+                        }
                     }
                 }
                 var lista = await _context.TbRecDet

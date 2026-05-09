@@ -4,10 +4,10 @@
 @using ConexionSql.Models.Recepciones
 
 @{
+
     
     
 
-    
     var listaSectores = ViewBag.ListaSectores as List<IbSec>;
     var subFormModel = ViewBag.SubFormularioDetalle as TbRecDetFormDto;
 
@@ -113,7 +113,7 @@
         </div>
     </form>
 </div>
-<div class="mt-4">
+<div>
 
     @if (Model == null || Model.TbRecId <= 0)
     {
@@ -232,7 +232,7 @@
         <input type="hidden" id="elimDetId" name="tbRecDetId" />
         <input type="hidden" name="tbRecId" value="@(Model != null && Model.TbRecId > 0 ? Model.TbRecId : 0)" />
     </form>
-
+</div>
     
 
     @* Botones viejos removidos. Se usan los botones del footer desde _BotonesInfoBasica.cshtml *@

@@ -1,0 +1,314 @@
+﻿/* ==========================================
+   ESTILOS GENERALES
+   ========================================== */
+body {
+    background-color: #f4f7f9;
+    color: #34495e;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.9rem;
+}
+
+.contenedor-titulo {
+    text-align: right;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.titulo-derecha {
+    font-family: 'Century Gothic', AppleGothic, sans-serif;
+    color: #2c3e50;
+    font-weight: normal;
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+/* ==========================================
+   PANEL DE FILTROS COMPACTO
+   ========================================== */
+.panel-filtros {
+    background: #ffffff !important;
+    height: auto !important;
+    min-height: 100px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 15px 20px !important;
+    margin-bottom: 15px;
+    border: 1px solid #e1e4e8;
+}
+
+.form-group {
+    margin-bottom: 8px !important;
+}
+
+.panel-filtros label {
+    font-size: 0.7rem;
+    color: #7f8c8d;
+    font-weight: 600;
+    margin-bottom: 1px;
+    display: block;
+}
+
+.panel-filtros .form-control {
+    border-radius: 4px;
+    border: 1px solid #ccd1d9;
+    font-size: 0.8rem;
+    padding: 2px 8px;
+    height: 28px;
+    width: 100%;
+}
+
+.campo-activo {
+    border: 2px solid #007bff !important;
+    background-color: #f0f7ff !important;
+}
+
+/* ==========================================
+   MENÚ DE OPERACIONES Y REPORTE HOVER
+   ========================================== */
+.menu-operaciones {
+    display: flex;
+    flex-direction: column;
+    background-color: #2c3e50;
+    border-radius: 6px;
+    overflow: hidden;
+    width: 100%;
+    border: 1px solid #1a252f;
+}
+
+.btn-menu {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 0 15px; /* Quitamos padding vertical para controlar con height */
+    height: 40px; /* Altura fija para todos los botones */
+    line-height: 40px;
+    text-align: left;
+    font-size: 0.85rem;
+    color: #ecf0f1;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+    .btn-menu:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+    .btn-menu .material-icons {
+        margin-right: 10px;
+        font-size: 18px;
+    }
+
+/* Contenedor Reporte sin saltos */
+.reporte-container {
+    position: relative;
+    width: 100%;
+    height: 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.opciones-reporte {
+    display: none;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    background-color: #34495e;
+}
+
+.reporte-container:hover #btnReporte {
+    display: none;
+}
+
+.reporte-container:hover .opciones-reporte {
+    display: flex;
+}
+
+.opciones-reporte .btn-menu {
+    width: 50% !important;
+    height: 100% !important;
+    justify-content: center;
+    padding: 0 !important;
+    border-bottom: none !important;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.75rem;
+}
+
+    .opciones-reporte .btn-menu:last-child {
+        border-right: none;
+    }
+
+.btn-pdf .material-icons {
+    color: #e74c3c;
+    margin-right: 5px !important;
+}
+
+.btn-excel .material-icons {
+    color: #2ecc71;
+    margin-right: 5px !important;
+}
+
+/* ==========================================
+   GRILLA Y RESULTADOS
+   ========================================== */
+#zonaResultados {
+    display: block !important;
+    width: 100% !important;
+    height: calc(100vh - 420px) !important;
+    min-height: 350px;
+    overflow: auto !important;
+    border: 1px solid #dee2e6;
+    background: #fff;
+    border-radius: 8px;
+}
+
+    #zonaResultados thead th {
+        position: sticky;
+        top: 0;
+        background-color: #2c3e50;
+        color: white;
+        z-index: 10;
+        padding: 10px;
+        font-size: 0.85rem;
+    }
+
+    #zonaResultados tbody td {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        border-bottom: 1px solid #eee;
+        white-space: nowrap;
+        background-color: transparent; /* Permite ver el fondo de la fila */
+    }
+
+    /* CEBREADO: Filas pares con gris suave */
+    #zonaResultados tbody tr:nth-child(even) td {
+        background-color: #f8f9fa !important;
+    }
+
+    /* HOVER: Resalta la fila al pasar el mouse */
+    #zonaResultados tbody tr:hover td {
+        background-color: #f1f4f6 !important;
+    }
+
+.badge-contador-grande {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px;
+    background-color: #2c3e50;
+    color: white;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    width: 100%;
+}
+
+/* ==========================================
+   ESTILOS DEL LOADERS GLOBAL
+   ========================================== */
+
+/* Contenedor principal que ocupa toda la zona de resultados */
+#loader {
+    display: none; /* Se activa por JS */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.85); /* Fondo blanco semitransparente */
+    z-index: 2000;
+    /* Alineación vertical centrada */
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 50px; /* Ajusta este número para subirlo o bajarlo a gusto */
+}
+
+/* 1. Estilo para el Texto de Marca (NUEVO) */
+.brand-text {
+    font-family: 'Century Gothic', AppleGothic, sans-serif;
+    color: #2c3e50; /* Azul oscuro */
+    font-size: 1.1rem;
+    font-weight: normal;
+    margin-bottom: 15px; /* Espacio antes del spinner */
+}
+
+/* 2. Estilo para el Círculo Giratorio (Spinner) */
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3; /* Gris claro */
+    border-top: 4px solid #007bff; /* Azul de acento */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px; /* Espacio antes del texto de acción */
+}
+
+/* 3. Estilo para el Texto de Acción (Procesando...) */
+.loading-text {
+    font-family: 'Segoe UI', sans-serif;
+    color: #34495e;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Tabla estilo Baxen (Encabezado oscuro) */
+.table-baxen-resultados {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+    .table-baxen-resultados thead th {
+        background-color: #2c3e50; /* Azul oscuro de la foto */
+        color: #ffffff !important;
+        padding: 12px 15px;
+        font-weight: bold;
+        text-transform: none;
+        border: 1px solid #34495e;
+    }
+
+    .table-baxen-resultados tbody td {
+        padding: 10px 15px;
+        border-bottom: 1px solid #e0e0e0;
+        vertical-align: middle;
+        color: #333;
+    }
+
+/* Pastilla de Estado */
+.badge-estado-baxen {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    padding: 3px 15px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 0.8em;
+    border: 1px solid #bbdefb;
+    text-transform: uppercase;
+}
+
+/* Botón de Acciones */
+.btn-ver-detalle {
+    background-color: #34495e;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto;
+}
+
+    .btn-ver-detalle:hover {
+        background-color: #2c3e50;
+    }
+
+    .btn-ver-detalle .material-icons {
+        font-size: 18px;
+    }

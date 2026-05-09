@@ -9,7 +9,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace ConexionSql.Controllers.Recepcion
+namespace ConexionSql.Controllers.reuepcion
 {
     public class RecepcionController : Controller
     {

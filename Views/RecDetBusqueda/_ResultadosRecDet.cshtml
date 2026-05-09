@@ -1,0 +1,79 @@
+﻿@model List<ConexionSql.Models.SP_Busquedas.RecDetBusquedaDto>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info" style="margin: 20px;">No se encontraron registros.</div>
+    return;
+}
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th class="text-center" style="text-transform: none; font-weight: normal;">Código etiqueta</th>
+            <th style="text-transform: none; font-weight: normal;">Recepción</th>
+            <th style="text-transform: none; font-weight: normal;">Fecha Recepción</th>
+            <th style="text-transform: none; font-weight: normal;">Hora</th>
+            <th style="text-transform: none; font-weight: normal;">Sector origen</th>
+            <th style="text-transform: none; font-weight: normal;">Sector destino</th>
+            <th style="text-transform: none; font-weight: normal;">Código Producto</th>
+            <th style="text-transform: none; font-weight: normal;">Denominación</th>
+            <th class="text-center" style="text-transform: none; font-weight: normal;">Contenido</th>
+            <th class="text-center" style="text-transform: none; font-weight: normal;">Cantidad</th>
+            <th style="text-transform: none; font-weight: normal;">Revisión</th>
+            <th class="text-center" style="text-transform: none; font-weight: normal;">Datos adicionales</th>
+            <th class="text-center" style="text-transform: none; font-weight: normal;">Control contenido</th>
+            <th class="text-center" style="text-transform: none; font-weight: normal;">Verificación funcional</th>
+            <th class="text-center" style="text-transform: none; font-weight: normal;">Código Reúso</th>
+            <th class="text-center" style="text-transform: none; font-weight: normal;">Reúsos actuales</th>
+            <th style="text-transform: none; font-weight: normal;">Tarea a realizar</th>
+            <th style="text-transform: none; font-weight: normal;">Etapa actual</th>
+            <th style="text-transform: none; font-weight: normal;">Lote</th>
+            <th style="text-transform: none; font-weight: normal;">Vencimiento</th>
+            <th style="text-transform: none; font-weight: normal;">Proveedor</th>
+            <th style="text-transform: none; font-weight: normal;">Paciente</th>
+            <th style="text-transform: none; font-weight: normal;">Profesional</th>
+            <th style="text-transform: none; font-weight: normal;">Remito</th>
+            <th style="text-transform: none; font-weight: normal;">Fecha Procedimiento</th>
+            <th style="text-transform: none; font-weight: normal;">Hora</th>
+            <th style="text-transform: none; font-weight: normal;">Obsservaciones</th>
+            <th style="text-transform: none; font-weight: normal;">Inspección visual</th>
+            <th style="text-transform: none; font-weight: normal;">Control armado</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var x in Model)
+        {
+            <tr>
+                <td class="text-center">@x.TB_REC_DET_ID</td>
+                <td>@x.TB_REC_ID</td>
+                <td>@x.TB_REC_FEC?.ToString("dd/MM/yyyy")</td>
+                <td>@x.TB_REC_HOR_INI?.ToString("HH:mm")</td>
+                <td>@x.TB_REC_SEC_ORI_DEN</td>
+                <td>@x.TB_REC_SEC_DES_DEN</td>
+                <td>@x.TB_REC_DET_MAT_PR</td>
+                <td>@x.TB_REC_DET_MAT_DEN</td>
+                <td class="text-center">@x.TB_REC_DET_CANT_MULT</td>
+                <td class="text-center">@x.TB_REC_DET_CANT</td>
+                <td>@x.TB_REC_DET_TXT_3</td>
+                <td class="text-center"><input type="checkbox" @(x.TB_REC_DET_MDE == true ? "checked" : "") disabled /></td>
+                <td class="text-center"><input type="checkbox" @(x.TB_REC_DET_MCO == true ? "checked" : "") disabled /></td>
+                <td class="text-center"><input type="checkbox" @(x.TB_REC_DET_VOP_OPC == true ? "checked" : "") disabled /></td>
+                <td class="text-center">@x.TB_REC_DET_REU_ID</td>
+                <td class="text-center">@x.TB_REC_DET_REU_CANT</td>
+                <td>@x.TB_REC_DET_EST_DEN</td>
+                <td>@x.TB_REC_DET_EST_ING_DEN</td>
+                <td>@x.TB_REC_DET_LOT</td>
+                <td>@x.TB_REC_DET_VEN?.ToString("dd/MM/yyyy")</td>
+                <td>@x.TB_REC_ORT_DEN</td>
+                <td>@x.TB_REC_DET_PAC</td>
+                <td>@x.TB_REC_DET_PRO_NOM</td>
+                <td>@x.TB_REC_DET_REM</td>
+                <td>@x.TB_REC_DET_FEN?.ToString("dd/MM/yyyy")</td>
+                <td>@x.TB_REC_DET_HEN?.ToString("HH:mm")</td>
+                <td>@x.TB_REC_DET_OBS</td>
+                <td>@x.TB_REC_DET_IVIS_OPC_NOM</td>
+                <td>@x.TB_REC_DET_ACAJ_OPC_NOM</td>
+            </tr>
+        }
+    </tbody>
+</table>

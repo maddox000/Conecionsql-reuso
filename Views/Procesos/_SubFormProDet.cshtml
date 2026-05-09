@@ -4,6 +4,7 @@
 
     
     <link rel="stylesheet" href="~/css/views/crear-procesos.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
 
     <div class="bx-card proceso-demo">
         <div class="proceso-banner">Proceso de Esterilizacion</div>
@@ -101,13 +102,14 @@
             <button type="button" class="proceso-tab" data-tab-target="proceso-tab-cancelados">Materiales cancelados</button>
             <button type="button" class="proceso-tab" data-tab-target="proceso-tab-controles">Controles de proceso</button>
         </div>
-        <div class="proceso-materiales-wrap">
-            <div id="detalleTabla">
-                @await Html.PartialAsync("~/Views/Procesos/_DetalleTabla.cshtml", Model.Detalles)
-            </div>
-        </div>
+        
 
         <div id="proceso-tab-materiales" class="proceso-tab-panel is-active">
+            <div class="proceso-materiales-wrap proceso-detalle-scroll">
+                <div id="detalleTabla">
+                    @await Html.PartialAsync("~/Views/Procesos/_DetalleTabla.cshtml", Model.Detalles)
+                </div>
+            </div>
 
             <div class="proceso-materiales-wrap">
                 <div class="proceso-title">Ingreso de etiqueta</div>
@@ -275,10 +277,15 @@
         </div>
 
         <div class="proceso-actions">
-            <button type="button" class="btn btn-primary" onclick="window.location.reload()">Nuevo</button>
-            <button type="button" class="btn btn-outline-primary" onclick="alert('Accion de demostracion')">Controles de proceso</button>
-            <button type="button" class="btn btn-outline-primary" id="btnEditarProceso">Editar</button>
-            <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cerrar</button>
+            <button type="button" class="btn-baxen" onclick="window.location.reload()">Nuevo</button>
+
+            @* eliminado controles *@
+
+            <button type="button" class="btn-baxen" id="btnEditarProceso">Editar</button>
+
+            <a href="@Url.Action("Index", "Home")" class="btn-baxen">
+                Cerrar
+            </a>
         </div>
     </div>
 </div>
@@ -509,13 +516,25 @@
                         materialNombre = data.materialDen;
                         stockDisponible = data.stockDisponible ?? 0;
 
-                        inputMaterial.value = materialNombre;
-                        inputCantidad.value = "1";
-                        inputCantidad.focus();
-                    } else {
-                        mostrarError(data.mensaje || "❌ No se encontró la etiqueta.");
-                    }
-                })
+                                inputMaterial.value = materialNombre;
+
+                        document.getElementById("sectorNombre").value = data.sectorDen ?? "";
+                        document.getElementById("codigoReuso").value = data.codigoReuso ?? "";
+                        document.getElementById("recibidos").value = data.recibidos ?? 0;
+                        document.getElementById("enProceso").value = data.enProceso ?? 0;
+                        document.getElementById("sinProcesar").value = data.sinProcesar ?? 0;
+
+                        if (data.autoInsertar === true) {
+                            inputCantidad.value = data.cantidadAuto ?? 1;
+                            guardarDetalle();
+                        } else {
+                            inputCantidad.value = "";
+                            inputCantidad.focus();
+                        }
+                        } else {
+                            mostrarError(data.mensaje || "❌ No se encontró la etiqueta.");
+                        }
+                        })
                 .catch(() => mostrarError("❌ Error al buscar la etiqueta."));
         }
 
@@ -543,6 +562,8 @@
                 TB_PRO_DET_CANT: cantidad
             };
 
+            console.log("DATOS A INSERTAR:", datos);
+
             fetch("/TbProDet/Insertar", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -554,7 +575,7 @@
                         mostrarOk(data.mensaje || "✅ Detalle agregado correctamente.");
                         inputEtiqueta.value = "";
                         inputMaterial.value = "";
-                        inputCantidad.value = "1";
+                        inputCantidad.value = "";
                         etiquetaId = 0;
                         materialId = 0;
                         document.getElementById("detalleTabla").innerHTML = data.html;

@@ -472,20 +472,19 @@ namespace ConexionSql.Models.Procesos
         public DateTime? TbProFinHor { get; set; }
 
         [Column("TB_PRO_PEST_1")]
-        public float? TbProPest1 { get; set; }
+        public double? TbProPest1 { get; set; }
 
         [Column("TB_PRO_PEST_2")]
-        public float? TbProPest2 { get; set; }
+        public double? TbProPest2 { get; set; }
 
         [Column("TB_PRO_PEST_3")]
         public int? TbProPest3 { get; set; }
 
         [Column("TB_PRO_PEST_4")]
-        public float? TbProPest4 { get; set; }
+        public double? TbProPest4 { get; set; }
 
         [Column("TB_PRO_PEST_TOT")]
-        public float? TbProPestTot { get; set; }
-
+        public double? TbProPestTot { get; set; }
         [Column("TB_PRO_AUSU")]
         public bool TbProAusu { get; set; }
 

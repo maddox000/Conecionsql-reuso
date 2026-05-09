@@ -90,7 +90,7 @@ namespace ConexionSql.Controllers.Procesos
 
             recDet.TbRecDetProStock = stock - cantidad;
             recDet.TbRecDetProTot = (recDet.TbRecDetProTot ?? 0) + cantidad;
-            recDet.TbRecDetEntCant = (recDet.TbRecDetEntCant ?? 0) + cantidad;
+            recDet.TbRecDetEntStock = (recDet.TbRecDetEntStock ?? 0) + cantidad;
 
             var material = await _context.IbMat
             .FirstOrDefaultAsync(m => m.IB_MAT_ID == recDet.TbRecDetMatId);
@@ -193,8 +193,19 @@ namespace ConexionSql.Controllers.Procesos
                 {
                     TB_PRO_DET_ID = d.TbProDetId,
                     TB_PRO_ID = d.TbProId,
+
                     TB_PRO_DET_REC_DET_ID = d.TbProDetRecDetId ?? 0,
+                    TB_PRO_DET_REC_DET_MAT_ID = d.TbProDetRecDetMatId ?? 0,
                     TB_PRO_DET_REC_DET_MAT_DEN = d.TbProDetRecDetMatDen,
+
+                    TB_REC_SEC_DES_ID = d.TbRecSecDesId,
+                    TB_REC_SEC_DES_DEN = d.TbRecSecDesDen,
+
+                    TB_PRO_DET_REC_DET_REU_ID = d.TbProDetRecDetReuId,
+                    TB_PRO_DET_REC_DET_CANT = d.TbProDetRecDetCant,
+                    TB_PRO_DET_REC_DET_PRO_TOT = d.TbProDetRecDetProTot,
+                    TB_PRO_DET_REC_DET_PRO_STOCK = d.TbProDetRecDetProStock,
+
                     TB_PRO_DET_CANT = d.TbProDetCant,
                     TB_PRO_DET_PC_USR = d.TbProDetPcUsr,
                     TB_PRO_FEC = d.TbProFec
@@ -225,12 +236,27 @@ namespace ConexionSql.Controllers.Procesos
             if (recDet == null)
                 return Json(new { success = false, mensaje = "❌ Etiqueta no encontrada." });
 
+            int sinProcesar = recDet.TbRecDetProStock ?? 0;
+
             return Json(new
             {
                 success = true,
+
                 materialId = recDet.TbRecDetMatId,
                 materialDen = recDet.TbRecDetMatDen,
-                stockDisponible = recDet.TbRecDetProStock ?? 0
+
+                sectorId = recDet.TbRecSecDesId,
+                sectorDen = recDet.TbRecSecDesDen,
+
+                codigoReuso = recDet.TbRecDetReuId,
+                recibidos = recDet.TbRecDetCant,
+                enProceso = recDet.TbRecDetProTot ?? 0,
+                sinProcesar = sinProcesar,
+
+                stockDisponible = sinProcesar,
+
+                autoInsertar = sinProcesar == 1,
+                cantidadAuto = 1
             });
         }
 

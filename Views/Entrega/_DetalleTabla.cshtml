@@ -1,39 +1,53 @@
 ﻿@model List<ConexionSql.Models.Entrega.TbEntDetDto>
 
-<!-- _DetalleTabla -->
-<!-- Tabla que muestra los detalles de la entrega -->
-<table class="table table-bordered table-sm">
-    <thead class="thead-dark">
-        <tr>
-            <th style="width: 20%;">Código Material</th>
-            <th style="width: 50%;">Denominación</th>
-            <th style="width: 15%;">Cantidad</th>
-            <th style="width: 15%;">Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Count > 0)
-        {
-            foreach (var item in Model)
+<div class="entrega-table-wrap" style="height:280px; overflow:auto;">
+    <div class="entrega-table-head">Materiales entregados</div>
+
+    <table class="entrega-table">
+        <thead>
+            <tr>
+                <th>Código etiqueta</th>
+                <th>Denominación</th>
+                <th>Código reuso</th>
+                <th>Recibidos</th>
+                <th>Pendientes</th>
+                <th>Entregados</th>
+                <th>Cantidad</th>
+                <th>Imprimir</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.TB_ENT_DET_REC_DET_ID</td>
+                        <td>@item.TbEntDetRecDetMatDen</td>
+                        <td>@item.CodigoReuso</td>
+                        <td>@item.Recibidos</td>
+                        <td>@item.Pendientes</td>
+                        <td>@item.Entregados</td>
+                        <td>@item.TB_ENT_DET_CANT</td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-danger btn-sm"
+                                    onclick="eliminarDetalle(@item.TB_ENT_DET_ID)">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-                    <td>@item.IB_MAT_ID</td>
-                    <td>@item.TbEntDetRecDetMatDen</td>
-                    <td>@item.TB_ENT_DET_CANT</td>
-                    <td>
-                        <!-- Botón de eliminar usando ID real del detalle -->
-                        <button type="button" class="btn btn-danger btn-sm" onclick="eliminarDetalle(@item.TB_ENT_DET_ID)">
-                            Eliminar
-                        </button>
+                    <td colspan="8" class="text-center text-muted">
+                        No hay detalles cargados.
                     </td>
                 </tr>
             }
-        }
-        else
-        {
-            <tr>
-                <td colspan="4" class="text-center text-muted">No hay detalles cargados.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>

@@ -64,6 +64,8 @@ namespace ConexionSql.Data
         public DbSet<IbOrt> IbOrt { get; set; }
         public DbSet<IbPro> IbPro { get; set; }
         public DbSet<IbMatCon> IbMatCons { get; set; }
+        public DbSet<TbProDto> TbProDto { get; set; }
+        public DbSet<TbProPendienteDto> TbProPendienteDto { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -121,7 +123,8 @@ namespace ConexionSql.Data
                 entity.HasKey(e => e.TbEntDetId);
             });
 
-
+            modelBuilder.Entity<TbProDto>().HasNoKey();
+            modelBuilder.Entity<TbProPendienteDto>().HasNoKey();
         }
     }
 }

@@ -7,6 +7,7 @@
 }
 
 <link rel="stylesheet" href="~/css/views/crear-lavado.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
 
 <div class="bx-card lavado-demo">
     <div class="lavado-banner">Proceso de lavado</div>
@@ -86,7 +87,7 @@
                     </div>
                 </div>
 
-                <div class="lavado-kv">
+                <div class="lavado-kv" id="bloqueEquipo">
                     <div class="k">Equipo</div>
                     <div class="v">
                         <select class="form-select" asp-for="EquipoId" asp-items="Model.Equipos" id="EquipoId" required>
@@ -95,7 +96,7 @@
                     </div>
                 </div>
 
-                <div class="lavado-kv">
+                <div class="lavado-kv" id="bloqueTipoCiclo">
                     <div class="k">Tipo de ciclo</div>
                     <div class="v">
                         <select class="form-select" asp-for="TipoCicloId" asp-items="Model.TiposCiclo" id="TipoCicloId" required>
@@ -183,15 +184,11 @@
         </tbody>
     </table>
 
-    <div class="lavado-actions mt-2">
-        <button type="button" class="btn btn-primary">Registrar</button>
-        <button type="button" class="btn btn-outline-primary">Nuevo</button>
-        <button type="button" class="btn btn-outline-primary">Editar</button>
-        <button type="button" class="btn btn-secondary">Cerrar</button>
-    </div>
 </div>
 
 <div id="contenedorSubform" class="mt-5"></div>
+
+@await Html.PartialAsync("~/Views/Shared/_BotonesInfoBasica.cshtml")
 
 @section Scripts {
     <script>
@@ -199,18 +196,29 @@
             const data = {
                 TbProLavFec: document.getElementById("fechaLavado").value,
                 TbProLavHorIni: document.getElementById("horaInicio").value,
-                TipoLavadoId: parseInt(document.getElementById("TipoLavadoId").value),
-                EquipoId: parseInt(document.getElementById("EquipoId").value),
-                TipoCicloId: parseInt(document.getElementById("TipoCicloId").value),
-                TipoLavadoDen: document.getElementById("TipoLavadoId").selectedOptions[0]?.text,
-                EquipoDen: document.getElementById("EquipoId").selectedOptions[0]?.text,
-                TipoCicloDen: document.getElementById("TipoCicloId").selectedOptions[0]?.text
+                // TipoLavadoId: parseInt(document.getElementById("TipoLavadoId").value),
+                // EquipoId: parseInt(document.getElementById("EquipoId").value),
+                // TipoCicloId: parseInt(document.getElementById("TipoCicloId").value),
+                // TipoLavadoDen: document.getElementById("TipoLavadoId").selectedOptions[0]?.text,
+                // EquipoDen: document.getElementById("EquipoId").selectedOptions[0]?.text,
+                // TipoCicloDen: document.getElementById("TipoCicloId").selectedOptions[0]?.text
+                    TipoLavadoId: parseInt(document.getElementById("TipoLavadoId").value),
+                    EquipoId: parseInt(document.getElementById("TipoLavadoId").value) === 4 ? 0 : parseInt(document.getElementById("EquipoId").value),
+                    TipoCicloId: parseInt(document.getElementById("TipoLavadoId").value) === 4 ? 0 : parseInt(document.getElementById("TipoCicloId").value),
+                    TipoLavadoDen: document.getElementById("TipoLavadoId").selectedOptions[0]?.text,
+                    EquipoDen: parseInt(document.getElementById("TipoLavadoId").value) === 4 ? "NO REGISTRADO" : document.getElementById("EquipoId").selectedOptions[0]?.text,
+                    TipoCicloDen: parseInt(document.getElementById("TipoLavadoId").value) === 4 ? "NO REGISTRADO" : document.getElementById("TipoCicloId").selectedOptions[0]?.text
             };
 
-            if (!data.TipoLavadoId || !data.EquipoId || !data.TipoCicloId) {
+            if (!data.TipoLavadoId) {
                 document.getElementById("mensajeLavado").innerText = "⚠️ Complete todos los campos.";
                 return;
             }
+
+            if (data.TipoLavadoId !== 4 && (!data.EquipoId || !data.TipoCicloId)) {
+            document.getElementById("mensajeLavado").innerText = "⚠️ Complete todos los campos.";
+            return;
+             }
 
             const resp = await fetch('/Lavado/Insertar', {
                 method: 'POST',
@@ -227,9 +235,31 @@
             }
         }
 
-        document.getElementById("TipoLavadoId").addEventListener("change", async function () {
+                document.getElementById("TipoLavadoId").addEventListener("change", async function () {
+
+            const tipoLavadoId = parseInt(this.value) || 0;
+            const esManual = tipoLavadoId === 4;
+
             const comboEquipo = document.getElementById("EquipoId");
             const comboCiclo = document.getElementById("TipoCicloId");
+
+            const bloqueEquipo = document.getElementById("bloqueEquipo");
+            const bloqueTipoCiclo = document.getElementById("bloqueTipoCiclo");
+
+            // 🔴 CASO MANUAL
+            if (esManual) {
+                bloqueEquipo.style.display = "none";
+                bloqueTipoCiclo.style.display = "none";
+
+                comboEquipo.innerHTML = '<option value="0" selected>NO REGISTRADO</option>';
+                comboCiclo.innerHTML = '<option value="0" selected>NO REGISTRADO</option>';
+
+                return; // 🔥 corta acá → no ejecuta fetch
+            }
+
+            // 🟢 CASO NORMAL
+            bloqueEquipo.style.display = "";
+            bloqueTipoCiclo.style.display = "";
 
             comboEquipo.innerHTML = '<option value="">-- Cargando equipos... --</option>';
             comboCiclo.innerHTML = '<option value="">-- Cargando ciclos... --</option>';
@@ -244,6 +274,8 @@
                 opt.text = e.nombre;
                 comboEquipo.appendChild(opt);
             });
+
+            
 
             const respCiclos = await fetch(`/Lavado/ObtenerTiposCiclo`);
             const dataCiclos = await respCiclos.json();

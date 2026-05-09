@@ -1,5 +1,5 @@
 ﻿/* Tabla con scroll independiente */
-.rec-screen-table-wrap {
+.reu-screen-table-wrap {
     max-height: calc(100vh - 250px);
     overflow-y: auto;
 }

@@ -1,0 +1,65 @@
+﻿@model IEnumerable<ConexionSql.Models.SP_Busquedas.BusRecDetDto>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table-baxen-resultados">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Fecha</th>
+                <th>Material / Referencia</th>
+                <th>Sector Origen</th>
+                <th>Sector Destino</th>
+                <th>Paciente</th>
+                <th>Estado</th>
+                <th style="text-align: center;">Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td style="font-weight: bold; color: #2c3e50;">
+                        @item.TB_REC_DET_ID
+                    </td>
+                    <td>
+                        @(item.TB_REC_FEC.HasValue? item.TB_REC_FEC.Value.ToString("dd/MM/yyyy") : "-")
+                    </td>
+                    <td>
+                        <div style="font-weight: 600;">@item.TB_REC_DET_MAT_DEN</div>
+                        <small class="text-muted">Ref: @item.TB_REC_DET_MAT_PR</small>
+                    </td>
+                    <td>@item.TB_REC_SEC_ORI_DEN</td>
+                    <td>@item.TB_REC_SEC_DES_DEN</td>
+                    <td>@(string.IsNullOrEmpty(item.TB_REC_DET_PAC) ? "-" : item.TB_REC_DET_PAC)</td>
+                    <td>
+                        <span class="badge-estado-baxen">
+                            @item.TB_REC_DET_EST_DEN
+                        </span>
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn-ver-detalle" onclick="verDetalleMaterial(@item.TB_REC_DET_ID)" title="Ver Detalle">
+                            <span class="material-icons">visibility</span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <script>
+        // Actualizamos el contador de resultados en la vista principal
+        document.getElementById('lblContador').innerText = '@Model.Count()';
+    </script>
+}
+else
+{
+    <div style="padding: 20px; text-align: center; color: #7f8c8d;">
+        <span class="material-icons" style="font-size: 48px; display: block; margin-bottom: 10px;">search_off</span>
+        No se encontraron materiales con los filtros aplicados.
+    </div>
+
+    <script>
+        document.getElementById('lblContador').innerText = '0';
+    </script>
+}

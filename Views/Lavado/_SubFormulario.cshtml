@@ -3,6 +3,7 @@
 <div class="subform-lavado mt-4">
    
     <link rel="stylesheet" href="~/css/views/crear-lavado.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
     <!-- Cabecera del lavado -->
     <div class="bx-card lavado-demo">
         <div class="lavado-banner">Proceso de lavado</div>
@@ -180,7 +181,7 @@
     </form>
 </div>
 
-
+    @await Html.PartialAsync("~/Views/Shared/_BotonesInfoBasica.cshtml")
 
 
 
@@ -221,27 +222,35 @@
 
             ocultarMensajes();
 
-                    fetch(`/TbProLavDet/ObtenerMaterial?tbRecDetId=${etiquetaId}`)
-                        .then(res => res.json())
-                        .then(data => {
-                                    if (data.success) {
-                                    materialId = data.materialId;
-                                    materialNombre = data.nombre ?? "";
-                                    stockDisponible = data.sinProcesar ?? 0;
 
-                                    inputMaterial.value = materialNombre;
-                                    document.getElementById("sector").value = data.sector ?? "";
-                                    document.getElementById("codigoReuso").value = data.codigoReuso ?? "";
-                                    document.getElementById("recibidos").value = data.recibidos ?? 0;
-                                    document.getElementById("enProceso").value = data.enProceso ?? 0;
-                                    document.getElementById("sinProcesar").value = data.sinProcesar ?? 0;
+          fetch(`/TbProLavDet/ObtenerMaterial?tbRecDetId=${etiquetaId}`)
+              .then(res => res.json())
+                .then(data => {
+                        if (data.success) {
+                            materialId = data.materialId;
+                            materialNombre = data.nombre ?? "";
+                            stockDisponible = data.sinProcesar ?? 0;
 
-                                    inputCantidad.value = "1";
-                                    inputCantidad.focus();
+                            inputMaterial.value = materialNombre;
+                            document.getElementById("sector").value = data.sector ?? "";
+                            document.getElementById("codigoReuso").value = data.codigoReuso ?? "";
+                            document.getElementById("recibidos").value = data.recibidos ?? 0;
+                            document.getElementById("enProceso").value = data.enProceso ?? 0;
+                            document.getElementById("sinProcesar").value = data.sinProcesar ?? 0;
+
+                            
+
+                            if (data.autoInsertar === true) {
+                                inputCantidad.value = data.cantidadAuto ?? 1;
+                                guardarDetalle();
                             } else {
-                                mostrarError(data.mensaje || "❌ No se encontró la etiqueta.");
+                                inputCantidad.value = "";
+                                inputCantidad.focus();
                             }
-                        })
+                        } else {
+                            mostrarError(data.mensaje || "❌ No se encontró la etiqueta.");
+                        }
+                    })
                         .catch(() => mostrarError("❌ Error al buscar la etiqueta."));
                 
         }

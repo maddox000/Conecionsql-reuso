@@ -128,6 +128,7 @@
 
                 activarSubmenuExtendido(".submenu a[href='/ProcesoMateriales']");
                 activarSubmenuExtendido(".submenu a[href='/Entregas']");
+                activarSubmenuExtendido("#btnIdentificar");
 
                 /* --- RESALTAR ÍTEMS INTERNOS --- */
                 const menuLinks = document.querySelectorAll(".submenu a, .submenu-extra a");
@@ -150,6 +151,105 @@
                 const btnSalir = document.getElementById("btnSalir");
                 if (btnSalir) btnSalir.addEventListener("click", () => window.close());
 
+                            const btnReusosAsignar = document.getElementById("btnReusosAsignar");
+            // llama a modal debugger reuso
+                    
+                if (btnReusosAsignar) {
+                btnReusosAsignar.addEventListener("click", function (e) {
+                    e.preventDefault();
+
+                    fetch("/Reusos/ModalBuscarReuso")
+                        .then(response => response.text())
+                        .then(html => {
+                            const contenedor = document.getElementById("contenedorModalReuso");
+                            contenedor.innerHTML = html;
+
+                            const modal = document.getElementById("modalBuscarReuso");
+                            modal.style.display = "flex";
+
+                         // 🔥 FOCO AUTOMÁTICO
+                            setTimeout(() => {
+                                const input = document.getElementById("txtBuscarCodigoReuso");
+                                if (input) {
+                                    input.focus();
+                                    input.select();
+                                }
+                            }, 100);
+
+                            const btnCerrar = document.getElementById("btnCerrarModalReuso");
+
+                            if (btnCerrar) {
+                                btnCerrar.addEventListener("click", function () {
+                                    modal.style.display = "none";
+                                });
+                            }
+
+                            // para ingresar codigo reuso
+
+                            const btnBuscar = document.getElementById("btnBuscarCodigoReuso");
+                            const txtCodigo = document.getElementById("txtBuscarCodigoReuso");
+                            const msg = document.getElementById("msgBuscarReuso");
+
+                            if (txtCodigo && btnBuscar) {
+                                        txtCodigo.addEventListener("keydown", function (e) {
+                                            if (e.key === "Enter") {
+                                                e.preventDefault();
+                                                btnBuscar.click();
+                                            }
+                                        });
+                                    }
+
+                            if (btnBuscar) {
+                                btnBuscar.addEventListener("click", function () {
+                                    const codigo = txtCodigo.value.trim();
+
+                                    msg.style.display = "none";
+                                    msg.textContent = "";
+
+                                    if (!codigo) {
+                                        msg.textContent = "Ingrese un código.";
+                                        msg.style.display = "block";
+                                        txtCodigo.focus();
+                                        return;
+                                    }
+
+                                fetch(`/Reusos/ValidarCodigoReusoDisponible?codigo=${encodeURIComponent(codigo)}`)
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                if (!data.success || !data.disponible) {
+                                                    msg.textContent = data.mensaje || "Código no disponible.";
+                                                    msg.style.display = "block";
+                                                    txtCodigo.focus();
+                                                    return;
+                                                }
+
+                                                modal.style.display = "none";
+
+                                                // guardamos el código de reuso
+                                                localStorage.setItem("codigoReuso", data.codigo);
+
+                                                // seteamos destino como hacen los otros módulos
+                                                localStorage.setItem(
+                                                            "loginDestino",
+                                                            `/Reusos/CrearReusos?codigo=${encodeURIComponent(data.codigo)}`
+                                                        );
+
+                                                // abrimos el login REAL de tu sistema
+                                                const modalLogin = new bootstrap.Modal(document.getElementById('loginTareasModal'));
+                                                modalLogin.show();
+                                            })
+                                            .catch(() => {
+                                                msg.textContent = "Error al validar el código.";
+                                                msg.style.display = "block";
+                                            });
+                                });
+                            }
+
+                           
+
+                        });
+                });
+            }
             });
     </script>
 
@@ -200,8 +300,14 @@
                             <a href="/PanelSalas">Panel salas quirúrgicas</a>
                             <a href="/BuscarProcedimientos">Buscar procedimientos</a>
                         </li>
-
-                        <li><a href="#" id="btnIdentificar">Identificar materiales</a></li>
+                    <li><a href="#" id="btnIdentificar">Identificar materiales</a></li>
+                            <li class="submenu-extra">
+                                <a href="/Trazabilidad">Producción</a>
+                                <a href="/Reusos">Generar código de reúso</a>
+                                <a href="#" id="btnReusosAsignar">Asignar código de reúso</a>
+                                <a href="/Reusos">Baja código de reúso</a>
+                                <a href="/Reusos">Liberar código de reúso</a>
+                            </li>
                         <li><a href="/Transito">Instrumental en tránsito</a></li>
                         <li><a href="/Stock">Transacciones de stock</a></li>
                     </ul>
@@ -272,6 +378,7 @@
         </main>
 
         <partial name="_LoginModal" />
+        <div id="contenedorModalReuso"></div>
 
         <script src="~/lib/jquery/dist/jquery.min.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

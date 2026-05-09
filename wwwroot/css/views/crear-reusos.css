@@ -1,0 +1,220 @@
+﻿.reu-screen {
+    border-left: 0;
+    padding: 1rem;
+    /*max-width: 1250px;*/
+    margin: 0;
+}
+/*
+.reu-screen {
+    background: red !important;
+}*/
+
+.reu-screen-banner {
+    width: 100%;
+    background: linear-gradient(90deg, #2f3e46 0%, #3a4f58 100%);
+    color: #fff;
+    border-radius: 8px;
+    padding: 0.58rem 1rem;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.95rem;
+    font-size: 0.9rem;
+}
+
+.reu-layout {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 0.75rem;
+}
+
+.reu-left-col {
+    width: 52%;
+    vertical-align: top;
+    padding-right: 18px;
+}
+
+.reu-right-col {
+    width: 48%;
+    vertical-align: top;
+}
+
+.reu-screen-panel {
+    border: 1px solid #d8dee2;
+    border-radius: 8px;
+    background: #fff;
+    padding: 0.6rem;
+}
+
+.reu-material-panel {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top: 0;
+}
+
+.reu-screen-kv {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0.25rem;
+    margin-bottom: 0.18rem;
+    font-size: 0.74rem;
+}
+
+.reu-screen-k {
+    border: 1px solid #b0bec5;
+    background: #f0f5f5;
+    color: #2f3e46;
+    padding: 0.08rem 0.25rem;
+    min-height: 1.45rem;
+}
+
+.reu-screen-v {
+    border-bottom: 1px solid #d8dee2;
+    color: #243238;
+    padding: 0.08rem 0.18rem;
+    min-height: 1.45rem;
+    display: flex;
+    align-items: center;
+}
+
+    .reu-screen-v .form-select,
+    .reu-screen-v .form-control {
+        border: 0;
+        padding: 0;
+        height: 20px;
+        box-shadow: none;
+        font-size: 0.74rem;
+        background: transparent;
+    }
+
+.reu-screen-image {
+    border: 1px solid #d8dee2;
+    border-radius: 5px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    background: repeating-linear-gradient(-20deg, #f5f7f7, #f5f7f7 10px, #e8eef0 10px, #e8eef0 20px);
+}
+
+.reu-reusos-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.55rem;
+}
+
+.reu-screen-observ {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+}
+
+    .reu-screen-observ textarea {
+        min-height: 48px;
+        border: 1px solid #d8dee2;
+        border-radius: 5px;
+        font-size: 0.78rem;
+        padding: 0.25rem 0.35rem;
+    }
+
+.reu-screen-table-wrap {
+    border: 1px solid #d8dee2;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+    background: #fff;
+}
+
+.reu-screen-table-title {
+    background: #2f3e46;
+    color: #fff;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.22rem 0.45rem;
+}
+
+.reu-screen-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.74rem;
+}
+
+    .reu-screen-table th {
+        background: #3a4f58;
+        color: #ecf4ff;
+        padding: 0.2rem;
+    }
+
+    .reu-screen-table td {
+        border-top: 1px solid #e2eaf5;
+        padding: 0.23rem;
+    }
+
+.reu-screen-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.35rem;
+}
+
+    .reu-screen-actions .btn {
+        min-width: 96px;
+        font-size: 0.8rem;
+    }
+
+.reu-screen-note {
+    color: #8a9bb5;
+    text-align: center;
+}
+
+.reu-screen-error {
+    color: #b42318;
+    font-size: 0.78rem;
+    margin-top: 0.35rem;
+}
+
+#listaReusos {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 3000;
+    width: 100%;
+    max-height: 280px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #d0d7de;
+    box-shadow: 0 4px 10px rgba(0,0,0,.15);
+}
+
+    #listaReusos:empty {
+        display: none;
+    }
+
+@media (max-width: 900px) {
+    .reu-screen {
+        width: 100%;
+    }
+
+    .reu-layout,
+    .reu-layout tbody,
+    .reu-layout tr,
+    .reu-layout td {
+        display: block;
+        width: 100%;
+    }
+
+    .reu-left-col,
+    .reu-right-col {
+        width: 100%;
+        padding-right: 0;
+    }
+
+    .reu-right-col {
+        margin-top: 0.75rem;
+    }
+}
+

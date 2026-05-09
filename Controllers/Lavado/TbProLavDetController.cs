@@ -206,6 +206,8 @@ namespace ConexionSql.Controllers.Lavado
                 if (recDet == null)
                     return Json(new { success = false, mensaje = "Etiqueta no encontrada." });
 
+                int sinProcesar = recDet.TbRecDetLavStock ?? 0;
+
                 return Json(new
                 {
                     success = true,
@@ -215,7 +217,10 @@ namespace ConexionSql.Controllers.Lavado
                     codigoReuso = recDet.TbRecDetReuId,
                     recibidos = recDet.TbRecDetRecStock ?? 0,
                     enProceso = recDet.TbRecDetLavTot ?? 0,
-                    sinProcesar = recDet.TbRecDetLavStock ?? 0
+                    sinProcesar = sinProcesar,
+
+                    autoInsertar = sinProcesar == 1,
+                    cantidadAuto = 1
                 });
             }
             catch (Exception ex)

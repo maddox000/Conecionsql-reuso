@@ -1,0 +1,207 @@
+﻿/* ==========================================
+   ESTILOS GENERALES DE LA PÁGINA
+   ========================================== */
+body {
+    background-color: #f4f7f9;
+    color: #34495e;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Título alineado a la derecha con Century Gothic */
+.contenedor-titulo {
+    text-align: right;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.titulo-derecha {
+    font-family: 'Century Gothic', AppleGothic, 'Segoe UI', sans-serif;
+    color: #2c3e50;
+    font-weight: normal;
+    font-size: 2.2rem;
+    letter-spacing: -0.5px;
+    margin: 0;
+    display: inline-block;
+}
+
+/* ==========================================
+   PANEL DE FILTROS (BOX SUPERIOR)
+   ========================================== */
+.panel-filtros {
+    background: #ffffff !Important;
+    height: 250px; /* Altura panel de operaciones */
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 25px;
+    height: 330px;
+    margin-bottom: 10px;
+    border: 1px solid #e1e4e8;
+}
+
+label {
+    font-size: 0.75rem; 
+    text-transform: none; 
+    color: #7f8c8d;
+    font-weight: normal; 
+    margin-bottom: 4px;
+    display: block;
+}
+
+.form-control {
+    border-radius: 4px;
+    border: 1px solid #ccd1d9;
+    font-size: 0.85rem;
+    padding: 5px 10px;
+    height: 34px;
+    width: 100%;
+}
+
+/* ==========================================
+   MENÚ DE OPERACIONES (BOTONERA)
+   ========================================== */
+.menu-operaciones {
+    display: flex;
+    flex-direction: column;
+    background-color: #2c3e50;
+    border-radius: 6px;
+    overflow: hidden;
+    flex-grow: 1;
+}
+
+.btn-menu {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 18px;
+    text-align: left;
+    font-size: 0.85rem;
+    color: #bdc3c7;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    text-decoration: none !important;
+    flex: 1;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-menu:hover:not(:disabled) {
+    background-color: #34495e;
+    color: #ffffff;
+}
+
+.btn-menu:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ==========================================
+   CONTADOR DE REGISTROS (BADGE)
+   ========================================== */
+.badge-contador {
+    display: inline-block;
+    /* 105px para que baje a la altura de los campos inferiores */
+    margin-top: 105px; 
+    padding: 5px 15px;
+    background-color: #ebf5fb;
+    color: #2980b9;
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 0.75rem;
+    border: 1px solid #d6eaf8;
+}
+
+/* ==========================================
+   GRILLA DE RESULTADOS (TABLA)
+   ========================================== */
+#zonaResultados-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+#zonaResultados {
+    display: block !important;
+    width: 100% !important;
+    height: 450px !important;
+    overflow: auto !important;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background: #fff;
+}
+
+#zonaResultados table {
+    width: 100%;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+/* Cabecera Sticky (siempre visible al hacer scroll) */
+#zonaResultados thead th {
+    position: sticky !important;
+    top: 0 !important;
+    background-color: #2c3e50 !important;
+    color: #ffffff !important;
+    z-index: 10;
+    padding: 12px;
+    font-size: 1.2rem !Important;    
+    border: none !important;
+    white-space: nowrap;
+}
+
+#zonaResultados tbody tr td {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #eee !important;
+    padding: 8px !important;
+    font-size: 1.0rem;
+    white-space: nowrap;
+}
+
+/* Cebreado de filas */
+#zonaResultados tbody tr:nth-child(even) td {
+    background-color: #f9f9f9 !important;
+}
+
+/* Alineación para campos numéricos y checkboxes */
+.text-center {
+    text-align: center !important;
+}
+
+/* ==========================================
+   INDICADOR DE CARGA (LOADER)
+   ========================================== */
+#loader {
+    display: none;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255, 255, 255, 0.85);
+    z-index: 2000;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #2980b9;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-weight: bold;
+    color: #2c3e50;
+    font-size: 1rem;
+}
+
+
+/*Original*/

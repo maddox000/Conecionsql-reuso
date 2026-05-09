@@ -163,5 +163,69 @@ namespace ConexionSql.Models.Acondicionado
         // TB_PRO_ACO_DET_DAT
         [Column("TB_PRO_ACO_DET_DAT")]
         public string? TbProAcoDetDat { get; set; }
+
+        // TB_PRO_ACO_DET_SEL
+        [Column("TB_PRO_ACO_DET_SEL")]
+        public bool TbProAcoDetSel { get; set; }
+
+        // TB_PRO_ACO_DET_SEL_CANT
+        [Column("TB_PRO_ACO_DET_SEL_CANT")]
+        public int TbProAcoDetSelCant { get; set; }
+
+        // TB_PRO_ACO_DET_IVIS_OPC
+        [Column("TB_PRO_ACO_DET_IVIS_OPC")]
+        public bool TbProAcoDetIvisOpc { get; set; }
+
+        // TB_PRO_ACO_DET_IVIS_OPC_NOM
+        [Column("TB_PRO_ACO_DET_IVIS_OPC_NOM")]
+        public string? TbProAcoDetIvisOpcNom { get; set; }
+
+        // TB_PRO_ACO_DET_ACAJ_OPC
+        [Column("TB_PRO_ACO_DET_ACAJ_OPC")]
+        public bool TbProAcoDetAcajOpc { get; set; }
+
+        // TB_PRO_ACO_DET_ACAJ_OPC_NOM
+        [Column("TB_PRO_ACO_DET_ACAJ_OPC_NOM")]
+        public string? TbProAcoDetAcajOpcNom { get; set; }
+
+        // TB_PRO_ACO_DET_ACAJ_REV_ID
+        [Column("TB_PRO_ACO_DET_ACAJ_REV_ID")]
+        public int TbProAcoDetAcajRevId { get; set; }
+
+        // TB_PRO_ACO_DET_ACAJ_REV_DEN
+        [Column("TB_PRO_ACO_DET_ACAJ_REV_DEN")]
+        public string? TbProAcoDetAcajRevDen { get; set; }
+
+        // TB_PRO_ACO_DET_ACAJ_FALT
+        [Column("TB_PRO_ACO_DET_ACAJ_FALT")]
+        public string? TbProAcoDetAcajFalt { get; set; }
+
+        // TB_PRO_ACO_DET_ACAJ_CANT
+        [Column("TB_PRO_ACO_DET_ACAJ_CANT")]
+        public int TbProAcoDetAcajCant { get; set; }
+
+        // TB_PRO_ACO_DET_PER_ID
+        [Column("TB_PRO_ACO_DET_PER_ID")]
+        public int TbProAcoDetPerId { get; set; }
+
+        // TB_PRO_ACO_DET_PER_DEN
+        [Column("TB_PRO_ACO_DET_PER_DEN")]
+        public string? TbProAcoDetPerDen { get; set; }
+
+        // TB_PRO_ACO_DET_PTI_ID
+        [Column("TB_PRO_ACO_DET_PTI_ID")]
+        public int TbProAcoDetPtiId { get; set; }
+
+        // TB_PRO_ACO_DET_PTI_DEN
+        [Column("TB_PRO_ACO_DET_PTI_DEN")]
+        public string? TbProAcoDetPtiDen { get; set; }
+
+        // TB_PRO_ACO_DET_EQU_NUM
+        [Column("TB_PRO_ACO_DET_EQU_NUM")]
+        public string? TbProAcoDetEquNum { get; set; }
+
+        // TB_PRO_ACO_DET_LOT
+        [Column("TB_PRO_ACO_DET_LOT")]
+        public string? TbProAcoDetLot { get; set; }
     }
 }

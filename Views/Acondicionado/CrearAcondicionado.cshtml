@@ -7,6 +7,7 @@
 }
 
 <link rel="stylesheet" href="~/css/views/crear-acondicionado.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
 
 <div class="aco-demo">
     <div class="aco-banner">Acondicionado de materiales</div>
@@ -43,7 +44,9 @@
             <!-- Botón Guardar Cabecera -->
             <form asp-action="CrearAcondicionado" method="post" id="formCrearAcondicionado">
                 <div class="aco-actions mt-2 text-end">
-                    <button type="submit" class="btn btn-success btn-sm">💾 Guardar Cabecera</button>
+                    <button type="submit" class="btn btn-baxen btn-sm">
+                        Guardar Cabecera
+                    </button>
                 </div>
             </form>
         </div>
@@ -116,7 +119,7 @@
     </div>
 
     <!-- Acciones -->
-    <div class="aco-actions">
+@*     <div class="aco-actions">
         <button type="submit" form="formCrearAcondicionado" class="btn btn-primary" @(dataUnavailable ? "disabled" : "")>Registrar</button>
         <button type="button" class="btn btn-outline-primary" onclick="alert('Accion de demostracion')">Nuevo</button>
         <button type="button" class="btn btn-outline-primary aco-icon-btn" id="btnAcoPdf" title="Imprimir en PDF" aria-label="Imprimir en PDF">
@@ -127,7 +130,7 @@
         </button>
         <button type="button" class="btn btn-outline-primary" onclick="alert('Accion de demostracion')">Editar</button>
         <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cerrar</button>
-    </div>
+    </div> *@
 </div>
 
 
@@ -150,7 +153,7 @@
 </div>
 
 <form id="formAcoPrintLabel" method="post" action="@Url.Action("ImprimirEtiqueta", "Home")" class="d-none"></form>
-
+@await Html.PartialAsync("~/Views/Shared/_BotonesInfoBasica.cshtml")
 
 @section Scripts {
     @{

@@ -180,7 +180,7 @@ namespace ConexionSql.Utilidades
                 // =============================
                 "^FO20,150^GB440,40,40^FS\n" +   // 🔹 fondo negro (relleno)
                 "^CF0,26\n" +
-                "^FO30,158^FR^FDPRIORIDAD DE PROCESO^FS\n" +  // 🔹 texto blanco
+                "^FO30,158^FR^FDCOMPLETO^FS\n" +  // 🔹 texto blanco
 
                 // =============================
                 // 🟦 ID

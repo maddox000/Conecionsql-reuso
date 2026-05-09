@@ -2276,7 +2276,7 @@
   }
 
   var toPaddingObject = function toPaddingObject(padding, state) {
-    padding = typeof padding === 'function' ? padding(Object.assign({}, state.rects, {
+    padding = typeof padding === 'function' ? padding(Object.assign({}, state.reuts, {
       placement: state.placement
     })) : padding;
     return mergePaddingObject(typeof padding !== 'number' ? padding : expandToHashMap(padding, basePlacements));
@@ -2303,8 +2303,8 @@
     var arrowRect = getLayoutRect(arrowElement);
     var minProp = axis === 'y' ? top : left;
     var maxProp = axis === 'y' ? bottom : right;
-    var endDiff = state.rects.reference[len] + state.rects.reference[axis] - popperOffsets[axis] - state.rects.popper[len];
-    var startDiff = popperOffsets[axis] - state.rects.reference[axis];
+    var endDiff = state.reuts.reference[len] + state.reuts.reference[axis] - popperOffsets[axis] - state.reuts.popper[len];
+    var startDiff = popperOffsets[axis] - state.reuts.reference[axis];
     var arrowOffsetParent = getOffsetParent(arrowElement);
     var clientSize = arrowOffsetParent ? axis === 'y' ? arrowOffsetParent.clientHeight || 0 : arrowOffsetParent.clientWidth || 0 : 0;
     var centerToReference = endDiff / 2 - startDiff / 2; // Make sure the arrow doesn't overflow the popper if the center point is
@@ -2459,7 +2459,7 @@
     var commonStyles = {
       placement: getBasePlacement(state.placement),
       popper: state.elements.popper,
-      popperRect: state.rects.popper,
+      popperRect: state.reuts.popper,
       gpuAcceleration: gpuAcceleration
     };
 
@@ -2850,7 +2850,7 @@
     var paddingObject = mergePaddingObject(typeof padding !== 'number' ? padding : expandToHashMap(padding, basePlacements));
     var altContext = elementContext === popper ? reference : popper;
     var referenceElement = state.elements.reference;
-    var popperRect = state.rects.popper;
+    var popperRect = state.reuts.popper;
     var element = state.elements[altBoundary ? altContext : elementContext];
     var clippingClientRect = getClippingRect(isElement(element) ? element : element.contextElement || getDocumentElement(state.elements.popper), boundary, rootBoundary);
     var referenceClientRect = getBoundingClientRect(referenceElement);
@@ -2968,8 +2968,8 @@
         allowedAutoPlacements: allowedAutoPlacements
       }) : placement);
     }, []);
-    var referenceRect = state.rects.reference;
-    var popperRect = state.rects.popper;
+    var referenceRect = state.reuts.reference;
+    var popperRect = state.reuts.popper;
     var checksMap = new Map();
     var makeFallbackChecks = true;
     var firstFittingPlacement = placements[0];
@@ -3089,8 +3089,8 @@
   function hide(_ref) {
     var state = _ref.state,
         name = _ref.name;
-    var referenceRect = state.rects.reference;
-    var popperRect = state.rects.popper;
+    var referenceRect = state.reuts.reference;
+    var popperRect = state.reuts.popper;
     var preventedOffsets = state.modifiersData.preventOverflow;
     var referenceOverflow = detectOverflow(state, {
       elementContext: 'reference'
@@ -3151,7 +3151,7 @@
     var _options$offset = options.offset,
         offset = _options$offset === void 0 ? [0, 0] : _options$offset;
     var data = placements.reduce(function (acc, placement) {
-      acc[placement] = distanceAndSkiddingToXY(placement, state.rects, offset);
+      acc[placement] = distanceAndSkiddingToXY(placement, state.reuts, offset);
       return acc;
     }, {});
     var _data$state$placement = data[state.placement],
@@ -3183,8 +3183,8 @@
     // This is the most basic placement, and will be adjusted by
     // the modifiers in the next step
     state.modifiersData[name] = computeOffsets({
-      reference: state.rects.reference,
-      element: state.rects.popper,
+      reference: state.reuts.reference,
+      element: state.reuts.popper,
       strategy: 'absolute',
       placement: state.placement
     });
@@ -3231,9 +3231,9 @@
     var mainAxis = getMainAxisFromPlacement(basePlacement);
     var altAxis = getAltAxis(mainAxis);
     var popperOffsets = state.modifiersData.popperOffsets;
-    var referenceRect = state.rects.reference;
-    var popperRect = state.rects.popper;
-    var tetherOffsetValue = typeof tetherOffset === 'function' ? tetherOffset(Object.assign({}, state.rects, {
+    var referenceRect = state.reuts.reference;
+    var popperRect = state.reuts.popper;
+    var tetherOffsetValue = typeof tetherOffset === 'function' ? tetherOffset(Object.assign({}, state.reuts, {
       placement: state.placement
     })) : tetherOffset;
     var data = {
@@ -3540,7 +3540,7 @@
           } // Store the reference and popper rects to be read by modifiers
 
 
-          state.rects = {
+          state.reuts = {
             reference: getCompositeRect(reference, getOffsetParent(popper), state.options.strategy === 'fixed'),
             popper: getLayoutRect(popper)
           }; // Modifiers have the ability to reset the current update cycle. The

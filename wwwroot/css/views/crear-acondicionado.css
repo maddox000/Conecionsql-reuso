@@ -235,3 +235,55 @@
         width: 100%;
         flex-wrap: wrap;
     }
+
+.btn-baxen {
+    background-color: #2c3e50;
+    color: #fff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+    .btn-baxen:hover {
+        background-color: #1a2734;
+        color: #fff;
+    }
+
+.aco-tabbar {
+    display: flex;
+    gap: 0.22rem;
+    margin-bottom: 0.45rem;
+}
+
+.aco-tab {
+    border: 1px solid #d8dee2;
+    border-bottom: 0;
+    border-radius: 6px 6px 0 0;
+    background: #f4f8fc;
+    color: #546e7a;
+    font-size: 0.74rem;
+    padding: 0.22rem 0.7rem;
+    cursor: pointer;
+}
+
+    .aco-tab.is-active {
+        background: #2f3e46;
+        color: #fff;
+        border-color: #2f3e46;
+    }
+
+.aco-tab-panel {
+    display: none;
+}
+
+    .aco-tab-panel.is-active {
+        display: block;
+    }
+
+#contenedor-aco-pendientes {
+    height: 250px;
+    overflow-y: auto;
+    overflow-x: auto;
+}

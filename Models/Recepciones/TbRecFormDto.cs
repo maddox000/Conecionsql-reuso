@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace ConexionSql.Models.Recepciones
+namespace ConexionSql.Models.reuepciones
 {
     public class TbRecFormDto
     {

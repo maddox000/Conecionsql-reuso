@@ -3,6 +3,7 @@
 <div class="subform-proceso mt-4">
 
     <link rel="stylesheet" href="~/css/views/crear-procesos.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
 
     <div class="bx-card proceso-demo mt-3">
         <div class="proceso-banner">Proceso de Esterilizacion</div>
@@ -191,10 +192,15 @@
         </div>
 
         <div class="proceso-actions">
-            <button type="button" class="btn btn-primary" onclick="window.location.reload()">Nuevo</button>
-            <button type="button" class="btn btn-outline-primary" onclick="alert('Accion de demostracion')">Controles de proceso</button>
-            <button type="button" class="btn btn-outline-primary" id="btnEditarProceso">Editar</button>
-            <button type="button" class="btn btn-secondary" onclick="window.location.href='/Home/Index'">Cerrar</button>
+            <button type="button" class="btn-baxen" onclick="window.location.reload()">Nuevo</button>
+
+            @* eliminado controles de proceso *@
+
+            <button type="button" class="btn-baxen" id="btnEditarProceso">Editar</button>
+
+            <a href="@Url.Action("Index", "Home")" class="btn-baxen">
+                Cerrar
+            </a>
         </div>
     </div>
 </div>

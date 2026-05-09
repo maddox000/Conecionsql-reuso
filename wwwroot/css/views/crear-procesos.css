@@ -544,5 +544,9 @@
 #formProDetalle .proceso-operativo-grid {
     grid-template-columns: repeat(5, minmax(120px, 1fr));
 }
+.proceso-detalle-scroll {
+    max-height: 190px;
+    overflow-y: auto;
+}
 
 /*--- ingreso etiqueta*/

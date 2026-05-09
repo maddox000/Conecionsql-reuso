@@ -1,0 +1,721 @@
+﻿@model ConexionSql.Models.Reuso.TbReuDto
+
+@{
+    ViewData["Title"] = "Reusos";
+
+    var codigoReuso = Model?.TbReuIdForm ?? "Pendiente";
+    var usuario = $"{Model?.TbReuPerApe} {Model?.TbReuPerNom}".Trim();
+    if (string.IsNullOrWhiteSpace(usuario)) usuario = ViewBag.UsuarioLogueado ?? "NO REGISTRADO";
+
+    var cargo = Model?.TbReuPerCarDen ?? "";
+    var fecha = Model?.TbReuFec?.ToString("dd/MM/yyyy") ?? DateTime.Now.ToString("dd/MM/yyyy");
+    var hora = Model?.TbReuHorIni?.ToString("HH:mm") ?? DateTime.Now.ToString("HH:mm");
+    var listaSectores = ViewBag.ListaSectores as List<ConexionSql.Models.Sectores.IbSec>;
+}
+
+<link rel="stylesheet" href="~/css/views/crear-reusos.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
+
+<div class="bx-card reu-screen">
+    <div class="reu-screen-banner">Reusos</div>
+
+    <table class="reu-layout">
+        <tr>
+            <td class="reu-left-col">
+
+                <div class="reu-screen-panel">
+                    <div class="reu-screen-kv">
+                        <div class="reu-screen-k">Código de reuso</div>
+                        <div class="reu-screen-v">@codigoReuso</div>
+                    </div>
+
+                    <div class="reu-screen-kv">
+                        <div class="reu-screen-k">Usuario</div>
+                        <div class="reu-screen-v">@usuario</div>
+                    </div>
+
+                    <div class="reu-screen-kv">
+                        <div class="reu-screen-k">Cargo</div>
+                        <div class="reu-screen-v">@cargo</div>
+                    </div>
+                </div>
+
+                <div class="reu-screen-table-wrap mt-2">
+                    <div class="reu-screen-table-title">Datos del material</div>
+
+                    <div class="reu-screen-panel reu-material-panel">
+
+                        <div class="reu-screen-kv">
+                            <div class="reu-screen-k">Sector</div>
+                            <div class="reu-screen-v">
+                                <div style="flex-direction: column; align-items: stretch;">
+                                    <input type="text"
+                                           id="TbReuSecBusqueda"
+                                           class="form-control form-control-sm"
+                                           autocomplete="off"
+                                           placeholder="Seleccione sector" />
+
+                                    <div id="listaSectoresReuso" class="list-group mt-2"></div>
+
+                                    <input type="hidden" id="TbReuSecId" name="TbReuSecId" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reu-screen-kv">
+                            <div class="reu-screen-k">Denominación</div>
+                            <div class="reu-screen-v">
+                                <div style="flex-direction: column; align-items: stretch;">
+                                    <input type="text" class="form-control form-control-sm"
+                                           id="TbReuMatDen" name="TbReuMatDen"
+                                           autocomplete="off"
+                                           value="@Model?.TbReuMatDen" />
+
+                                    <div id="listaMaterialesReusoDen" class="list-group mt-2"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reu-screen-kv">
+                            <div class="reu-screen-k">Código producto</div>
+                            <div class="reu-screen-v">
+                                <div style="flex-direction: column; align-items: stretch;">
+                                    <input type="text"
+                                           id="TbReuMatBusqueda"
+                                           class="form-control form-control-sm"
+                                           autocomplete="off"
+                                           placeholder="Código producto" />
+
+                                    <div id="listaMaterialesReuso" class="list-group mt-2"></div>
+
+                                    <input type="hidden" id="TbReuMatId" name="TbReuMatId" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reu-screen-kv">
+                            <div class="reu-screen-k">Marca</div>
+                            <div class="reu-screen-v">
+                                <input type="text" class="form-control form-control-sm"
+                                       id="TbReuMatMca" name="TbReuMatMca"
+                                       value="@Model?.TbReuMatMca" />
+                            </div>
+                        </div>
+
+                        <div class="reu-screen-kv">
+                            <div class="reu-screen-k">Identificación</div>
+                            <div class="reu-screen-v">
+                                <input type="text" class="form-control form-control-sm"
+                                       id="TbReuMatIde" name="TbReuMatIde"
+                                       value="@Model?.TbReuMatIde" />
+                            </div>
+                        </div>
+
+                        <div class="reu-screen-kv">
+                            <div class="reu-screen-k">Fabricante</div>
+                            <div class="reu-screen-v">
+                                <input type="text" class="form-control form-control-sm"
+                                       id="TbReuMatFab" name="TbReuMatFab"
+                                       value="@Model?.TbReuMatFab" />
+                            </div>
+                        </div>
+
+                        <div class="reu-screen-kv">
+                            <div class="reu-screen-k">Número de lote</div>
+                            <div class="reu-screen-v">
+                                <input type="text" class="form-control form-control-sm"
+                                       id="TbReuLot" name="TbReuLot" />
+                            </div>
+                        </div>
+
+                        <div class="reu-screen-kv">
+                            <div class="reu-screen-k">Vencimiento</div>
+                            <div class="reu-screen-v">
+                                <input type="text" class="form-control form-control-sm"
+                                       id="TbReuVto" name="TbReuVto" />
+                            </div>
+                        </div>
+
+                        <div class="reu-reusos-row">
+                            <div class="reu-screen-kv">
+                                <div class="reu-screen-k">Reusos permitidos</div>
+                                <div class="reu-screen-v">
+                                    <input type="text" class="form-control form-control-sm"
+                                           id="TbReuMatOpcCant" name="TbReuMatOpcCant"
+                                           value="@Model?.TbReuMatOpcCant" />
+                                </div>
+                            </div>
+
+                            <div class="reu-screen-kv">
+                                <div class="reu-screen-k">Reusos registrados</div>
+                                <div class="reu-screen-v">
+                                    <input type="text" class="form-control form-control-sm"
+                                           id="TbReuMatOpcReg" name="TbReuMatOpcReg"
+                                           value="@Model?.TbReuMatOpcReg" />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </td>
+
+            <td class="reu-right-col">
+
+                <div class="reu-screen-panel">
+                    <div class="reu-screen-kv">
+                        <div class="reu-screen-k">Fecha</div>
+                        <div class="reu-screen-v">@fecha &nbsp;&nbsp; @hora</div>
+                    </div>
+
+                    <div class="reu-screen-image mt-2 mb-2">
+                        <div id="productoImagenContainer">
+                            <div style="color:#999; font-size:0.8rem;">Sin imagen</div>
+                        </div>
+                    </div>
+
+                    <div class="reu-screen-kv">
+                        <div class="reu-screen-k">Ubicación física</div>
+                        <div class="reu-screen-v"></div>
+                    </div>
+
+                    <div class="reu-screen-kv">
+                        <div class="reu-screen-k">Fecha registro</div>
+                        <div class="reu-screen-v"></div>
+                    </div>
+
+                    <div class="reu-screen-kv">
+                        <div class="reu-screen-k">Baja de producto</div>
+                        <div class="reu-screen-v">
+                            <select class="form-select form-select-sm" id="TbReuBsto" name="TbReuBsto">
+                                <option value="false" selected>No</option>
+                                <option value="true">Sí</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="reu-screen-kv">
+                        <div class="reu-screen-k">Fecha de baja</div>
+                        <div class="reu-screen-v"></div>
+                    </div>
+
+                    <div class="reu-screen-kv">
+                        <div class="reu-screen-k">Motivo baja</div>
+                        <div class="reu-screen-v">
+                            <input type="text" class="form-control form-control-sm"
+                                   id="TbReuBstoBcreuDen" name="TbReuBstoBcreuDen"
+                                   value="@Model?.TbReuBstoBcreuDen" />
+                        </div>
+                    </div>
+
+                    <div class="reu-screen-kv">
+                        <div class="reu-screen-k">Realizado por</div>
+                        <div class="reu-screen-v"></div>
+                    </div>
+                </div>
+
+            </td>
+        </tr>
+    </table>
+
+    <div id="msgReuso"
+         style="display:none;
+        margin-top:10px;
+        padding:10px;
+        border-radius:6px;
+        background:#d4edda;
+        color:#155724;
+        font-weight:600;">
+    </div>
+
+
+
+
+    <div class="reu-screen-observ mt-2">
+        <div class="reu-screen-k">Observaciones</div>
+        <textarea id="TbReuMem1" name="TbReuMem1">@Model?.TbReuMem1</textarea>
+    </div>
+
+
+
+    <div class="reu-screen-table-wrap mt-2">
+        <div class="reu-screen-table-title">Detalle de reusos registrados</div>
+
+        <table class="reu-screen-table">
+            <thead>
+                <tr>
+                    <th>Código etiqueta</th>
+                    <th>Procedimiento</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Paciente</th>
+                    <th>Historia Clínica</th>
+                    <th>Sector</th>
+                    <th>Código reuso</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="8" class="reu-screen-note">Sin registros</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+@await Html.PartialAsync("~/Views/Shared/_BotonesInfoBasica.cshtml")
+
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // =========================
+        // SECTORES
+        // =========================
+
+        const sectores = [
+            @if (listaSectores != null)
+            {
+                    for (int i = 0; i < listaSectores.Count; i++)
+                    {
+                            var s = listaSectores[i];
+                            @:{ id: @s.IbSecId, den: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(s.IbSecDen ?? ""))" }@(i < listaSectores.Count - 1 ? "," : "")
+                    }
+            }
+        ];
+
+        const inputSec = document.getElementById("TbReuSecBusqueda");
+        const hiddenSec = document.getElementById("TbReuSecId");
+        const listaSec = document.getElementById("listaSectoresReuso");
+
+        let filtradosSec = [];
+        let indiceSec = -1;
+
+        function renderSec(items) {
+            filtradosSec = items || [];
+            listaSec.innerHTML = "";
+
+            if (!items.length) {
+                listaSec.style.display = "none";
+                return;
+            }
+
+            items.forEach((sec, i) => {
+                const item = document.createElement("button");
+                item.type = "button";
+                item.className = "list-group-item list-group-item-action";
+                item.textContent = sec.den;
+
+                if (i === indiceSec) item.classList.add("active");
+
+                item.onclick = () => {
+                    inputSec.value = sec.den;
+                    hiddenSec.value = sec.id;
+                    listaSec.style.display = "none";
+
+                    const inputDen = document.getElementById("TbReuMatDen");
+                    if (inputDen) {
+                        inputDen.focus();
+                        inputDen.select();
+                    }
+                };
+
+                listaSec.appendChild(item);
+            });
+
+            listaSec.style.display = "block";
+        }
+
+        inputSec.addEventListener("focus", () => { indiceSec = -1; renderSec(sectores); });
+        inputSec.addEventListener("click", () => { indiceSec = -1; renderSec(sectores); });
+
+        inputSec.addEventListener("input", function () {
+            indiceSec = -1;
+            hiddenSec.value = "";
+
+            const f = sectores.filter(x =>
+                x.den.toLowerCase().includes(this.value.toLowerCase())
+            );
+
+            renderSec(f);
+        });
+
+        inputSec.addEventListener("keydown", function (e) {
+
+            if (e.key === "ArrowDown") {
+                if (!filtradosSec.length) return;
+                e.preventDefault();
+                indiceSec = (indiceSec + 1) % filtradosSec.length;
+                renderSec(filtradosSec);
+            }
+
+            if (e.key === "ArrowUp") {
+                if (!filtradosSec.length) return;
+                e.preventDefault();
+                indiceSec = (indiceSec - 1 + filtradosSec.length) % filtradosSec.length;
+                renderSec(filtradosSec);
+            }
+
+            if (e.key === "Enter") {
+                e.preventDefault();
+
+                let seleccionado = null;
+
+                if (indiceSec >= 0 && filtradosSec.length > 0) {
+                    seleccionado = filtradosSec[indiceSec];
+                } else {
+                    seleccionado = sectores.find(x => x.den === inputSec.value.trim());
+                }
+
+                if (seleccionado) {
+                    inputSec.value = seleccionado.den;
+                    hiddenSec.value = seleccionado.id;
+                    listaSec.style.display = "none";
+
+                    const inputDen = document.getElementById("TbReuMatDen");
+                    if (inputDen) {
+                        inputDen.focus();
+                        inputDen.select();
+                    }
+                }
+            }
+        });
+
+        // =========================
+        // MATERIALES
+        // =========================
+
+        const materiales = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.ListaMateriales ?? new List<object>()));
+
+        const inputMat = document.getElementById("TbReuMatBusqueda");
+        const hiddenMat = document.getElementById("TbReuMatId");
+        const listaMat = document.getElementById("listaMaterialesReuso");
+
+        const inputDen = document.getElementById("TbReuMatDen");
+        const listaMatDen = document.getElementById("listaMaterialesReusoDen");
+
+        const inputReusosPermitidos = document.getElementById("TbReuMatOpcCant");
+
+        let filtradosMat = [];
+        let indiceMat = -1;
+
+        function seleccionarMat(mat) {
+            inputMat.value = mat.pr ?? "";
+            hiddenMat.value = mat.id ?? "";
+
+            if (inputDen) inputDen.value = mat.den ?? "";
+            if (inputReusosPermitidos) inputReusosPermitidos.value = mat.reuOpcCant ?? "";
+            const inputVto = document.getElementById("TbReuVto");
+                if (inputVto && mat.vtoDefault) {
+                    inputVto.value = mat.vtoDefault;
+                }
+
+            listaMat.style.display = "none";
+            listaMat.innerHTML = "";
+
+            if (listaMatDen) {
+                listaMatDen.style.display = "none";
+                listaMatDen.innerHTML = "";
+            }
+
+            const inputMarca = document.getElementById("TbReuMatMca");
+            if (inputMarca) {
+                inputMarca.focus();
+                inputMarca.select();
+            }
+        }
+
+        function renderMat(items, listaDestino, tipo) {
+            filtradosMat = items || [];
+            listaDestino.innerHTML = "";
+
+            if (!items.length) {
+                listaDestino.style.display = "none";
+                return;
+            }
+
+            items.forEach((mat, i) => {
+                const item = document.createElement("button");
+                item.type = "button";
+                item.className = "list-group-item list-group-item-action";
+                item.textContent = tipo === "den" ? (mat.den ?? "") : (mat.pr ?? "");
+
+                if (i === indiceMat) item.classList.add("active");
+
+                item.onclick = () => seleccionarMat(mat);
+
+                listaDestino.appendChild(item);
+            });
+
+            listaDestino.style.display = "block";
+        }
+
+        function buscarPorDen(texto) {
+            const t = texto.toLowerCase();
+
+            return materiales.filter(x =>
+                (x.den ?? "").toLowerCase().includes(t)
+            );
+        }
+
+        function buscarPorPr(texto) {
+            const t = texto.toString();
+
+            return materiales.filter(x =>
+                (x.pr ?? "").toString().includes(t)
+            );
+        }
+
+        inputDen.addEventListener("click", () => {
+            indiceMat = -1;
+            if (listaMat) listaMat.style.display = "none";
+            renderMat(materiales, listaMatDen, "den");
+        });
+
+        inputDen.addEventListener("input", function () {
+            indiceMat = -1;
+            hiddenMat.value = "";
+
+            const f = buscarPorDen(this.value);
+            renderMat(f, listaMatDen, "den");
+        });
+
+        inputDen.addEventListener("keydown", function (e) {
+            if (e.key === "ArrowDown") {
+                if (!filtradosMat.length) return;
+
+                e.preventDefault();
+                indiceMat = (indiceMat + 1) % filtradosMat.length;
+                renderMat(filtradosMat, listaMatDen, "den");
+            }
+
+            if (e.key === "ArrowUp") {
+                if (!filtradosMat.length) return;
+
+                e.preventDefault();
+                indiceMat = (indiceMat - 1 + filtradosMat.length) % filtradosMat.length;
+                renderMat(filtradosMat, listaMatDen, "den");
+            }
+
+            if (e.key === "Enter") {
+                e.preventDefault();
+
+                let seleccionado = null;
+
+                if (indiceMat >= 0 && filtradosMat.length > 0) {
+                    seleccionado = filtradosMat[indiceMat];
+                } else {
+                    seleccionado = materiales.find(x =>
+                        (x.den ?? "") === inputDen.value.trim()
+                    );
+                }
+
+                if (seleccionado) {
+                    seleccionarMat(seleccionado);
+                    return;
+                }
+
+                if (inputMat) {
+                    inputMat.focus();
+                    inputMat.select();
+                }
+            }
+        });
+
+        inputMat.addEventListener("click", () => {
+            indiceMat = -1;
+            if (listaMatDen) listaMatDen.style.display = "none";
+            renderMat(materiales, listaMat, "pr");
+        });
+
+        inputMat.addEventListener("input", function () {
+            indiceMat = -1;
+            hiddenMat.value = "";
+
+            const f = buscarPorPr(this.value);
+            renderMat(f, listaMat, "pr");
+        });
+
+        inputMat.addEventListener("keydown", function (e) {
+            if (e.key === "ArrowDown") {
+                if (!filtradosMat.length) return;
+
+                e.preventDefault();
+                indiceMat = (indiceMat + 1) % filtradosMat.length;
+                renderMat(filtradosMat, listaMat, "pr");
+            }
+
+            if (e.key === "ArrowUp") {
+                if (!filtradosMat.length) return;
+
+                e.preventDefault();
+                indiceMat = (indiceMat - 1 + filtradosMat.length) % filtradosMat.length;
+                renderMat(filtradosMat, listaMat, "pr");
+            }
+
+            if (e.key === "Enter") {
+                e.preventDefault();
+
+                let seleccionado = null;
+
+                if (indiceMat >= 0 && filtradosMat.length > 0) {
+                    seleccionado = filtradosMat[indiceMat];
+                } else {
+                    seleccionado = materiales.find(x =>
+                        (x.pr ?? "").toString() === inputMat.value.trim()
+                    );
+                }
+
+                if (seleccionado) {
+                    seleccionarMat(seleccionado);
+                    return;
+                }
+
+                const inputMarca = document.getElementById("TbReuMatMca");
+                if (inputMarca) {
+                    inputMarca.focus();
+                    inputMarca.select();
+                }
+            }
+        });
+
+        // =========================
+        // mayusc los datos
+        // =========================
+
+        [
+            "TbReuMatMca",
+            "TbReuMatIde",
+            "TbReuMatFab",
+            "TbReuLot",
+            "TbReuMem1"
+                ].forEach(id => {
+
+                    const campo = document.getElementById(id);
+
+                    if (!campo) return;
+
+                    campo.addEventListener("input", function () {
+                        this.value = this.value.toUpperCase();
+                    });
+                });
+
+        // =========================
+        // ENTER ENTRE CAMPOS
+        // =========================
+
+        const ordenCamposReuso = [
+            "TbReuMatMca",
+            "TbReuMatIde",
+            "TbReuMatFab",
+            "TbReuLot",
+            "TbReuVto",
+            "TbReuMatOpcReg",
+            "TbReuMem1"
+        ];
+
+        ordenCamposReuso.forEach((id, index) => {
+            const campo = document.getElementById(id);
+
+            if (!campo) return;
+
+                    campo.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+
+                // 🔴 SI ES REUSOS REGISTRADOS → GUARDAR
+                if (id === "TbReuMatOpcReg") {
+
+                    const data = {
+                        TbReuIdForm: "@codigoReuso",
+
+                        TbReuPerId: @Model?.TbReuPerId ?? 0,
+                        TbReuPerNom: "@(Model?.TbReuPerNom ?? "")",
+                        TbReuPerApe: "@(Model?.TbReuPerApe ?? "")",
+                        TbReuPerCarId: @Model?.TbReuPerCarId ?? 0,
+                        TbReuPerCarDen: "@(Model?.TbReuPerCarDen ?? "")",
+
+                        TbReuSecId: document.getElementById("TbReuSecId")?.value,
+                        TbReuMatId: document.getElementById("TbReuMatId")?.value,
+
+                        TbReuMatMca: document.getElementById("TbReuMatMca")?.value,
+                        TbReuMatFab: document.getElementById("TbReuMatFab")?.value,
+                        TbReuMatIde: document.getElementById("TbReuMatIde")?.value,
+
+                        TbReuMatOpcCant: document.getElementById("TbReuMatOpcCant")?.value,
+                        TbReuMatOpcReg: document.getElementById("TbReuMatOpcReg")?.value,
+
+                        TbReuTxt1: document.getElementById("TbReuLot")?.value,
+                        TbReuDti1: document.getElementById("TbReuVto")?.value,
+
+                        TbReuMem1: document.getElementById("TbReuMem1")?.value
+                    };
+
+                        console.log("DATA REUSO:", data);
+                             //alert("Codigo que mando: " + data.TbReuIdForm);
+
+                    fetch("/Reusos/ActualizarReuso", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(r => r.json())
+                    .then(res => {
+                        if (res.success) {
+                            console.log("✔ UPDATE OK");
+
+                        const msg = document.getElementById("msgReuso");
+
+                                if (msg) {
+                                    msg.innerText = "✔ Código de reúso registrado correctamente";
+                                    msg.style.display = "block";
+                                }
+
+                            const siguiente = document.getElementById("TbReuMem1");
+                            if (siguiente) {
+                                siguiente.focus();
+                                siguiente.select();
+                            }
+                        } else {
+                            alert(res.mensaje || "Error al actualizar");
+                        }
+                    })
+                    .catch(() => alert("Error de conexión"));
+
+                    return;
+                }
+
+                // 🟢 flujo normal
+                const siguienteId = ordenCamposReuso[index + 1];
+
+                if (siguienteId) {
+                    const siguiente = document.getElementById(siguienteId);
+
+                    if (siguiente) {
+                        siguiente.focus();
+                        if (siguiente.select) siguiente.select();
+                    }
+                }
+            }
+        });
+
+        // =========================
+        // FOCO INICIAL
+        // =========================
+
+        if (inputSec) {
+            setTimeout(() => {
+                inputSec.focus();
+                inputSec.select();
+                listaSec.style.display = "none";
+            }, 200);
+        }
+        });
+    });
+</script>
