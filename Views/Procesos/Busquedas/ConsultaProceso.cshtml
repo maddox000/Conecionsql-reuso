@@ -100,6 +100,7 @@
             <button type="button" class="proceso-tab is-active" data-tab-target="proceso-tab-materiales">Materiales procesados</button>
             <button type="button" class="proceso-tab" data-tab-target="proceso-tab-cancelados">Materiales cancelados</button>
             <button type="button" class="proceso-tab" data-tab-target="proceso-tab-controles">Controles de proceso</button>
+            <button type="button" class="proceso-tab" data-tab-target="proceso-tab-liberacion">Liberación de proceso</button>
         </div>
 
         <div id="proceso-tab-materiales" class="proceso-tab-panel is-active">
@@ -107,10 +108,12 @@
 
             <div class="proceso-materiales-wrap mt-3">
                 <div id="detalleTabla">
-                    @await Html.PartialAsync("~/Views/Procesos/_DetalleTabla.cshtml", Model.Detalles)
+                    @await Html.PartialAsync("~/Views/Procesos/_DetalleTablaBusqueda.cshtml", Model.Detalles)
                 </div>
             </div>
         </div>
+
+        
 
         <div id="proceso-tab-cancelados" class="proceso-tab-panel">
             <div class="proceso-materiales-wrap">
@@ -147,7 +150,7 @@
                                 <th>Ubicacion</th>
                                 <th>Cantidad</th>
                                 <th>Resultado</th>
-                                <th>Editar</th>
+                                <th class="col-editar d-none">Editar</th>
                             </tr>
                         </thead>
                         <tbody id="tablaControlesProceso">
@@ -191,7 +194,92 @@
             </div>
         </div>
 
+        @* pestaña finalizacion *@
+
+        @* pestaña finalizacion *@
+
+        <div id="proceso-tab-liberacion" class="proceso-tab-panel">
+            <div class="proceso-materiales-wrap">
+                <div class="proceso-title">Liberación de proceso</div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:24px; align-items:start;">
+
+                    <div>
+                        <table class="proceso-mini-table">
+                            <tbody>
+                                <tr>
+                                    <td>Integridad envoltorios</td>
+                                    <td><input type="checkbox" id="chkIntegridadEnvoltorios" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Ausencia de humedad</td>
+                                    <td><input type="checkbox" id="chkAusenciaHumedad" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Ausencia de suciedad</td>
+                                    <td><input type="checkbox" id="chkAusenciaSuciedad" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Viro correcto control químico</td>
+                                    <td><input type="checkbox" id="chkViroCorrectoControlQuimico" /></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div>
+                        <table class="proceso-mini-table">
+                            <tbody>
+                                <tr>
+                                    <td>Parámetros de ciclo correcto</td>
+                                    <td><input type="checkbox" id="chkParametrosCicloCorrecto" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Res negativo ind biológico</td>
+                                    <td><input type="checkbox" id="chkResNegativoBiologico" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Liberar ciclo de esterilización</td>
+                                    <td><input type="checkbox" id="chkLiberarCicloEsterilizacion" /></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="bloqueResultadoFinalProceso" style="display:none;">
+                        <table class="proceso-mini-table">
+                            <tbody>
+                                <tr>
+                                    <td>Liberar proceso</td>
+                                    <td><input type="radio" name="resultadoFinalProceso" value="LIBERAR_PROCESO" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Abortar proceso</td>
+                                    <td><input type="radio" name="resultadoFinalProceso" value="ABORTAR_PROCESO" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Reproceso parcial de carga</td>
+                                    <td><input type="radio" name="resultadoFinalProceso" value="REPROCESO_PARCIAL" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Falla de proceso</td>
+                                    <td><input type="radio" name="resultadoFinalProceso" value="FALLA_PROCESO" /></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
         <div class="proceso-actions">
+            <button type="button"
+                    class="btn-baxen"
+                    id="btnReprocesarMateriales"
+                    disabled>
+                Reprocesar materiales
+            </button>
             <button type="button" class="btn-baxen" onclick="window.location.reload()">Nuevo</button>
 
             @* eliminado controles de proceso *@
@@ -204,7 +292,10 @@
         </div>
     </div>
 </div>
+
 @await Html.PartialAsync("~/Views/Procesos/Modals/_ModalReproceso.cshtml")
+@await Html.PartialAsync("~/Views/Procesos/Modals/_ModalReprocesoParcial.cshtml")
+
 <div class="modal fade" id="procesoPrinterTypeModal" tabindex="-1" aria-labelledby="procesoPrinterTypeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-primary" style="max-width:420px;">
@@ -281,7 +372,7 @@
                                 </td>
 
                             <!-- COMBO -->
-                            <td>
+                            <td class="col-editar d-none">
                                 <select class="form-select form-select-sm combo-resultado d-none"
                                         data-id="${x.tbProDetPteId}">
                                     <option value="">Seleccione...</option>
@@ -310,17 +401,6 @@
                 });
             }
 
-            // document.getElementById("btnEditarProceso")?.addEventListener("click", async function () {
-            //     console.log("CLICK EDITAR");
-
-            //     await cargarResultados();
-            //     await cargarControlesProceso();
-
-            //     document.querySelectorAll(".combo-resultado").forEach(x => {
-            //         x.classList.remove("d-none");
-            //         x.style.display = "block";
-            //     });
-            // });
 
         const tabs = document.querySelectorAll('.proceso-tab[data-tab-target]');
         const panels = document.querySelectorAll('.proceso-tab-panel');
@@ -342,15 +422,36 @@
                     await cargarResultados();
                     await cargarControlesProceso();
 
-                    if (sessionStorage.getItem("editarProceso") === "1") {
+                if (sessionStorage.getItem("editarProceso") === "2") {
+
+                        document.querySelectorAll(".col-editar").forEach(x => {
+                            x.classList.remove("d-none");
+                        });
+
                         document.querySelectorAll(".combo-resultado").forEach(x => {
                             x.classList.remove("d-none");
                             x.style.display = "block";
                         });
                     }
                 }
+                //     cargarControlesProceso().then(() => {
+
+                // if (sessionStorage.getItem("editarProceso") === "2") {
+
+                //             document.querySelectorAll(".col-editar").forEach(x => {
+                //                 x.classList.remove("d-none");
+                //             });
+
+                //             document.querySelectorAll(".combo-resultado").forEach(x => {
+                //                 x.classList.remove("d-none");
+                //                 x.style.display = "block";
+                //             });
+                //         }
+                //     });
+
+                });
             });
-        });
+
 
         document.addEventListener('click', function (event) {
             const btnPdfRow = event.target.closest('.js-pro-row-print-pdf');
@@ -389,22 +490,211 @@
             });
         }
 
+        //dispararReproceso la finalizacion
 
+                // =========================
+    // LIBERACION DE PROCESO
+    // =========================
+
+    let usuarioLiberacionValidado = sessionStorage.getItem("editarProceso") === "2";
+
+    window.addEventListener("loginTareasValidado", function () {
+                    usuarioLiberacionValidado = true;
+                });
+
+    const chkLiberarCiclo = document.getElementById("chkLiberarCicloEsterilizacion");
+    const bloqueResultadoFinal = document.getElementById("bloqueResultadoFinalProceso");
+
+    // todos los checks de liberacion
+    const checksLiberacion = document.querySelectorAll(`
+        #chkIntegridadEnvoltorios,
+        #chkAusenciaHumedad,
+        #chkAusenciaSuciedad,
+        #chkViroCorrectoControlQuimico,
+        #chkParametrosCicloCorrecto,
+        #chkResNegativoBiologico,
+        #chkLiberarCicloEsterilizacion
+    `);
+
+    // radios finales
+    const radiosResultadoFinal = document.querySelectorAll('input[name="resultadoFinalProceso"]');
+
+    // 🔒 bloquear todo al cargar
+        // radios ocultos al iniciar
+    radiosResultadoFinal.forEach(x => {
+        x.disabled = true;
+    });
+
+    //muestra los checks de finalizacion del cilco
+        const estadoProceso = "@Model.Cabecera.IbProEstDen";
+    const liberado = @((Model.Cabecera.TbProIbre ?? false).ToString().ToLower());
+
+    if (liberado) {
+
+        document.getElementById("chkIntegridadEnvoltorios").checked =
+            @((Model.Cabecera.TbProIenv ?? false).ToString().ToLower());
+
+        document.getElementById("chkAusenciaHumedad").checked =
+            @(Model.Cabecera.TbProHume.ToString().ToLower());
+
+        document.getElementById("chkAusenciaSuciedad").checked =
+            @(Model.Cabecera.TbProAusu.ToString().ToLower());
+
+        document.getElementById("chkViroCorrectoControlQuimico").checked =
+            @(Model.Cabecera.TbProIqvi.ToString().ToLower());
+
+        document.getElementById("chkParametrosCicloCorrecto").checked =
+            @(Model.Cabecera.TbProPaci.ToString().ToLower());
+
+        document.getElementById("chkResNegativoBiologico").checked =
+            @(Model.Cabecera.TbProIbrn.ToString().ToLower());
+
+        document.getElementById("chkLiberarCicloEsterilizacion").checked = true;
+
+        bloqueResultadoFinal.style.display = "block";
+
+        radiosResultadoFinal.forEach(x => {
+            x.disabled = false;
+        });
+
+        if (estadoProceso === "FINALIZADO") {
+
+            document.querySelector(
+                'input[name="resultadoFinalProceso"][value="LIBERAR_PROCESO"]'
+            ).checked = true;
+        }
+
+        if (estadoProceso === "REPROCESO PARCIAL") {
+
+            document.querySelector(
+                'input[name="resultadoFinalProceso"][value="REPROCESO_PARCIAL"]'
+            ).checked = true;
+        }
+
+        if (estadoProceso === "ABORTADO") {
+
+            document.querySelector(
+                'input[name="resultadoFinalProceso"][value="ABORTAR_PROCESO"]'
+            ).checked = true;
+        }
+
+        if (estadoProceso === "FALLA DE PROCESO") {
+
+            document.querySelector(
+                'input[name="resultadoFinalProceso"][value="FALLA_PROCESO"]'
+            ).checked = true;
+        }
+    }
+
+    //termina los checks
+        // cuando quieran tocar algo sin validar
+        checksLiberacion.forEach(chk => {
+
+        chk.addEventListener("change", function (e) {
+
+            if (!usuarioLiberacionValidado) {
+
+                e.preventDefault();
+
+                chk.checked = false;
+
+                alert("Debe validar usuario antes de liberar el proceso.");
+
+                sessionStorage.setItem("editarProceso", "2");
+                localStorage.setItem("loginDestino", window.location.pathname + window.location.search);
+
+                const modalLogin = document.getElementById("loginTareasModal");
+
+                if (modalLogin) {
+                    const bsModalLogin = new bootstrap.Modal(modalLogin);
+                    bsModalLogin.show();
+                }
+
+                return false;
+            }
+
+            const tbProId = parseInt(document.getElementById("tbProId")?.value) || 0;
+
+            fetch('/TbProBusqueda/ActualizarChecksLiberacion', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    TbProId: tbProId,
+
+                    TbProIenv: document.getElementById("chkIntegridadEnvoltorios")?.checked || false,
+                    TbProHume: document.getElementById("chkAusenciaHumedad")?.checked || false,
+                    TbProAusu: document.getElementById("chkAusenciaSuciedad")?.checked || false,
+                    TbProIqvi: document.getElementById("chkViroCorrectoControlQuimico")?.checked || false,
+                    TbProPaci: document.getElementById("chkParametrosCicloCorrecto")?.checked || false,
+                    TbProIbrn: document.getElementById("chkResNegativoBiologico")?.checked || false,
+                    TbProIbre: document.getElementById("chkLiberarCicloEsterilizacion")?.checked || false
+                })
+            });
+
+        });
+    });
+
+    // mostrar/ocultar radios
+    if (chkLiberarCiclo && bloqueResultadoFinal) {
+
+        chkLiberarCiclo.addEventListener("change", function () {
+
+            if (chkLiberarCiclo.checked) {
+
+                bloqueResultadoFinal.style.display = "block";
+
+                radiosResultadoFinal.forEach(x => x.disabled = false);
+
+            } else {
+
+                bloqueResultadoFinal.style.display = "none";
+
+                radiosResultadoFinal.forEach(function (radio) {
+
+                    radio.checked = false;
+                    radio.disabled = true;
+                });
+            }
+        });
+    }
+     //abre modal reproceso
+            document.querySelector('input[name="resultadoFinalProceso"][value="REPROCESO_PARCIAL"]')
+                ?.addEventListener("change", async function () {
+
+                    if (!this.checked) return;
+
+                    const modal = document.getElementById("modalReprocesoParcial");
+                    if (!modal) return;
+
+                    await cargarMotivosReprocesoParcial();
+
+                    modal.style.display = "flex";
+                });
 
         // ACA VA LA RUTA DE LA VISTA NUEVA
         // window.location.href = `/Procesos/ConsultaProceso/${tbProId}`;
 
-            cargarControlesProceso().then(() => {
-        if (sessionStorage.getItem("editarProceso") === "1") {
-            document.querySelectorAll(".combo-resultado").forEach(x => {
-                x.classList.remove("d-none");
-                x.style.display = "block";
-            });
+        //     cargarControlesProceso().then(() => {
+        // if (sessionStorage.getItem("editarProceso") === "2") {
+        //     document.querySelectorAll(".combo-resultado").forEach(x => {
+        //         x.classList.remove("d-none");
+        //         x.style.display = "block";
+        //     });
 
             //sessionStorage.removeItem("editarProceso");
-        }
+//         }
+//     });
+// });
+
+
+    document.getElementById("btnEditarProceso")?.addEventListener("click", function (e) {
+        console.log("CLICK EDITAR DETECTADO EN ESTA VISTA");
+        sessionStorage.setItem("editarProceso", "2");
+        console.log("loginDestino:", localStorage.getItem("loginDestino"));
+        console.log("editarProceso:", sessionStorage.getItem("editarProceso"));
     });
-});
 
     function actualizarEstadoNodosControles(controles) {
         document.querySelectorAll(".js-camara-node").forEach(nodo => {
@@ -455,6 +745,49 @@
 
     }
 
+    //motivos reproceso
+
+        async function cargarMotivosReprocesoParcial() {
+
+        const contenedor = document.getElementById("txtMensajeReprocesoParcial");
+
+        if (!contenedor) return;
+
+        contenedor.innerHTML = "Cargando motivos...";
+
+        try {
+
+            const response = await fetch('/TbProReproceso/ObtenerNoConformidades');
+
+            if (!response.ok) {
+                throw new Error("Error HTTP " + response.status);
+            }
+
+            const json = await response.json();
+
+            if (!json || json.length === 0) {
+
+                contenedor.innerHTML = "No se encontraron motivos.";
+                return;
+            }
+
+            contenedor.innerHTML = json.map(x => `
+                <label style="display:block; margin-bottom:6px;">
+                    <input type="radio"
+                           name="motivoReprocesoParcial"
+                                   value="${x.tB_PRO_NCO_ID}">
+                            ${x.tB_PRO_NCO_DEN}
+                </label>
+            `).join("");
+
+        } catch (error) {
+
+            console.error("ERROR CARGAR MOTIVOS REPROCESO:", error);
+
+            contenedor.innerHTML = "Error al cargar motivos de reproceso.";
+        }
+    }
+
 
         document.addEventListener("change", async function (e) {
 
@@ -503,6 +836,27 @@
                         modal.style.display = "flex";
                     }
 
+
+            //reproceso parcial modal
+
+            if (json.dispararReprocesoParcial) {
+
+                    const modal = document.getElementById("modalReprocesoParcial");
+                    if (!modal) return;
+
+                    const txtMensaje = document.getElementById("txtMensajeReprocesoParcial");
+
+                    if (txtMensaje) {
+
+                        const materiales = json.materialesReproceso || [];
+
+                        txtMensaje.innerHTML =
+                            materiales.map(x => `• ${x}`).join("<br>");
+                    }
+
+                    modal.style.display = "flex";
+                }
+
                 // 👉 actualizar estado del ciclo
                 document.getElementById("panelEstadoCiclo").textContent = json.estadoDen;
 
@@ -530,5 +884,70 @@
         }
     });
 
+
+        document.getElementById("btnReprocesarMateriales")?.addEventListener("click", async function () {
+
+        const tbProId = parseInt(document.getElementById("tbProId")?.value) || 0;
+        const motivoId = parseInt(sessionStorage.getItem("motivoReprocesoParcialId")) || 0;
+
+        const detallesSeleccionados = Array.from(document.querySelectorAll(".chkReprocesoParcial:checked"))
+            .map(chk => {
+                const tbProDetId = parseInt(chk.value);
+
+                const inputCantidad = document.querySelector(
+                    `.cantReprocesoParcial[data-det-id='${tbProDetId}']`
+                );
+
+                const cantidad = parseInt(inputCantidad?.value) || 0;
+
+                    return {
+                        TbProDetId: tbProDetId,
+                        Cantidad: cantidad
+                    };
+            });
+
+        if (tbProId <= 0) {
+            alert("Proceso inválido.");
+            return;
+        }
+
+        if (motivoId <= 0) {
+            alert("Debe seleccionar un motivo de reproceso.");
+            return;
+        }
+
+        if (detallesSeleccionados.length === 0) {
+            alert("Debe seleccionar al menos un material.");
+            return;
+        }
+
+        try {
+            const response = await fetch('/TbProReproceso/EjecutarReprocesoParcial', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    tbProId: tbProId,
+                    motivoId: motivoId,
+                    detalles: detallesSeleccionados
+                })
+            });
+
+            const json = await response.json();
+
+            if (json.success) {
+                alert(json.mensaje);
+                location.reload();
+            } else {
+                alert(json.mensaje);
+            }
+
+        } catch (error) {
+            console.error("ERROR REPROCESO PARCIAL:", error);
+            alert("Error al ejecutar reproceso parcial.");
+        }
+    });
+    });
 
 </script>

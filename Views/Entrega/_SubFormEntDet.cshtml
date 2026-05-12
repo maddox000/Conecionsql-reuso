@@ -175,6 +175,8 @@
     </form>
 </div>
 
+@await Html.PartialAsync("~/Views/Entrega/Modals/_ModalProcesoPendiente.cshtml")
+
 <div class="info-basica-footer-fixed">
     @await Html.PartialAsync("~/Views/Shared/_BotonesInfoBasica.cshtml")
 </div>
@@ -209,6 +211,37 @@
             guardarDetalle();
         });
 
+        //funcion para modal de procesos pendientes
+
+            function abrirModalProcesoPendiente(tbProId, mensaje) {
+
+                const modal = document.getElementById("modalProcesoPendiente");
+                const txtMensaje = document.getElementById("txtMensajeProcesoPendiente");
+                const btnAbrir = document.getElementById("btnAbrirProcesoPendiente");
+
+                if (txtMensaje) {
+                    txtMensaje.textContent = mensaje || "";
+                }
+
+                if (btnAbrir) {
+                    btnAbrir.onclick = function () {
+
+                        window.open(
+                            `/TbProBusqueda/VerProceso?tbProId=${tbProId}`,
+                            '_blank'
+                        );
+
+                        if (modal) {
+                            modal.style.display = "none";
+                        }
+                    };
+                }
+
+                if (modal) {
+                    modal.style.display = "flex";
+                }
+            }
+
         function buscarEtiqueta() {
             etiquetaId = parseInt(inputEtiqueta.value);
             if (!etiquetaId || etiquetaId <= 0) {
@@ -218,21 +251,16 @@
 
             ocultarMensajes();
 
-            fetch(`/TbEntDet/ValidarProcesoPendiente?id=${etiquetaId}`)
-    .then(res => res.json())
-    .then(validacion => {
+        fetch(`/TbEntDet/ValidarProcesoPendiente?id=${etiquetaId}`)
+                .then(res => res.json())
+                .then(validacion => {
+
+        //abre modal de procesos sin finalizar
 
         if (validacion.requiereFinalizarProceso === true) {
-
-            const confirmar = confirm(validacion.mensaje);
-
-        window.open(
-                    `/TbProBusqueda/VerProceso?tbProId=${validacion.tbProId}`,
-                    '_blank'
-                );
-
-            return;
-        }
+                    abrirModalProcesoPendiente(validacion.tbProId, validacion.mensaje);
+                    return;
+                }
 
         // 👇 TU CÓDIGO ORIGINAL, SIN CAMBIAR
         fetch(`/TbEntDet/BuscarPorId?id=${etiquetaId}`)

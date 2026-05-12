@@ -289,5 +289,26 @@ namespace ConexionSql.Controllers.Procesos
 
             return Ok(lista);
         }
+
+        //cierra el proceso y cambia hora final
+
+        [HttpPost]
+        public async Task<IActionResult> CerrarProceso([FromBody] int tbProId)
+        {
+            if (tbProId <= 0)
+                return Json(new { success = false, mensaje = "TB_PRO_ID inválido." });
+
+            var proceso = await _context.TbPro
+                .FirstOrDefaultAsync(x => x.TbProId == tbProId);
+
+            if (proceso == null)
+                return Json(new { success = false, mensaje = "No se encontró el proceso." });
+
+            proceso.TbProHorFin = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true });
+        }
     }
 }

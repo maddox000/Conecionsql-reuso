@@ -1,5 +1,6 @@
 ﻿<div id="modalReproceso" class="modal-overlay">
-    <div class="modal-box">
+    <div class="modal-box"
+         style="width:480px; height:auto; min-height:240px;">
 
         <!-- HEADER -->
         <div class="modal-header">
@@ -8,12 +9,37 @@
 
         <!-- BODY -->
         <div class="modal-body">
-            <div class="form-row">
-                <label>Mensaje</label>
-                <textarea id="txtMensajeReproceso"
-                          class="form-control"
-                          readonly></textarea>
+
+            <div style="display:flex; align-items:flex-start; gap:14px;">
+
+                <div style="font-size:26px; line-height:1;">
+                    ⚠️
+                </div>
+
+                <div style="flex:1;">
+
+                    <div style="font-size:20px; font-weight:500; color:#1f2937; margin-bottom:10px;">
+                        El proceso ha sido abortado.
+                    </div>
+
+                    <div style="font-size:15px; color:#374151; margin-bottom:10px;">
+                        ¿Desea realizar el reproceso de los materiales?
+                    </div>
+
+                    <div id="txtMensajeReproceso"
+                         style="
+                        font-size:14px;
+                        color:#374151;
+                        max-height:80px;
+                        overflow:auto;
+                        white-space:pre-line;
+                        ">
+                    </div>
+
+                </div>
+
             </div>
+
         </div>
 
         <!-- FOOTER -->
@@ -25,7 +51,7 @@
             </button>
 
             <button type="button"
-                    class="btn btn-warning"
+                    class="btn btn-primary"
                     id="btnAceptarReproceso">
                 Aceptar
             </button>

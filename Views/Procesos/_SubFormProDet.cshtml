@@ -276,6 +276,8 @@
             </div>
         </div>
 
+        
+
         <div class="proceso-actions">
             <button type="button" class="btn-baxen" onclick="window.location.reload()">Nuevo</button>
 
@@ -283,9 +285,9 @@
 
             <button type="button" class="btn-baxen" id="btnEditarProceso">Editar</button>
 
-            <a href="@Url.Action("Index", "Home")" class="btn-baxen">
+            <button type="button" class="btn-baxen" id="btnCerrarProceso">
                 Cerrar
-            </a>
+            </button>
         </div>
     </div>
 </div>
@@ -831,6 +833,41 @@
         }
 
         window.location.href = `/TbProDet/SubFormulario/${tbProId}`;
+    });
+
+        document.getElementById("btnCerrarProceso")?.addEventListener("click", async function () {
+
+        const tbProId = document.getElementById("tbProId")?.value;
+
+        if (!tbProId || tbProId <= 0) {
+            alert("No se encontró el proceso.");
+            return;
+        }
+
+        try {
+
+            const response = await fetch('/TbProDet/CerrarProceso', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(parseInt(tbProId))
+            });
+
+            const json = await response.json();
+
+            if (!json.success) {
+                alert(json.mensaje);
+                return;
+            }
+
+            window.location.href = '/Home/Index';
+
+        } catch (error) {
+
+            console.error(error);
+            alert("Error al cerrar el proceso.");
+        }
     });
         
 </script>

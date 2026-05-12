@@ -13,7 +13,6 @@ using ConexionSql.Models.Reuso;
 using ConexionSql.Models.Reusos;
 using ConexionSql.Models.Sectores;
 using Microsoft.EntityFrameworkCore;
-using ConexionSql.Models.Procesos.Controles;
 using ConexionSql.Models.Proveedores;
 using ConexionSql.Models.Profesionales;
 using ConexionSql.Models.Instrumental;
@@ -66,6 +65,7 @@ namespace ConexionSql.Data
         public DbSet<IbMatCon> IbMatCons { get; set; }
         public DbSet<TbProDto> TbProDto { get; set; }
         public DbSet<TbProPendienteDto> TbProPendienteDto { get; set; }
+        public DbSet<TbProNco> TbProNco { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -121,6 +121,12 @@ namespace ConexionSql.Data
             {
                 entity.ToTable("TB_ENT_DET");
                 entity.HasKey(e => e.TbEntDetId);
+            });
+
+            modelBuilder.Entity<TbProNco>(entity =>
+            {
+                entity.ToTable("TB_PRO_NCO");
+                entity.HasKey(e => e.TbProNcoId);
             });
 
             modelBuilder.Entity<TbProDto>().HasNoKey();

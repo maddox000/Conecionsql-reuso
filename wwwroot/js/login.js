@@ -49,7 +49,7 @@ document.getElementById('btnEditarProceso')?.addEventListener('click', function 
         return;
     }
 
-    sessionStorage.setItem("editarProceso", "1");
+    sessionStorage.setItem("editarProceso", "2");
 
     const modal = new bootstrap.Modal(document.getElementById('loginTareasModal'));
     modal.show();
@@ -182,6 +182,8 @@ document.getElementById('btnValidarLogin')?.addEventListener('click', async func
 
         if (data.ok) {
             localStorage.setItem("usuarioId", data.id);
+
+            window.dispatchEvent(new Event("loginTareasValidado"));
 
             const modal = bootstrap.Modal.getInstance(document.getElementById('loginTareasModal'));
             modal.hide();

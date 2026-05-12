@@ -210,7 +210,9 @@ namespace ConexionSql.Controllers.Procesos.Controles
                         tbProPteDen = x.TbProPteDen,
                         tbProPteIde = x.TbProPteIde,
                         tbProDetTesUbiDen = x.TbProDetTesUbiDen,
-                        tbProPteCant = x.TbProPteCant
+                        tbProPteCant = x.TbProPteCant,
+                        tbProPteResId = x.TbProPteResId,
+                        tbProPteResDen = x.TbProPteResDen
                     })
                     .ToList();
 

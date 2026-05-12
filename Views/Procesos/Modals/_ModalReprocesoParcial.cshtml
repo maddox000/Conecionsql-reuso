@@ -1,0 +1,192 @@
+﻿<div id="modalReprocesoParcial" class="modal-overlay">
+    <div class="modal-box"
+         style="width:480px; height:auto; min-height:240px;">
+
+        <!-- HEADER -->
+        <div class="modal-header">
+            Reproceso parcial
+        </div>
+
+        <!-- BODY -->
+        <div class="modal-body">
+
+            <div style="display:flex; align-items:flex-start; gap:14px;">
+
+                <div style="font-size:26px; line-height:1;">
+                    ⚠️
+                </div>
+
+                <div style="flex:1;">
+
+                    <div style="font-size:20px; font-weight:500; color:#1f2937; margin-bottom:10px;">
+                        Se realizará un reproceso parcial.
+                    </div>
+
+                    <div style="font-size:15px; color:#374151; margin-bottom:10px;">
+                        Seleccione el motivo del reproceso parcial.
+                    </div>
+
+                    <div id="txtMensajeReprocesoParcial"
+                         style="
+                        font-size:14px;
+                        color:#374151;
+                        max-height:120px;
+                        overflow:auto;
+                        white-space:normal;
+                        ">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="modal-footer">
+            <button type="button"
+                    class="btn btn-secondary"
+                    onclick="cerrarModalReprocesoParcial()">
+                Cancelar
+            </button>
+
+            <button type="button"
+                    class="btn btn-primary"
+                    id="btnAceptarReprocesoParcial">
+                Aceptar
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const btnAceptar = document.getElementById("btnAceptarReprocesoParcial");
+
+        if (!btnAceptar) return;
+
+        btnAceptar.addEventListener("click", function () {
+            try {
+                const motivoSeleccionado = document.querySelector("input[name='motivoReprocesoParcial']:checked");
+
+                if (!motivoSeleccionado) {
+                    alert("Debe seleccionar un motivo de reproceso.");
+                    return;
+                }
+
+                sessionStorage.setItem("motivoReprocesoParcialId", motivoSeleccionado.value);
+
+                cerrarModalReprocesoParcial();
+
+                document.querySelector('[data-tab-target="proceso-tab-materiales"]')?.click();
+
+                document.querySelectorAll(".chkReprocesoParcial").forEach(x => {
+                    x.disabled = false;
+                });
+            document.querySelectorAll(".cantReprocesoParcial").forEach(x => {
+                        x.disabled = false;
+                    });
+
+            const btnReprocesar = document.getElementById("btnReprocesarMateriales");
+
+                    if (btnReprocesar) {
+                        btnReprocesar.disabled = false;
+                    }
+
+                //alert("Seleccione los materiales a reprocesar.");
+
+            } catch (error) {
+                console.error("ERROR EN CLICK REPROCESO PARCIAL:", error);
+            }
+        });
+    });
+
+    async function ejecutarReprocesoParcial(tbProId, motivoId) {
+        try {
+            const response = await fetch('/TbProReproceso/EjecutarReprocesoParcial', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    tbProId: parseInt(tbProId),
+                    motivoId: parseInt(motivoId)
+                })
+            });
+
+            const json = await response.json();
+
+            console.log("RESPUESTA REPROCESO PARCIAL:", json);
+
+            if (json.success) {
+                cerrarModalReprocesoParcial();
+                alert(json.mensaje);
+                location.reload();
+            } else {
+                alert(json.mensaje);
+            }
+
+        } catch (error) {
+            console.error("ERROR EJECUTAR REPROCESO PARCIAL:", error);
+        }
+    }
+
+    function cerrarModalReprocesoParcial() {
+        const modal = document.getElementById("modalReprocesoParcial");
+        if (!modal) return;
+
+        modal.style.display = "none";
+    }
+        document.getElementById("btnReprocesarMateriales")?.addEventListener("click", async function () {
+
+        const tbProId = parseInt(document.getElementById("tbProId")?.value) || 0;
+        const motivoId = parseInt(sessionStorage.getItem("motivoReprocesoParcialId")) || 0;
+
+        const detallesSeleccionados = Array.from(document.querySelectorAll(".chkReprocesoParcial:checked"))
+            .map(x => parseInt(x.value));
+
+        if (tbProId <= 0) {
+            alert("Proceso inválido.");
+            return;
+        }
+
+        if (motivoId <= 0) {
+            alert("Debe seleccionar un motivo de reproceso.");
+            return;
+        }
+
+        if (detallesSeleccionados.length === 0) {
+            alert("Debe seleccionar al menos un material.");
+            return;
+        }
+
+        try {
+            const response = await fetch('/TbProReproceso/EjecutarReprocesoParcial', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    tbProId: tbProId,
+                    motivoId: motivoId,
+                    detallesIds: detallesSeleccionados
+                })
+            });
+
+            const json = await response.json();
+
+            if (json.success) {
+                alert(json.mensaje);
+                location.reload();
+            } else {
+                alert(json.mensaje);
+            }
+
+        } catch (error) {
+            console.error("ERROR REPROCESO PARCIAL:", error);
+            alert("Error al ejecutar reproceso parcial.");
+        }
+    });
+</script>

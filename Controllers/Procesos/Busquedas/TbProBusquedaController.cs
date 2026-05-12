@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
-using ConexionSql.Models.Procesos.Controles;
+
 
 namespace ConexionSql.Controllers.Procesos.Busquedas
 {
@@ -262,6 +262,47 @@ namespace ConexionSql.Controllers.Procesos.Busquedas
                     mensaje = ex.Message
                 });
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ActualizarChecksLiberacion([FromBody] TbProLiberacionChecksDto dto)
+        {
+            if (dto == null || dto.TbProId <= 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    mensaje = "Proceso inválido."
+                });
+            }
+
+            var proceso = await _context.TbPro
+                .FirstOrDefaultAsync(x => x.TbProId == dto.TbProId);
+
+            if (proceso == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    mensaje = "No se encontró el proceso."
+                });
+            }
+
+            proceso.TbProIenv = dto.TbProIenv;
+            proceso.TbProHume = dto.TbProHume;
+            proceso.TbProAusu = dto.TbProAusu;
+            proceso.TbProIqvi = dto.TbProIqvi;
+            proceso.TbProPaci = dto.TbProPaci;
+            proceso.TbProIbrn = dto.TbProIbrn;
+            proceso.TbProIbre = dto.TbProIbre;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                success = true,
+                mensaje = "Checks guardados correctamente."
+            });
         }
     }
 }

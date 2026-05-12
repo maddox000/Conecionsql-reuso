@@ -1,0 +1,61 @@
+﻿<div id="modalProcesoPendiente" class="modal-overlay">
+    <div class="modal-box"
+         style="width:500px; height:auto; min-height:240px;">
+
+        <!-- HEADER -->
+        <div class="modal-header">
+            Proceso pendiente
+        </div>
+
+        <!-- BODY -->
+        <div class="modal-body">
+
+            <div style="display:flex; align-items:flex-start; gap:14px;">
+
+                <div style="font-size:26px; line-height:1;">
+                    ⚠️
+                </div>
+
+                <div style="flex:1;">
+
+                    <div style="font-size:20px; font-weight:500; color:#1f2937; margin-bottom:10px;">
+                        El proceso no ha sido finalizado.
+                    </div>
+
+                    <div style="font-size:15px; color:#374151; margin-bottom:10px;">
+                        Debe finalizar el ciclo antes de realizar la entrega.
+                    </div>
+
+                    <div id="txtMensajeProcesoPendiente"
+                         style="
+                        font-size:14px;
+                        color:#374151;
+                        max-height:80px;
+                        overflow:auto;
+                        white-space:pre-line;
+                        ">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="modal-footer">
+            <button type="button"
+                    class="btn btn-secondary"
+                    onclick="cerrarModalProcesoPendiente()">
+                Cancelar
+            </button>
+
+            <button type="button"
+                    class="btn btn-primary"
+                    id="btnAbrirProcesoPendiente">
+                Abrir proceso
+            </button>
+        </div>
+
+    </div>
+</div>
