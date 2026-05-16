@@ -132,6 +132,12 @@ namespace ConexionSql.Controllers.Lavado
                 // CANTIDAD
                 TB_PRO_LAV_DET_CANT = dto.TB_PRO_LAV_DET_CANT,
 
+                // REPROCESO / ABORTADOS
+                TB_PRO_LAV_DET_REPRO = false,
+                TB_PRO_LAV_DET_NUM_1 = dto.TB_PRO_LAV_DET_CANT,
+                TB_PRO_LAV_DET_NUM_2 = 0,
+                TB_PRO_LAV_DET_NUM_3 = 0,
+
                 // SISTEMA
                 TB_PRO_LAV_DET_PC_LOG = Environment.MachineName,
                 TB_PRO_LAV_DET_PC_USR = Environment.UserName,
@@ -227,6 +233,51 @@ namespace ConexionSql.Controllers.Lavado
             {
                 Console.WriteLine("❌ Error en ObtenerMaterial Lavado: " + ex.Message);
                 return Json(new { success = false, mensaje = "❌ Error interno al obtener material." });
+            }
+        }
+
+        //para el boton cerrar
+
+        [HttpPost]
+        public async Task<IActionResult> CerrarProceso(int tbProLavId)
+        {
+            try
+            {
+                var cabecera = await _context.TbProLav
+                    .FirstOrDefaultAsync(x => x.TbProLavId == tbProLavId);
+
+                if (cabecera == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        mensaje = "❌ No se encontró el proceso."
+                    });
+                }
+
+                cabecera.TbProLavHorFin = new DateTime(
+                    1899,
+                    12,
+                    30,
+                    DateTime.Now.Hour,
+                    DateTime.Now.Minute,
+                    DateTime.Now.Second
+                );
+
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    mensaje = ex.Message
+                });
             }
         }
     }

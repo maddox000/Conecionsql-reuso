@@ -1,0 +1,116 @@
+﻿<div id="modalReprocesoLavado" class="modal-overlay">
+    <div class="modal-box"
+         style="width:480px; height:auto; min-height:240px;">
+
+        <!-- HEADER -->
+        <div class="modal-header">
+            Reproceso requerido
+        </div>
+
+        <!-- BODY -->
+        <div class="modal-body">
+
+            <div style="display:flex; align-items:flex-start; gap:14px;">
+
+                <div style="font-size:26px; line-height:1;">
+                    ⚠️
+                </div>
+
+                <div style="flex:1;">
+
+                    <div style="font-size:20px; font-weight:500; color:#1f2937; margin-bottom:10px;">
+                        El lavado ha sido abortado.
+                    </div>
+
+                    <div style="font-size:15px; color:#374151; margin-bottom:10px;">
+                        ¿Desea realizar el reproceso de los materiales?
+                    </div>
+
+                    <div id="txtMensajeReprocesoLavado"
+                         style="
+                        font-size:14px;
+                        color:#374151;
+                        max-height:80px;
+                        overflow:auto;
+                        white-space:pre-line;
+                        ">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="modal-footer">
+            <button type="button"
+                    class="btn btn-secondary"
+                    onclick="cerrarModalReprocesoLavado()">
+                Cancelar
+            </button>
+
+            <button type="button"
+                    class="btn btn-primary"
+                    id="btnAceptarReprocesoLavado">
+                Aceptar
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const btnAceptar = document.getElementById("btnAceptarReprocesoLavado");
+
+        if (!btnAceptar) return;
+
+        btnAceptar.addEventListener("click", function () {
+            try {
+                const tbProLavId = document.getElementById("tbProLavId")?.value;
+
+                ejecutarReprocesoLavado(tbProLavId);
+            } catch (error) {
+                console.error("ERROR EN CLICK REPROCESO LAVADO:", error);
+            }
+        });
+
+    });
+
+    async function ejecutarReprocesoLavado(tbProLavId) {
+        try {
+            const response = await fetch('/TbProLavReproceso/EjecutarReproceso', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(parseInt(tbProLavId))
+            });
+
+            const json = await response.json();
+
+            console.log("RESPUESTA REPROCESO LAVADO:", json);
+
+            if (json.success) {
+                cerrarModalReprocesoLavado();
+                alert(json.mensaje);
+
+                location.reload();
+            } else {
+                alert(json.mensaje);
+            }
+
+        } catch (error) {
+            console.error("ERROR EJECUTAR REPROCESO LAVADO:", error);
+        }
+    }
+
+    function cerrarModalReprocesoLavado() {
+        const modal = document.getElementById("modalReprocesoLavado");
+        if (!modal) return;
+
+        modal.style.display = "none";
+    }
+</script>

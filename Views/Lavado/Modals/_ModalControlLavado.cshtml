@@ -1,0 +1,305 @@
+﻿<div id="modalControlLavado" class="modal-overlay">
+    <div class="modal-box">
+
+        <!-- CAMPOS OCULTOS -->
+        <input type="hidden" id="tbProLavId" />
+        <input type="hidden" id="tbProLavDetPteId" />
+        <input type="hidden" id="ubicacionOriginal" />
+        <input type="hidden" id="modoModal" />
+
+        <!-- HEADER -->
+        <div class="modal-header">
+            Datos de controles de lavado
+        </div>
+
+        <!-- BODY -->
+        <div class="modal-body">
+
+            <div class="form-row">
+                <label for="tipoControl">Tipo de control</label>
+                <select id="tipoControl" class="form-control">
+                    <option value="">-- Seleccionar --</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label for="identificacion">Identificación</label>
+                <input type="text" id="identificacion" class="form-control" />
+            </div>
+
+            <div class="form-row">
+                <label for="marca">Marca</label>
+                <input type="text" id="marca" value="TERRAGENE" class="form-control" readonly />
+            </div>
+
+            <div class="form-row">
+                <label for="producto">Producto</label>
+                <input type="text" id="producto" value="NO REGISTRA" class="form-control" readonly />
+            </div>
+
+            <div class="form-row">
+                <label for="lote">Lote</label>
+                <input type="text" id="lote" value="0" class="form-control" readonly />
+            </div>
+
+            <div class="form-row">
+                <label for="vencimiento">Vencimiento</label>
+                <input type="text" id="vencimiento" value="" class="form-control" readonly />
+            </div>
+
+            <div class="form-row">
+                <label for="ubicacion">Ubicación encámara</label>
+                <select id="ubicacion" class="form-control">
+                    <option value="">-- Seleccionar --</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label for="codigoBarras">Escanear código de barras</label>
+                <input type="text" id="codigoBarras" value="NO REGISTRA" class="form-control" readonly />
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="modal-footer">
+            <button type="button"
+                    id="btnGuardarControl"
+                    class="btn btn-primary">
+                Registrar
+            </button>
+
+            <button type="button"
+                    id="btnCancelarControl"
+                    class="btn btn-secondary"
+                    onclick="cerrarModalControlLavado()">
+                Cancelar
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+
+        function cargarTiposControl() {
+        fetch('/TbProLavControl/ObtenerTiposControl')
+            .then(res => res.json())
+            .then(data => {
+                const combo = document.getElementById("tipoControl");
+                if (!combo) return;
+
+                combo.innerHTML = '<option value="">-- Seleccionar --</option>';
+
+                data.forEach(item => {
+                    const option = document.createElement("option");
+                    option.value = item.iB_PTE_ID;
+                    option.text = item.iB_PTE_DEN;
+                    combo.appendChild(option);
+                });
+            })
+            .catch(err => console.error("Error:", err));
+    }
+
+        
+
+    function cargarUbicacionesControl() {
+        fetch('/TbProLavControl/ObtenerUbicacionesControl')
+            .then(res => res.json())
+            .then(data => {
+
+                const combo = document.getElementById("ubicacion");
+                if (!combo) return;
+
+                combo.innerHTML = '<option value="">-- Seleccionar --</option>';
+
+                data.forEach(item => {
+                    const option = document.createElement("option");
+                    option.value = item.iB_PTES_UBI_ID;
+                    option.text = item.iB_PTES_UBI_DEN;
+                    combo.appendChild(option);
+                });
+
+                const ubicacionOriginal = document.getElementById("ubicacionOriginal").value;
+
+                if (ubicacionOriginal) {
+                    combo.value = ubicacionOriginal;
+                }
+            })
+            .catch(err => console.error("Error cargando ubicaciones:", err));
+    }
+
+    function abrirModalControlLavado(tbProLavId, posicion = null) {
+
+        cargarTiposControl();
+
+        if (posicion !== null) {
+            document.getElementById("ubicacionOriginal").value = posicion;
+        }
+        else {
+            document.getElementById("ubicacionOriginal").value = "";
+        }
+
+        cargarUbicacionesControl();
+
+        document.getElementById("tbProLavId").value = tbProLavId;
+        document.getElementById("modalControlLavado").style.display = "flex";
+        document.getElementById("modoModal").value = "alta";
+
+        document.getElementById("tbProLavDetPteId").value = "";
+        document.getElementById("identificacion").value = "";
+
+        setTimeout(() => {
+            document.getElementById("tipoControl")?.focus();
+        }, 100);
+    }
+
+    function cerrarModalControlLavado() {
+
+        document.getElementById("modalControlLavado").style.display = "none";
+
+        document.getElementById("tbProLavDetPteId").value = "";
+        document.getElementById("identificacion").value = "";
+        document.getElementById("ubicacionOriginal").value = "";
+        document.getElementById("modoModal").value = "";
+
+        const tipoControl = document.getElementById("tipoControl");
+
+        if (tipoControl) {
+            tipoControl.value = "";
+            tipoControl.dataset.id = "";
+        }
+    }
+
+    function marcarNodo(posicion) {
+
+        document.querySelectorAll(".proceso-diagram .node")
+            .forEach(n => {
+                if (n.textContent.trim() === String(posicion)) {
+                    n.classList.add("activo");
+                }
+            });
+
+        if (String(posicion) === "28") {
+            document.querySelector(".proceso-bd")?.classList.add("activo");
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const btnGuardarControl = document.getElementById("btnGuardarControl");
+        const tipoControl = document.getElementById("tipoControl");
+        const identificacion = document.getElementById("identificacion");
+        const ubicacion = document.getElementById("ubicacion");
+        
+
+        
+
+        
+
+        if (identificacion) {
+
+            identificacion.addEventListener("keydown", function (e) {
+
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    ubicacion?.focus();
+                }
+            });
+        }
+
+        async function guardarControlLavado() {
+
+            try {
+
+                const tipoControl = document.getElementById("tipoControl");
+                const ubicacion = document.getElementById("ubicacion");
+
+                const tbProLavIdInput = document.getElementById("tbProLavId");
+                const tbProLavDetPteIdInput = document.getElementById("tbProLavDetPteId");
+
+                const identificacionInput = document.getElementById("identificacion");
+                const marcaInput = document.getElementById("marca");
+                const productoInput = document.getElementById("producto");
+                const loteInput = document.getElementById("lote");
+                const vencimientoInput = document.getElementById("vencimiento");
+                const codigoBarrasInput = document.getElementById("codigoBarras");
+                const modoModalInput = document.getElementById("modoModal");
+
+                const tbProLavId = parseInt(tbProLavIdInput.value || "0");
+
+                const data = {
+
+                    TB_PRO_LAV_ID: tbProLavId,
+
+                    TB_PRO_DET_PTE_ID: parseInt(tbProLavDetPteIdInput?.value || "0"),
+
+                    TB_PRO_PTE_ID: parseInt(tipoControl.value || "0"),
+                    TB_PRO_PTE_DEN: tipoControl.selectedOptions[0]?.text || "",
+                    TB_PRO_PTE_IDE: identificacionInput?.value || "",
+
+                    TB_PRO_DET_TES_UBI_ID: parseInt(ubicacion.value || "0"),
+
+                    TB_PRO_DET_TES_UBI_DEN: ubicacion.value
+                        ? ubicacion.options[ubicacion.selectedIndex].text
+                        : "",
+
+                    TB_PRO_DET_PTE_PROD_BRAND: marcaInput?.value || "",
+                    TB_PRO_DET_PTE_PROD_NAME: productoInput?.value || "",
+
+                    TB_PRO_PTE_LOT: loteInput?.value || "0",
+                    TB_PRO_PTE_VEN: vencimientoInput?.value || null,
+
+                    TB_PRO_DET_PTE_TICKET_NUMB:
+                        codigoBarrasInput?.value || "NO REGISTRA",
+
+                    TB_PRO_PTE_CANT: 1,
+
+                    MODO_MODAL: modoModalInput?.value || "alta"
+                };
+
+                const response = await fetch("/TbProLavControl/Insertar", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (!result.ok && !result.success) {
+                    alert(result.mensaje || "❌ Error al guardar.");
+                    return;
+                }
+
+                if (result.ok || result.success) {
+
+                    cerrarModalControlLavado();
+
+                    const tbProLavId = document.getElementById("tbProLavId").value;
+
+                    const response = await fetch(`/TbProLavControl/ObtenerControlesPorLavado?tbProLavId=${tbProLavId}`);
+
+                    const json = await response.json();
+
+                    console.log("CONTROLES:", json);
+                }
+
+                if (window.cargarControlesLavado) {
+                    window.cargarControlesLavado();
+                }
+
+            }
+            catch (error) {
+
+                console.error("Error al guardar control:", error);
+
+                alert("❌ Error inesperado al guardar.");
+            }
+        }
+
+        if (btnGuardarControl) {
+            btnGuardarControl.addEventListener("click", guardarControlLavado);
+        }
+    });
+</script>

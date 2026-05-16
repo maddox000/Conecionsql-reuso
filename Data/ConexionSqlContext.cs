@@ -4,18 +4,20 @@ using ConexionSql.Models.Entrega;
 using ConexionSql.Models.Equipos;
 using ConexionSql.Models.Estados;
 using ConexionSql.Models.IbPer;
+using ConexionSql.Models.Instrumental;
 using ConexionSql.Models.Lavado;
+using ConexionSql.Models.Lavado.Controles;
 using ConexionSql.Models.Materiales;
 using ConexionSql.Models.Procesos;
 using ConexionSql.Models.Procesos.Controles;
+using ConexionSql.Models.Profesionales;
+using ConexionSql.Models.Proveedores;
 using ConexionSql.Models.Recepciones;
 using ConexionSql.Models.Reuso;
 using ConexionSql.Models.Reusos;
 using ConexionSql.Models.Sectores;
 using Microsoft.EntityFrameworkCore;
-using ConexionSql.Models.Proveedores;
-using ConexionSql.Models.Profesionales;
-using ConexionSql.Models.Instrumental;
+
 
 
 namespace ConexionSql.Data
@@ -66,6 +68,9 @@ namespace ConexionSql.Data
         public DbSet<TbProDto> TbProDto { get; set; }
         public DbSet<TbProPendienteDto> TbProPendienteDto { get; set; }
         public DbSet<TbProNco> TbProNco { get; set; }
+        public DbSet<TbProLavDetPte> TbProLavDetPte { get; set; }
+        public DbSet<TbProLavNco> TbProLavNco { get; set; }
+        public DbSet<TbProLavPendienteDto> TbProLavPendienteDto { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -131,6 +136,7 @@ namespace ConexionSql.Data
 
             modelBuilder.Entity<TbProDto>().HasNoKey();
             modelBuilder.Entity<TbProPendienteDto>().HasNoKey();
+            modelBuilder.Entity<TbProLavPendienteDto>().HasNoKey();
         }
     }
 }

@@ -13,13 +13,31 @@
             <td>@(item.TB_PRO_LAV_DET_REC_DET_PRO_TOT ?? 0)</td>
             <td>@(item.TB_PRO_LAV_DET_REC_DET_PRO_STOCK ?? 0)</td>
             <td>@(item.TB_PRO_LAV_DET_CANT ?? 0)</td>
+
+            <td class="col-reproceso d-none">
+                <input type="text"
+                       class="cantReprocesoParcial"
+                       value="@item.TB_PRO_LAV_DET_CANT"
+                       data-det-id="@item.TB_PRO_LAV_DET_ID"
+                       disabled
+                       style="width:70px; text-align:center;" />
+            </td>
+
+            <td class="col-reproceso d-none">
+                <input type="checkbox"
+                       class="chkReprocesoParcial"
+                       value="@item.TB_PRO_LAV_DET_ID"
+                       data-rec-det-id="@item.TB_PRO_LAV_DET_REC_DET_ID"
+                       disabled />
+            </td>
+
         </tr>
     }
 }
 else
 {
     <tr>
-        <td colspan="8" class="text-center text-muted">
+        <td colspan="10" class="text-center text-muted">
             ⚠️ No hay detalles cargados.
         </td>
     </tr>

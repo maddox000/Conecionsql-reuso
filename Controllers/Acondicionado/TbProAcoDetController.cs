@@ -577,5 +577,33 @@ namespace ConexionSql.Controllers
                     ImpresionZebra.EnviarAImpresora("ZDesigner GK420t", zplReprocesado);
             }
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ValidarLavadoPendiente(int id)
+        {
+            var pendientes = await _context.Set<TbProLavPendienteDto>()
+                .FromSqlRaw($@"
+        EXEC SP_BUSCAR_LAVADO_PENDIENTE_POR_ETIQUETA
+        @TB_REC_DET_ID = {id}")
+                .ToListAsync();
+
+            if (pendientes.Any())
+            {
+                return Json(new
+                {
+                    success = false,
+                    requiereFinalizarLavado = true,
+                    tbProLavId = pendientes.First().TbProLavId,
+                    mensaje = "Aún existen lavados sin finalizar para este elemento. ¿Desea finalizar los lavados incompletos?"
+                });
+            }
+
+            return Json(new
+            {
+                success = true,
+                requiereFinalizarLavado = false
+            });
+        }
     }
 }

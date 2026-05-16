@@ -176,99 +176,235 @@
         <div id="mensajeAco" class="mt-3"></div>
     </div>
 
+    @await Html.PartialAsync("~/Views/Acondicionado/Modals/_ModalLavadoPendiente.cshtml")
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const inputEtiqueta = document.getElementById("tbRecDetId");
-        const inputCantidad = document.getElementById("cantidad");
-        const inputCabecera = document.getElementById("tbProAcoIdHidden");
-        const inputMaterial = document.getElementById("materialNombre");
-        const mensaje = document.getElementById("mensajeAco");
-        const cabeceraCantidad = document.getElementById("cabeceraCantidad");
-        const formAcoDetalle = document.getElementById("formAcoDetalle");
 
-                    const btnRegistrarMasivo = document.getElementById("btnRegistrarMasivoAco");
+    <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const inputEtiqueta = document.getElementById("tbRecDetId");
+                const inputCantidad = document.getElementById("cantidad");
+                const inputCabecera = document.getElementById("tbProAcoIdHidden");
+                const inputMaterial = document.getElementById("materialNombre");
+                const mensaje = document.getElementById("mensajeAco");
+                const cabeceraCantidad = document.getElementById("cabeceraCantidad");
+                const formAcoDetalle = document.getElementById("formAcoDetalle");
 
-            if (btnRegistrarMasivo) {
-                btnRegistrarMasivo.addEventListener("click", function () {
+                const btnRegistrarMasivo = document.getElementById("btnRegistrarMasivoAco");
 
-                    console.log("CLICK REGISTRAR"); // para verificar
+                if (btnRegistrarMasivo) {
+                    btnRegistrarMasivo.addEventListener("click", function () {
 
-                    const tbProAcoId = parseInt(inputCabecera.value);
-
-                    const etiquetas = Array.from(document.querySelectorAll(".chk-aco-pendiente:checked"))
-                        .map(x => parseInt(x.value))
-                        .filter(x => Number.isInteger(x));
-
-                    if (etiquetas.length === 0) {
-                        mensaje.innerText = "⚠️ Debe seleccionar al menos un material.";
-                        mensaje.className = "text-danger mt-3";
-                        return;
-                    }
-
-                    fetch("/TbProAcoDet/InsertarMasivo", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            tbProAcoId: tbProAcoId,
-                            etiquetas: etiquetas
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(result => {
-                        mensaje.innerText = result.success ? result.mensaje : "❌ " + result.mensaje;
-                        mensaje.className = result.success ? "text-success mt-3" : "text-danger mt-3";
-
-                   if (result.success) {
-                        cargarDetallesAco(tbProAcoId);
-                        cargarPendientesAco();
-            }
-                    })
-                    .catch(err => {
-                        mensaje.innerText = "❌ Error: " + err.message;
-                        mensaje.className = "text-danger mt-3";
-                    });
-                });
-            }
-
-                cargarPendientesAco();
-
-        if (!inputEtiqueta || !inputCantidad || !inputCabecera || !inputMaterial || !mensaje || !formAcoDetalle) {
-            return;
-        }
-
-        inputEtiqueta.addEventListener("keydown", function (event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-
-                const idEtiqueta = parseInt(inputEtiqueta.value);
-
-                if (!Number.isInteger(idEtiqueta)) {
-                    mensaje.innerText = "❌ Código inválido.";
-                    mensaje.className = "text-danger mt-3";
-                    inputEtiqueta.focus();
-                    return;
-                }
-                        fetch(`/TbProAcoDet/ObtenerMaterial?tbRecDetId=${idEtiqueta}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    inputMaterial.value = data.nombre ?? "";
-                    document.getElementById("sector").value = data.sector ?? "";
-                    document.getElementById("codigoReuso").value = data.codigoReuso ?? "";
-                    document.getElementById("tipoEnvoltorio").value = data.tipoEnvoltorio ?? "";
-                    document.getElementById("recibidos").value = data.recibidos ?? 0;
-                    document.getElementById("enProceso").value = data.enProceso ?? 0;
-                    document.getElementById("sinProcesar").value = data.sinProcesar ?? 0;
-
-                    if (data.autoInsertar === true) {
-                        inputCantidad.value = data.cantidadAuto ?? 1;
+                        console.log("CLICK REGISTRAR"); // para verificar
 
                         const tbProAcoId = parseInt(inputCabecera.value);
 
-                        fetch(`/TbProAcoDet/Insertar?tbRecDetId=${idEtiqueta}&cantidad=${inputCantidad.value}&tbProAcoId=${tbProAcoId}`, {
+                        const etiquetas = Array.from(document.querySelectorAll(".chk-aco-pendiente:checked"))
+                            .map(x => parseInt(x.value))
+                            .filter(x => Number.isInteger(x));
+
+                        if (etiquetas.length === 0) {
+                            mensaje.innerText = "⚠️ Debe seleccionar al menos un material.";
+                            mensaje.className = "text-danger mt-3";
+                            return;
+                        }
+
+                        fetch("/TbProAcoDet/InsertarMasivo", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                tbProAcoId: tbProAcoId,
+                                etiquetas: etiquetas
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(result => {
+                            mensaje.innerText = result.success ? result.mensaje : "❌ " + result.mensaje;
+                            mensaje.className = result.success ? "text-success mt-3" : "text-danger mt-3";
+
+                            if (result.success) {
+                                cargarDetallesAco(tbProAcoId);
+                                cargarPendientesAco();
+                            }
+                        })
+                        .catch(err => {
+                            mensaje.innerText = "❌ Error: " + err.message;
+                            mensaje.className = "text-danger mt-3";
+                        });
+                    });
+                }
+
+                cargarPendientesAco();
+
+                if (!inputEtiqueta || !inputCantidad || !inputCabecera || !inputMaterial || !mensaje || !formAcoDetalle) {
+                    return;
+                }
+
+                //abre modal de lavado
+
+                function abrirModalLavadoPendiente(tbProLavId, mensajeModal) {
+
+                    const modal =
+                        document.getElementById("modalLavadoPendiente");
+
+                    const txtMensaje =
+                        document.getElementById("txtMensajeLavadoPendiente");
+
+                    const btnAbrir =
+                        document.getElementById("btnAbrirLavadoPendiente");
+
+                    if (txtMensaje) {
+                        txtMensaje.textContent =
+                            mensajeModal || "";
+                    }
+
+                    if (btnAbrir) {
+
+                        btnAbrir.onclick = function () {
+
+                            window.open(
+                                `/TbProLavBusqueda/ConsultaLavado?tbProLavId=${tbProLavId}`,
+                                '_blank'
+                            );
+
+                            if (modal) {
+                                modal.style.display = "none";
+                            }
+                        };
+                    }
+
+                    if (modal) {
+                        modal.style.display = "flex";
+                    }
+                }
+
+                //termina modal lavado
+
+                inputEtiqueta.addEventListener("keydown", function (event) {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+
+                        const idEtiqueta = parseInt(inputEtiqueta.value);
+
+                        if (!Number.isInteger(idEtiqueta)) {
+                            mensaje.innerText = "❌ Código inválido.";
+                            mensaje.className = "text-danger mt-3";
+                            inputEtiqueta.focus();
+                            return;
+                        }
+
+                        fetch(`/TbProAcoDet/ValidarLavadoPendiente?id=${idEtiqueta}`)
+                            .then(res => res.json())
+                            .then(validacion => {
+
+                                if (validacion.requiereFinalizarLavado === true) {
+
+                                    abrirModalLavadoPendiente(
+                                        validacion.tbProLavId,
+                                        validacion.mensaje
+                                    );
+
+                                    return;
+                                }
+
+                                fetch(`/TbProAcoDet/ObtenerMaterial?tbRecDetId=${idEtiqueta}`)
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            inputMaterial.value = data.nombre ?? "";
+                                            document.getElementById("sector").value = data.sector ?? "";
+                                            document.getElementById("codigoReuso").value = data.codigoReuso ?? "";
+                                            document.getElementById("tipoEnvoltorio").value = data.tipoEnvoltorio ?? "";
+                                            document.getElementById("recibidos").value = data.recibidos ?? 0;
+                                            document.getElementById("enProceso").value = data.enProceso ?? 0;
+                                            document.getElementById("sinProcesar").value = data.sinProcesar ?? 0;
+
+                                            if (data.autoInsertar === true) {
+                                                inputCantidad.value = data.cantidadAuto ?? 1;
+
+                                                const tbProAcoId = parseInt(inputCabecera.value);
+
+                                                fetch(`/TbProAcoDet/Insertar?tbRecDetId=${idEtiqueta}&cantidad=${inputCantidad.value}&tbProAcoId=${tbProAcoId}`, {
+                                                    method: "POST"
+                                                })
+                                                .then(res => res.json())
+                                                .then(result => {
+                                                    mensaje.innerText = result.success ? result.mensaje : "❌ " + result.mensaje;
+                                                    mensaje.className = result.success ? "text-success mt-3" : "text-danger mt-3";
+
+                                                    if (result.success) {
+                                                        formAcoDetalle.reset();
+                                                        inputMaterial.value = "";
+
+                                                        if (result.html) {
+                                                            document.getElementById("tbody-aco-detalles").innerHTML = result.html;
+                                                        }
+
+                                                        if (cabeceraCantidad) {
+                                                            const actual = parseInt(cabeceraCantidad.innerText || "0");
+                                                            cabeceraCantidad.innerText = actual + 1;
+                                                        }
+
+                                                        inputEtiqueta.focus();
+                                                    }
+                                                })
+                                                .catch(err => {
+                                                    mensaje.innerText = "❌ Error al guardar: " + err.message;
+                                                    mensaje.className = "text-danger mt-3";
+                                                });
+                                            } else {
+                                                inputCantidad.focus();
+                                            }
+
+                                        } else {
+                                            inputMaterial.value = "No encontrado";
+                                            document.getElementById("sector").value = "";
+                                            document.getElementById("codigoReuso").value = "";
+                                            document.getElementById("tipoEnvoltorio").value = "";
+                                            document.getElementById("recibidos").value = "";
+                                            document.getElementById("enProceso").value = "";
+                                            document.getElementById("sinProcesar").value = "";
+
+                                            inputCantidad.focus();
+                                        }
+                                    })
+                                    .catch(() => {
+                                        inputMaterial.value = "Error";
+                                        document.getElementById("sector").value = "";
+                                        document.getElementById("codigoReuso").value = "";
+                                        document.getElementById("tipoEnvoltorio").value = "";
+                                        document.getElementById("recibidos").value = "";
+                                        document.getElementById("enProceso").value = "";
+                                        document.getElementById("sinProcesar").value = "";
+                                        inputCantidad.focus();
+                                    });
+                            })
+                            .catch(() => {
+                                mensaje.innerText =
+                                    "❌ Error al validar lavado pendiente.";
+
+                                mensaje.className =
+                                    "text-danger mt-3";
+                            });
+                    }
+                });
+
+                inputCantidad.addEventListener("keydown", function (event) {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+
+                        const tbRecDetId = parseInt(inputEtiqueta.value);
+                        const cantidad = parseInt(inputCantidad.value);
+                        const tbProAcoId = parseInt(inputCabecera.value);
+
+                        if (!Number.isInteger(tbRecDetId) || !Number.isInteger(cantidad) || cantidad < 1 || !Number.isInteger(tbProAcoId)) {
+                            mensaje.innerText = "❌ Ingrese todos los datos correctamente.";
+                            mensaje.className = "text-danger mt-3";
+                            return;
+                        }
+
+                        fetch(`/TbProAcoDet/Insertar?tbRecDetId=${tbRecDetId}&cantidad=${cantidad}&tbProAcoId=${tbProAcoId}`, {
                             method: "POST"
                         })
                         .then(res => res.json())
@@ -281,12 +417,12 @@
                                 inputMaterial.value = "";
 
                                 if (result.html) {
-                                    document.getElementById("tbody-aco-detalles").innerHTML = result.html;
+                                     document.getElementById("tbody-aco-detalles").innerHTML = result.html;
                                 }
 
                                 if (cabeceraCantidad) {
                                     const actual = parseInt(cabeceraCantidad.innerText || "0");
-                                    cabeceraCantidad.innerText = actual + 1;
+                                    cabeceraCantidad.innerText = actual + cantidad;
                                 }
 
                                 inputEtiqueta.focus();
@@ -296,82 +432,11 @@
                             mensaje.innerText = "❌ Error al guardar: " + err.message;
                             mensaje.className = "text-danger mt-3";
                         });
-                    } else {
-                        inputCantidad.focus();
                     }
-
-                } else {
-                    inputMaterial.value = "No encontrado";
-                    document.getElementById("sector").value = "";
-                    document.getElementById("codigoReuso").value = "";
-                    document.getElementById("tipoEnvoltorio").value = "";
-                    document.getElementById("recibidos").value = "";
-                    document.getElementById("enProceso").value = "";
-                    document.getElementById("sinProcesar").value = "";
-
-                    inputCantidad.focus();
-                }
-            })
-            .catch(() => {
-                inputMaterial.value = "Error";
-                document.getElementById("sector").value = "";
-                document.getElementById("codigoReuso").value = "";
-                document.getElementById("tipoEnvoltorio").value = "";
-                document.getElementById("recibidos").value = "";
-                document.getElementById("enProceso").value = "";
-                document.getElementById("sinProcesar").value = "";
-                inputCantidad.focus();
-            });
-            }
-        });
-
-        inputCantidad.addEventListener("keydown", function (event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-
-                const tbRecDetId = parseInt(inputEtiqueta.value);
-                const cantidad = parseInt(inputCantidad.value);
-                const tbProAcoId = parseInt(inputCabecera.value);
-
-                if (!Number.isInteger(tbRecDetId) || !Number.isInteger(cantidad) || cantidad < 1 || !Number.isInteger(tbProAcoId)) {
-                    mensaje.innerText = "❌ Ingrese todos los datos correctamente.";
-                    mensaje.className = "text-danger mt-3";
-                    return;
-                }
-
-                fetch(`/TbProAcoDet/Insertar?tbRecDetId=${tbRecDetId}&cantidad=${cantidad}&tbProAcoId=${tbProAcoId}`, {
-                    method: "POST"
-                })
-                .then(res => res.json())
-                .then(result => {
-                    mensaje.innerText = result.success ? result.mensaje : "❌ " + result.mensaje;
-                    mensaje.className = result.success ? "text-success mt-3" : "text-danger mt-3";
-
-                    if (result.success) {
-                        formAcoDetalle.reset();
-                        inputMaterial.value = "";
-
-                        if (result.html) {
-                             document.getElementById("tbody-aco-detalles").innerHTML = result.html;
-                        }
-
-                        if (cabeceraCantidad) {
-                            const actual = parseInt(cabeceraCantidad.innerText || "0");
-                            cabeceraCantidad.innerText = actual + cantidad;
-                        }
-
-                        inputEtiqueta.focus();
-                    }
-                })
-                .catch(err => {
-                    mensaje.innerText = "❌ Error al guardar: " + err.message;
-                    mensaje.className = "text-danger mt-3";
                 });
-            }
-        });
-    });
+            });
 
-                document.querySelectorAll(".aco-tab").forEach(btn => {
+            document.querySelectorAll(".aco-tab").forEach(btn => {
                 btn.addEventListener("click", function () {
                     const targetId = this.dataset.tabTarget;
 
@@ -420,7 +485,7 @@
                                 </tr>`;
                         });
 
-           inicializarEventosCheckboxPendientes();
+                        inicializarEventosCheckboxPendientes();
                     })
                     .catch(() => {
                         tbody.innerHTML = `
@@ -452,8 +517,8 @@
                         }
                     });
             }
-                                
-</script>
+
+    </script>
 
 
   

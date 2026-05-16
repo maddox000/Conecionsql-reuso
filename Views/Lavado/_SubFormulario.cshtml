@@ -4,6 +4,8 @@
    
     <link rel="stylesheet" href="~/css/views/crear-lavado.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/crear-procesos.css" asp-append-version="true" />
+
     <!-- Cabecera del lavado -->
     <div class="bx-card lavado-demo">
         <div class="lavado-banner">Proceso de lavado</div>
@@ -101,27 +103,150 @@
     <!--termina cabecera -->
     <!-- 📋 Tabla de detalles -->
     <!-- DETALLE ARRIBA -->
-    <div class="lavado-table-wrap mt-4">
-        <div class="lavado-title">Registro de materiales</div>
+    <!-- TABS -->
+    <div class="proceso-tabs mt-4">
 
-        <div id="contenedor-lavado-detalles">
-            <table class="lavado-table">
-                <thead>
-                    <tr>
-                        <th>Código etiqueta</th>
-                        <th>Denominación</th>
-                        <th>Sector</th>
-                        <th>Código reuso</th>
-                        <th>Recibidos</th>
-                        <th>En proceso</th>
-                        <th>Sin procesar</th>
-                        <th>Cantidad</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody-lavado-detalles">
-                    @await Html.PartialAsync("~/Views/Lavado/_DetalleTabla.cshtml", Model.Detalles)
-                </tbody>
-            </table>
+        <button type="button"
+                class="proceso-tab is-active"
+                data-tab-target="tab-materiales">
+            Materiales procesados
+        </button>
+
+        <button type="button"
+                class="proceso-tab"
+                data-tab-target="tab-cancelados">
+            Materiales cancelados
+        </button>
+
+        <button type="button"
+                class="proceso-tab"
+                data-tab-target="tab-controles">
+            Controles de lavado
+        </button>
+
+    </div>
+
+    <!-- TAB MATERIALES -->
+    <div id="tab-materiales"
+         class="proceso-tab-panel is-active">
+
+        <div class="lavado-table-wrap">
+
+            <div class="lavado-title">
+                Registro de materiales
+            </div>
+
+            <div id="contenedor-lavado-detalles">
+                <table class="lavado-table">
+                    <thead>
+                        <tr>
+                            <th>Código etiqueta</th>
+                            <th>Denominación</th>
+                            <th>Sector</th>
+                            <th>Código reuso</th>
+                            <th>Recibidos</th>
+                            <th>En proceso</th>
+                            <th>Sin procesar</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tbody-lavado-detalles">
+                        @await Html.PartialAsync("~/Views/Lavado/_DetalleTabla.cshtml", Model.Detalles)
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB CANCELADOS -->
+    <div id="tab-cancelados"
+         class="proceso-tab-panel">
+
+        <div class="lavado-table-wrap">
+            <div class="lavado-title">
+                Materiales cancelados
+            </div>
+
+            <div class="p-3 text-muted">
+                Sin materiales cancelados.
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB CONTROLES -->
+    <div id="tab-controles" class="proceso-tab-panel">
+
+        <div class="proceso-work">
+
+            <div>
+                <table class="proceso-mini-table">
+                    <thead>
+                        <tr>
+                            <th>Tipo de control</th>
+                            <th>Identificacion</th>
+                            <th>Ubicacion</th>
+                            <th>Cantidad</th>
+                            <th>Resultado</th>
+                            <th class="col-editar d-none">Editar</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tablaControlesLavado">
+                        <tr>
+                            <td colspan="4" class="proceso-table-empty-note">
+                                Sin controles cargados
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="proceso-diagram" aria-label="Mapa de camara">
+
+                <svg viewBox="0 0 290 110"
+                     xmlns="http://www.w3.org/2000/svg"
+                     aria-hidden="true">
+
+                    <line x1="50" y1="13" x2="210" y2="13" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="50" y1="13" x2="50" y2="66" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="210" y1="13" x2="210" y2="66" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="50" y1="66" x2="210" y2="66" stroke="#b8c0ca" stroke-width="2" />
+
+                    <line x1="82" y1="34" x2="242" y2="34" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="82" y1="34" x2="82" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="242" y1="34" x2="242" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="82" y1="94" x2="242" y2="94" stroke="#b8c0ca" stroke-width="2" />
+
+                    <line x1="50" y1="13" x2="82" y2="34" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="210" y1="13" x2="242" y2="34" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="50" y1="66" x2="82" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                    <line x1="210" y1="66" x2="242" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                </svg>
+
+                <div class="node proceso-node-1 js-camara-node" data-ubicacion="1">1</div>
+                <div class="node proceso-node-2 js-camara-node" data-ubicacion="2">2</div>
+                <div class="node proceso-node-3 js-camara-node" data-ubicacion="3">3</div>
+                <div class="node proceso-node-4 js-camara-node" data-ubicacion="4">4</div>
+                <div class="node proceso-node-5 js-camara-node" data-ubicacion="5">5</div>
+                <div class="node proceso-node-6 js-camara-node" data-ubicacion="6">6</div>
+                <div class="node proceso-node-7 js-camara-node" data-ubicacion="7">7</div>
+                <div class="node proceso-node-8 js-camara-node" data-ubicacion="8">8</div>
+                <div class="node proceso-node-9 js-camara-node" data-ubicacion="9">9</div>
+
+                <div class="node proceso-bd js-camara-node" data-ubicacion="28">
+                    LAV
+                </div>
+
+                <div class="proceso-door-label proceso-door-label-left">
+                    Entrada
+                </div>
+
+                <div class="proceso-door-label proceso-door-label-right">
+                    Salida
+                </div>
+
+            </div>
         </div>
     </div>
         <!-- 📋 Tabla de detalles -->
@@ -181,159 +306,409 @@
     </form>
 </div>
 
-    @await Html.PartialAsync("~/Views/Shared/_BotonesInfoBasica.cshtml")
+    <div class="proceso-actions">
+        <button type="button" class="btn-baxen" id="btnEditarLavado">
+            Editar
+        </button>
 
+        <button type="button" class="btn-baxen" id="btnCerrarModulo">
+            Cerrar
+        </button>
+    </div>
 
+    @await Html.PartialAsync("~/Views/Lavado/Modals/_ModalControlLavado.cshtml")
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const inputEtiqueta = document.getElementById("tbRecDetId");
-        const inputMaterial = document.getElementById("materialNombre");
-        const inputCantidad = document.getElementById("cantidad");
-        const inputCabecera = document.getElementById("tbProLavId");
-        const msgOk = document.getElementById("mensajeOk");
-        const msgErr = document.getElementById("mensajeError");
+    <script>
+            document.addEventListener("DOMContentLoaded", function () {
 
-        let etiquetaId = 0;
-        let materialId = 0;
-        let materialNombre = "";
-        let stockDisponible = 0;
+                // =========================
+                // TABS
+                // =========================
 
-        inputEtiqueta.focus();
+                const tabs = document.querySelectorAll(".proceso-tab[data-tab-target]");
+                const panels = document.querySelectorAll(".proceso-tab-panel");
 
-        inputEtiqueta.addEventListener("keydown", function (e) {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                buscarEtiqueta();
-            }
-        });
+                tabs.forEach(function (tab) {
+                    tab.addEventListener("click", function () {
+                        const targetId = tab.getAttribute("data-tab-target");
 
-        document.getElementById("formLavadoDetalle").addEventListener("submit", function (e) {
-            e.preventDefault();
-            guardarDetalle();
-        });
+                        tabs.forEach(t => t.classList.remove("is-active"));
+                        panels.forEach(p => p.classList.remove("is-active"));
 
-        function buscarEtiqueta() {
-            etiquetaId = parseInt(inputEtiqueta.value);
-            if (!etiquetaId || etiquetaId <= 0) {
-                mostrarError("⚠️ Código inválido.");
-                return;
-            }
+                        tab.classList.add("is-active");
 
-            ocultarMensajes();
-
-
-          fetch(`/TbProLavDet/ObtenerMaterial?tbRecDetId=${etiquetaId}`)
-              .then(res => res.json())
-                .then(data => {
-                        if (data.success) {
-                            materialId = data.materialId;
-                            materialNombre = data.nombre ?? "";
-                            stockDisponible = data.sinProcesar ?? 0;
-
-                            inputMaterial.value = materialNombre;
-                            document.getElementById("sector").value = data.sector ?? "";
-                            document.getElementById("codigoReuso").value = data.codigoReuso ?? "";
-                            document.getElementById("recibidos").value = data.recibidos ?? 0;
-                            document.getElementById("enProceso").value = data.enProceso ?? 0;
-                            document.getElementById("sinProcesar").value = data.sinProcesar ?? 0;
-
-                            
-
-                            if (data.autoInsertar === true) {
-                                inputCantidad.value = data.cantidadAuto ?? 1;
-                                guardarDetalle();
-                            } else {
-                                inputCantidad.value = "";
-                                inputCantidad.focus();
-                            }
-                        } else {
-                            mostrarError(data.mensaje || "❌ No se encontró la etiqueta.");
+                        const panel = document.getElementById(targetId);
+                        if (panel) {
+                            panel.classList.add("is-active");
                         }
-                    })
-                        .catch(() => mostrarError("❌ Error al buscar la etiqueta."));
-                
-        }
+                    });
+                });
 
-        function guardarDetalle() {
-            ocultarMensajes();
+                document.querySelectorAll(".js-camara-node").forEach(function (nodo) {
+                    nodo.addEventListener("dblclick", function () {
+                        const ubicacion = this.dataset.ubicacion;
+                        const tbProLavId = parseInt(document.getElementById("tbProLavId")?.value || "0");
 
-            const cantidad = parseInt(inputCantidad.value);
-            const cabeceraId = parseInt(inputCabecera.value);
+                        if (!tbProLavId) {
+                            alert("No se encontró el lavado.");
+                            return;
+                        }
 
-            if (!etiquetaId || !materialId || !cantidad || cantidad < 1 || !cabeceraId) {
-                mostrarError("⚠️ Todos los campos son obligatorios.");
-                return;
-            }
+                        abrirModalControlLavado(tbProLavId, ubicacion);
+                    });
+                });
 
-            if (cantidad > stockDisponible) {
-                mostrarError(`❌ Stock insuficiente. Disponible: ${stockDisponible}`);
-                return;
-            }
+                // =========================
+                // LAVADO
+                // =========================
 
-            const datos = {
-                TB_PRO_LAV_ID: cabeceraId,
-                TB_PRO_LAV_DET_REC_DET_ID: etiquetaId,
-                TB_PRO_LAV_DET_MAT_ID: materialId,
-                TB_PRO_LAV_DET_MAT_DEN: materialNombre,
-                TB_PRO_LAV_DET_CANT: cantidad
-            };
+                const inputEtiqueta = document.getElementById("tbRecDetId");
+                const inputMaterial = document.getElementById("materialNombre");
+                const inputCantidad = document.getElementById("cantidad");
+                const inputCabecera = document.getElementById("tbProLavId");
 
-            fetch("/TbProLavDet/Insertar", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(datos)
-            })
-                .then(res => res.json())
-                .then(data => {
-                        if (data.success) {
-                        mostrarOk(data.mensaje || "✅ Detalle agregado correctamente.");
+                const msgOk = document.getElementById("mensajeOk");
+                const msgErr = document.getElementById("mensajeError");
 
-                        inputEtiqueta.value = "";
-                        inputMaterial.value = "";
-                        document.getElementById("sector").value = "";
-                        document.getElementById("codigoReuso").value = "";
-                        document.getElementById("recibidos").value = "";
-                        document.getElementById("enProceso").value = "";
-                        document.getElementById("sinProcesar").value = "";
+                let etiquetaId = 0;
+                let materialId = 0;
+                let materialNombre = "";
+                let stockDisponible = 0;
 
-                        inputCantidad.value = "1";
+                if (inputEtiqueta) {
+                    inputEtiqueta.focus();
 
-                        etiquetaId = 0;
-                        materialId = 0;
-                        materialNombre = "";
-                        stockDisponible = 0;
+                    inputEtiqueta.addEventListener("keydown", function (e) {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            buscarEtiqueta();
+                        }
+                    });
+                }
 
-                    document.getElementById("tbody-lavado-detalles").innerHTML = data.html;
+                document.getElementById("formLavadoDetalle")
+                    ?.addEventListener("submit", function (e) {
+                        e.preventDefault();
+                        guardarDetalle();
+                    });
 
-                    const totalCell = document.getElementById("cantidadTotal");
-                    if (totalCell) {
-                        totalCell.innerText = data.total ?? 0;
+                function buscarEtiqueta() {
+                    etiquetaId = parseInt(inputEtiqueta.value);
+
+                    if (!etiquetaId || etiquetaId <= 0) {
+                        mostrarError("⚠️ Código inválido.");
+                        return;
                     }
 
-                    inputEtiqueta.focus();
-                } else {
-                    mostrarError(data.mensaje || "❌ Error al guardar.");
+                    ocultarMensajes();
+
+                    fetch(`/TbProLavDet/ObtenerMaterial?tbRecDetId=${etiquetaId}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                materialId = data.materialId;
+                                materialNombre = data.nombre ?? "";
+                                stockDisponible = data.sinProcesar ?? 0;
+
+                                inputMaterial.value = materialNombre;
+
+                                document.getElementById("sector").value = data.sector ?? "";
+                                document.getElementById("codigoReuso").value = data.codigoReuso ?? "";
+                                document.getElementById("recibidos").value = data.recibidos ?? 0;
+                                document.getElementById("enProceso").value = data.enProceso ?? 0;
+                                document.getElementById("sinProcesar").value = data.sinProcesar ?? 0;
+
+                                if (data.autoInsertar === true) {
+                                    inputCantidad.value = data.cantidadAuto ?? 1;
+                                    guardarDetalle();
+                                } else {
+                                    inputCantidad.value = "";
+                                    inputCantidad.focus();
+                                }
+                            } else {
+                                mostrarError(data.mensaje || "❌ No se encontró la etiqueta.");
+                            }
+                        })
+                        .catch(() => mostrarError("❌ Error al buscar la etiqueta."));
                 }
-            })
-                .catch(() => mostrarError("❌ Error inesperado."));
-        }
 
-        function mostrarOk(texto) {
-            msgOk.innerText = texto;
-            msgOk.style.display = "block";
-            msgErr.style.display = "none";
-        }
+                function guardarDetalle() {
+                    ocultarMensajes();
 
-        function mostrarError(texto) {
-            msgErr.innerText = texto;
-            msgErr.style.display = "block";
-            msgOk.style.display = "none";
-        }
+                    const cantidad = parseInt(inputCantidad.value);
+                    const cabeceraId = parseInt(inputCabecera.value);
 
-        function ocultarMensajes() {
-            msgOk.style.display = "none";
-            msgErr.style.display = "none";
-        }
-    });
-</script>
+                    if (!etiquetaId || !materialId || !cantidad || cantidad < 1 || !cabeceraId) {
+                        mostrarError("⚠️ Todos los campos son obligatorios.");
+                        return;
+                    }
+
+                    if (cantidad > stockDisponible) {
+                        mostrarError(`❌ Stock insuficiente. Disponible: ${stockDisponible}`);
+                        return;
+                    }
+
+                    const datos = {
+                        TB_PRO_LAV_ID: cabeceraId,
+                        TB_PRO_LAV_DET_REC_DET_ID: etiquetaId,
+                        TB_PRO_LAV_DET_MAT_ID: materialId,
+                        TB_PRO_LAV_DET_MAT_DEN: materialNombre,
+                        TB_PRO_LAV_DET_CANT: cantidad
+                    };
+
+                    fetch("/TbProLavDet/Insertar", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(datos)
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                mostrarOk(data.mensaje || "✅ Detalle agregado correctamente.");
+
+                                inputEtiqueta.value = "";
+                                inputMaterial.value = "";
+
+                                document.getElementById("sector").value = "";
+                                document.getElementById("codigoReuso").value = "";
+                                document.getElementById("recibidos").value = "";
+                                document.getElementById("enProceso").value = "";
+                                document.getElementById("sinProcesar").value = "";
+
+                                inputCantidad.value = "1";
+
+                                etiquetaId = 0;
+                                materialId = 0;
+                                materialNombre = "";
+                                stockDisponible = 0;
+
+                                document.getElementById("tbody-lavado-detalles").innerHTML = data.html;
+
+                                const totalCell = document.getElementById("cantidadTotal");
+                                if (totalCell) {
+                                    totalCell.innerText = data.total ?? 0;
+                                }
+
+                                inputEtiqueta.focus();
+                            } else {
+                                mostrarError(data.mensaje || "❌ Error al guardar.");
+                            }
+                        })
+                        .catch(() => mostrarError("❌ Error inesperado."));
+                }
+
+                // =========================
+                // CARGAR CONTROLES LAVADO
+                // =========================
+
+                window.cargarControlesLavado = async function () {
+                    const tbProLavId =
+                        parseInt(document.getElementById("tbProLavId")?.value) || 0;
+
+                    const tbody =
+                        document.getElementById("tablaControlesLavado");
+
+                    if (!tbProLavId || !tbody)
+                        return;
+
+                    try {
+                        const response =
+                            await fetch(`/TbProLavControl/ObtenerControlesPorLavado?tbProLavId=${tbProLavId}`);
+
+                        const json = await response.json();
+
+                        if (!json.success || !json.data || json.data.length === 0) {
+                            tbody.innerHTML = `
+                                <tr>
+                                    <td colspan="5" class="proceso-table-empty-note">
+                                        Sin controles cargados
+                                    </td>
+                                </tr>`;
+
+                            actualizarEstadoNodosControles([]);
+                            return;
+                        }
+
+                        tbody.innerHTML = json.data.map(x => `
+                            <tr>
+                                <td>${x.tbProPteDen ?? ""}</td>
+                                <td>${x.tbProPteIde ?? ""}</td>
+                                <td>${x.tbProDetTesUbiDen ?? ""}</td>
+                                <td>${x.tbProPteCant ?? ""}</td>
+                                <td class="resultado-valor" data-id="${x.tbProLavDetPteId}">
+                                    ${x.tbProPteResDen ?? ""}
+                                </td>
+
+                                <td class="col-editar d-none">
+                                    <select class="form-select form-select-sm combo-resultado d-none"
+                                            data-id="${x.tbProLavDetPteId}">
+                                        <option value="">Seleccione...</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        `).join("");
+
+                        actualizarEstadoNodosControles(json.data);
+
+                    } catch (error) {
+                        console.error("Error al cargar controles:", error);
+                    }
+                };
+
+                // =========================
+                // RESULTADOS DE CONTROLES
+                // =========================
+
+                async function cargarResultados() {
+                    const response =
+                        await fetch('/TbProLavBusqueda/ObtenerResultados');
+
+                    const json =
+                        await response.json();
+
+                    if (!json.success)
+                        return;
+
+                    document.querySelectorAll(".combo-resultado")
+                        .forEach(combo => {
+
+                            combo.innerHTML =
+                                '<option value="">--Resultado--</option>';
+
+                            json.data.forEach(x => {
+                                combo.innerHTML += `
+                                    <option value="${x.TB_PRO_PTE_RES_ID}">
+                                        ${x.TB_PRO_PTE_RES_DEN}
+                                    </option>
+                                `;
+                            });
+
+                            combo.addEventListener("change", async function () {
+                                const datos = {
+                                    TB_PRO_DET_PTE_ID:
+                                        parseInt(combo.dataset.id),
+
+                                    TB_PRO_PTE_RES_ID:
+                                        parseInt(combo.value),
+
+                                    TB_PRO_PTE_RES_DEN:
+                                        combo.options[combo.selectedIndex].text
+                                };
+
+                                await fetch('/TbProLavBusqueda/ActualizarResultadoControl', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(datos)
+                                });
+                            });
+                        });
+                }
+
+                // =========================
+                // ESTADO VISUAL NODOS
+                // =========================
+
+                function actualizarEstadoNodosControles(controles) {
+                    document.querySelectorAll(".js-camara-node").forEach(nodo => {
+                        nodo.classList.remove("activo");
+                        nodo.removeAttribute("data-bloqueado");
+                    });
+
+                    controles.forEach(x => {
+                        const ubicacion = String(x.tbProDetTesUbiDen ?? "").trim();
+
+                        if (!ubicacion) return;
+
+                        const nodo =
+                            document.querySelector(`.js-camara-node[data-ubicacion="${ubicacion}"]`);
+
+                        if (nodo) {
+                            nodo.classList.add("activo");
+                            nodo.setAttribute("data-bloqueado", "1");
+                        }
+                    });
+                }
+
+                // =========================
+                // MENSAJES
+                // =========================
+
+                function mostrarOk(texto) {
+                    msgOk.innerText = texto;
+                    msgOk.style.display = "block";
+                    msgErr.style.display = "none";
+                }
+
+                function mostrarError(texto) {
+                    msgErr.innerText = texto;
+                    msgErr.style.display = "block";
+                    msgOk.style.display = "none";
+                }
+
+                function ocultarMensajes() {
+                    msgOk.style.display = "none";
+                    msgErr.style.display = "none";
+                }
+
+                // =========================
+                // BOTON EDITAR
+                // =========================
+
+                // document.getElementById("btnEditarLavado")
+                //         ?.addEventListener("click", function (e) {
+
+                //             console.log("CLICK EDITAR LAVADO");
+
+                //             sessionStorage.setItem(
+                //                 "editarLavado",
+                //                 "2"
+                //             );
+
+                //             document.querySelectorAll(".col-editar")
+                //                 .forEach(x => {
+                //                     x.classList.remove("d-none");
+                //                 });
+
+                //             document.querySelectorAll(".combo-resultado")
+                //                 .forEach(x => {
+                //                     x.classList.remove("d-none");
+                //                     x.style.display = "block";
+                //                 });
+
+                //         });
+
+                // =========================
+                // BOTON CERRAR
+                // =========================
+
+                document.getElementById("btnCerrarModulo")
+                    ?.addEventListener("click", async function (e) {
+                        e.preventDefault();
+
+                        const tbProLavId = parseInt(
+                            document.getElementById("tbProLavId").value
+                        );
+
+                        if (!tbProLavId || tbProLavId <= 0) {
+                            window.location.href = "/";
+                            return;
+                        }
+
+                        await fetch(`/TbProLavDet/CerrarProceso?tbProLavId=${tbProLavId}`, {
+                            method: "POST"
+                        });
+
+                        window.location.href = "/";
+                    });
+
+                (async function () {
+                    await cargarControlesLavado();
+                    await cargarResultados();
+                })();
+
+            });
+    </script>

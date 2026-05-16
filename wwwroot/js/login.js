@@ -82,6 +82,39 @@ document.getElementById('btnLavado')?.addEventListener('click', function (e) {
 });
 
 // ==========================================
+// EDITAR LAVADO
+// ==========================================
+document.getElementById('btnEditarLavado')?.addEventListener('click', function (e) {
+
+    e.preventDefault();
+
+    const tbProLavId =
+        document.getElementById('tbProLavId')?.value;
+
+    if (!tbProLavId || tbProLavId === "0") {
+        alert("No hay lavado para editar.");
+        return;
+    }
+
+    sessionStorage.setItem(
+        "editarLavado",
+        "2"
+    );
+
+    const modal = new bootstrap.Modal(
+        document.getElementById('loginTareasModal')
+    );
+
+    modal.show();
+
+    localStorage.setItem(
+        "loginDestino",
+        window.location.pathname + window.location.search
+    );
+});
+
+
+// ==========================================
 // ACONDICIONADO - 135
 // ==========================================
 document.getElementById('btnAcondicionado')?.addEventListener('click', function (e) {
@@ -190,9 +223,16 @@ document.getElementById('btnValidarLogin')?.addEventListener('click', async func
 
             const destino = localStorage.getItem("loginDestino") || "/";
 
-            if (sessionStorage.getItem("primerModulo")) {
+            if (
+                sessionStorage.getItem("editarLavado") === "2" ||
+                sessionStorage.getItem("editarProceso") === "2"
+            ) {
+                window.location.href = destino;
+            }
+            else if (sessionStorage.getItem("primerModulo")) {
                 window.open(destino, '_blank');
-            } else {
+            }
+            else {
                 sessionStorage.setItem("primerModulo", "true");
                 window.location.href = destino;
             }

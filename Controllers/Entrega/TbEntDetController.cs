@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using ConexionSql.Models.Lavado;
 
 namespace ConexionSql.Controllers.Entrega
 {
@@ -299,5 +300,8 @@ namespace ConexionSql.Controllers.Entrega
                 requiereFinalizarProceso = false
             });
         }
+
+
+        
     }
 }

@@ -1,0 +1,712 @@
+﻿@model ConexionSql.Models.Lavado.TbProLavDetFormDto
+
+<div class="subform-proceso mt-4">
+
+    <link rel="stylesheet" href="~/css/views/crear-lavado.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/crear-procesos.css" asp-append-version="true" />
+
+    <div class="bx-card lavado-demo">
+
+        <div class="lavado-banner">
+            Proceso de lavado
+        </div>
+
+        <div class="lavado-grid">
+
+            <div class="lavado-panel">
+
+                <div class="lavado-kv">
+                    <div class="k">Numero de proceso</div>
+                    <div class="v">@Model.Cabecera.TbProLavId</div>
+                </div>
+
+                <div class="lavado-kv">
+                    <div class="k">Usuario</div>
+                    <div class="v">@Model.Cabecera.TbProLavPerNom</div>
+                </div>
+
+                <div class="lavado-kv">
+                    <div class="k">Cargo</div>
+                    <div class="v">-</div>
+                </div>
+
+                <div class="lavado-title">
+                    Datos del proceso
+                </div>
+
+                <div class="lavado-kv">
+                    <div class="k">Tipo de lavado</div>
+                    <div class="v">@Model.Cabecera.TbProLavPtiDen</div>
+                </div>
+
+                <div class="lavado-kv">
+                    <div class="k">Estado del ciclo</div>
+                    <div class="v" id="panelEstadoCiclo">
+                        @Model.Cabecera.TbProLavEstDen
+                    </div>
+                </div>
+
+                <div class="lavado-kv">
+                    <div class="k">Tipo de ciclo</div>
+                    <div class="v">@Model.Cabecera.TbProLavTciDen</div>
+                </div>
+
+                <div class="lavado-kv">
+                    <div class="k">Numero ciclo</div>
+                    <div class="v">@Model.Cabecera.TbProLavNum</div>
+                </div>
+
+            </div>
+
+            <div class="lavado-panel">
+
+                <div class="lavado-kv">
+                    <div class="k">Fecha</div>
+                    <div class="v">
+                        @Model.Cabecera.TbProLavFec?.ToString("yyyy-MM-dd")
+                        @Model.Cabecera.TbProLavHorIni?.ToString(@"hh\:mm")
+                    </div>
+                </div>
+
+                <div class="lavado-title">
+                    Datos del equipo
+                </div>
+
+                <div class="lavado-kv">
+                    <div class="k">Equipo</div>
+                    <div class="v">@Model.Cabecera.TbProLavEquDen</div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="lavado-observ">
+            <div class="k lavado-observ-label">Observaciones</div>
+            <textarea readonly>@(Model.Cabecera.TbProLavObs ?? "NO REGISTRA")</textarea>
+        </div>
+
+        <div class="proceso-tabs" role="tablist" aria-label="Secciones del lavado">
+            <button type="button" class="proceso-tab is-active" data-tab-target="lavado-tab-materiales">Materiales procesados</button>
+            <button type="button" class="proceso-tab" data-tab-target="lavado-tab-cancelados">Materiales cancelados</button>
+            <button type="button" class="proceso-tab" data-tab-target="lavado-tab-controles">Controles de lavado</button>
+            <button type="button" class="proceso-tab" data-tab-target="lavado-tab-liberacion">Liberación de lavado</button>
+        </div>
+
+        <div id="lavado-tab-materiales" class="proceso-tab-panel is-active">
+
+            <input type="hidden"
+                   id="tbProLavId"
+                   value="@Model.Cabecera.TbProLavId" />
+
+            <div class="proceso-materiales-wrap mt-3">
+
+                <table class="lavado-table">
+                    <thead>
+                        <tr>
+                            <th>Código etiqueta</th>
+                            <th>Denominación</th>
+                            <th>Sector</th>
+                            <th>Código reuso</th>
+                            <th>Recibidos</th>
+                            <th>En proceso</th>
+                            <th>Sin procesar</th>
+                            <th>Cantidad</th>
+                            <th class="col-reproceso d-none">
+                                Cant. reproceso
+                            </th>
+
+                            <th class="col-reproceso d-none">
+                                Seleccionar
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="detalleTabla">
+                        @await Html.PartialAsync(
+                            "~/Views/Lavado/_DetalleTabla.cshtml",
+                            Model.Detalles
+                        )
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+
+        <div id="lavado-tab-cancelados" class="proceso-tab-panel">
+            <div class="proceso-materiales-wrap">
+                <table class="proceso-table">
+                    <thead>
+                        <tr>
+                            <th>Codigo etiqueta</th>
+                            <th>Denominacion</th>
+                            <th>Sector</th>
+                            <th>Codigo reuso</th>
+                            <th>Recibidos</th>
+                            <th>En proceso</th>
+                            <th>Sin procesar</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="8" class="proceso-table-empty-note">Sin materiales cancelados</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="lavado-tab-controles" class="proceso-tab-panel">
+            <div class="proceso-work">
+                <div>
+                    <table class="proceso-mini-table">
+                        <thead>
+                            <tr>
+                                <th>Tipo de control</th>
+                                <th>Identificacion</th>
+                                <th>Ubicacion</th>
+                                <th>Cantidad</th>
+                                <th>Resultado</th>
+                                <th class="col-editar d-none">Editar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaControlesLavado">
+                            <tr>
+                                <td colspan="6" class="proceso-table-empty-note">Sin controles cargados</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="proceso-diagram" aria-label="Mapa de lavado">
+                    <svg viewBox="0 0 290 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <line x1="50" y1="13" x2="210" y2="13" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="50" y1="13" x2="50" y2="66" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="210" y1="13" x2="210" y2="66" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="50" y1="66" x2="210" y2="66" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="82" y1="34" x2="242" y2="34" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="82" y1="34" x2="82" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="242" y1="34" x2="242" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="82" y1="94" x2="242" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="50" y1="13" x2="82" y2="34" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="210" y1="13" x2="242" y2="34" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="50" y1="66" x2="82" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                        <line x1="210" y1="66" x2="242" y2="94" stroke="#b8c0ca" stroke-width="2" />
+                    </svg>
+
+                    <div class="node proceso-node-1 js-lavado-node" data-ubicacion="1">1</div>
+                    <div class="node proceso-node-2 js-lavado-node" data-ubicacion="2">2</div>
+                    <div class="node proceso-node-3 js-lavado-node" data-ubicacion="3">3</div>
+                    <div class="node proceso-node-4 js-lavado-node" data-ubicacion="4">4</div>
+                    <div class="node proceso-node-5 js-lavado-node" data-ubicacion="5">5</div>
+                    <div class="node proceso-node-6 js-lavado-node" data-ubicacion="6">6</div>
+                    <div class="node proceso-node-7 js-lavado-node" data-ubicacion="7">7</div>
+                    <div class="node proceso-node-8 js-lavado-node" data-ubicacion="8">8</div>
+                    <div class="node proceso-node-9 js-lavado-node" data-ubicacion="9">9</div>
+
+                    <div class="node proceso-bd js-lavado-node" data-ubicacion="28">BD</div>
+                    <div class="proceso-door-label proceso-door-label-left">Puerta de carga</div>
+                    <div class="proceso-door-label proceso-door-label-right">Puerta de descarga</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="lavado-tab-liberacion" class="proceso-tab-panel">
+            <div class="proceso-materiales-wrap">
+                <div class="proceso-title">Liberación de lavado</div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:24px; align-items:start;">
+
+                    <div>
+                        <table class="proceso-mini-table">
+                            <tbody>
+                                <tr>
+                                    <td>Integridad envoltorios</td>
+                                    <td><input type="checkbox" id="chkIntegridadEnvoltorios" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Ausencia de humedad</td>
+                                    <td><input type="checkbox" id="chkAusenciaHumedad" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Ausencia de suciedad</td>
+                                    <td><input type="checkbox" id="chkAusenciaSuciedad" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Viro correcto control químico</td>
+                                    <td><input type="checkbox" id="chkViroCorrectoControlQuimico" /></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div>
+                        <table class="proceso-mini-table">
+                            <tbody>
+                                <tr>
+                                    <td>Parámetros de ciclo correcto</td>
+                                    <td><input type="checkbox" id="chkParametrosCicloCorrecto" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Res negativo ind biológico</td>
+                                    <td><input type="checkbox" id="chkResNegativoBiologico" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Liberar ciclo de lavado</td>
+                                    <td><input type="checkbox" id="chkLiberarCicloLavado" /></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="bloqueResultadoFinalLavado" style="display:none;">
+                        <table class="proceso-mini-table">
+                            <tbody>
+                                <tr>
+                                    <td>Liberar lavado</td>
+                                    <td><input type="radio" name="resultadoFinalLavado" value="LIBERAR_PROCESO" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Abortar lavado</td>
+                                    <td><input type="radio" name="resultadoFinalLavado" value="ABORTAR_PROCESO" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Reproceso parcial de carga</td>
+                                    <td><input type="radio" name="resultadoFinalLavado" value="REPROCESO_PARCIAL" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Falla de proceso</td>
+                                    <td><input type="radio" name="resultadoFinalLavado" value="FALLA_PROCESO" /></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="proceso-actions">
+            <button type="button"
+                    class="btn-baxen"
+                    id="btnReprocesarMateriales"
+                    disabled>
+                Reprocesar materiales
+            </button>
+
+            <button type="button" class="btn-baxen" onclick="window.location.reload()">Nuevo</button>
+
+            <button type="button" class="btn-baxen" id="btnEditarLavado">Editar</button>
+
+            <a href="@Url.Action("Index", "Home")" class="btn-baxen">
+                Cerrar
+            </a>
+        </div>
+
+    </div>
+</div>
+
+@await Html.PartialAsync("~/Views/Lavado/Busquedas/_ModalReprocesoLavado.cshtml")
+@await Html.PartialAsync("~/Views/Lavado/Modals/_ModalReprocesoParcialLavado.cshtml")
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const tabs = document.querySelectorAll('.proceso-tab[data-tab-target]');
+        const panels = document.querySelectorAll('.proceso-tab-panel');
+
+        tabs.forEach(function (tab) {
+            tab.addEventListener('click', async function () {
+                const targetId = tab.getAttribute('data-tab-target');
+
+                tabs.forEach(function (t) {
+                    t.classList.remove('is-active');
+                });
+
+                panels.forEach(function (p) {
+                    p.classList.remove('is-active');
+                });
+
+                tab.classList.add('is-active');
+
+                const panel = document.getElementById(targetId);
+
+                if (panel) {
+                    panel.classList.add('is-active');
+                }
+
+                if (targetId === "lavado-tab-controles") {
+                    await cargarResultados();
+                    await cargarControlesLavado();
+
+                    if (sessionStorage.getItem("editarLavado") === "2") {
+                        document.querySelectorAll(".col-editar").forEach(x => {
+                            x.classList.remove("d-none");
+                        });
+
+                        document.querySelectorAll(".combo-resultado").forEach(x => {
+                            x.classList.remove("d-none");
+                            x.style.display = "block";
+                        });
+                    }
+                }
+            });
+        });
+
+            let listaResultados = [];
+
+    async function cargarResultados() {
+        try {
+            const response = await fetch('/TbProLavBusqueda/ObtenerResultados');
+            const json = await response.json();
+
+            if (json.success) {
+                listaResultados = json.data;
+                console.log("Resultados lavado cargados:", listaResultados);
+            }
+        } catch (error) {
+            console.error("Error al cargar resultados de lavado:", error);
+        }
+    }
+
+    // let listaResultados = [];
+
+    async function cargarControlesLavado() {
+
+        const tbProLavId =
+            parseInt(document.getElementById("tbProLavId")?.value) || 0;
+
+        const tbody =
+            document.getElementById("tablaControlesLavado");
+
+        if (!tbProLavId || !tbody)
+            return;
+
+        try {
+
+            const response =
+                await fetch(`/TbProLavControl/ObtenerControlesPorLavado?tbProLavId=${tbProLavId}`);
+
+            const json = await response.json();
+
+            if (!json.success || !json.data || json.data.length === 0) {
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="proceso-table-empty-note">
+                            Sin controles cargados
+                        </td>
+                    </tr>`;
+
+                actualizarEstadoNodosControles([]);
+                return;
+            }
+
+            tbody.innerHTML = json.data.map(x => `
+                <tr>
+                    <td>${x.tbProPteDen ?? ""}</td>
+                    <td>${x.tbProPteIde ?? ""}</td>
+                    <td>${x.tbProDetTesUbiDen ?? x.tbProDetTesUbiId ?? ""}</td>
+                    <td>${x.tbProPteCant ?? ""}</td>
+
+                    <td class="resultado-valor" data-id="${x.tbProLavDetPteId}">
+                        ${x.tbProPteResDen ?? ""}
+                    </td>
+
+                    <td class="col-editar d-none">
+                        <select class="form-select form-select-sm combo-resultado d-none"
+                                data-id="${x.tbProLavDetPteId}">
+                            <option value="">Seleccione...</option>
+                            ${listaResultados.map(r => `
+                                <option value="${r.tB_PRO_PTE_RES_ID}"
+                                    ${r.tB_PRO_PTE_RES_ID == x.tbProPteResId ? "selected" : ""}>
+                                    ${r.tB_PRO_PTE_RES_DEN}
+                                </option>
+                            `).join("")}
+                        </select>
+                    </td>
+                </tr>
+            `).join("");
+
+            actualizarEstadoNodosControles(json.data);
+
+        } catch (error) {
+            console.error("Error al cargar controles de lavado:", error);
+        }
+    }
+
+        document.addEventListener("change", async function (e) {
+
+        if (!e.target.classList.contains("combo-resultado"))
+            return;
+
+        const select = e.target;
+
+        const tbProLavDetPteId =
+            select.dataset.id;
+
+        const tbProPteResId =
+            select.value;
+
+        const tbProPteResDen =
+            select.options[select.selectedIndex].text;
+
+        if (!tbProPteResId)
+            return;
+
+        try {
+
+            const response =
+                await fetch('/TbProLavBusqueda/ActualizarResultadoControl', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify({
+                        TB_PRO_LAV_DET_PTE_ID:
+                            parseInt(tbProLavDetPteId),
+
+                        TB_PRO_PTE_RES_ID:
+                            parseInt(tbProPteResId),
+
+                        TB_PRO_PTE_RES_DEN:
+                            tbProPteResDen
+                    })
+                });
+
+            const json =
+                await response.json();
+
+            if (!json.success) {
+
+                alert(json.mensaje);
+
+            } else {
+
+                document.getElementById("panelEstadoCiclo")
+                    .textContent = json.estadoDen;
+
+                const celdaResultado =
+                    document.querySelector(
+                        `.resultado-valor[data-id='${tbProLavDetPteId}']`
+                    );
+
+             if (celdaResultado) {
+                        celdaResultado.textContent =
+                            tbProPteResDen;
+                    }
+
+                    if (json.dispararReproceso) {
+
+                        const modal =
+                            document.getElementById("modalReprocesoLavado");
+
+                        if (modal) {
+
+                            const txtMensaje =
+                                document.getElementById("txtMensajeReprocesoLavado");
+
+                            if (txtMensaje) {
+                                txtMensaje.textContent =
+                                    json.mensajeReproceso || "";
+                            }
+
+                            modal.style.display = "flex";
+                        }
+                    }
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Error al actualizar resultado."
+            );
+        }
+    });
+
+
+        function actualizarEstadoNodosControles(controles) {
+
+            document.querySelectorAll(".js-lavado-node").forEach(nodo => {
+                nodo.classList.remove("activo");
+                nodo.removeAttribute("data-bloqueado");
+                nodo.style.backgroundColor = "";
+                nodo.style.borderColor = "";
+                nodo.style.color = "";
+            });
+
+            controles.forEach(x => {
+
+                const ubicacion = String(
+                    x.tbProDetTesUbiId ??
+                    x.tbProDetTesUbiDen ??
+                    ""
+                ).trim();
+
+                if (!ubicacion)
+                    return;
+
+                const nodo =
+                    document.querySelector(`.js-lavado-node[data-ubicacion="${ubicacion}"]`);
+
+                if (nodo) {
+                    nodo.classList.add("activo");
+                    nodo.setAttribute("data-bloqueado", "1");
+                    nodo.style.backgroundColor = "#2563eb";
+                    nodo.style.borderColor = "#2563eb";
+                    nodo.style.color = "#ffffff";
+                }
+            });
+        }
+
+        const chkLiberarCiclo =
+            document.getElementById("chkLiberarCicloLavado");
+
+        const bloqueResultadoFinal =
+            document.getElementById("bloqueResultadoFinalLavado");
+
+        const radiosResultadoFinal =
+            document.querySelectorAll('input[name="resultadoFinalLavado"]');
+
+            //checks de libr¿eracion
+
+                let usuarioLiberacionValidado =
+        sessionStorage.getItem("editarLavado") === "2";
+
+    window.addEventListener("loginTareasValidado", function () {
+        usuarioLiberacionValidado = true;
+    });
+
+        const checksLiberacion = document.querySelectorAll(`
+        #chkIntegridadEnvoltorios,
+        #chkAusenciaHumedad,
+        #chkAusenciaSuciedad,
+        #chkViroCorrectoControlQuimico,
+        #chkParametrosCicloCorrecto,
+        #chkResNegativoBiologico,
+        #chkLiberarCicloLavado
+    `);
+
+    checksLiberacion.forEach(chk => {
+
+        chk.addEventListener("change", function (e) {
+
+            if (!usuarioLiberacionValidado) {
+
+                e.preventDefault();
+
+                chk.checked = false;
+
+                alert("Debe validar usuario antes de liberar el lavado.");
+
+                sessionStorage.setItem("editarLavado", "2");
+                localStorage.setItem(
+                    "loginDestino",
+                    window.location.pathname + window.location.search
+                );
+
+                const modalLogin =
+                    document.getElementById("loginTareasModal");
+
+                if (modalLogin) {
+                    const bsModalLogin =
+                        new bootstrap.Modal(modalLogin);
+
+                    bsModalLogin.show();
+                }
+
+                return false;
+            }
+
+            const tbProLavId =
+                parseInt(document.getElementById("tbProLavId")?.value) || 0;
+
+            fetch('/TbProLavBusqueda/ActualizarChecksLiberacion', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    TbProLavId: tbProLavId,
+
+                    TbProLavLpaCk1:
+                        document.getElementById("chkIntegridadEnvoltorios")?.checked || false,
+
+                    TbProLavLpaCk2:
+                        document.getElementById("chkAusenciaHumedad")?.checked || false,
+
+                    TbProLavLpaCk3:
+                        document.getElementById("chkAusenciaSuciedad")?.checked || false,
+
+                    LiberarLavado:
+                        document.getElementById("chkLiberarCicloLavado")?.checked || false
+                })
+            })
+            .then(res => res.json())
+            .then(json => {
+                if (!json.success) {
+                    alert(json.mensaje);
+                    return;
+                }
+
+                document.getElementById("panelEstadoCiclo").textContent =
+                    json.estadoDen;
+            });
+        });
+    });
+
+        radiosResultadoFinal.forEach(x => {
+            x.disabled = true;
+        });
+
+        if (chkLiberarCiclo && bloqueResultadoFinal) {
+
+            chkLiberarCiclo.addEventListener("change", function () {
+
+                if (chkLiberarCiclo.checked) {
+
+                    bloqueResultadoFinal.style.display = "block";
+
+                    radiosResultadoFinal.forEach(x => {
+                        x.disabled = false;
+                    });
+
+                } else {
+
+                    bloqueResultadoFinal.style.display = "none";
+
+                    radiosResultadoFinal.forEach(function (radio) {
+                        radio.checked = false;
+                        radio.disabled = true;
+                    });
+                }
+            });
+        }
+
+            // abre modal reproceso parcial lavado
+            document.querySelector('input[name="resultadoFinalLavado"][value="REPROCESO_PARCIAL"]')
+                ?.addEventListener("change", async function () {
+
+                    if (!this.checked) return;
+
+                    const modal =
+                        document.getElementById("modalReprocesoParcialLavado");
+
+                    if (!modal)
+                        return;
+
+                    await cargarMotivosReprocesoParcialLavado();
+
+                    modal.style.display = "flex";
+            });
+
+    });
+
+
+</script>

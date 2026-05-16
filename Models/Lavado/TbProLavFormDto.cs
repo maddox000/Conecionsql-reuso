@@ -31,5 +31,10 @@ namespace ConexionSql.Models.Lavado
         public List<SelectListItem>? TiposLavado { get; set; }
         public List<SelectListItem>? Equipos { get; set; }
         public List<SelectListItem>? TiposCiclo { get; set; }
+        // 🔢 Número de ciclo
+        public int? NumeroCiclo { get; set; }
+
+        // 📝 Observaciones
+        public string? Observaciones { get; set; }
     }
 }
