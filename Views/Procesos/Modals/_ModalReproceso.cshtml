@@ -86,7 +86,10 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(parseInt(tbProId))
+                body: JSON.stringify({
+                        TbProId: parseInt(tbProId),
+                        ResultadoFinalProceso: document.querySelector('input[name="resultadoFinalProceso"]:checked')?.value || "ABORTAR_PROCESO"
+                    })
             });
 
             const json = await response.json();

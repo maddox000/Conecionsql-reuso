@@ -17,6 +17,7 @@ using ConexionSql.Models.Reuso;
 using ConexionSql.Models.Reusos;
 using ConexionSql.Models.Sectores;
 using Microsoft.EntityFrameworkCore;
+using ConexionSql.Models.Recepciones.Ortopedias;
 
 
 
@@ -71,6 +72,7 @@ namespace ConexionSql.Data
         public DbSet<TbProLavDetPte> TbProLavDetPte { get; set; }
         public DbSet<TbProLavNco> TbProLavNco { get; set; }
         public DbSet<TbProLavPendienteDto> TbProLavPendienteDto { get; set; }
+        public DbSet<TbRecOrt> TbRecOrt { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -132,6 +134,12 @@ namespace ConexionSql.Data
             {
                 entity.ToTable("TB_PRO_NCO");
                 entity.HasKey(e => e.TbProNcoId);
+            });
+
+            modelBuilder.Entity<TbRecOrt>(entity =>
+            {
+                entity.ToTable("TB_REC_ORT");
+                entity.HasKey(e => e.TbRecOrtId);
             });
 
             modelBuilder.Entity<TbProDto>().HasNoKey();

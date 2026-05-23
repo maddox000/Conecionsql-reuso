@@ -43,6 +43,7 @@ namespace ConexionSql.Controllers.Lavado
                         TB_PRO_LAV_ID = d.TB_PRO_LAV_DET_PRO_LAV_ID,
                         TB_PRO_LAV_DET_REC_DET_ID = d.TB_PRO_LAV_DET_REC_DET_ID ?? 0,
                         TB_PRO_LAV_DET_REC_DET_MAT_DEN = d.TB_PRO_LAV_DET_IB_MAT_DEN,
+
                         TB_PRO_LAV_DET_CANT = d.TB_PRO_LAV_DET_CANT,
                         TB_PRO_LAV_DET_PC_USR = d.TB_PRO_LAV_DET_PC_USR,
                         TB_PRO_LAV_FEC = d.TB_PRO_LAV_DET_PRO_LAV_FEC
@@ -147,8 +148,8 @@ namespace ConexionSql.Controllers.Lavado
                 TB_PRO_LAV_DET_PRO_LAV_HOR = DateTime.Now,
 
                 // ESTADO
-                TB_PRO_LAV_DET_EST_ID = 1,
-                TB_PRO_LAV_DET_EST_DEN = "EN PROCESO"
+                TB_PRO_LAV_DET_EST_ID = 2,
+                TB_PRO_LAV_DET_EST_DEN = "PROCESADO"
             };
 
             _context.TbProLavDet.Add(nuevo);
@@ -180,6 +181,9 @@ namespace ConexionSql.Controllers.Lavado
                     TB_PRO_LAV_DET_REC_DET_CANT = d.TB_PRO_LAV_DET_REC_DET_CANT,
                     TB_PRO_LAV_DET_REC_DET_PRO_TOT = d.TB_PRO_LAV_DET_TOT,
                     TB_PRO_LAV_DET_REC_DET_PRO_STOCK = d.TB_PRO_LAV_DET_STOCK,
+
+                    TB_PRO_LAV_DET_EST_ID = d.TB_PRO_LAV_DET_EST_ID,
+                    TB_PRO_LAV_DET_EST_DEN = d.TB_PRO_LAV_DET_EST_DEN,
 
                     TB_PRO_LAV_DET_CANT = d.TB_PRO_LAV_DET_CANT
                 })

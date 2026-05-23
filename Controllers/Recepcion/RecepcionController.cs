@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using ConexionSql.Data;
-using ConexionSql.Models.Recepciones;
+﻿using ConexionSql.Data;
+using ConexionSql.Models.Estados;
 using ConexionSql.Models.IbPer;
 using ConexionSql.Models.Materiales;
-using ConexionSql.Models.Estados;
+using ConexionSql.Models.Recepciones;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ConexionSql.Controllers.reuepcion
 {
@@ -214,6 +215,16 @@ namespace ConexionSql.Controllers.reuepcion
                 _context.TbRec.Add(nuevaRecepcion);
                 _context.SaveChanges();
 
+                // 📦 ==============================
+                // LLAMA MODAL ORTOPEDIAS
+                // ==============================
+
+                if (nuevaRecepcion.TbRecSecOriId == 901)
+                {
+                    ViewBag.AbrirModalOrtopedia = true;
+                    ViewBag.TbRecIdOrtopedia = nuevaRecepcion.TbRecId;
+                }
+
                 TempData["MensajeExito"] = "Recepción guardada correctamente.";
 
                 // 📦 ==============================
@@ -312,5 +323,7 @@ namespace ConexionSql.Controllers.reuepcion
 
             return View("~/Views/Recepcion/CrearRecepcion.cshtml", nuevaRecepcion);
         }
+
+        
     }
 }

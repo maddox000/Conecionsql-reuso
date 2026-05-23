@@ -10,9 +10,10 @@
             <th>Recibidos</th>
             <th>En proceso</th>
             <th>Sin procesar</th>
+            <th>Estado</th>
             <th>Cantidad</th>
-            <th>Cant. reproceso</th>
-            <th>Seleccionar</th>
+            <th hidden>Cant. reproceso</th>
+            <th hidden>Seleccionar</th>
         </tr>
     </thead>
     <tbody>
@@ -28,8 +29,9 @@
                     <td>@item.TB_PRO_DET_REC_DET_CANT</td>
                     <td>@item.TB_PRO_DET_REC_DET_PRO_TOT</td>
                     <td>@item.TB_PRO_DET_REC_DET_PRO_STOCK</td>
+                    <td>@(item.TB_PRO_DET_EST_DEN ?? "NO REGISTRA")</td>
                     <td>@item.TB_PRO_DET_CANT</td>
-                    <td style="text-align:center;">
+                    <td hidden style="text-align:center;">
                         <input type="number"
                                class="cantReprocesoParcial"
                                value="@item.TB_PRO_DET_CANT"
@@ -39,7 +41,7 @@
                                disabled
                                style="width:70px;" />
                     </td>
-                    <td style="text-align:center;">
+                    <td hidden style="text-align:center;">
                         <input type="checkbox"
                                class="chkReprocesoParcial"
                                value="@item.TB_PRO_DET_ID"
@@ -52,7 +54,7 @@
         else
         {
             <tr>
-                <td colspan="10" class="proceso-table-empty-note">Sin materiales cargados</td>
+                <td colspan="11" class="proceso-table-empty-note">Sin materiales cargados</td>
             </tr>
         }
     </tbody>

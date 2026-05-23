@@ -1,6 +1,7 @@
 ﻿using ConexionSql.Data;
 using ConexionSql.Models.Procesos;
 using ConexionSql.Models.Recepciones;
+using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,15 +11,19 @@ namespace ConexionSql.Controllers.Procesos
     {
         private readonly ConexionSqlContext _context;
 
+        private const int EstadoDetalleReprocesadoId = 3;
+        private const string EstadoDetalleReprocesadoDen = "REPROCESADO";
+
         public TbProReprocesoController(ConexionSqlContext context)
         {
             _context = context;
         }
 
+        
         [HttpPost]
-        public async Task<IActionResult> EjecutarReproceso([FromBody] int tbProId)
+        public async Task<IActionResult> EjecutarReproceso([FromBody] TbProLiberacionChecksDto dto)
         {
-            if (tbProId <= 0)
+            if (dto.TbProId <= 0)
             {
                 return Json(new
                 {
@@ -34,7 +39,7 @@ namespace ConexionSql.Controllers.Procesos
             try
             {
                 var detallesProceso = await _context.TbProDet
-                    .Where(x => x.TbProId == tbProId && (x.TbProDetCantAbo ?? 0) > 0)
+                    .Where(x => x.TbProId == dto.TbProId && (x.TbProDetCantAbo ?? 0) > 0)
                     .ToListAsync();
 
                 if (soloVerDetalles)
@@ -56,7 +61,7 @@ namespace ConexionSql.Controllers.Procesos
                     return Json(new
                     {
                         success = false,
-                        mensaje = "No se encontraron detalles abortados para reprocesar."
+                        mensaje = "Este proceso ha sido abortado, no tiene materiales pendientes de reproceso."
                     });
                 }
 
@@ -103,7 +108,34 @@ namespace ConexionSql.Controllers.Procesos
                     detalle.TbProDetNum3 =
                         (detalle.TbProDetNum3 ?? 0) + cantidadAbortada;
 
+                    detalle.TbProDetRepro = true;
+                    detalle.TbProDetEstId = EstadoDetalleReprocesadoId;
+                    detalle.TbProDetEstDen = EstadoDetalleReprocesadoDen;
+                    detalle.TbProDetEstFec = DateTime.Now;
+
                     detalle.TbProDetCantAbo = 0;
+                }
+
+                //toma el check de abortado o falla de equipo
+
+                var proceso = await _context.TbPro
+                .FirstOrDefaultAsync(x => x.TbProId == dto.TbProId);
+
+                if (proceso != null)
+                {
+                    if (dto.ResultadoFinalProceso == "ABORTAR_PROCESO")
+                    {
+                        proceso.IbProEstId = 3;
+                        proceso.IbProEstDen = "ABORTADO";
+                        proceso.TbProTxt2 = "PROCESO ABORTADO";
+                    }
+
+                    if (dto.ResultadoFinalProceso == "FALLA_PROCESO")
+                    {
+                        proceso.IbProEstId = 5; // revisar ID real
+                        proceso.IbProEstDen = "FALLA DE PROCESO";
+                        proceso.TbProTxt2 = "FALLA DE PROCESO";
+                    }
                 }
 
                 await _context.SaveChangesAsync();
@@ -288,16 +320,33 @@ namespace ConexionSql.Controllers.Procesos
                     if (cantidad <= 0)
                         continue;
 
-                    if (detalle.TbProDetCant.HasValue && cantidad > detalle.TbProDetCant.Value)
+                    var cantidadPendienteReproceso = detalle.TbProDetCantAbo ?? 0;
+
+                    if (cantidad > cantidadPendienteReproceso)
                     {
                         await transaction.RollbackAsync();
+
+                        var etiqueta = detalle.TbProDetRecDetId ?? 0;
 
                         return Json(new
                         {
                             success = false,
-                            mensaje = $"La cantidad a reprocesar no puede superar la cantidad del detalle {detalle.TbProDetId}."
+                            mensaje = cantidadPendienteReproceso <= 0
+                                ? $"La etiqueta {etiqueta} ya no tiene cantidad pendiente para reproceso."
+                                : $"La etiqueta {etiqueta} solo tiene {cantidadPendienteReproceso} unidad(es) pendiente(s) para reproceso."
                         });
                     }
+
+                    //if (detalle.TbProDetCant.HasValue && cantidad > detalle.TbProDetCant.Value)
+                    //{
+                    //    await transaction.RollbackAsync();
+
+                    //    return Json(new
+                    //    {
+                    //        success = false,
+                    //        mensaje = $"La cantidad a reprocesar no puede superar la cantidad del detalle {detalle.TbProDetId}."
+                    //    });
+                    //}
 
                     var recDetId = detalle.TbProDetRecDetId ?? 0;
 
@@ -320,10 +369,22 @@ namespace ConexionSql.Controllers.Procesos
                         dto.MotivoId,
                         cantidad
                     );
+                    detalle.TbProDetNum3 = (detalle.TbProDetNum3 ?? 0) + cantidad;
+                    detalle.TbProDetCantAbo = cantidadPendienteReproceso - cantidad;
+
+                    detalle.TbProDetRepro = true;
+                    detalle.TbProDetEstId = EstadoDetalleReprocesadoId;
+                    detalle.TbProDetEstDen = EstadoDetalleReprocesadoDen;
+                    detalle.TbProDetEstFec = DateTime.Now;
                 }
 
                 proceso.IbProEstId = 4;
                 proceso.IbProEstDen = "REPROCESO PARCIAL";
+
+                var motivo = await _context.TbProNco
+                .FirstOrDefaultAsync(x => x.TbProNcoId == dto.MotivoId);
+
+                proceso.TbProTxt2 = motivo?.TbProNcoDen ?? "NO REGISTRA";
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();

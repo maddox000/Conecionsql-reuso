@@ -37,6 +37,9 @@ namespace ConexionSql.Models.Lavado
         // 📦 Cantidad a procesar (puede diferir del recibido)
         public int? TB_PRO_LAV_DET_CANT { get; set; }
 
+        public int? TB_PRO_LAV_DET_EST_ID { get; set; }
+        public string? TB_PRO_LAV_DET_EST_DEN { get; set; }
+
         // ✅ Controlado / Aprobado
         public int? TB_PRO_LAV_DET_CANT_CTRL { get; set; }
         public int? TB_PRO_LAV_DET_CANT_ABO { get; set; }

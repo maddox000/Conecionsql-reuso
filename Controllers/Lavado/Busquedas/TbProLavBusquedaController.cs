@@ -50,6 +50,9 @@ namespace ConexionSql.Controllers.Lavado.Busquedas
 
                     TB_PRO_LAV_DET_REC_DET_PRO_STOCK = d.TB_PRO_LAV_DET_STOCK,
 
+                    TB_PRO_LAV_DET_EST_ID = d.TB_PRO_LAV_DET_EST_ID,
+                    TB_PRO_LAV_DET_EST_DEN = d.TB_PRO_LAV_DET_EST_DEN,
+
                     TB_PRO_LAV_DET_CANT = d.TB_PRO_LAV_DET_CANT,
 
                     TB_PRO_LAV_FEC = d.TB_PRO_LAV_DET_PRO_LAV_FEC
@@ -151,6 +154,8 @@ namespace ConexionSql.Controllers.Lavado.Busquedas
                         if (result != null)
                             tbProLavId = Convert.ToInt32(result);
                     }
+
+
 
                     int pendientes = 0;
 

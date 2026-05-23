@@ -9,6 +9,9 @@ namespace ConexionSql.Controllers.Lavado
     {
         private readonly ConexionSqlContext _context;
 
+        private const int EstadoDetalleReprocesadoId = 3;
+        private const string EstadoDetalleReprocesadoDen = "REPROCESADO";
+
         public TbProLavReprocesoController(
             ConexionSqlContext context)
         {
@@ -17,9 +20,9 @@ namespace ConexionSql.Controllers.Lavado
 
         [HttpPost]
         public async Task<IActionResult> EjecutarReproceso(
-            [FromBody] int tbProLavId)
+            [FromBody] TbProLavLiberacionChecksDto dto)
         {
-            if (tbProLavId <= 0)
+            if (dto == null || dto.TbProLavId <= 0)
             {
                 return Json(new
                 {
@@ -36,9 +39,9 @@ namespace ConexionSql.Controllers.Lavado
                 var detallesLavado =
                     await _context.TbProLavDet
                     .Where(x =>
-                        x.TB_PRO_LAV_DET_PRO_LAV_ID == tbProLavId
-                        &&
-                        (x.TB_PRO_LAV_DET_NUM_1 ?? 0) > 0)
+                    x.TB_PRO_LAV_DET_PRO_LAV_ID == dto.TbProLavId
+                    &&
+                    (x.TB_PRO_LAV_DET_NUM_1 ?? 0) > 0)
                     .ToListAsync();
 
                 if (detallesLavado.Count == 0)
@@ -84,9 +87,54 @@ namespace ConexionSql.Controllers.Lavado
                         + cantidadAbortada;
 
                     detalle.TB_PRO_LAV_DET_NUM_1 = 0;
+
+                    detalle.TB_PRO_LAV_DET_REPRO = true;
+                    detalle.TB_PRO_LAV_DET_EST_ID = EstadoDetalleReprocesadoId;
+                    detalle.TB_PRO_LAV_DET_EST_DEN = EstadoDetalleReprocesadoDen;
+                    detalle.TB_PRO_LAV_DET_EST_FEC = DateTime.Now;
+
+                    //if (dto.ResultadoFinalLavado == "ABORTAR_LAVADO")
+                    //{
+                    //    detalle.TB_PRO_LAV_DET_EST_ID = 3;
+                    //    detalle.TB_PRO_LAV_DET_EST_DEN = "ABORTADO";
+                    //}
+
+                    //if (dto.ResultadoFinalLavado == "FALLA_EQUIPO")
+                    //{
+                    //    detalle.TB_PRO_LAV_DET_EST_ID = 5;
+                    //    detalle.TB_PRO_LAV_DET_EST_DEN = "FALLA DE PROCESO";
+                    //}
                 }
 
+
+
+                //completa estado de cabecera
+
+                var lavado = await _context.TbProLav
+                .FirstOrDefaultAsync(x => x.TbProLavId == dto.TbProLavId);
+
+                if (lavado != null)
+                {
+                    if (dto.ResultadoFinalLavado == "ABORTAR_LAVADO")
+                    {
+                        lavado.TbProLavEstId = 3;
+                        lavado.TbProLavEstDen = "ABORTADO";
+                        lavado.TbProLavTxt2 = "PROCESO ABORTADO";
+                    }
+
+                    if (dto.ResultadoFinalLavado == "FALLA_EQUIPO")
+                    {
+                        lavado.TbProLavEstId = 5;
+                        lavado.TbProLavEstDen = "FALLA DE PROCESO";
+                        lavado.TbProLavTxt2 = "FALLA DE PROCESO";
+                    }
+                }
+
+
+
                 await _context.SaveChangesAsync();
+
+                
 
                 await transaction.CommitAsync();
 
@@ -200,10 +248,18 @@ namespace ConexionSql.Controllers.Lavado
                             (detalle.TB_PRO_LAV_DET_NUM_1 ?? 0)
                             - item.Cantidad
                         );
+                    detalle.TB_PRO_LAV_DET_REPRO = true;
+                    detalle.TB_PRO_LAV_DET_EST_ID = EstadoDetalleReprocesadoId;
+                    detalle.TB_PRO_LAV_DET_EST_DEN = EstadoDetalleReprocesadoDen;
+                    detalle.TB_PRO_LAV_DET_EST_FEC = DateTime.Now;
                 }
+
+
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
+
+
 
                 return Json(new
                 {

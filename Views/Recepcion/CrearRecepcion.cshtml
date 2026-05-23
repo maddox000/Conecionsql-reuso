@@ -98,7 +98,7 @@
             </div>
 
             <div class="rec-screen-image" style="display:flex; align-items:center; justify-content:center;">
-    
+
                 <div id="productoImagenContainer" style="text-align:center;">
                     <div style="color:#999; font-size:0.8rem;">
                         Sin imagen
@@ -114,116 +114,62 @@
     </form>
 </div>
 <div>
-
+    @* detalle *@
     @if (Model == null || Model.TbRecId <= 0)
-    {
-        <div class="rec-screen-table-wrap">
-            <div class="rec-screen-table-title">Carga de material</div>
-            <form id="formCargaMaterial" asp-action="AgregarMaterialSimple" asp-controller="Recepcion" method="post" class="p-3">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="tbRecId" value="@(Model != null && Model.TbRecId > 0 ? Model.TbRecId : 0)" />
-
-                <div class="alert alert-info py-2 mb-2" role="alert">
-                    Seleccione sector de entrega para generar el numero de recepcion y habilitar la carga de material.
-                </div>
-
-                <table class="rec-screen-table rec-screen-table-entry mb-3">
-                    <thead>
-                        <tr>
-                            <th>Codigo de Producto</th>
-                            <th>Denominacion</th>
-                            <th>Codigo reuso</th>
-                            <th>Revision</th>
-                            <th>Tarea a realizar</th>
-                            <th>Contenido</th>
-                            <th>Cantidad</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <select id="ibMatId" name="ibMatId" class="form-select form-select-sm" @((Model != null && Model.TbRecId > 0) ? "required" : "disabled")>
-                                    <option value="">-- Seleccione --</option>
-                                </select>
-                            </td>
-                            <td>
-                                <input type="text" id="matDenominacion" class="form-control form-control-sm" readonly placeholder="Denominacion" />
-                            </td>
-                            <td>
-                                <input type="text" id="codigoReuso" class="form-control form-control-sm" placeholder="Codigo reuso" @((Model != null && Model.TbRecId > 0) ? "" : "disabled") />
-                            </td>
-                            <td>
-                                <select id="revisionMaterial" class="form-select form-select-sm" @((Model != null && Model.TbRecId > 0) ? "" : "disabled")>
-                                    <option value="">-- Seleccione --</option>
-                                    <option value="OK">OK</option>
-                                    <option value="Pendiente">Pendiente</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select id="tareaMaterial" class="form-select form-select-sm" @((Model != null && Model.TbRecId > 0) ? "" : "disabled")>
-                                    <option value="">-- Seleccione --</option>
-                                    <option value="Lavado">Lavado</option>
-                                    <option value="Proceso">Proceso</option>
-                                    <option value="Entrega">Entrega</option>
-                                </select>
-                            </td>
-                            <td>
-                                <input type="number" id="contenidoMaterial" class="form-control form-control-sm" min="0" step="1" placeholder="Numerico" @((Model != null && Model.TbRecId > 0) ? "" : "disabled") />
-                            </td>
-                            <td>
-                                <input type="number" id="cantidadMaterial" name="cantidad" min="1" step="1" class="form-control form-control-sm" placeholder="Numerico" @((Model != null && Model.TbRecId > 0) ? "required" : "disabled") />
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </form>
-        </div>
-    }
-
-    @{
-        var detalles = ViewBag.Detalles as List<TbRecDetDto> ?? new List<TbRecDetDto>();
-    }
-
-    @if (detalles.Count > 0)
     {
         <div class="rec-screen-table-wrap mt-3">
             <div class="rec-screen-table-title">Materiales ingresados</div>
+
             <table class="rec-screen-table">
                 <thead>
                     <tr>
                         <th>Codigo etiqueta</th>
                         <th>Denominacion</th>
-                        <th>Codigo reuso</th>
-                        <th>Recibidos</th>
-                        <th>Pendientes</th>
-                        <th>Entregados</th>
+                        <th>Estado</th>
                         <th>Cantidad</th>
                         <th style="width:72px;"></th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in detalles)
-                    {
-                        <tr id="fila-det-@item.TB_REC_DET_ID">
-                            <td>@item.TB_REC_DET_ID</td>
-                            <td>@(string.IsNullOrWhiteSpace(item.TbRecDetMatDen) ? "SIN MATERIAL" : item.TbRecDetMatDen)</td>
-                            <td>-</td>
-                            <td>@item.TB_REC_DET_CANT</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>@item.TB_REC_DET_CANT</td>
-                            <td style="white-space:nowrap;">
-                                <button type="button"
-                                        class="btn btn-sm btn-outline-danger p-1 lh-1 ms-1"
-                                        title="Eliminar"
-                                        onclick="confirmarEliminarDetalle(@item.TB_REC_DET_ID, @(Model != null ? Model.TbRecId : 0))">
-                                    <i class="bi bi-trash-fill" style="font-size:0.7rem;"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    }
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">
+                            No hay detalles cargados.
+                        </td>
+                    </tr>
+                    <tr style="height:200px;">
+                        <td colspan="5"></td>
+                    </tr>
                 </tbody>
             </table>
+        </div>
+
+        <div class="rec-screen-table-wrap rec-wrap-detalle" style="margin-top:10px;">
+            <div class="p-3">
+                <table class="rec-screen-table rec-screen-table-entry mb-3">
+                    <thead>
+                        <tr>
+                            <th>Codigo Producto</th>
+                            <th>Material</th>
+                            <th>Codigo Reuso</th>
+                            <th>Revision</th>
+                            <th>Estado</th>
+                            <th>Cantidad</th>
+                            <th style="width:110px; display:none;">Accion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input class="form-control form-control-sm" disabled /></td>
+                            <td><input class="form-control form-control-sm" disabled /></td>
+                            <td><input class="form-control form-control-sm" disabled /></td>
+                            <td><input class="form-control form-control-sm" disabled /></td>
+                            <td><input class="form-control form-control-sm" disabled /></td>
+                            <td><input class="form-control form-control-sm" disabled /></td>
+                            <td style="display:none;"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     }
 
@@ -233,10 +179,10 @@
         <input type="hidden" name="tbRecId" value="@(Model != null && Model.TbRecId > 0 ? Model.TbRecId : 0)" />
     </form>
 </div>
-    
 
-    @* Botones viejos removidos. Se usan los botones del footer desde _BotonesInfoBasica.cshtml *@
-    @* <div class="rec-screen-actions rec-screen-actions-bottom mt-3">
+    
+@* Botones viejos removidos. Se usan los botones del footer desde _BotonesInfoBasica.cshtml *@
+@* <div class="rec-screen-actions rec-screen-actions-bottom mt-3">
         <button type="button" class="btn btn-secondary btn-sm" onclick="window.history.back()">Cerrar</button>
 
         <button type="button"
@@ -267,21 +213,38 @@
     </div>
 }
 
-    @await Html.PartialAsync("~/Views/Shared/_BotonesInfoBasica.cshtml")
+@await Html.PartialAsync("~/Views/Shared/_BotonesInfoBasica.cshtml")
+
+<div id="contenedorModalOrtopedia"></div>
 
 @section Scripts {
+
+    
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
+            // setTimeout(function () {
+
+            //         const campoOrtopedia =
+            //             document.getElementById("TB_REC_ORT_ORT_ID");
+
+            //         if (campoOrtopedia) {
+            //             campoOrtopedia.focus();
+            //         }
+
+            //     }, 150);
+
         const sectores = [
             @if (listaSectores != null)
             {
-                        for (int i = 0; i < listaSectores.Count; i++)
-                        {
-                                    var s = listaSectores[i];
-                                    @:{ id: @s.IbSecId, den: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(s.IbSecDen ?? ""))" }@(i < listaSectores.Count - 1 ? "," : "")
-                        }
+                            for (int i = 0; i < listaSectores.Count; i++)
+                            {
+                                            var s = listaSectores[i];
+                                            // @:{ id: @s.IbSecId, den: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(s.IbSecDen ?? ""))" }@(i < listaSectores.Count - 1 ? "," : "")
+                                            @:{ id: @s.IbSecId, den: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(s.IbSecDen ?? ""))", desId: @s.IbSecDesId, desDen: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(s.IbSecDesDen ?? ""))" }@(i < listaSectores.Count - 1 ? "," : "")
+                                }
+                
             }
         ];
 
@@ -437,8 +400,8 @@
                 hiddenSectorOrigen.value = sec.id;
 
                 // copiar a destino
-                inputSectorDestino.value = sec.den;
-                hiddenSectorDestino.value = sec.id;
+                inputSectorDestino.value = sec.desDen;
+                hiddenSectorDestino.value = sec.desId;
 
                 listaSectoresOrigen.style.display = "none";
 
@@ -526,6 +489,44 @@
         window.addEventListener("beforeunload", function () {
             localStorage.removeItem("modulo_23_abierto");
         });
+
+
     </script>
+
+    @if (ViewBag.AbrirModalOrtopedia == true)
+    {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+
+                fetch("/TbRecOrt/AbrirModalOrtopedias?tbRecId=@ViewBag.TbRecIdOrtopedia")
+                    .then(response => response.text())
+                    .then(html => {
+
+                            const contenedor =
+                                document.getElementById("contenedorModalOrtopedia");
+
+                            contenedor.innerHTML = html;
+
+                            contenedor.querySelectorAll("script").forEach(script => {
+                                    const nuevo = document.createElement("script");
+                                    nuevo.text = script.innerHTML;
+                                    document.body.appendChild(nuevo);
+                                });
+
+                            const modal =
+                                document.getElementById("modalRegistroOrtopedia");
+
+                            if (modal) {
+                                modal.style.display = "flex";
+                            }
+
+                            console.log("MODAL CARGADO");
+
+                        });
+
+            });
+        </script>
+    }
+    
 
 }

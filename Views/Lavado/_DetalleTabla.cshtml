@@ -12,6 +12,7 @@
             <td>@(item.TB_PRO_LAV_DET_REC_DET_CANT ?? 0)</td>
             <td>@(item.TB_PRO_LAV_DET_REC_DET_PRO_TOT ?? 0)</td>
             <td>@(item.TB_PRO_LAV_DET_REC_DET_PRO_STOCK ?? 0)</td>
+            <td>@(item.TB_PRO_LAV_DET_EST_DEN ?? "NO REGISTRA")</td>
             <td>@(item.TB_PRO_LAV_DET_CANT ?? 0)</td>
 
             <td class="col-reproceso d-none">
@@ -37,7 +38,7 @@
 else
 {
     <tr>
-        <td colspan="10" class="text-center text-muted">
+        <td colspan="11" class="text-center text-muted">
             ⚠️ No hay detalles cargados.
         </td>
     </tr>

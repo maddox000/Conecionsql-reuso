@@ -319,635 +319,672 @@
 </form>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const btnPrintDocument = document.getElementById('btnProcesoPrintDocument');
-        const btnPrintLabel = document.getElementById('btnProcesoPrintLabel');
-        const labelForm = document.getElementById('formProcesoPrintLabel');
-        const labelCodeInput = document.getElementById('procesoEtiquetaCodigo');
-        const printerRowInfo = document.getElementById('procesoPrinterRowInfo');
-        const modalEl = document.getElementById('procesoPrinterTypeModal');
-        const printerTypeModal = modalEl ? new bootstrap.Modal(modalEl) : null;
+        document.addEventListener("DOMContentLoaded", function () {
+            const btnPrintDocument = document.getElementById('btnProcesoPrintDocument');
+            const btnPrintLabel = document.getElementById('btnProcesoPrintLabel');
+            const labelForm = document.getElementById('formProcesoPrintLabel');
+            const labelCodeInput = document.getElementById('procesoEtiquetaCodigo');
+            const printerRowInfo = document.getElementById('procesoPrinterRowInfo');
+            const modalEl = document.getElementById('procesoPrinterTypeModal');
+            const printerTypeModal = modalEl ? new bootstrap.Modal(modalEl) : null;
 
-        let selectedEtiqueta = "";
+            let selectedEtiqueta = "";
 
-        function setSelectedEtiqueta(codigoEtiqueta) {
-            selectedEtiqueta = codigoEtiqueta || '';
-            if (labelCodeInput) {
-                labelCodeInput.value = selectedEtiqueta;
+            function setSelectedEtiqueta(codigoEtiqueta) {
+                selectedEtiqueta = codigoEtiqueta || '';
+                if (labelCodeInput) {
+                    labelCodeInput.value = selectedEtiqueta;
+                }
+                if (printerRowInfo) {
+                    printerRowInfo.textContent = `Etiqueta seleccionada: ${selectedEtiqueta || '-'}`;
+                }
             }
-            if (printerRowInfo) {
-                printerRowInfo.textContent = `Etiqueta seleccionada: ${selectedEtiqueta || '-'}`;
+
+            async function cargarControlesProceso() {
+                const tbProId = parseInt(document.getElementById("tbProId")?.value) || 0;
+                const tbody = document.getElementById("tablaControlesProceso");
+
+                if (!tbProId || !tbody) return;
+
+                try {
+                    const response = await fetch(`/TbProControl/ObtenerControlesPorProceso?tbProId=${tbProId}`);
+                    const json = await response.json();
+
+                    if (!json.success || !json.data || json.data.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="proceso-table-empty-note">Sin controles cargados</td>
+                            </tr>`;
+                        actualizarEstadoNodosControles([]);
+                        return;
+                    }
+
+                            tbody.innerHTML = json.data.map(x => `
+                            <tr>
+                                <td>${x.tbProPteDen ?? ""}</td>
+                                <td>${x.tbProPteIde ?? ""}</td>
+                                <td>${x.tbProDetTesUbiDen ?? x.tbProDetTesUbiId ?? ""}</td>
+                                <td>${x.tbProPteCant ?? ""}</td>
+
+                                <!-- RESULTADO -->
+                                    <td class="resultado-valor" data-id="${x.tbProDetPteId}">
+                                        ${x.tbProPteResDen ?? ""}
+                                    </td>
+
+                                <!-- COMBO -->
+                                <td class="col-editar d-none">
+                                    <select class="form-select form-select-sm combo-resultado d-none"
+                                            data-id="${x.tbProDetPteId}">
+                                        <option value="">Seleccione...</option>
+                                        ${listaResultados.map(r => `
+                                            <option value="${r.tB_PRO_PTE_RES_ID}"
+                                                ${r.tB_PRO_PTE_RES_ID == x.tbProPteResId ? "selected" : ""}>
+                                                ${r.tB_PRO_PTE_RES_DEN}
+                                            </option>
+                                        `).join("")}
+                                    </select>
+                                </td>
+                            </tr>
+                        `).join("");
+                    //mostrarCombosResultado();
+                    actualizarEstadoNodosControles(json.data);
+                } catch (error) {
+                    console.error("Error al cargar controles:", error);
+                }
             }
-        }
 
-        async function cargarControlesProceso() {
-            const tbProId = parseInt(document.getElementById("tbProId")?.value) || 0;
-            const tbody = document.getElementById("tablaControlesProceso");
 
-            if (!tbProId || !tbody) return;
 
-            try {
-                const response = await fetch(`/TbProControl/ObtenerControlesPorProceso?tbProId=${tbProId}`);
-                const json = await response.json();
+                function mostrarCombosResultado() {
+                    document.querySelectorAll(".combo-resultado").forEach(select => {
+                        select.classList.remove("d-none");
+                    });
+                }
 
-                if (!json.success || !json.data || json.data.length === 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="proceso-table-empty-note">Sin controles cargados</td>
-                        </tr>`;
-                    actualizarEstadoNodosControles([]);
+
+            const tabs = document.querySelectorAll('.proceso-tab[data-tab-target]');
+            const panels = document.querySelectorAll('.proceso-tab-panel');
+
+            tabs.forEach(function (tab) {
+                tab.addEventListener('click', async function () {
+                    const targetId = tab.getAttribute('data-tab-target');
+
+                    tabs.forEach(function (t) { t.classList.remove('is-active'); });
+                    panels.forEach(function (p) { p.classList.remove('is-active'); });
+
+                    tab.classList.add('is-active');
+                    const panel = document.getElementById(targetId);
+                    if (panel) {
+                        panel.classList.add('is-active');
+                    }
+
+                    if (targetId === "proceso-tab-controles") {
+                        await cargarResultados();
+                        await cargarControlesProceso();
+
+                    if (sessionStorage.getItem("editarProceso") === "2") {
+
+                            document.querySelectorAll(".col-editar").forEach(x => {
+                                x.classList.remove("d-none");
+                            });
+
+                            document.querySelectorAll(".combo-resultado").forEach(x => {
+                                x.classList.remove("d-none");
+                                x.style.display = "block";
+                            });
+                        }
+                    }
+                    //     cargarControlesProceso().then(() => {
+
+                    // if (sessionStorage.getItem("editarProceso") === "2") {
+
+                    //             document.querySelectorAll(".col-editar").forEach(x => {
+                    //                 x.classList.remove("d-none");
+                    //             });
+
+                    //             document.querySelectorAll(".combo-resultado").forEach(x => {
+                    //                 x.classList.remove("d-none");
+                    //                 x.style.display = "block";
+                    //             });
+                    //         }
+                    //     });
+
+                    });
+                });
+
+
+            document.addEventListener('click', function (event) {
+                const btnPdfRow = event.target.closest('.js-pro-row-print-pdf');
+                if (btnPdfRow) {
+                    setSelectedEtiqueta(btnPdfRow.getAttribute('data-etiqueta'));
+                    window.print();
                     return;
                 }
 
-                        tbody.innerHTML = json.data.map(x => `
-                        <tr>
-                            <td>${x.tbProPteDen ?? ""}</td>
-                            <td>${x.tbProPteIde ?? ""}</td>
-                            <td>${x.tbProDetTesUbiDen ?? x.tbProDetTesUbiId ?? ""}</td>
-                            <td>${x.tbProPteCant ?? ""}</td>
-
-                            <!-- RESULTADO -->
-                                <td class="resultado-valor" data-id="${x.tbProDetPteId}">
-                                    ${x.tbProPteResDen ?? ""}
-                                </td>
-
-                            <!-- COMBO -->
-                            <td class="col-editar d-none">
-                                <select class="form-select form-select-sm combo-resultado d-none"
-                                        data-id="${x.tbProDetPteId}">
-                                    <option value="">Seleccione...</option>
-                                    ${listaResultados.map(r => `
-                                        <option value="${r.tB_PRO_PTE_RES_ID}"
-                                            ${r.tB_PRO_PTE_RES_ID == x.tbProPteResId ? "selected" : ""}>
-                                            ${r.tB_PRO_PTE_RES_DEN}
-                                        </option>
-                                    `).join("")}
-                                </select>
-                            </td>
-                        </tr>
-                    `).join("");
-                //mostrarCombosResultado();
-                actualizarEstadoNodosControles(json.data);
-            } catch (error) {
-                console.error("Error al cargar controles:", error);
-            }
-        }
-
-
-
-            function mostrarCombosResultado() {
-                document.querySelectorAll(".combo-resultado").forEach(select => {
-                    select.classList.remove("d-none");
-                });
-            }
-
-
-        const tabs = document.querySelectorAll('.proceso-tab[data-tab-target]');
-        const panels = document.querySelectorAll('.proceso-tab-panel');
-
-        tabs.forEach(function (tab) {
-            tab.addEventListener('click', async function () {
-                const targetId = tab.getAttribute('data-tab-target');
-
-                tabs.forEach(function (t) { t.classList.remove('is-active'); });
-                panels.forEach(function (p) { p.classList.remove('is-active'); });
-
-                tab.classList.add('is-active');
-                const panel = document.getElementById(targetId);
-                if (panel) {
-                    panel.classList.add('is-active');
-                }
-
-                if (targetId === "proceso-tab-controles") {
-                    await cargarResultados();
-                    await cargarControlesProceso();
-
-                if (sessionStorage.getItem("editarProceso") === "2") {
-
-                        document.querySelectorAll(".col-editar").forEach(x => {
-                            x.classList.remove("d-none");
-                        });
-
-                        document.querySelectorAll(".combo-resultado").forEach(x => {
-                            x.classList.remove("d-none");
-                            x.style.display = "block";
-                        });
+                const btnPrinterRow = event.target.closest('.js-pro-row-print-printer');
+                if (btnPrinterRow) {
+                    setSelectedEtiqueta(btnPrinterRow.getAttribute('data-etiqueta'));
+                    if (printerTypeModal) {
+                        printerTypeModal.show();
                     }
                 }
-                //     cargarControlesProceso().then(() => {
-
-                // if (sessionStorage.getItem("editarProceso") === "2") {
-
-                //             document.querySelectorAll(".col-editar").forEach(x => {
-                //                 x.classList.remove("d-none");
-                //             });
-
-                //             document.querySelectorAll(".combo-resultado").forEach(x => {
-                //                 x.classList.remove("d-none");
-                //                 x.style.display = "block";
-                //             });
-                //         }
-                //     });
-
-                });
             });
 
-
-        document.addEventListener('click', function (event) {
-            const btnPdfRow = event.target.closest('.js-pro-row-print-pdf');
-            if (btnPdfRow) {
-                setSelectedEtiqueta(btnPdfRow.getAttribute('data-etiqueta'));
-                window.print();
-                return;
+            if (btnPrintDocument) {
+                btnPrintDocument.addEventListener('click', function () {
+                    if (printerTypeModal) {
+                        printerTypeModal.hide();
+                    }
+                    window.print();
+                });
             }
 
-            const btnPrinterRow = event.target.closest('.js-pro-row-print-printer');
-            if (btnPrinterRow) {
-                setSelectedEtiqueta(btnPrinterRow.getAttribute('data-etiqueta'));
-                if (printerTypeModal) {
-                    printerTypeModal.show();
-                }
-            }
-        });
-
-        if (btnPrintDocument) {
-            btnPrintDocument.addEventListener('click', function () {
-                if (printerTypeModal) {
-                    printerTypeModal.hide();
-                }
-                window.print();
-            });
-        }
-
-        if (btnPrintLabel) {
-            btnPrintLabel.addEventListener('click', function () {
-                if (printerTypeModal) {
-                    printerTypeModal.hide();
-                }
-                if (labelForm) {
-                    labelForm.submit();
-                }
-            });
-        }
-
-        //dispararReproceso la finalizacion
-
-                // =========================
-    // LIBERACION DE PROCESO
-    // =========================
-
-    let usuarioLiberacionValidado = sessionStorage.getItem("editarProceso") === "2";
-
-    window.addEventListener("loginTareasValidado", function () {
-                    usuarioLiberacionValidado = true;
+            if (btnPrintLabel) {
+                btnPrintLabel.addEventListener('click', function () {
+                    if (printerTypeModal) {
+                        printerTypeModal.hide();
+                    }
+                    if (labelForm) {
+                        labelForm.submit();
+                    }
                 });
+            }
 
-    const chkLiberarCiclo = document.getElementById("chkLiberarCicloEsterilizacion");
-    const bloqueResultadoFinal = document.getElementById("bloqueResultadoFinalProceso");
+            //dispararReproceso la finalizacion
 
-    // todos los checks de liberacion
-    const checksLiberacion = document.querySelectorAll(`
-        #chkIntegridadEnvoltorios,
-        #chkAusenciaHumedad,
-        #chkAusenciaSuciedad,
-        #chkViroCorrectoControlQuimico,
-        #chkParametrosCicloCorrecto,
-        #chkResNegativoBiologico,
-        #chkLiberarCicloEsterilizacion
-    `);
+                    // =========================
+        // LIBERACION DE PROCESO
+        // =========================
 
-    // radios finales
-    const radiosResultadoFinal = document.querySelectorAll('input[name="resultadoFinalProceso"]');
+        let usuarioLiberacionValidado = sessionStorage.getItem("editarProceso") === "2";
 
-    // 🔒 bloquear todo al cargar
-        // radios ocultos al iniciar
-    radiosResultadoFinal.forEach(x => {
-        x.disabled = true;
-    });
+        window.addEventListener("loginTareasValidado", function () {
+                        usuarioLiberacionValidado = true;
+                    });
 
-    //muestra los checks de finalizacion del cilco
-        const estadoProceso = "@Model.Cabecera.IbProEstDen";
-    const liberado = @((Model.Cabecera.TbProIbre ?? false).ToString().ToLower());
+        const chkLiberarCiclo = document.getElementById("chkLiberarCicloEsterilizacion");
+        const bloqueResultadoFinal = document.getElementById("bloqueResultadoFinalProceso");
 
-    if (liberado) {
+        // todos los checks de liberacion
+        const checksLiberacion = document.querySelectorAll(`
+            #chkIntegridadEnvoltorios,
+            #chkAusenciaHumedad,
+            #chkAusenciaSuciedad,
+            #chkViroCorrectoControlQuimico,
+            #chkParametrosCicloCorrecto,
+            #chkResNegativoBiologico,
+            #chkLiberarCicloEsterilizacion
+        `);
 
-        document.getElementById("chkIntegridadEnvoltorios").checked =
-            @((Model.Cabecera.TbProIenv ?? false).ToString().ToLower());
+        // radios finales
+        const radiosResultadoFinal = document.querySelectorAll('input[name="resultadoFinalProceso"]');
 
-        document.getElementById("chkAusenciaHumedad").checked =
-            @(Model.Cabecera.TbProHume.ToString().ToLower());
-
-        document.getElementById("chkAusenciaSuciedad").checked =
-            @(Model.Cabecera.TbProAusu.ToString().ToLower());
-
-        document.getElementById("chkViroCorrectoControlQuimico").checked =
-            @(Model.Cabecera.TbProIqvi.ToString().ToLower());
-
-        document.getElementById("chkParametrosCicloCorrecto").checked =
-            @(Model.Cabecera.TbProPaci.ToString().ToLower());
-
-        document.getElementById("chkResNegativoBiologico").checked =
-            @(Model.Cabecera.TbProIbrn.ToString().ToLower());
-
-        document.getElementById("chkLiberarCicloEsterilizacion").checked = true;
-
-        bloqueResultadoFinal.style.display = "block";
-
+        // 🔒 bloquear todo al cargar
+            // radios ocultos al iniciar
         radiosResultadoFinal.forEach(x => {
-            x.disabled = false;
+            x.disabled = true;
         });
 
-        if (estadoProceso === "FINALIZADO") {
+        //muestra los checks de finalizacion del cilco
+            const estadoProceso = "@Model.Cabecera.IbProEstDen";
+        const liberado = @((Model.Cabecera.TbProIbre ?? false).ToString().ToLower());
 
-            document.querySelector(
-                'input[name="resultadoFinalProceso"][value="LIBERAR_PROCESO"]'
-            ).checked = true;
-        }
+            if (liberado) {
 
-        if (estadoProceso === "REPROCESO PARCIAL") {
+                document.getElementById("chkIntegridadEnvoltorios").checked =
+                    @((Model.Cabecera.TbProIenv ?? false).ToString().ToLower());
 
-            document.querySelector(
-                'input[name="resultadoFinalProceso"][value="REPROCESO_PARCIAL"]'
-            ).checked = true;
-        }
+                document.getElementById("chkAusenciaHumedad").checked =
+                    @(Model.Cabecera.TbProHume.ToString().ToLower());
 
-        if (estadoProceso === "ABORTADO") {
+                document.getElementById("chkAusenciaSuciedad").checked =
+                    @(Model.Cabecera.TbProAusu.ToString().ToLower());
 
-            document.querySelector(
-                'input[name="resultadoFinalProceso"][value="ABORTAR_PROCESO"]'
-            ).checked = true;
-        }
+                // document.getElementById("chkViroCorrectoControlQuimico").checked =
+                //     @(Model.Cabecera.TbProIqvi.ToString().ToLower());
+                document.getElementById("chkViroCorrectoControlQuimico").checked =
+                        @((Model.Cabecera.TbProIqvi ?? false).ToString().ToLower());
 
-        if (estadoProceso === "FALLA DE PROCESO") {
+                document.getElementById("chkParametrosCicloCorrecto").checked =
+                    @(Model.Cabecera.TbProPaci.ToString().ToLower());
 
-            document.querySelector(
-                'input[name="resultadoFinalProceso"][value="FALLA_PROCESO"]'
-            ).checked = true;
-        }
-    }
+                document.getElementById("chkResNegativoBiologico").checked =
+                    @(Model.Cabecera.TbProIbrn.ToString().ToLower());
+            document.getElementById("chkLiberarCicloEsterilizacion").checked = true;
 
-    //termina los checks
-        // cuando quieran tocar algo sin validar
-        checksLiberacion.forEach(chk => {
+            bloqueResultadoFinal.style.display = "block";
 
-        chk.addEventListener("change", function (e) {
-
-            if (!usuarioLiberacionValidado) {
-
-                e.preventDefault();
-
-                chk.checked = false;
-
-                alert("Debe validar usuario antes de liberar el proceso.");
-
-                sessionStorage.setItem("editarProceso", "2");
-                localStorage.setItem("loginDestino", window.location.pathname + window.location.search);
-
-                const modalLogin = document.getElementById("loginTareasModal");
-
-                if (modalLogin) {
-                    const bsModalLogin = new bootstrap.Modal(modalLogin);
-                    bsModalLogin.show();
-                }
-
-                return false;
-            }
-
-            const tbProId = parseInt(document.getElementById("tbProId")?.value) || 0;
-
-            fetch('/TbProBusqueda/ActualizarChecksLiberacion', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    TbProId: tbProId,
-
-                    TbProIenv: document.getElementById("chkIntegridadEnvoltorios")?.checked || false,
-                    TbProHume: document.getElementById("chkAusenciaHumedad")?.checked || false,
-                    TbProAusu: document.getElementById("chkAusenciaSuciedad")?.checked || false,
-                    TbProIqvi: document.getElementById("chkViroCorrectoControlQuimico")?.checked || false,
-                    TbProPaci: document.getElementById("chkParametrosCicloCorrecto")?.checked || false,
-                    TbProIbrn: document.getElementById("chkResNegativoBiologico")?.checked || false,
-                    TbProIbre: document.getElementById("chkLiberarCicloEsterilizacion")?.checked || false
-                })
+            radiosResultadoFinal.forEach(x => {
+                x.disabled = false;
             });
 
-        });
-    });
+            if (estadoProceso === "FINALIZADO") {
 
-    // mostrar/ocultar radios
-    if (chkLiberarCiclo && bloqueResultadoFinal) {
-
-        chkLiberarCiclo.addEventListener("change", function () {
-
-            if (chkLiberarCiclo.checked) {
-
-                bloqueResultadoFinal.style.display = "block";
-
-                radiosResultadoFinal.forEach(x => x.disabled = false);
-
-            } else {
-
-                bloqueResultadoFinal.style.display = "none";
-
-                radiosResultadoFinal.forEach(function (radio) {
-
-                    radio.checked = false;
-                    radio.disabled = true;
-                });
+                document.querySelector(
+                    'input[name="resultadoFinalProceso"][value="LIBERAR_PROCESO"]'
+                ).checked = true;
             }
+
+            if (estadoProceso === "REPROCESO PARCIAL") {
+
+                document.querySelector(
+                    'input[name="resultadoFinalProceso"][value="REPROCESO_PARCIAL"]'
+                ).checked = true;
+            }
+
+            if (estadoProceso === "ABORTADO") {
+
+                document.querySelector(
+                    'input[name="resultadoFinalProceso"][value="ABORTAR_PROCESO"]'
+                ).checked = true;
+            }
+
+            if (estadoProceso === "FALLA DE PROCESO") {
+
+                document.querySelector(
+                    'input[name="resultadoFinalProceso"][value="FALLA_PROCESO"]'
+                ).checked = true;
+            }
+        }
+
+        //termina los checks
+            // cuando quieran tocar algo sin validar
+            checksLiberacion.forEach(chk => {
+
+            chk.addEventListener("change", function (e) {
+
+                if (!usuarioLiberacionValidado) {
+
+                    e.preventDefault();
+
+                    chk.checked = false;
+
+                    alert("Debe validar usuario antes de liberar el proceso.");
+
+                    sessionStorage.setItem("editarProceso", "2");
+                    localStorage.setItem("loginDestino", window.location.pathname + window.location.search);
+
+                    const modalLogin = document.getElementById("loginTareasModal");
+
+                    if (modalLogin) {
+                        const bsModalLogin = new bootstrap.Modal(modalLogin);
+                        bsModalLogin.show();
+                    }
+
+                    return false;
+                }
+
+                const tbProId = parseInt(document.getElementById("tbProId")?.value) || 0;
+
+                fetch('/TbProBusqueda/ActualizarChecksLiberacion', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        TbProId: tbProId,
+
+                        TbProIenv: document.getElementById("chkIntegridadEnvoltorios")?.checked || false,
+                        TbProHume: document.getElementById("chkAusenciaHumedad")?.checked || false,
+                        TbProAusu: document.getElementById("chkAusenciaSuciedad")?.checked || false,
+                        TbProIqvi: document.getElementById("chkViroCorrectoControlQuimico")?.checked || false,
+                        TbProPaci: document.getElementById("chkParametrosCicloCorrecto")?.checked || false,
+                        TbProIbrn: document.getElementById("chkResNegativoBiologico")?.checked || false,
+                        TbProIbre: document.getElementById("chkLiberarCicloEsterilizacion")?.checked || false
+                    })
+                });
+
+            });
         });
-    }
-     //abre modal reproceso
-            document.querySelector('input[name="resultadoFinalProceso"][value="REPROCESO_PARCIAL"]')
-                ?.addEventListener("change", async function () {
+
+        // mostrar/ocultar radios
+        if (chkLiberarCiclo && bloqueResultadoFinal) {
+
+            chkLiberarCiclo.addEventListener("change", function () {
+
+                if (chkLiberarCiclo.checked) {
+
+                    bloqueResultadoFinal.style.display = "block";
+
+                    radiosResultadoFinal.forEach(x => x.disabled = false);
+
+                } else {
+
+                    bloqueResultadoFinal.style.display = "none";
+
+                    radiosResultadoFinal.forEach(function (radio) {
+
+                        radio.checked = false;
+                        radio.disabled = true;
+                    });
+                }
+            });
+        }
+         //abre modal reproceso
+                document.querySelector('input[name="resultadoFinalProceso"][value="REPROCESO_PARCIAL"]')
+                    ?.addEventListener("change", async function () {
+
+                        if (!this.checked) return;
+
+                        const modal = document.getElementById("modalReprocesoParcial");
+                        if (!modal) return;
+
+                        await cargarMotivosReprocesoParcial();
+
+                        modal.style.display = "flex";
+                    });
+
+
+            document.querySelector(
+                    'input[name="resultadoFinalProceso"][value="ABORTAR_PROCESO"]'
+                )
+                ?.addEventListener("change", function () {
 
                     if (!this.checked) return;
 
-                    const modal = document.getElementById("modalReprocesoParcial");
-                    if (!modal) return;
+                    const modal = document.getElementById("modalReproceso");
 
-                    await cargarMotivosReprocesoParcial();
+                    if (!modal) return;
 
                     modal.style.display = "flex";
                 });
 
-        // ACA VA LA RUTA DE LA VISTA NUEVA
-        // window.location.href = `/Procesos/ConsultaProceso/${tbProId}`;
 
-        //     cargarControlesProceso().then(() => {
-        // if (sessionStorage.getItem("editarProceso") === "2") {
-        //     document.querySelectorAll(".combo-resultado").forEach(x => {
-        //         x.classList.remove("d-none");
-        //         x.style.display = "block";
-        //     });
+                document.querySelector(
+                    'input[name="resultadoFinalProceso"][value="FALLA_PROCESO"]'
+                )
+                ?.addEventListener("change", function () {
 
-            //sessionStorage.removeItem("editarProceso");
-//         }
-//     });
-// });
+                    if (!this.checked) return;
+
+                    const modal = document.getElementById("modalReproceso");
+
+                    if (!modal) return;
+
+                    modal.style.display = "flex";
+                });
+
+            // ACA VA LA RUTA DE LA VISTA NUEVA
+            // window.location.href = `/Procesos/ConsultaProceso/${tbProId}`;
+
+            //     cargarControlesProceso().then(() => {
+            // if (sessionStorage.getItem("editarProceso") === "2") {
+            //     document.querySelectorAll(".combo-resultado").forEach(x => {
+            //         x.classList.remove("d-none");
+            //         x.style.display = "block";
+            //     });
+
+                //sessionStorage.removeItem("editarProceso");
+    //         }
+    //     });
+    // });
 
 
-    document.getElementById("btnEditarProceso")?.addEventListener("click", function (e) {
-        console.log("CLICK EDITAR DETECTADO EN ESTA VISTA");
-        sessionStorage.setItem("editarProceso", "2");
-        console.log("loginDestino:", localStorage.getItem("loginDestino"));
-        console.log("editarProceso:", sessionStorage.getItem("editarProceso"));
-    });
-
-    function actualizarEstadoNodosControles(controles) {
-        document.querySelectorAll(".js-camara-node").forEach(nodo => {
-            nodo.classList.remove("activo");
-            nodo.removeAttribute("data-bloqueado");
-            nodo.style.backgroundColor = "";
-            nodo.style.borderColor = "";
-            nodo.style.color = "";
+        document.getElementById("btnEditarProceso")?.addEventListener("click", function (e) {
+            console.log("CLICK EDITAR DETECTADO EN ESTA VISTA");
+            sessionStorage.setItem("editarProceso", "2");
+            console.log("loginDestino:", localStorage.getItem("loginDestino"));
+            console.log("editarProceso:", sessionStorage.getItem("editarProceso"));
         });
 
-        controles.forEach(x => {
-            const ubicacion = String(
-                x.tbProDetTesUbiId ??
-                x.tbProDetTesUbiDen ??
-                ""
-            ).trim();
-
-            if (!ubicacion) return;
-
-            const nodo = document.querySelector(`.js-camara-node[data-ubicacion="${ubicacion}"]`);
-            if (nodo) {
-                nodo.classList.add("activo");
-                nodo.setAttribute("data-bloqueado", "1");
-                nodo.style.backgroundColor = "#2563eb";
-                nodo.style.borderColor = "#2563eb";
-                nodo.style.color = "#ffffff";
-            }
-        });
-    }
-
-        let listaResultados = [];
-
-    async function cargarResultados() {
-        try {
-            const url = '@Url.Action("ObtenerResultados", "TbProBusqueda")';
-
-            const response = await fetch(url);
-            const json = await response.json();
-
-            if (json.success) {
-                listaResultados = json.data;
-                console.log("Resultados cargados:", listaResultados);
-                console.log(listaResultados[0]);
-            }
-        } catch (error) {
-            console.error("Error al cargar resultados:", error);
-        }
-
-    }
-
-    //motivos reproceso
-
-        async function cargarMotivosReprocesoParcial() {
-
-        const contenedor = document.getElementById("txtMensajeReprocesoParcial");
-
-        if (!contenedor) return;
-
-        contenedor.innerHTML = "Cargando motivos...";
-
-        try {
-
-            const response = await fetch('/TbProReproceso/ObtenerNoConformidades');
-
-            if (!response.ok) {
-                throw new Error("Error HTTP " + response.status);
-            }
-
-            const json = await response.json();
-
-            if (!json || json.length === 0) {
-
-                contenedor.innerHTML = "No se encontraron motivos.";
-                return;
-            }
-
-            contenedor.innerHTML = json.map(x => `
-                <label style="display:block; margin-bottom:6px;">
-                    <input type="radio"
-                           name="motivoReprocesoParcial"
-                                   value="${x.tB_PRO_NCO_ID}">
-                            ${x.tB_PRO_NCO_DEN}
-                </label>
-            `).join("");
-
-        } catch (error) {
-
-            console.error("ERROR CARGAR MOTIVOS REPROCESO:", error);
-
-            contenedor.innerHTML = "Error al cargar motivos de reproceso.";
-        }
-    }
-
-
-        document.addEventListener("change", async function (e) {
-
-        if (!e.target.classList.contains("combo-resultado")) return;
-
-        const select = e.target;
-
-        const tbProDetPteId = select.dataset.id;
-        const tbProPteResId = select.value;
-        const tbProPteResDen = select.options[select.selectedIndex].text;
-
-        if (!tbProPteResId) return;
-
-        try {
-            const response = await fetch('@Url.Action("ActualizarResultadoControl", "TbProBusqueda")', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    TB_PRO_DET_PTE_ID: parseInt(tbProDetPteId),
-                    TB_PRO_PTE_RES_ID: parseInt(tbProPteResId),
-                    TB_PRO_PTE_RES_DEN: tbProPteResDen
-                })
+        function actualizarEstadoNodosControles(controles) {
+            document.querySelectorAll(".js-camara-node").forEach(nodo => {
+                nodo.classList.remove("activo");
+                nodo.removeAttribute("data-bloqueado");
+                nodo.style.backgroundColor = "";
+                nodo.style.borderColor = "";
+                nodo.style.color = "";
             });
 
-            if (!response.ok) {
-                throw new Error("Error HTTP " + response.status);
+            controles.forEach(x => {
+                const ubicacion = String(
+                    x.tbProDetTesUbiId ??
+                    x.tbProDetTesUbiDen ??
+                    ""
+                ).trim();
+
+                if (!ubicacion) return;
+
+                const nodo = document.querySelector(`.js-camara-node[data-ubicacion="${ubicacion}"]`);
+                if (nodo) {
+                    nodo.classList.add("activo");
+                    nodo.setAttribute("data-bloqueado", "1");
+                    nodo.style.backgroundColor = "#2563eb";
+                    nodo.style.borderColor = "#2563eb";
+                    nodo.style.color = "#ffffff";
+                }
+            });
+        }
+
+            let listaResultados = [];
+
+        async function cargarResultados() {
+            try {
+                const url = '@Url.Action("ObtenerResultados", "TbProBusqueda")';
+
+                const response = await fetch(url);
+                const json = await response.json();
+
+                if (json.success) {
+                    listaResultados = json.data;
+                    console.log("Resultados cargados:", listaResultados);
+                    console.log(listaResultados[0]);
+                }
+            } catch (error) {
+                console.error("Error al cargar resultados:", error);
             }
 
-            const json = await response.json();
+        }
 
-            if (!json.success) {
-                alert(json.mensaje);
-            } else {
+        //motivos reproceso
 
-             if (json.dispararReproceso) {
+            async function cargarMotivosReprocesoParcial() {
+
+            const contenedor = document.getElementById("txtMensajeReprocesoParcial");
+
+            if (!contenedor) return;
+
+            contenedor.innerHTML = "Cargando motivos...";
+
+            try {
+
+                const response = await fetch('/TbProReproceso/ObtenerNoConformidades');
+
+                if (!response.ok) {
+                    throw new Error("Error HTTP " + response.status);
+                }
+
+                const json = await response.json();
+
+                if (!json || json.length === 0) {
+
+                    contenedor.innerHTML = "No se encontraron motivos.";
+                    return;
+                }
+
+                contenedor.innerHTML = json.map(x => `
+                    <label style="display:block; margin-bottom:6px;">
+                        <input type="radio"
+                               name="motivoReprocesoParcial"
+                                       value="${x.tB_PRO_NCO_ID}">
+                                ${x.tB_PRO_NCO_DEN}
+                    </label>
+                `).join("");
+
+            } catch (error) {
+
+                console.error("ERROR CARGAR MOTIVOS REPROCESO:", error);
+
+                contenedor.innerHTML = "Error al cargar motivos de reproceso.";
+            }
+        }
+
+
+            document.addEventListener("change", async function (e) {
+
+            if (!e.target.classList.contains("combo-resultado")) return;
+
+            const select = e.target;
+
+            const tbProDetPteId = select.dataset.id;
+            const tbProPteResId = select.value;
+            const tbProPteResDen = select.options[select.selectedIndex].text;
+
+            if (!tbProPteResId) return;
+
+            try {
+                const response = await fetch('@Url.Action("ActualizarResultadoControl", "TbProBusqueda")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        TB_PRO_DET_PTE_ID: parseInt(tbProDetPteId),
+                        TB_PRO_PTE_RES_ID: parseInt(tbProPteResId),
+                        TB_PRO_PTE_RES_DEN: tbProPteResDen
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Error HTTP " + response.status);
+                }
+
+                const json = await response.json();
+
+                if (!json.success) {
+                    alert(json.mensaje);
+                } else {
+
+                if (json.dispararReproceso) {
+
                         const modal = document.getElementById("modalReproceso");
+
+                        if (modal) {
+
+                            const txtMensaje = document.getElementById("txtMensajeReproceso");
+
+                            if (txtMensaje) {
+                                txtMensaje.innerHTML = json.mensajeReproceso || "";
+                            }
+
+                            modal.style.display = "flex";
+                        }
+                    }
+
+                //reproceso parcial modal
+
+                if (json.dispararReprocesoParcial) {
+
+                        const modal = document.getElementById("modalReprocesoParcial");
                         if (!modal) return;
 
-                        const txtMensaje = document.getElementById("txtMensajeReproceso");
+                        const txtMensaje = document.getElementById("txtMensajeReprocesoParcial");
+
                         if (txtMensaje) {
-                            txtMensaje.value = json.mensajeReproceso || "";
+
+                            const materiales = json.materialesReproceso || [];
+
+                            txtMensaje.innerHTML =
+                                materiales.map(x => `• ${x}`).join("<br>");
                         }
 
                         modal.style.display = "flex";
                     }
 
+                    // 👉 actualizar estado del ciclo
+                    document.getElementById("panelEstadoCiclo").textContent = json.estadoDen;
 
-            //reproceso parcial modal
+                    // 👉 actualizar texto de la fila
+                    // const span = document.querySelector(`.resultado-texto[data-id='${tbProDetPteId}']`);
+                    // if (span) span.textContent = tbProPteResDen;
 
-            if (json.dispararReprocesoParcial) {
-
-                    const modal = document.getElementById("modalReprocesoParcial");
-                    if (!modal) return;
-
-                    const txtMensaje = document.getElementById("txtMensajeReprocesoParcial");
-
-                    if (txtMensaje) {
-
-                        const materiales = json.materialesReproceso || [];
-
-                        txtMensaje.innerHTML =
-                            materiales.map(x => `• ${x}`).join("<br>");
+                    // 👉 ocultar combos si finaliza
+                    // if (json.estadoDen === "FINALIZADO") {
+                    //     document.querySelectorAll(".combo-resultado").forEach(c => c.classList.add("d-none"));
+                    //     document.querySelectorAll(".resultado-texto").forEach(t => t.classList.remove("d-none"));
+                    // }
+                const celdaResultado = document.querySelector(`.resultado-valor[data-id='${tbProDetPteId}']`);
+                    if (celdaResultado) {
+                        celdaResultado.textContent = tbProPteResDen;
                     }
 
-                    modal.style.display = "flex";
                 }
 
-                // 👉 actualizar estado del ciclo
-                document.getElementById("panelEstadoCiclo").textContent = json.estadoDen;
+                
 
-                // 👉 actualizar texto de la fila
-                // const span = document.querySelector(`.resultado-texto[data-id='${tbProDetPteId}']`);
-                // if (span) span.textContent = tbProPteResDen;
-
-                // 👉 ocultar combos si finaliza
-                // if (json.estadoDen === "FINALIZADO") {
-                //     document.querySelectorAll(".combo-resultado").forEach(c => c.classList.add("d-none"));
-                //     document.querySelectorAll(".resultado-texto").forEach(t => t.classList.remove("d-none"));
-                // }
-            const celdaResultado = document.querySelector(`.resultado-valor[data-id='${tbProDetPteId}']`);
-                if (celdaResultado) {
-                    celdaResultado.textContent = tbProPteResDen;
-                }
-
-            } 
-
-            //aca pongo?
-
-        } catch (error) {
-            console.error("Error al actualizar:", error);
-            alert("Error al actualizar el resultado del control.");
-        }
-    });
+            } catch (error) {
+                console.error("Error al actualizar:", error);
+                alert("Error al actualizar el resultado del control.");
+            }
+        });
 
 
-        document.getElementById("btnReprocesarMateriales")?.addEventListener("click", async function () {
+            document.getElementById("btnReprocesarMateriales")?.addEventListener("click", async function () {
+                console.log("CLICK REPROCESAR");
 
-        const tbProId = parseInt(document.getElementById("tbProId")?.value) || 0;
-        const motivoId = parseInt(sessionStorage.getItem("motivoReprocesoParcialId")) || 0;
+            const tbProId = parseInt(document.getElementById("tbProId")?.value) || 0;
+            const motivoId = parseInt(sessionStorage.getItem("motivoReprocesoParcialId")) || 0;
 
-        const detallesSeleccionados = Array.from(document.querySelectorAll(".chkReprocesoParcial:checked"))
-            .map(chk => {
-                const tbProDetId = parseInt(chk.value);
+            const detallesSeleccionados = Array.from(document.querySelectorAll(".chkReprocesoParcial:checked"))
+                .map(chk => {
+                    const tbProDetId = parseInt(chk.value);
 
-                const inputCantidad = document.querySelector(
-                    `.cantReprocesoParcial[data-det-id='${tbProDetId}']`
-                );
+                    const inputCantidad = document.querySelector(
+                        `.cantReprocesoParcial[data-det-id='${tbProDetId}']`
+                    );
 
-                const cantidad = parseInt(inputCantidad?.value) || 0;
+                    const cantidad = parseInt(inputCantidad?.value) || 0;
 
-                    return {
-                        TbProDetId: tbProDetId,
-                        Cantidad: cantidad
-                    };
-            });
+                        return {
+                            TbProDetId: tbProDetId,
+                            Cantidad: cantidad
+                        };
+                });
 
-        if (tbProId <= 0) {
-            alert("Proceso inválido.");
-            return;
-        }
+                console.log("DETALLES:", detallesSeleccionados);
 
-        if (motivoId <= 0) {
-            alert("Debe seleccionar un motivo de reproceso.");
-            return;
-        }
-
-        if (detallesSeleccionados.length === 0) {
-            alert("Debe seleccionar al menos un material.");
-            return;
-        }
-
-        try {
-            const response = await fetch('/TbProReproceso/EjecutarReprocesoParcial', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    tbProId: tbProId,
-                    motivoId: motivoId,
-                    detalles: detallesSeleccionados
-                })
-            });
-
-            const json = await response.json();
-
-            if (json.success) {
-                alert(json.mensaje);
-                location.reload();
-            } else {
-                alert(json.mensaje);
+            if (tbProId <= 0) {
+                alert("Proceso inválido.");
+                return;
             }
 
-        } catch (error) {
-            console.error("ERROR REPROCESO PARCIAL:", error);
-            alert("Error al ejecutar reproceso parcial.");
-        }
-    });
-    });
+            if (motivoId <= 0) {
+                alert("Debe seleccionar un motivo de reproceso.");
+                return;
+            }
+
+            if (detallesSeleccionados.length === 0) {
+                alert("Debe seleccionar al menos un material.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/TbProReproceso/EjecutarReprocesoParcial', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        tbProId: tbProId,
+                        motivoId: motivoId,
+                        detalles: detallesSeleccionados
+                    })
+                });
+
+                const json = await response.json();
+
+                if (json.success) {
+                    alert(json.mensaje);
+                    location.reload();
+                } else {
+                    alert(json.mensaje);
+                }
+
+            } catch (error) {
+                console.error("ERROR REPROCESO PARCIAL:", error);
+                alert("Error al ejecutar reproceso parcial.");
+            }
+        });
+        });
 
 </script>

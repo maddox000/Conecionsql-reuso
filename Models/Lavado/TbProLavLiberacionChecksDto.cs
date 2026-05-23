@@ -9,5 +9,6 @@
         public bool TbProLavLpaCk3 { get; set; }
 
         public bool LiberarLavado { get; set; }
+        public string? ResultadoFinalLavado { get; set; }
     }
 }

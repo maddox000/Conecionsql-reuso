@@ -1,0 +1,685 @@
+﻿@model ConexionSql.Models.Recepciones.Ortopedias.TbRecOrtDto
+
+<link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
+
+<div id="modalRegistroOrtopedia" class="modal-overlay">
+
+    <div class="modal-box"
+         style="width:1180px; max-width:96%; min-height:650px;">
+
+        <div class="rec-screen">
+
+            <div class="rec-screen-banner">
+                Registro de ortopedias: Datos del proveedor
+            </div>
+
+            <form id="formRegistroOrtopedia"
+                  asp-action="InsertarOrtopedias"
+                  asp-controller="TbRecOrt"
+                  method="post">
+
+                <input type="hidden"
+                       id="tbRecIdOrtopedia"
+                       name="TB_REC_ID"
+                       value="@Model.TB_REC_ID" />
+
+                <div class="rec-screen-head"
+                     style="grid-template-columns: 1fr 1fr;">
+
+                    <div class="rec-screen-panel">
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Número de registro</div>
+                            <div class="rec-screen-v"></div>
+                        </div>
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Número recepción</div>
+                            <div class="rec-screen-v">@Model.TB_REC_ID</div>
+                        </div>
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Usuario</div>
+                            <div class="rec-screen-v">
+                                @Model.Cabecera?.TbRecPerNom
+                            </div>
+                        </div>
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Cargo</div>
+                            <div class="rec-screen-v">
+                                @Model.Cabecera?.TbRecPerCarDen
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="rec-screen-panel">
+
+                        <div class="rec-screen-kv"
+                             style="grid-template-columns: 120px 1fr 90px 1fr;">
+
+                            <div class="rec-screen-k">Fecha</div>
+
+                            <div class="rec-screen-v">
+                                @DateTime.Today.ToString("dd/MM/yyyy")
+                            </div>
+
+                            <div class="rec-screen-k">Hora</div>
+
+                            <div class="rec-screen-v"
+                                 style="justify-content:end;">
+                                @DateTime.Now.ToString("HH:mm")
+                            </div>
+
+                        </div>
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Ortopedia</div>
+
+                            <div class="rec-screen-v" style="position:relative;">
+                                <input type="text"
+                                       id="ortopediaBusqueda"
+                                       class="form-control campo-ortopedia-enter"
+                                       autocomplete="off"
+                                       value="NO REGISTRA" />
+
+                                <div id="listaOrtopedias"
+                                     class="list-group"
+                                     style="position:absolute; top:100%; left:0; right:0; z-index:9999; max-height:220px; overflow-y:auto; display:none;">
+                                </div>
+
+                                <input type="hidden"
+                                       id="TB_REC_ORT_ORT_ID"
+                                       name="TB_REC_ORT_ORT_ID" />
+
+                                    
+                            </div>
+                        </div>
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Personal ortopedia</div>
+
+                            <div class="rec-screen-v">
+                                <input class="form-control campo-ortopedia-enter campo-ortopedia-mayus"
+                                       id="TB_REC_ORT_ORT_PER"
+                                       name="TB_REC_ORT_ORT_PER"
+                                       style="border:0; background:transparent; width:100%; box-shadow:none;" />
+                            </div>
+                        </div>
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Paciente</div>
+
+                            <div class="rec-screen-v">
+                                <input class="form-control campo-ortopedia-enter campo-ortopedia-mayus"
+                                       id="TB_REC_ORT_PAC"
+                                       name="TB_REC_ORT_PAC"
+                                       style="border:0; background:transparent; width:100%; box-shadow:none;" />
+                            </div>
+                        </div>
+
+                        <div class="rec-screen-kv">
+
+                            <div class="rec-screen-k">Profesional</div>
+
+                            <div class="rec-screen-v" style="position:relative;">
+
+                                <input type="text"
+                                       id="profesionalBusqueda"
+                                       class="form-control campo-ortopedia-enter"
+                                       autocomplete="off"
+                                       value="NO REGISTRA" />
+
+                                <div id="listaProfesionales"
+                                     class="list-group"
+                                     style="position:absolute; top:100%; left:0; right:0; z-index:9999; max-height:220px; overflow-y:auto; display:none;">
+                                </div>
+
+                                <input type="hidden"
+                                       id="TB_REC_ORT_PRO_ID"
+                                       name="TB_REC_ORT_PRO_ID" />
+
+                            </div>
+
+                        </div>
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Remito</div>
+
+                            <div class="rec-screen-v">
+                                <input class="form-control campo-ortopedia-enter campo-ortopedia-mayus"
+                                       id="TB_REC_ORT_REM"
+                                       name="TB_REC_ORT_REM"
+                                       style="border:0; background:transparent; width:100%; box-shadow:none;" />
+                            </div>
+                        </div>
+
+                        <div class="rec-screen-kv"
+                             style="grid-template-columns: 120px 1fr 90px 1fr;">
+
+                            <div class="rec-screen-k">Fecha procedimiento</div>
+
+                            <div class="rec-screen-v">
+
+                                <input type="date"
+                                       class="form-control campo-ortopedia-enter"
+                                       id="TB_REC_ORT_FEC_PROC"
+                                       name="TB_REC_ORT_FEC_PROC" />
+
+                            </div>
+
+                            <div class="rec-screen-k">Hora</div>
+
+                            <div class="rec-screen-v"
+                                 style="justify-content:end;">
+
+                                <input type="time"
+                                       class="form-control campo-ortopedia-enter"
+                                       id="TB_REC_ORT_HOR_PROC"
+                                       name="TB_REC_ORT_HOR_PROC" />
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="rec-screen-observ">
+
+                    <div class="rec-screen-k">
+                        Observaciones
+                    </div>
+
+                    <textarea id="TB_REC_ORT_OBS_REC"
+                              name="TB_REC_ORT_OBS_REC"
+                              class="campo-ortopedia-enter campo-ortopedia-mayus"
+                              style="border:0; background:transparent; width:100%; box-shadow:none;"></textarea>
+
+                </div>
+
+                <div class="rec-screen-table-wrap">
+
+                    <table class="rec-screen-table">
+
+                        <thead>
+                            <tr>
+                                <th>Cajas de instrumental</th>
+                                <th>Instrumental suelto</th>
+                                <th>Elementos estériles</th>
+                                <th>Otros elementos</th>
+                                <th>Total unidades</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input type="number"
+                                           class="campo-ortopedia-enter campo-ortopedia-cantidad"
+                                           id="TB_REC_ORT_CANT_REC_CIN"
+                                           name="TB_REC_ORT_CANT_REC_CIN"
+                                           value="0"
+                                           style="width:60px;border:none;background:transparent;text-align:center;" />
+                                </td>
+
+                                <td>
+                                    <input type="number"
+                                           class="campo-ortopedia-enter campo-ortopedia-cantidad"
+                                           id="TB_REC_ORT_CANT_REC_INS"
+                                           name="TB_REC_ORT_CANT_REC_INS"
+                                           value="0"
+                                           style="width:60px;border:none;background:transparent;text-align:center;" />
+                                </td>
+
+                                <td>
+                                    <input type="number"
+                                           class="campo-ortopedia-enter campo-ortopedia-cantidad"
+                                           id="TB_REC_ORT_CANT_REC_EST"
+                                           name="TB_REC_ORT_CANT_REC_EST"
+                                           value="0"
+                                           style="width:60px;border:none;background:transparent;text-align:center;" />
+                                </td>
+
+                                <td>
+                                    <input type="number"
+                                           class="campo-ortopedia-enter campo-ortopedia-cantidad"
+                                           id="TB_REC_ORT_CANT_REC_VS"
+                                           name="TB_REC_ORT_CANT_REC_VS"
+                                           value="0"
+                                           style="width:60px;border:none;background:transparent;text-align:center;" />
+                                </td>
+
+                                <td>
+                                    <input type="number"
+                                           id="TB_REC_ORT_CANT_REC"
+                                           name="TB_REC_ORT_CANT_REC"
+                                           value="0"
+                                           readonly
+                                           style="width:60px;border:none;background:transparent;text-align:center;" />
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="rec-screen-actions">
+
+                    <button type="submit"
+                            class="btn btn-secondary">
+                        Volver a recepción
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    (function () {
+
+        //busqueda en campo ortopedias
+
+        const ortopedias = [
+            @for (int i = 0; i < ViewBag.ListaOrtopedias.Count; i++)
+            {
+                    var o = ViewBag.ListaOrtopedias[i];
+
+                    @:{ id:@o.IbOrtId, den:"@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(o.IbOrtDen ?? ""))" }@(i < ViewBag.ListaOrtopedias.Count - 1 ? "," : "")
+            }
+        ];
+
+        const inputOrtopedia =
+            document.getElementById("ortopediaBusqueda");
+
+        const hiddenOrtopedia =
+            document.getElementById("TB_REC_ORT_ORT_ID");
+
+        const listaOrtopedias =
+            document.getElementById("listaOrtopedias");
+
+        document.addEventListener("focusin", function () {
+                console.log("FOCO EN:", document.activeElement?.id, document.activeElement);
+            });
+
+        setTimeout(function () {
+            if (inputOrtopedia) {
+                inputOrtopedia.focus();
+                inputOrtopedia.select();
+            }
+        }, 300);
+
+        let ortopediasFiltradas = [];
+        let indiceOrtopedia = -1;
+
+        function renderOrtopedias(items) {
+
+            ortopediasFiltradas = items || [];
+            listaOrtopedias.innerHTML = "";
+
+            if (!items.length) {
+                listaOrtopedias.style.display = "none";
+                return;
+            }
+
+            items.forEach((o, i) => {
+
+                const item =
+                    document.createElement("button");
+
+                item.type = "button";
+                item.tabIndex = -1;
+
+                item.className =
+                    "list-group-item list-group-item-action";
+
+                item.textContent = o.den;
+
+                if (i === indiceOrtopedia) {
+                    item.classList.add("active");
+                }
+
+                item.onclick = () => {
+
+                    inputOrtopedia.value = o.den;
+                    hiddenOrtopedia.value = o.id;
+
+                    listaOrtopedias.style.display = "none";
+
+                    const siguiente =
+                        document.getElementById("TB_REC_ORT_ORT_PER");
+
+                    siguiente?.focus();
+                };
+
+                listaOrtopedias.appendChild(item);
+
+            });
+
+            listaOrtopedias.style.display = "block";
+        }
+
+            inputOrtopedia?.addEventListener("focus", () => {
+
+                    indiceOrtopedia = -1;
+
+                });
+
+        inputOrtopedia?.addEventListener("input", async function () {
+
+            indiceOrtopedia = -1;
+
+            hiddenOrtopedia.value = "";
+
+            const texto = this.value || "";
+
+            if (texto.length < 1) {
+                listaOrtopedias.style.display = "none";
+                return;
+            }
+
+            const response =
+                await fetch(`/TbRecOrt/BuscarOrtopedias?texto=${texto}`);
+
+            const datos = await response.json();
+
+            const filtrados = datos.map(x => ({
+                id: x.id,
+                den: x.denominacion
+            }));
+
+            renderOrtopedias(filtrados);
+
+        });
+
+        inputOrtopedia?.addEventListener("keydown", function (e) {
+
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+
+                indiceOrtopedia =
+                    (indiceOrtopedia + 1)
+                    % ortopediasFiltradas.length;
+
+                renderOrtopedias(
+                    ortopediasFiltradas
+                );
+            }
+
+            if (e.key === "ArrowUp") {
+                e.preventDefault();
+
+                indiceOrtopedia =
+                    (indiceOrtopedia - 1 +
+                        ortopediasFiltradas.length)
+                    % ortopediasFiltradas.length;
+
+                renderOrtopedias(
+                    ortopediasFiltradas
+                );
+            }
+
+            if (e.key === "Enter") {
+
+                e.preventDefault();
+
+                if (indiceOrtopedia >= 0) {
+
+                    const seleccionada = ortopediasFiltradas[indiceOrtopedia];
+
+                    inputOrtopedia.value = seleccionada.den;
+                    hiddenOrtopedia.value = seleccionada.id;
+
+                    listaOrtopedias.style.display = "none";
+
+                    const siguiente =
+                        document.getElementById("TB_REC_ORT_ORT_PER");
+
+                    siguiente?.focus();
+                }
+            }
+
+        });
+
+        //termina busqueda campo ortopedias
+
+        //busqueda campo profesional
+
+                const inputProfesional =
+            document.getElementById("profesionalBusqueda");
+
+        const hiddenProfesional =
+            document.getElementById("TB_REC_ORT_PRO_ID");
+
+        const listaProfesionales =
+            document.getElementById("listaProfesionales");
+
+        let profesionalesFiltrados = [];
+        let indiceProfesional = -1;
+
+        function renderProfesionales(items) {
+
+            profesionalesFiltrados = items || [];
+            listaProfesionales.innerHTML = "";
+
+            if (!items.length) {
+                listaProfesionales.style.display = "none";
+                return;
+            }
+
+            items.forEach((p, i) => {
+
+                const item = document.createElement("button");
+
+                item.type = "button";
+                item.tabIndex = -1;
+
+                item.className =
+                    "list-group-item list-group-item-action";
+
+                item.textContent = p.den;
+
+                if (i === indiceProfesional) {
+                    item.classList.add("active");
+                }
+
+                item.onclick = () => {
+
+                    inputProfesional.value = p.den;
+                    hiddenProfesional.value = p.id;
+
+                    listaProfesionales.style.display = "none";
+
+                    document
+                    .getElementById("TB_REC_ORT_REM")
+                    ?.focus();
+
+                };
+
+                listaProfesionales.appendChild(item);
+
+            });
+
+            listaProfesionales.style.display = "block";
+        }
+
+        inputProfesional?.addEventListener("input", async function () {
+            console.log("BUSCANDO PROFESIONAL:", this.value);
+
+            indiceProfesional = -1;
+
+            hiddenProfesional.value = "";
+
+            const texto = this.value || "";
+
+            if (texto.length < 1) {
+                listaProfesionales.style.display = "none";
+                return;
+            }
+
+            const response =
+                await fetch(`/TbRecOrt/BuscarProfesionales?texto=${texto}`);
+
+            const datos = await response.json();
+
+            const filtrados = datos.map(x => ({
+                id: x.id,
+                den: x.denominacion
+            }));
+
+            renderProfesionales(filtrados);
+
+        });
+
+        inputProfesional?.addEventListener("keydown", function (e) {
+
+            if (e.key === "ArrowDown") {
+
+                e.preventDefault();
+
+                indiceProfesional =
+                (indiceProfesional + 1)
+                % profesionalesFiltrados.length;
+
+                renderProfesionales(
+                    profesionalesFiltrados
+                );
+            }
+
+            if (e.key === "ArrowUp") {
+
+                e.preventDefault();
+
+                indiceProfesional =
+                (indiceProfesional - 1 +
+                profesionalesFiltrados.length)
+                % profesionalesFiltrados.length;
+
+                renderProfesionales(
+                    profesionalesFiltrados
+                );
+            }
+
+            if (e.key === "Enter") {
+
+                e.preventDefault();
+
+                if (indiceProfesional >= 0) {
+
+                    const seleccionado =
+                        profesionalesFiltrados[indiceProfesional];
+
+                    inputProfesional.value =
+                        seleccionado.den;
+
+                    hiddenProfesional.value =
+                        seleccionado.id;
+
+                    listaProfesionales.style.display =
+                        "none";
+
+                    document
+                    .getElementById("TB_REC_ORT_REM")
+                    ?.focus();
+                }
+            }
+        });
+
+        //termina profesional
+
+        const camposMayuscula = document.querySelectorAll(".campo-ortopedia-mayus");
+
+        camposMayuscula.forEach(function (campo) {
+            campo.addEventListener("input", function () {
+                this.value = this.value.toUpperCase();
+            });
+        });
+
+        const cantidades = document.querySelectorAll(".campo-ortopedia-cantidad");
+        const total = document.getElementById("TB_REC_ORT_CANT_REC");
+
+        function calcularTotalOrtopedia() {
+            let suma = 0;
+
+            cantidades.forEach(function (campo) {
+                suma += parseInt(campo.value || 0);
+            });
+
+            total.value = suma;
+        }
+
+        cantidades.forEach(function (campo) {
+            campo.addEventListener("input", calcularTotalOrtopedia);
+        });
+
+            const camposEnter = Array.from(document.querySelectorAll(".campo-ortopedia-enter"));
+
+        camposEnter.forEach(function (campo, index) {
+            campo.addEventListener("keydown", function (e) {
+
+                if (e.key !== "Enter") {
+                    return;
+                }
+
+                e.preventDefault();
+
+                if (campo.id === "ortopediaBusqueda") {
+                    return;
+                }
+
+                const siguiente = camposEnter[index + 1];
+
+                if (siguiente) {
+                    siguiente.focus();
+
+                    if (typeof siguiente.select === "function") {
+                        siguiente.select();
+                    }
+                }
+            });
+        });
+
+            const formRegistroOrtopedia =
+                    document.getElementById("formRegistroOrtopedia");
+
+                formRegistroOrtopedia?.addEventListener("submit", async function (e) {
+
+                    e.preventDefault();
+
+                    const formData = new FormData(this);
+
+                    const response = await fetch(this.action, {
+                        method: "POST",
+                        body: formData
+                    });
+
+                    const resultado = await response.json();
+
+                    if (!resultado.success) {
+                        alert(resultado.mensaje || "No se pudo guardar.");
+                        return;
+                    }
+
+                    document.getElementById("modalRegistroOrtopedia")?.remove();
+
+                    setTimeout(() => {
+
+                            document
+                                .getElementById("codigoProducto")
+                                ?.focus();
+
+                        }, 100);
+                });
+
+    })();
+</script>

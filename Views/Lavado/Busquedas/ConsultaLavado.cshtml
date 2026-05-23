@@ -112,6 +112,7 @@
                             <th>Recibidos</th>
                             <th>En proceso</th>
                             <th>Sin procesar</th>
+                            <th>Estado</th>
                             <th>Cantidad</th>
                             <th class="col-reproceso d-none">
                                 Cant. reproceso
@@ -224,20 +225,16 @@
                         <table class="proceso-mini-table">
                             <tbody>
                                 <tr>
-                                    <td>Integridad envoltorios</td>
+                                    <td>Cumple condiciones de higiene por inspección visual</td>
                                     <td><input type="checkbox" id="chkIntegridadEnvoltorios" /></td>
                                 </tr>
                                 <tr>
-                                    <td>Ausencia de humedad</td>
+                                    <td>Cumple integridad de componentes</td>
                                     <td><input type="checkbox" id="chkAusenciaHumedad" /></td>
                                 </tr>
                                 <tr>
-                                    <td>Ausencia de suciedad</td>
+                                    <td>Los productos médicos están completos</td>
                                     <td><input type="checkbox" id="chkAusenciaSuciedad" /></td>
-                                </tr>
-                                <tr>
-                                    <td>Viro correcto control químico</td>
-                                    <td><input type="checkbox" id="chkViroCorrectoControlQuimico" /></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -246,14 +243,14 @@
                     <div>
                         <table class="proceso-mini-table">
                             <tbody>
-                                <tr>
+                                @* <tr>
                                     <td>Parámetros de ciclo correcto</td>
                                     <td><input type="checkbox" id="chkParametrosCicloCorrecto" /></td>
                                 </tr>
                                 <tr>
                                     <td>Res negativo ind biológico</td>
                                     <td><input type="checkbox" id="chkResNegativoBiologico" /></td>
-                                </tr>
+                                </tr> *@
                                 <tr>
                                     <td>Liberar ciclo de lavado</td>
                                     <td><input type="checkbox" id="chkLiberarCicloLavado" /></td>
@@ -271,7 +268,7 @@
                                 </tr>
                                 <tr>
                                     <td>Abortar lavado</td>
-                                    <td><input type="radio" name="resultadoFinalLavado" value="ABORTAR_PROCESO" /></td>
+                                    <td><input type="radio" name="resultadoFinalLavado" value="ABORTAR_LAVADO" /></td>
                                 </tr>
                                 <tr>
                                     <td>Reproceso parcial de carga</td>
@@ -279,7 +276,7 @@
                                 </tr>
                                 <tr>
                                     <td>Falla de proceso</td>
-                                    <td><input type="radio" name="resultadoFinalLavado" value="FALLA_PROCESO" /></td>
+                                    <td><input type="radio" name="resultadoFinalLavado" value="FALLA_EQUIPO" /></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -309,7 +306,7 @@
     </div>
 </div>
 
-@await Html.PartialAsync("~/Views/Lavado/Busquedas/_ModalReprocesoLavado.cshtml")
+@await Html.PartialAsync("~/Views/Lavado/Modals/_ModalReprocesoLavado.cshtml")
 @await Html.PartialAsync("~/Views/Lavado/Modals/_ModalReprocesoParcialLavado.cshtml")
 
 <script>
@@ -520,6 +517,8 @@
                     }
             }
 
+            
+
         } catch (error) {
 
             console.error(error);
@@ -574,7 +573,7 @@
         const radiosResultadoFinal =
             document.querySelectorAll('input[name="resultadoFinalLavado"]');
 
-            //checks de libr¿eracion
+            
 
                 let usuarioLiberacionValidado =
         sessionStorage.getItem("editarLavado") === "2";
@@ -587,9 +586,6 @@
         #chkIntegridadEnvoltorios,
         #chkAusenciaHumedad,
         #chkAusenciaSuciedad,
-        #chkViroCorrectoControlQuimico,
-        #chkParametrosCicloCorrecto,
-        #chkResNegativoBiologico,
         #chkLiberarCicloLavado
     `);
 
@@ -689,6 +685,41 @@
             });
         }
 
+        //checks de libr¿eracion
+
+                const estadoLavado = "@Model.Cabecera.TbProLavEstDen";
+
+                if (
+                    estadoLavado === "FINALIZADO" ||
+                    estadoLavado === "REPROCESO PARCIAL" ||
+                    estadoLavado === "ABORTADO" ||
+                    estadoLavado === "FALLA DE PROCESO"
+                ) {
+                    document.getElementById("chkLiberarCicloLavado").checked = true;
+
+                    bloqueResultadoFinal.style.display = "block";
+
+                    radiosResultadoFinal.forEach(x => {
+                        x.disabled = false;
+                    });
+
+                    if (estadoLavado === "FINALIZADO") {
+                        document.querySelector('input[name="resultadoFinalLavado"][value="LIBERAR_PROCESO"]').checked = true;
+                    }
+
+                    if (estadoLavado === "REPROCESO PARCIAL") {
+                        document.querySelector('input[name="resultadoFinalLavado"][value="REPROCESO_PARCIAL"]').checked = true;
+                    }
+
+                    if (estadoLavado === "ABORTADO") {
+                        document.querySelector('input[name="resultadoFinalLavado"][value="ABORTAR_LAVADO"]').checked = true;
+                    }
+
+                    if (estadoLavado === "FALLA DE PROCESO") {
+                        document.querySelector('input[name="resultadoFinalLavado"][value="FALLA_EQUIPO"]').checked = true;
+                    }
+                }
+
             // abre modal reproceso parcial lavado
             document.querySelector('input[name="resultadoFinalLavado"][value="REPROCESO_PARCIAL"]')
                 ?.addEventListener("change", async function () {
@@ -705,6 +736,37 @@
 
                     modal.style.display = "flex";
             });
+
+                //llama al cierre manual de abortado o falla
+
+                    document.querySelector('input[name="resultadoFinalLavado"][value="ABORTAR_LAVADO"]')
+                        ?.addEventListener("change", function () {
+
+                            if (!this.checked) return;
+
+                            const modal =
+                                document.getElementById("modalReprocesoLavado");
+
+                            if (!modal)
+                                return;
+
+                            modal.style.display = "flex";
+                    });
+
+
+                    document.querySelector('input[name="resultadoFinalLavado"][value="FALLA_EQUIPO"]')
+                        ?.addEventListener("change", function () {
+
+                            if (!this.checked) return;
+
+                            const modal =
+                                document.getElementById("modalReprocesoLavado");
+
+                            if (!modal)
+                                return;
+
+                            modal.style.display = "flex";
+                    });
 
     });
 

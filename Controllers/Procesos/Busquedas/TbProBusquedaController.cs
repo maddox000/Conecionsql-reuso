@@ -37,13 +37,30 @@ namespace ConexionSql.Controllers.Procesos.Busquedas
                 {
                     TB_PRO_DET_ID = d.TbProDetId,
                     TB_PRO_ID = d.TbProId,
+
                     TB_PRO_DET_REC_DET_ID = d.TbProDetRecDetId ?? 0,
+                    TB_PRO_DET_REC_DET_MAT_ID = d.TbProDetRecDetMatId ?? 0,
                     TB_PRO_DET_REC_DET_MAT_DEN = d.TbProDetRecDetMatDen,
+
+                    TB_REC_SEC_DES_ID = d.TbRecSecDesId,
+                    TB_REC_SEC_DES_DEN = d.TbRecSecDesDen,
+
+                    TB_PRO_DET_REC_DET_REU_ID = d.TbProDetRecDetReuId,
+                    TB_PRO_DET_REC_DET_CANT = d.TbProDetRecDetCant,
+                    TB_PRO_DET_REC_DET_PRO_TOT = d.TbProDetRecDetProTot,
+                    TB_PRO_DET_REC_DET_PRO_STOCK = d.TbProDetRecDetProStock,
+
                     TB_PRO_DET_CANT = d.TbProDetCant,
+
+                    // ESTADO
+                    TB_PRO_DET_REPRO = d.TbProDetRepro,
+                    TB_PRO_DET_EST_ID = d.TbProDetEstId,
+                    TB_PRO_DET_EST_DEN = d.TbProDetEstDen,
+
                     TB_PRO_DET_PC_USR = d.TbProDetPcUsr,
                     TB_PRO_FEC = d.TbProFec
                 })
-                .ToListAsync();
+    .ToListAsync();
 
             var dto = new TbProDetFormDto
             {
@@ -87,7 +104,7 @@ namespace ConexionSql.Controllers.Procesos.Busquedas
 
                 string estadoDen = "EN PROCESO";
 
-                // 👉 NUEVO: detectar resultados 3 o 6
+                // RESULTADOS 3 O 6 => ABORTADO
                 bool dispararReproceso = dto.TB_PRO_PTE_RES_ID == 3 || dto.TB_PRO_PTE_RES_ID == 6;
 
                 using (var conn = _context.Database.GetDbConnection())
@@ -96,15 +113,15 @@ namespace ConexionSql.Controllers.Procesos.Busquedas
 
                     int tbProId = 0;
 
-                    // 👉 1. Actualizar el control seleccionado
+                    // 1. Actualizar el control seleccionado
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"
-            UPDATE TB_PRO_DET_PTE
-            SET TB_PRO_PTE_RES_ID = @resId,
-                TB_PRO_PTE_RES_DEN = @resDen
-            WHERE TB_PRO_DET_PTE_ID = @id
-        ";
+                        UPDATE TB_PRO_DET_PTE
+                        SET TB_PRO_PTE_RES_ID = @resId,
+                            TB_PRO_PTE_RES_DEN = @resDen
+                        WHERE TB_PRO_DET_PTE_ID = @id
+                        ";
 
                         var p1 = cmd.CreateParameter();
                         p1.ParameterName = "@resId";
@@ -124,14 +141,14 @@ namespace ConexionSql.Controllers.Procesos.Busquedas
                         cmd.ExecuteNonQuery();
                     }
 
-                    // 👉 2. Obtener TB_PRO_ID del control actualizado
+                    // 2. Obtener TB_PRO_ID del control actualizado
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"
-            SELECT TB_PRO_ID
-            FROM TB_PRO_DET_PTE
-            WHERE TB_PRO_DET_PTE_ID = @id
-        ";
+                        SELECT TB_PRO_ID
+                        FROM TB_PRO_DET_PTE
+                        WHERE TB_PRO_DET_PTE_ID = @id
+                        ";
 
                         var p = cmd.CreateParameter();
                         p.ParameterName = "@id";
@@ -145,16 +162,65 @@ namespace ConexionSql.Controllers.Procesos.Busquedas
                         }
                     }
 
-                    // 👉 3. Contar cuantos controles tiene el proceso
+                    // 3. Si el resultado es 3 o 6, el proceso queda ABORTADO
+                    //    y guardamos TB_PRO_TXT_2 = ABORTADO
+                    if (dispararReproceso)
+                    {
+                        estadoDen = "ABORTADO";
+
+                        using (var cmd = conn.CreateCommand())
+                        {
+                            cmd.CommandText = @"
+                        UPDATE TB_PRO
+                        SET IB_PRO_EST_ID = @estadoId,
+                            IB_PRO_EST_DEN = @estadoDen,
+                            TB_PRO_TXT_2 = @txt2
+                        WHERE TB_PRO_ID = @tbProId
+                        ";
+
+                            var p1 = cmd.CreateParameter();
+                            p1.ParameterName = "@estadoId";
+                            p1.Value = 3;
+                            cmd.Parameters.Add(p1);
+
+                            var p2 = cmd.CreateParameter();
+                            p2.ParameterName = "@estadoDen";
+                            p2.Value = "ABORTADO";
+                            cmd.Parameters.Add(p2);
+
+                            var p3 = cmd.CreateParameter();
+                            p3.ParameterName = "@txt2";
+                            p3.Value = "ABORTADO";
+                            cmd.Parameters.Add(p3);
+
+                            var p4 = cmd.CreateParameter();
+                            p4.ParameterName = "@tbProId";
+                            p4.Value = tbProId;
+                            cmd.Parameters.Add(p4);
+
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        return Json(new
+                        {
+                            success = true,
+                            mensaje = "Resultado actualizado correctamente.",
+                            estadoDen = "ABORTADO",
+                            dispararReproceso = true,
+                            mensajeReproceso = "⚠️ El proceso fue abortado. ¿Desea reprocesar los materiales?"
+                        });
+                    }
+
+                    // 4. Contar cuantos controles tiene el proceso
                     int totalControles = 0;
 
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"
-            SELECT COUNT(*)
-            FROM TB_PRO_DET_PTE
-            WHERE TB_PRO_ID = @tbProId
-        ";
+                        SELECT COUNT(*)
+                        FROM TB_PRO_DET_PTE
+                        WHERE TB_PRO_ID = @tbProId
+                        ";
 
                         var p = cmd.CreateParameter();
                         p.ParameterName = "@tbProId";
@@ -164,7 +230,6 @@ namespace ConexionSql.Controllers.Procesos.Busquedas
                         totalControles = Convert.ToInt32(cmd.ExecuteScalar());
                     }
 
-                    // 👉 4. Si no hay controles, no tocar cabecera
                     if (totalControles == 0)
                     {
                         return Json(new
@@ -172,25 +237,25 @@ namespace ConexionSql.Controllers.Procesos.Busquedas
                             success = true,
                             mensaje = "Resultado actualizado correctamente.",
                             estadoDen = "EN PROCESO",
-                            dispararReproceso = dispararReproceso,
-                            mensajeReproceso = dispararReproceso ? "⚠️ Resultado 3 o 6 detectado. Acá después abrimos el modal de reproceso." : ""
+                            dispararReproceso = false,
+                            mensajeReproceso = ""
                         });
                     }
 
-                    // 👉 5. Verificar si existe algun control sin resultado o fuera de 2,5,7
+                    // 5. Verificar si todos los controles están en resultados correctos 2,5,7
                     int controlesPendientesOFueraDeFinalizado = 0;
 
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"
-                SELECT COUNT(*)
-                FROM TB_PRO_DET_PTE
-                WHERE TB_PRO_ID = @tbProId
-                  AND (
-                        TB_PRO_PTE_RES_ID IS NULL
-                        OR TB_PRO_PTE_RES_ID NOT IN (2,5,7)
-                      )
-                ";
+                        SELECT COUNT(*)
+                        FROM TB_PRO_DET_PTE
+                        WHERE TB_PRO_ID = @tbProId
+                          AND (
+                                TB_PRO_PTE_RES_ID IS NULL
+                                OR TB_PRO_PTE_RES_ID NOT IN (2,5,7)
+                              )
+                        ";
 
                         var p = cmd.CreateParameter();
                         p.ParameterName = "@tbProId";
@@ -200,7 +265,6 @@ namespace ConexionSql.Controllers.Procesos.Busquedas
                         controlesPendientesOFueraDeFinalizado = Convert.ToInt32(cmd.ExecuteScalar());
                     }
 
-                    // 👉 6. Si hay al menos uno sin resultado o fuera de 2,5,7, no tocar cabecera
                     if (controlesPendientesOFueraDeFinalizado > 0)
                     {
                         return Json(new
@@ -208,27 +272,26 @@ namespace ConexionSql.Controllers.Procesos.Busquedas
                             success = true,
                             mensaje = "Resultado actualizado correctamente.",
                             estadoDen = "EN PROCESO",
-                            dispararReproceso = dispararReproceso,
-                            mensajeReproceso = dispararReproceso ? "⚠️ Resultado 3 o 6 detectado. Acá después abrimos el modal de reproceso." : ""
+                            dispararReproceso = false,
+                            mensajeReproceso = ""
                         });
                     }
 
-                    // 👉 7. Solo si todos estan en 2,5,7, finalizar cabecera
-                    int estadoId = 2;
+                    // 6. Si todos están correctos, finalizar cabecera
                     estadoDen = "FINALIZADO";
 
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"
-            UPDATE TB_PRO
-            SET IB_PRO_EST_ID = @estadoId,
-                IB_PRO_EST_DEN = @estadoDen
-            WHERE TB_PRO_ID = @tbProId
-        ";
+                    UPDATE TB_PRO
+                    SET IB_PRO_EST_ID = @estadoId,
+                        IB_PRO_EST_DEN = @estadoDen
+                    WHERE TB_PRO_ID = @tbProId
+                    ";
 
                         var p1 = cmd.CreateParameter();
                         p1.ParameterName = "@estadoId";
-                        p1.Value = estadoId;
+                        p1.Value = 2;
                         cmd.Parameters.Add(p1);
 
                         var p2 = cmd.CreateParameter();
@@ -250,8 +313,8 @@ namespace ConexionSql.Controllers.Procesos.Busquedas
                     success = true,
                     mensaje = "Resultado actualizado correctamente.",
                     estadoDen = estadoDen,
-                    dispararReproceso = dispararReproceso,
-                    mensajeReproceso = dispararReproceso ? "⚠️ Resultado 3 o 6 detectado. Acá después abrimos el modal de reproceso." : ""
+                    dispararReproceso = false,
+                    mensajeReproceso = ""
                 });
             }
             catch (Exception ex)
@@ -296,12 +359,19 @@ namespace ConexionSql.Controllers.Procesos.Busquedas
             proceso.TbProIbrn = dto.TbProIbrn;
             proceso.TbProIbre = dto.TbProIbre;
 
+            if (dto.TbProIbre)
+            {
+                proceso.IbProEstId = 2;
+                proceso.IbProEstDen = "FINALIZADO";
+            }
+
             await _context.SaveChangesAsync();
 
             return Json(new
             {
                 success = true,
-                mensaje = "Checks guardados correctamente."
+                mensaje = "Checks guardados correctamente.",
+                estadoDen = proceso.IbProEstDen
             });
         }
     }

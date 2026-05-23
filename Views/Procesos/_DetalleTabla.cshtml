@@ -10,7 +10,10 @@
             <th>Recibidos</th>
             <th>En proceso</th>
             <th>Sin procesar</th>
+            <th>Estado</th>
             <th>Cantidad</th>
+            <th hidden>Cant. reproceso</th>
+            <th hidden>Seleccionar</th>
             <th>Imprimir</th>
         </tr>
     </thead>
@@ -27,7 +30,32 @@
                     <td>@item.TB_PRO_DET_REC_DET_CANT</td>
                     <td>@item.TB_PRO_DET_REC_DET_PRO_TOT</td>
                     <td>@item.TB_PRO_DET_REC_DET_PRO_STOCK</td>
+
+                    <td>
+                        @(item.TB_PRO_DET_EST_DEN ?? "NO REGISTRA")
+                    </td>
+
                     <td>@item.TB_PRO_DET_CANT</td>
+
+                    <td hidden style="text-align:center;">
+                        <input type="number"
+                               class="cantReprocesoParcial"
+                               value="@item.TB_PRO_DET_CANT"
+                               min="1"
+                               max="@item.TB_PRO_DET_CANT"
+                               data-det-id="@item.TB_PRO_DET_ID"
+                               disabled
+                               style="width:70px;" />
+                    </td>
+
+                    <td hidden style="text-align:center;">
+                        <input type="checkbox"
+                               class="chkReprocesoParcial"
+                               value="@item.TB_PRO_DET_ID"
+                               data-rec-det-id="@item.TB_PRO_DET_REC_DET_ID"
+                               disabled />
+                    </td>
+
                     <td>
                         <div class="proceso-print-actions" role="group" aria-label="Acciones de impresion por etiqueta">
                             <button type="button"
@@ -53,7 +81,9 @@
         else
         {
             <tr>
-                <td colspan="9" class="proceso-table-empty-note">Sin materiales cargados</td>
+                <td colspan="12" class="proceso-table-empty-note">
+                    Sin materiales cargados
+                </td>
             </tr>
         }
     </tbody>

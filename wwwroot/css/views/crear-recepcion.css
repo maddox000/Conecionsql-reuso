@@ -243,16 +243,52 @@
 #listaEstados:empty {
     display: none;
 }
+/*
+-----------------------------------
+    css para ortopedias
+*/
 
-/*.rec-screen {
-    margin-top: 28px;
-    padding: 1.25rem 2rem;
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
 }
 
-.rec-screen-head {
-    margin-top: 0.7rem;
+.modal-box {
+    width: 12cm;
+    height: 12cm;
+    background: #f4f6f8;
+    border: 1px solid #cfd6dc;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
-.subform-recepcion {
-    margin-top: 18px;
-}*/
+.modal-header {
+    background: #2c3e50;
+    color: #fff;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 10px 14px;
+}
+
+.modal-body {
+    flex: 1;
+    padding: 12px 14px;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 10px 14px;
+    border-top: 1px solid #d8dde3;
+    background: #eef2f5;
+}

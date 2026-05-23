@@ -86,7 +86,10 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(parseInt(tbProLavId))
+                body: JSON.stringify({
+                        TbProLavId: parseInt(tbProLavId),
+                        ResultadoFinalLavado: document.querySelector('input[name="resultadoFinalLavado"]:checked')?.value || "ABORTAR_LAVADO"
+                    })
             });
 
             const json = await response.json();

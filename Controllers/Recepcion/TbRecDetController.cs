@@ -1,5 +1,6 @@
 ﻿using ConexionSql.Data;
 using ConexionSql.Models.Afmr;
+using ConexionSql.Models.Estados;
 using ConexionSql.Models.Materiales;
 using ConexionSql.Models.Recepciones;
 using ConexionSql.Models.Reuso;
@@ -1547,6 +1548,110 @@ namespace ConexionSql.Controllers
             }
 
             return null;
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> CerrarRecepcion([FromBody] int tbRecId)
+        {
+            var recepcion = await _context.TbRec
+                .FirstOrDefaultAsync(x => x.TbRecId == tbRecId);
+
+            if (recepcion == null)
+                return Json(new { success = false });
+
+            recepcion.TbRecHorFin = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true });
+        }
+
+        //boton eliminar
+
+        [HttpPost]
+        public async Task<IActionResult> Eliminar(int tbRecDetId, int tbRecId)
+        {
+            var detalle = await _context.TbRecDet
+                .FirstOrDefaultAsync(x => x.TbRecDetId == tbRecDetId);
+
+            if (detalle == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    mensaje = "No se encontró el detalle."
+                });
+            }
+
+            // NO BORRA EL REGISTRO
+            // SOLO LO MARCA COMO ELIMINADO
+            detalle.TbRecDetEstId = 15;
+            detalle.TbRecDetEstDen = "ELIMINADO";
+
+            _context.TbRecDet.Update(detalle);
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                success = true,
+                estado = "ELIMINADO"
+            });
+        }
+
+        //metodo para llamar subform desde ortopedias
+
+        [HttpGet]
+        public async Task<IActionResult> SubFormulario(int id)
+        {
+            var cabecera = await _context.TbRec
+                .FirstOrDefaultAsync(x => x.TbRecId == id);
+
+            if (cabecera == null)
+                return NotFound("No se encontró la cabecera de recepción.");
+
+            var detalles = await _context.TbRecDet
+                .Where(d => d.TbRecId == id)
+                .Select(d => new TbRecDetDto
+                {
+                    TB_REC_DET_ID = d.TbRecDetId,
+                    TB_REC_ID = d.TbRecId,
+                    IB_MAT_ID = d.TbRecDetMatId,
+                    TbRecDetMatDen = d.TbRecDetMatDen,
+                    IB_EST_ID = d.TbRecDetEstId,
+                    IB_EST_DEN = d.TbRecDetEstDen,
+                    TB_REC_DET_CANT = d.TbRecDetCant
+                })
+                .ToListAsync();
+
+            var dto = new TbRecDetFormDto
+            {
+                Detalle = new TbRecDetDto
+                {
+                    TB_REC_ID = id
+                },
+                Estados = await _context.IbEst
+                    .Select(x => new IbEstDto
+                    {
+                        IbEstId = x.IbEstId,
+                        IbEstDen = x.IbEstDen
+                    })
+                    .ToListAsync(),
+                Revisiones = await _context.IbMatRevisiones
+                    .Select(x => new IbMatRevDto
+                    {
+                        IbMatRevId = x.IbMatRevId,
+                        IbMatRevDen = x.IbMatRevDen
+                    })
+                    .ToListAsync(),
+                EstadoDefaultId = 4
+            };
+
+            ViewBag.Cabecera = cabecera;
+            ViewBag.Detalles = detalles;
+            ViewBag.UsuarioLogueado = cabecera.TbRecPerNom ?? "NO REGISTRADO";
+
+            return View("~/Views/Recepcion/_SubFormRecDet.cshtml", dto);
         }
     }
 }

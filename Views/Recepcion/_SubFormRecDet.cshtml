@@ -37,7 +37,7 @@
                             <th>Revision</th>
                             <th>Estado</th>
                             <th>Cantidad</th>
-                            <th style="width:110px;">Accion</th>
+                                <th style="width:110px; display:none;">Accion</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -100,9 +100,14 @@
                                        value="" />
                             </td>
 
-                            <td>
-                                <button type="button" id="btnGuardar" class="btn btn-primary btn-sm w-100">Guardar</button>
-                            </td>
+                                <td style="display:none;">
+                                    <button type="button"
+                                            id="btnGuardar"
+                                            class="btn btn-primary btn-sm w-100"
+                                            style="display:none;">
+                                        Guardar
+                                    </button>
+                                </td>
                         </tr>
                     </tbody>
                 </table>
@@ -524,6 +529,23 @@
         }
     }
 
+    // carga el estado desp de ingresar materiales
+
+        function cargarEstadoDefault(est) {
+        if (!est && typeof estadoDefaultId !== "undefined" && estadoDefaultId !== null) {
+            est = estadosOriginales.find(x => x.id == estadoDefaultId);
+        }
+
+        if (!est) return;
+
+        estadoBusqueda.value = est.denominacion;
+        estadoSelect.value = est.id;
+
+        listaEstados.innerHTML = "";
+        estadosBusqueda = [];
+        indiceEstado = -1;
+    }
+
     seleccionarEstado();
 
     function renderizarListaEstados() {
@@ -697,13 +719,29 @@
         codigoProductoInput.addEventListener("blur", async function () {
             const valor = (this.value || "").trim();
 
-            if (valor === "") {
-                setTimeout(() => {
-                    materialBusqueda.focus();
-                    materialBusqueda.select?.();
-                }, 100);
-                return;
-            }
+                console.log("BLUR CODIGO PRODUCTO, valor:", valor);
+                 // debugger;
+
+                if (valor === "") {
+
+        const modalOrtopedia =
+            document.getElementById("modalRegistroOrtopedia");
+
+                if (!modalOrtopedia) {
+
+                    setTimeout(() => {
+                        materialBusqueda.focus();
+                        materialBusqueda.select?.();
+                    },100);
+
+                }
+
+        return;
+    }
+
+           // if (valor === "") {
+           //              return;
+           //          }
 
             await buscarMaterialPorCodigo();
         });
@@ -758,27 +796,55 @@
             });
         }
 
-                    if (materialBusqueda && listaMateriales) {
+        if (materialBusqueda && listaMateriales) {
+
+        materialBusqueda.addEventListener("focus", function () {
+                    if ((this.value || "").trim() !== "") {
+                        this.select();
+                    }
+                });
 
         materialBusqueda.addEventListener("click", function () {
 
-            // solo abrir lista si el campo está vacío
-            if ((this.value || "").trim() !== "") return;
+                if ((this.value || "").trim() !== "") {
+                    this.select();
+                    return;
+                }
 
-            fetch(`/TbRecDet/BuscarMaterial?texto=1`)
-                .then(res => res.json())
-                .then(data => {
-                    if (!data || data.length === 0) return;
+                fetch(`/TbRecDet/BuscarMaterial?texto=1`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data || data.length === 0) return;
 
-                    materialesBusqueda = data;
-                    indiceMaterial = -1;
+                        materialesBusqueda = data;
+                        indiceMaterial = -1;
 
-                    renderizarListaMateriales();
-                })
-                .catch(error => {
-                    console.error("Error al desplegar materiales:", error);
-                });
-        });
+                        renderizarListaMateriales();
+                    })
+                    .catch(error => {
+                        console.error("Error al desplegar materiales:", error);
+                    });
+            });
+
+        // materialBusqueda.addEventListener("click", function () {
+
+        //     // solo abrir lista si el campo está vacío
+        //     if ((this.value || "").trim() !== "") return;
+
+        //     fetch(`/TbRecDet/BuscarMaterial?texto=1`)
+        //         .then(res => res.json())
+        //         .then(data => {
+        //             if (!data || data.length === 0) return;
+
+        //             materialesBusqueda = data;
+        //             indiceMaterial = -1;
+
+        //             renderizarListaMateriales();
+        //         })
+        //         .catch(error => {
+        //             console.error("Error al desplegar materiales:", error);
+        //         });
+        // });
 
             materialBusqueda.addEventListener("blur", function () {
         setTimeout(() => {
@@ -1584,7 +1650,8 @@
                     limpiarModalRegistroControlArmado();
                     restaurarRevision();
 
-                    seleccionarEstado();
+                    //seleccionarEstado();
+                    cargarEstadoDefault();
 
                     vieneDeReuso = false;
                     requiereControlAdicional = false;
@@ -1949,6 +2016,68 @@
 
             // 🔹 cerrar modal
             modalRegistroControlArmado.hide();
+        });
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const btnCerrar = document.getElementById("btnCerrarModulo");
+
+        if (!btnCerrar)
+            return;
+
+        btnCerrar.addEventListener("click", async function (e) {
+
+            e.preventDefault();
+
+            const tbRecId = @(Model.Detalle?.TB_REC_ID ?? 0);
+
+            // si todavía no existe recepción, salir directo
+            if (tbRecId <= 0) {
+                window.location.href = '/Home/Index';
+                return;
+            }
+
+            await fetch('/TbRecDet/CerrarRecepcion', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(tbRecId)
+            });
+
+            window.location.href = '/Home/Index';
+        });
+
+    });
+</script>
+
+<script>
+    function confirmarEliminarDetalle(tbRecDetId, tbRecId) {
+
+        if (!confirm("¿Eliminar detalle?"))
+            return;
+
+        fetch(`/TbRecDet/Eliminar?tbRecDetId=${tbRecDetId}&tbRecId=${tbRecId}`, {
+            method: 'POST'
+        })
+        .then(r => r.json())
+        .then(data => {
+
+            if (!data.success) {
+                alert(data.mensaje || "Error");
+                return;
+            }
+
+            const fila =
+                document.getElementById(`fila-det-${tbRecDetId}`);
+
+            if (fila) {
+                    fila.children[2].innerText = "ELIMINADO";
+                    fila.style.opacity = "0.5";
+                }
         });
     }
 </script>

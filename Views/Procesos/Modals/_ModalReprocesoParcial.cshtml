@@ -83,10 +83,25 @@
                 document.querySelector('[data-tab-target="proceso-tab-materiales"]')?.click();
 
                 document.querySelectorAll(".chkReprocesoParcial").forEach(x => {
-                    x.disabled = false;
-                });
-            document.querySelectorAll(".cantReprocesoParcial").forEach(x => {
-                        x.disabled = false;
+                            x.disabled = false;
+
+                            x.closest("td")?.removeAttribute("hidden");
+                        });
+
+                        document.querySelectorAll(".cantReprocesoParcial").forEach(x => {
+                            x.disabled = false;
+
+                            x.closest("td")?.removeAttribute("hidden");
+                        });
+
+                document.querySelectorAll("th").forEach(x => {
+
+                        if (
+                            x.textContent.trim() === "Cant. reproceso" ||
+                            x.textContent.trim() === "Seleccionar"
+                        ) {
+                            x.removeAttribute("hidden");
+                        }
                     });
 
             const btnReprocesar = document.getElementById("btnReprocesarMateriales");
@@ -139,54 +154,5 @@
 
         modal.style.display = "none";
     }
-        document.getElementById("btnReprocesarMateriales")?.addEventListener("click", async function () {
-
-        const tbProId = parseInt(document.getElementById("tbProId")?.value) || 0;
-        const motivoId = parseInt(sessionStorage.getItem("motivoReprocesoParcialId")) || 0;
-
-        const detallesSeleccionados = Array.from(document.querySelectorAll(".chkReprocesoParcial:checked"))
-            .map(x => parseInt(x.value));
-
-        if (tbProId <= 0) {
-            alert("Proceso inválido.");
-            return;
-        }
-
-        if (motivoId <= 0) {
-            alert("Debe seleccionar un motivo de reproceso.");
-            return;
-        }
-
-        if (detallesSeleccionados.length === 0) {
-            alert("Debe seleccionar al menos un material.");
-            return;
-        }
-
-        try {
-            const response = await fetch('/TbProReproceso/EjecutarReprocesoParcial', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    tbProId: tbProId,
-                    motivoId: motivoId,
-                    detallesIds: detallesSeleccionados
-                })
-            });
-
-            const json = await response.json();
-
-            if (json.success) {
-                alert(json.mensaje);
-                location.reload();
-            } else {
-                alert(json.mensaje);
-            }
-
-        } catch (error) {
-            console.error("ERROR REPROCESO PARCIAL:", error);
-            alert("Error al ejecutar reproceso parcial.");
-        }
-    });
+        
 </script>

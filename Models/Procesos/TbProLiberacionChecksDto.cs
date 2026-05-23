@@ -11,5 +11,6 @@
         public bool TbProPaci { get; set; }
         public bool TbProIbrn { get; set; }
         public bool TbProIbre { get; set; }
+        public string? ResultadoFinalProceso { get; set; }
     }
 }
