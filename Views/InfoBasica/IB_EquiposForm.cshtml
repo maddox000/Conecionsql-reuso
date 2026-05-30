@@ -2,7 +2,7 @@
 
 <link rel="stylesheet" href="~/css/infobasica-custom.css" asp-append-version="true" />
 
-<form asp-action="Guardar" asp-controller="IbEquipos" method="post" autocomplete="off" id="formEquipo">
+<form asp-action="GuardarEquipo" asp-controller="IB_Equipos" method="post" autocomplete="off" id="formEquipo">
     @Html.AntiForgeryToken()
 
     @* --- CAMPOS OCULTOS --- *@
@@ -111,7 +111,13 @@
                     <div class="col-6">
                         <div class="row align-items-center">
                             <label class="col-6 col-form-label col-form-label-sm fw-bold text-end">Capacidad total</label>
-                            <div class="col-6"><input asp-for="IbEquCap" class="form-control form-control-sm" /></div>
+                            <div class="col-6">
+                                <input asp-for="IbEquCap"
+                                       class="form-control form-control-sm"
+                                       readonly
+                                       tabindex="-1"
+                                       style="background-color:#f8f9fa;" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -258,6 +264,38 @@
             $('#IB_EQU_MAR_ID').on('select2:unselect', function (e) {
                 $('#IB_EQU_MAR_DEN').val('');
             });
+
+            function calcularCapacidadEquipo() {
+            const altura = parseInt($('[name="IbEquAlt"]').val()) || 0;
+            const ancho = parseInt($('[name="IbEquAnc"]').val()) || 0;
+            const profundidad = parseInt($('[name="IbEquPro"]').val()) || 0;
+
+            $('[name="IbEquCap"]').val(altura * ancho * profundidad);
+                }
+
+                // $('[name="IbEquPro"]').on('blur', function () {
+                //     calcularCapacidadEquipo();
+                // });
+
+            $('[name="IbEquMod"], [name="IbEquSer"]').on('input', function () {
+                    this.value = this.value.toUpperCase();
+                });
+
+            $('[name="IbEquAlt"], [name="IbEquAnc"], [name="IbEquPro"], [name="IbEquPorc"], [name="IbEquLmat"], [name="IbEquNum"]').on('change', function () {
+            const valorOriginal = this.value;
+            const valorLimpio = valorOriginal.replace(/[^0-9]/g, '');
+
+                    if (valorOriginal !== valorLimpio) {
+                        alert("Este campo solo permite números.");
+                        this.value = valorLimpio;
+                        this.focus();
+                        return;
+                    }
+
+                    if ($(this).attr('name') === 'IbEquPro') {
+                        calcularCapacidadEquipo();
+                    }
+                });
         });
     </script>
 }

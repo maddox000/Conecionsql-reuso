@@ -214,14 +214,39 @@ document.getElementById('btnValidarLogin')?.addEventListener('click', async func
         const data = await response.json();
 
         if (data.ok) {
+
+            //valida nivel usuario para info basica
+
+            const destino = localStorage.getItem("loginDestino") || "/";
+
+            if (
+                (
+                    destino.startsWith("/IBPersonal/") ||
+                    destino.startsWith("/IB_Equipos/") ||
+                    destino.startsWith("/IBSector/") ||
+                    destino.startsWith("/IBProveedor/") ||
+                    destino.startsWith("/IBProfesional/")
+                )
+                && data.nivelUsuarioId === 3
+            ) {
+                alert("Su nivel de usuario no tiene autorización para crear o modificar registros.");
+
+                document.getElementById('loginClave').value = "";
+                document.getElementById('loginClave').focus();
+
+                return;
+            }
+
             localStorage.setItem("usuarioId", data.id);
+
+            //llama a loguien de personal
+
 
             window.dispatchEvent(new Event("loginTareasValidado"));
 
             const modal = bootstrap.Modal.getInstance(document.getElementById('loginTareasModal'));
             modal.hide();
 
-            const destino = localStorage.getItem("loginDestino") || "/";
 
             if (
                 sessionStorage.getItem("editarLavado") === "2" ||

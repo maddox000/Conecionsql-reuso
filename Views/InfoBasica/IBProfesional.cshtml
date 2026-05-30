@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ConexionSql.InfoBasica.Models.IBProveedor>
+﻿@model IEnumerable<ConexionSql.Models.Profesionales.IbPro>
 
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
@@ -9,22 +9,18 @@
 <link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
 
 <style>
-    /* 1. Cebreado de la tabla */
     .rec-screen-table tbody tr:nth-child(even) {
         background-color: #f9f9f9;
     }
 
-    /* 2. Hover: Sombreado gris al señalar */
     .rec-screen-table tbody tr:hover {
         background-color: #f0f0f0 !important;
     }
 
-    /* 3. Selección: Sombreado gris al hacer clic */
     .rec-screen-table tbody tr.fila-seleccionada {
         background-color: #e2e2e2 !important;
     }
 
-    /* 4. Fila Inhabilitada */
     .rec-screen-table tbody tr.fila-inhabilitada {
         background-color: #fafafa !important;
         opacity: 0.55;
@@ -34,7 +30,6 @@
             color: #999999 !important;
         }
 
-    /* 5. REGLAS PARA EL ENCABEZADO */
     .rec-screen-table {
         border-collapse: separate;
         border-spacing: 0;
@@ -109,7 +104,6 @@
         display: block;
     }
 
-    /* 6. ESTILOS PARA EL TOGGLE SWITCH BAXEN */
     .baxen-switch-container {
         display: flex;
         align-items: center;
@@ -167,7 +161,6 @@
         pointer-events: none;
     }
 
-    /* 7. ESTILOS PARA TU MODAL ABM */
     .modal-baxen {
         display: none;
         position: fixed;
@@ -217,15 +210,12 @@
         box-sizing: border-box;
     }
 
-    /* =========================================================================
-           8. CORRECCIÓN BOTONERA 2x2 (HOVER + TAMAÑO FLUIDO)
-           ========================================================================= */
     .menu-operaciones-grid {
         display: grid !important;
-        grid-template-columns: 1fr 1fr !important; /* 50% y 50% para que llene todo */
+        grid-template-columns: 1fr 1fr !important;
         width: 280px;
         gap: 1px;
-        background-color: #4a6278; /* Color de la cruz divisoria */
+        background-color: #4a6278;
         border: 1px solid #4a6278;
         border-radius: 4px;
         overflow: hidden;
@@ -244,25 +234,25 @@
         background-color: #34495e !important;
         color: white !important;
         cursor: pointer !important;
-        transition: background-color 0.2s ease !important; /* Transición suave */
+        transition: background-color 0.2s ease !important;
         padding: 0 !important;
     }
 
         .btn-baxen-grid:hover {
-            background-color: #263645 !important; /* Azul más oscuro para el efecto hover */
+            background-color: #263645 !important;
         }
 </style>
 
 <div style="height: calc(100vh - 80px); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; padding: 0 10px;">
 
     <div class="contenedor-titulo" style="flex-shrink: 0; padding-bottom: 5px; margin-bottom: 10px;">
-        <h1 class="titulo-derecha" style="margin: 0; font-size: 1.5rem; color: #34495e; font-weight: 400;">Gestión de proveedores (IB_ORT)</h1>
+        <h1 class="titulo-derecha" style="margin: 0; font-size: 1.5rem; color: #34495e; font-weight: 400;">Gestión de profesionales (IB_PRO)</h1>
     </div>
 
     <div style="flex-shrink: 0; display: flex; gap: 20px; padding: 15px 20px; background: white; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 15px;">
 
         <div style="width: 200px; height: 180px; background: white; border: 1px solid #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">
-            <div id="proveedorImagenContainer" style="text-align: center;">
+            <div id="profesionalImagenContainer" style="text-align: center;">
                 <div style="color: #d8d8d8; font-size: 1.3rem; font-weight: bold; line-height: 1.1; letter-spacing: -1px; text-transform: lowercase;">
                     imagen<br>no<br>disponible
                 </div>
@@ -278,10 +268,17 @@
                 </div>
             </div>
 
-            <div style="width: 400px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0;">
+            <div style="width: 300px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0;">
                 <div>
-                    <label class="label-detalle">Denominación</label>
-                    <div id="detalle-denominacion" class="campo-detalle" style="width: 100%;">-</div>
+                    <label class="label-detalle">Apellido</label>
+                    <div id="detalle-apellido" class="campo-detalle" style="width: 100%;">-</div>
+                </div>
+            </div>
+
+            <div style="width: 300px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0;">
+                <div>
+                    <label class="label-detalle">Nombre</label>
+                    <div id="detalle-nombre" class="campo-detalle" style="width: 100%;">-</div>
                 </div>
             </div>
 
@@ -307,7 +304,8 @@
             <thead>
                 <tr>
                     <th style="width: 15%; text-align: center;">Código</th>
-                    <th style="width: 70%;">Proveedor</th>
+                    <th style="width: 35%;">Apellido</th>
+                    <th style="width: 35%;">Nombre</th>
                     <th style="width: 15%; text-align: center;">Inhabilitados</th>
                 </tr>
             </thead>
@@ -316,18 +314,20 @@
                 {
                     foreach (var item in Model)
                     {
-                        <tr class="fila-proveedor @(item.IB_ORT_OCU ? "fila-inhabilitada" : "")"
-                            data-id="@item.IB_ORT_ID"
-                            data-denominacion="@item.IB_ORT_DEN"
-                            data-inhabilitado="@(item.IB_ORT_OCU ? "true" : "false")">
+                        <tr class="fila-profesional @(item.IbProOcu ? "fila-inhabilitada" : "")"
+                            data-id="@item.IbProId"
+                            data-nombre="@item.IbProNom"
+                            data-apellido="@item.IbProApe"
+                            data-inhabilitado="@(item.IbProOcu ? "true" : "false")">
 
-                            <td style="text-align: center;">@item.IB_ORT_ID.ToString("000")</td>
-                            <td>@item.IB_ORT_DEN</td>
+                            <td style="text-align: center;">@item.IbProId.ToString("000")</td>
+                            <td>@item.IbProApe</td>
+                            <td>@item.IbProNom</td>
 
                             <td style="text-align: center; vertical-align: middle; padding: 6px 10px;">
                                 <div class="baxen-switch-container">
                                     <label class="baxen-switch switch-readonly">
-                                        <input type="checkbox" disabled @(item.IB_ORT_OCU ? "checked" : "") />
+                                        <input type="checkbox" disabled @(item.IbProOcu ? "checked" : "") />
                                         <span class="baxen-slider"></span>
                                     </label>
                                 </div>
@@ -338,8 +338,8 @@
                 else
                 {
                     <tr>
-                        <td colspan="3" style="text-align: center; padding: 25px; color: #888; font-size: 0.9rem;">
-                            No hay proveedores cargados.
+                        <td colspan="4" style="text-align: center; padding: 25px; color: #888; font-size: 0.9rem;">
+                            No hay profesionales cargados.
                         </td>
                     </tr>
                 }
@@ -358,14 +358,14 @@
                 Buscar
             </span>
             <input type="text"
-                   id="buscarProveedor"
-                   placeholder="Por denominación..."
+                   id="buscarProfesional"
+                   placeholder="Por apellido o nombre..."
                    style="border: 1px solid #34495e; padding: 4px 12px; font-size: 0.85rem; outline: none; width: 250px; height: 30px; border-left: none; background: #34495e; color: white; border-radius: 0 4px 4px 0;" />
         </div>
 
         <div class="menu-operaciones-grid">
 
-            <button class="btn-menu btn-baxen-grid" onclick="nuevoProveedorConLogin()">
+            <button class="btn-menu btn-baxen-grid" onclick="nuevoProfesionalConLogin()">
                 <span class="material-icons" style="font-size: 1.1rem;">add</span> Nuevo
             </button>
 
@@ -379,7 +379,7 @@
                 </div>
             </div>
 
-            <button class="btn-menu btn-baxen-grid" onclick="editarProveedorConLogin()">
+            <button class="btn-menu btn-baxen-grid" onclick="editarProfesionalConLogin()">
                 <span class="material-icons" style="font-size: 1.1rem;">edit</span> Editar
             </button>
 
@@ -393,16 +393,22 @@
 
 <div id="modalABM" class="modal-baxen">
     <div class="modal-contenido">
-        <div class="modal-header" id="modalTitulo">Nuevo Proveedor</div>
+        <div class="modal-header" id="modalTitulo">Nuevo Profesional</div>
         <form asp-action="Guardar" method="post">
             @Html.AntiForgeryToken()
             <div class="modal-body">
                 <input type="hidden" name="Id" id="input_Id" value="0" />
 
-                <label style="font-size: 0.85rem; font-weight: 500; color: #444;">Denominación:</label>
-                <input type="text" name="Denominacion" id="input_Den" class="campo-baxen" required maxlength="50" />
+                <label style="font-size: 0.85rem; font-weight: 500; color: #444;">Apellido:</label>
+                <input type="text" name="Apellido" id="input_Ape" class="campo-baxen" required maxlength="50" oninput="this.value = this.value.toUpperCase();" />
 
                 <br /><br />
+
+                <label style="font-size: 0.85rem; font-weight: 500; color: #444;">Nombre:</label>
+                <input type="text" name="Nombre" id="input_Nom" class="campo-baxen" required maxlength="50" oninput="this.value = this.value.toUpperCase();" />
+
+                <br /><br />
+
                 <label style="display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #444;">
                     <input type="checkbox" name="Oculto" id="input_Ocu" value="true" /> Ocultar en sistema
                 </label>
@@ -419,21 +425,22 @@
     let idSeleccionado = 0;
 
     function mostrarImagenNoDisponible() {
-        document.getElementById('proveedorImagenContainer').innerHTML = `
+        document.getElementById('profesionalImagenContainer').innerHTML = `
             <div style="color: #d8d8d8; font-size: 1.3rem; font-weight: bold; line-height: 1.1; letter-spacing: -1px; text-transform: lowercase;">
                 imagen<br>no<br>disponible
             </div>
         `;
     }
 
-    document.querySelectorAll('.fila-proveedor').forEach(function (fila) {
+    document.querySelectorAll('.fila-profesional').forEach(function (fila) {
         fila.addEventListener('click', function () {
             idSeleccionado = parseInt(this.dataset.id);
             const rawId = this.dataset.id || '';
             const paddedId = rawId ? String(rawId).padStart(3, '0') : '-';
 
             document.getElementById('detalle-codigo').innerHTML = paddedId;
-            document.getElementById('detalle-denominacion').innerHTML = this.dataset.denominacion || '-';
+            document.getElementById('detalle-apellido').innerHTML = this.dataset.apellido || '-';
+            document.getElementById('detalle-nombre').innerHTML = this.dataset.nombre || '-';
 
             const switchInhabilitado = document.getElementById('detalle-inhabilitado-switch');
             if (this.dataset.inhabilitado === 'true') {
@@ -442,20 +449,24 @@
                 switchInhabilitado.checked = false;
             }
 
-            document.querySelectorAll('.fila-proveedor').forEach(function (f) {
+            document.querySelectorAll('.fila-profesional').forEach(function (f) {
                 f.classList.remove('fila-seleccionada');
             });
+
             this.classList.add('fila-seleccionada');
 
             mostrarImagenNoDisponible();
         });
     });
 
-    document.getElementById('buscarProveedor').addEventListener('keyup', function () {
+    document.getElementById('buscarProfesional').addEventListener('keyup', function () {
         const texto = this.value.toLowerCase();
-        document.querySelectorAll('.fila-proveedor').forEach(function (fila) {
-            const denominacion = fila.dataset.denominacion ? fila.dataset.denominacion.toLowerCase() : '';
-            if (denominacion.includes(texto)) {
+
+        document.querySelectorAll('.fila-profesional').forEach(function (fila) {
+            const apellido = fila.dataset.apellido ? fila.dataset.apellido.toLowerCase() : '';
+            const nombre = fila.dataset.nombre ? fila.dataset.nombre.toLowerCase() : '';
+
+            if (apellido.includes(texto) || nombre.includes(texto)) {
                 fila.style.display = '';
             } else {
                 fila.style.display = 'none';
@@ -463,32 +474,37 @@
         });
     });
 
-    function nuevoProveedor() {
+    function nuevoProfesional() {
         document.getElementById('input_Id').value = 0;
-        document.getElementById('input_Den').value = "";
+        document.getElementById('input_Ape').value = "";
+        document.getElementById('input_Nom').value = "";
         document.getElementById('input_Ocu').checked = false;
-        document.getElementById('modalTitulo').innerText = "Nuevo Proveedor";
+        document.getElementById('modalTitulo').innerText = "Nuevo Profesional";
         document.getElementById('modalABM').style.display = "block";
     }
 
-    function editarProveedor() {
-        if (idSeleccionado === 0) { alert("Seleccione un proveedor"); return; }
-        fetch(`/IBProveedor/Obtener?id=${idSeleccionado}`)
+    function editarProfesional() {
+        if (idSeleccionado === 0) {
+            alert("Seleccione un profesional");
+            return;
+        }
+
+        fetch(`/IBProfesional/Obtener?id=${idSeleccionado}`)
             .then(res => res.json())
             .then(data => {
-                document.getElementById('input_Id').value = data.iB_ORT_ID;
-                document.getElementById('input_Den').value = data.iB_ORT_DEN;
-                document.getElementById('input_Ocu').checked = data.iB_ORT_OCU;
-                document.getElementById('modalTitulo').innerText = "Editar Proveedor";
+                document.getElementById('input_Id').value = data.iB_PRO_ID;
+                document.getElementById('input_Ape').value = data.iB_PRO_APE;
+                document.getElementById('input_Nom').value = data.iB_PRO_NOM;
+                document.getElementById('input_Ocu').checked = data.iB_PRO_OCU;
+                document.getElementById('modalTitulo').innerText = "Editar Profesional";
                 document.getElementById('modalABM').style.display = "block";
             });
     }
 
-        function nuevoProveedorConLogin() {
-
+    function nuevoProfesionalConLogin() {
         localStorage.setItem(
             "loginDestino",
-            "/IBProveedor/IBProveedor?nuevo=1"
+            "/IBProfesional/IBProfesional?nuevo=1"
         );
 
         const modalLogin = new bootstrap.Modal(
@@ -498,40 +514,38 @@
         modalLogin.show();
     }
 
-    function editarProveedorConLogin() {
-
+    function editarProfesionalConLogin() {
         if (idSeleccionado === 0) {
-            alert("Seleccione un proveedor");
+            alert("Seleccione un profesional");
             return;
         }
 
         localStorage.setItem(
             "loginDestino",
-            "/IBProveedor/IBProveedor?editar=" + idSeleccionado
+            "/IBProfesional/IBProfesional?editar=" + idSeleccionado
         );
 
         const modalLogin = new bootstrap.Modal(
             document.getElementById('loginTareasModal')
-                );
+        );
 
-                modalLogin.show();
-            }
+        modalLogin.show();
+    }
 
-            // llama modal
-            const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(window.location.search);
 
-            if (params.get("nuevo") === "1") {
-                nuevoProveedor();
-            }
+    if (params.get("nuevo") === "1") {
+        nuevoProfesional();
+    }
 
-            const editarId = params.get("editar");
+    const editarId = params.get("editar");
 
-            if (editarId) {
-                idSeleccionado = parseInt(editarId);
-                editarProveedor();
-            }
+    if (editarId) {
+        idSeleccionado = parseInt(editarId);
+        editarProfesional();
+    }
 
-            function cerrarModal() {
-                document.getElementById('modalABM').style.display = "none";
-            }
+    function cerrarModal() {
+        document.getElementById('modalABM').style.display = "none";
+    }
 </script>

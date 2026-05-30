@@ -355,18 +355,30 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px;">
                     <div>
                         <label class="label-detalle">Apellido</label>
-                        <input type="text" name="Apellido" id="input_Apellido" class="infobasica-campo" required maxlength="50" />
+                        <input type="text"
+                               name="Apellido"
+                               id="input_Apellido"
+                               class="infobasica-campo"
+                               required
+                               maxlength="50"
+                               style="text-transform: uppercase;" />
                     </div>
 
                     <div>
                         <label class="label-detalle">Nombre</label>
-                        <input type="text" name="Nombre" id="input_Nombre" class="infobasica-campo" required maxlength="50" />
+                        <input type="text"
+                               name="Nombre"
+                               id="input_Nombre"
+                               class="infobasica-campo"
+                               required
+                               maxlength="50"
+                               style="text-transform: uppercase;" />
                     </div>
 
                     <div>
                         <label class="label-detalle">Cargo</label>
 
-                        <div style="position:relative;">
+                        <div style="position:relative; z-index:999999;">
                             <input type="text"
                                    id="cargoBusqueda"
                                    class="infobasica-campo"
@@ -378,7 +390,7 @@
                                 top:100%;
                                 left:0;
                                 right:0;
-                                z-index:9999;
+                                z-index:999999;
                                 max-height:220px;
                                 overflow-y:auto;
                                 display:none;">
@@ -468,6 +480,7 @@
 
             <div class="infobasica-modal-footer">
                 <button type="button"
+                        onclick="document.getElementById('modalPersonalABM').style.display='none';"
                         style="background-color: #6c757d; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; margin-right: 0px;">
                     Cancelar
                 </button>
@@ -484,10 +497,39 @@
 
 <script>
     // --- LÓGICA MANTENIDA DE TUS BOTONES ---
-    let idSeleccionado = 0;
+
+
+
+       let idSeleccionado = 0;
 
     function nuevoPersonal() {
-        window.location.href = '@Url.Action("IBPersonal", "IBPersonal")';
+        localStorage.setItem("loginDestino", "/IBPersonal/IBPersonalListado?nuevo=1");
+
+        const modalLogin = new bootstrap.Modal(document.getElementById('loginTareasModal'));
+        modalLogin.show();
+    }
+
+        function abrirModalNuevoPersonal() {
+        document.getElementById('modalPersonalTitulo').innerText = 'Nuevo Personal';
+
+        document.getElementById('input_PersonalId').value = 0;
+        document.getElementById('input_Apellido').value = '';
+        document.getElementById('input_Nombre').value = '';
+        document.getElementById('cargoBusqueda').value = '';
+        document.getElementById('CargoId').value = '';
+        document.getElementById('nivelUsuarioBusqueda').value = '';
+        document.getElementById('NivelUsuarioId').value = '';
+        document.getElementById('sectorBusqueda').value = '';
+        document.getElementById('SectorId').value = '';
+        document.getElementById('input_Inhabilitado').checked = false;
+        document.getElementById('input_Password').value = '';
+        document.getElementById('input_PasswordRepite').value = '';
+
+        document.getElementById('modalPersonalABM').style.display = 'flex';
+
+        setTimeout(function () {
+            document.getElementById('input_Apellido').focus();
+        }, 100);
     }
 
     function editarPersonal() {
@@ -495,7 +537,11 @@
             alert("Por favor, seleccione un registro del personal haciendo clic en la lista.");
             return;
         }
-        window.location.href = '@Url.Action("IBPersonal", "IBPersonal")?id=' + idSeleccionado;
+
+        localStorage.setItem("loginDestino", "/IBPersonal/IBPersonalListado?editar=" + idSeleccionado);
+
+        const modalLogin = new bootstrap.Modal(document.getElementById('loginTareasModal'));
+        modalLogin.show();
     }
 
     function exportarLista(formato) {
@@ -577,4 +623,183 @@
             }
         });
     });
+
+    //llamadas a las listas
+
+        function configurarBusquedaLista(inputId, listaId, hiddenId, url) {
+        const input = document.getElementById(inputId);
+        const lista = document.getElementById(listaId);
+        const hidden = document.getElementById(hiddenId);
+
+        input.addEventListener('input', function () {
+            const texto = input.value.trim();
+
+            hidden.value = "";
+            lista.innerHTML = "";
+            lista.style.display = "none";
+
+            if (texto.length < 1) return;
+
+            fetch(url + "?texto=" + encodeURIComponent(texto))
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || data.length === 0) return;
+
+                    data.forEach(item => {
+                        const boton = document.createElement("button");
+                        boton.type = "button";
+                        boton.className = "list-group-item list-group-item-action";
+                        boton.textContent = item.den;
+
+                        boton.addEventListener("click", function () {
+                            input.value = item.den;
+                            hidden.value = item.id;
+                            lista.innerHTML = "";
+                            lista.style.display = "none";
+                        });
+
+                        lista.appendChild(boton);
+                    });
+
+                    lista.style.display = "block";
+                });
+        });
+
+            input.addEventListener('click', function () {
+            fetch(url + "?texto=")
+            .then(res => res.json())
+            .then(data => {
+                if (!data || data.length === 0) return;
+
+                lista.innerHTML = "";
+
+                data.forEach(item => {
+                    const boton = document.createElement("button");
+                    boton.type = "button";
+                    boton.className = "list-group-item list-group-item-action";
+                    boton.textContent = item.den;
+
+                        boton.addEventListener("click", function () {
+                        input.value = item.den;
+                        hidden.value = item.id;
+                        lista.innerHTML = "";
+                        lista.style.display = "none";
+
+                        const siguienteCampo = {
+                            cargoBusqueda: "nivelUsuarioBusqueda",
+                            nivelUsuarioBusqueda: "sectorBusqueda",
+                            sectorBusqueda: "input_Password"
+                        };
+
+                        const siguienteId = siguienteCampo[input.id];
+
+                        if (siguienteId) {
+                            const siguiente = document.getElementById(siguienteId);
+
+                            if (siguiente) {
+                                siguiente.focus();
+
+                                if (typeof siguiente.select === "function") {
+                                    siguiente.select();
+                                }
+                            }
+                        }
+                    });
+
+                    // boton.addEventListener("click", function () {
+                    //     input.value = item.den;
+                    //     hidden.value = item.id;
+                    //     lista.innerHTML = "";
+                    //     lista.style.display = "none";
+                    // });
+
+                    lista.appendChild(boton);
+                });
+
+                lista.style.display = "block";
+            });
+        });
+    }
+
+    configurarBusquedaLista("cargoBusqueda", "listaCargos", "CargoId", "/IBPersonal/BuscarCargos");
+    configurarBusquedaLista("nivelUsuarioBusqueda", "listaNivelesUsuario", "NivelUsuarioId", "/IBPersonal/BuscarNivelesUsuario");
+    configurarBusquedaLista("sectorBusqueda", "listaSectores", "SectorId", "/IBPersonal/BuscarSectores");
+
+    //fin llamada a listas
+
+            const paramsPersonal = new URLSearchParams(window.location.search);
+
+    if (paramsPersonal.get("nuevo") === "1") {
+        abrirModalNuevoPersonal();
+    }
+
+    const editarId = paramsPersonal.get("editar");
+
+    if (editarId) {
+        fetch("/IBPersonal/ObtenerPersonal?id=" + editarId)
+            .then(res => res.json())
+            .then(json => {
+                if (!json.success) {
+                    alert(json.mensaje);
+                    return;
+                }
+
+                const p = json.data;
+
+                document.getElementById('modalPersonalTitulo').innerText = 'Editar Personal';
+
+                document.getElementById('input_PersonalId').value = p.id;
+                document.getElementById('input_Apellido').value = p.apellido;
+                document.getElementById('input_Nombre').value = p.nombre;
+
+                document.getElementById('CargoId').value = p.cargoId;
+                document.getElementById('NivelUsuarioId').value = p.nivelUsuarioId;
+                document.getElementById('SectorId').value = p.sectorId;
+
+                document.getElementById('cargoBusqueda').value = p.cargo;
+                document.getElementById('nivelUsuarioBusqueda').value = p.nivelUsuario;
+                document.getElementById('sectorBusqueda').value = p.sector;
+
+                document.getElementById('input_Inhabilitado').checked = p.inhabilitado;
+                document.getElementById('input_Password').value = p.password || "";
+                document.getElementById('input_PasswordRepite').value = p.passwordRepite || "";
+
+                document.getElementById('modalPersonalABM').style.display = 'flex';
+            });
+    }
+
+                const camposEnter = [
+                    document.getElementById("input_Apellido"),
+                    document.getElementById("input_Nombre"),
+                    document.getElementById("cargoBusqueda"),
+                    document.getElementById("nivelUsuarioBusqueda"),
+                    document.getElementById("sectorBusqueda"),
+                    document.getElementById("input_Inhabilitado"),
+                    document.getElementById("input_Password"),
+                    document.getElementById("input_PasswordRepite")
+                ];
+
+                camposEnter.forEach(function (campo, index) {
+
+                    campo?.addEventListener("keydown", function (e) {
+
+                        if (e.key !== "Enter") {
+                            return;
+                        }
+
+                        e.preventDefault();
+
+                        const siguiente = camposEnter[index + 1];
+
+                        if (siguiente) {
+                            siguiente.focus();
+
+                            if (typeof siguiente.select === "function") {
+                                siguiente.select();
+                            }
+                        }
+                    });
+
+                });
+
 </script>

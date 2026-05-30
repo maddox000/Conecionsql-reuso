@@ -47,6 +47,8 @@ namespace ConexionSql.Data
         public DbSet<TbProAco> TbProAco { get; set; }
         public DbSet<TbProAcoDet> TbProAcoDet { get; set; }
         public DbSet<IbEqu> IbEqu { get; set; }
+        public DbSet<IbEquTeq> IbEquTeq { get; set; }
+        public DbSet<IbEquMar> IbEquMar { get; set; }
         public DbSet<IbEquPti> IbEquPti { get; set; }
         public DbSet<IbProTci> IbProTci { get; set; }
         public DbSet<TbEnt> TbEnt { get; set; }
@@ -80,6 +82,7 @@ namespace ConexionSql.Data
         public DbSet<IBSector> IBSectores { get; set; }
         public DbSet<IBProveedor> IBProveedores { get; set; }
         public DbSet<IBPersonalDto> IBPersonalListado { get; set; }
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -390,7 +390,7 @@
 
         <div class="menu-operaciones-grid">
 
-            <button class="btn-menu btn-baxen-grid" onclick="nuevoSector()">
+            <button class="btn-menu btn-baxen-grid" onclick="nuevoSectorConLogin()">
                 <span class="material-icons" style="font-size: 1.1rem;">add</span> Nuevo
             </button>
 
@@ -404,7 +404,7 @@
                 </div>
             </div>
 
-            <button class="btn-menu btn-baxen-grid" onclick="editarSector()">
+            <button class="btn-menu btn-baxen-grid" onclick="editarSectorConLogin()">
                 <span class="material-icons" style="font-size: 1.1rem;">edit</span> Editar
             </button>
 
@@ -595,6 +595,55 @@
             form.submit();
         }
     } */
+
+        function nuevoSectorConLogin() {
+
+        localStorage.setItem(
+            "loginDestino",
+            "/IBSector/IBSector?nuevo=1"
+        );
+
+        const modalLogin = new bootstrap.Modal(
+            document.getElementById('loginTareasModal')
+                );
+
+                modalLogin.show();
+            }
+
+
+       function editarSectorConLogin() {
+
+        if (idSeleccionado === 0) {
+            alert("Seleccione un sector");
+            return;
+        }
+
+        localStorage.setItem(
+            "loginDestino",
+            "/IBSector/IBSector?editar=" + idSeleccionado
+        );
+
+        const modalLogin = new bootstrap.Modal(
+            document.getElementById('loginTareasModal')
+                );
+
+                modalLogin.show();
+            }
+
+
+        //llama modal
+            const params = new URLSearchParams(window.location.search);
+
+                if (params.get("nuevo") === "1") {
+                    nuevoSector();
+                }
+
+                const editarId = params.get("editar");
+
+                if (editarId) {
+                    idSeleccionado = parseInt(editarId);
+                    editarSector();
+                }
 
     function cerrarModal() {
         document.getElementById('modalABM').style.display = "none";

@@ -37,7 +37,8 @@ namespace ConexionSql.Controllers.A_PSW_LOG
                             return Json(new
                             {
                                 ok = true,
-                                id = dr["IB_PER_ID"].ToString()
+                                id = dr["IB_PER_ID"].ToString(),
+                                nivelUsuarioId = Convert.ToInt32(dr["IB_PER_UNI_ID"])
                             });
                         }
                         else
