@@ -1,0 +1,119 @@
+﻿@model List<ConexionSql.Models.SP_Busquedas.BusProDetDto>
+
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="~/css/busquedas-custom.css" />
+
+<style>
+    #zonaResultados-wrapper {
+        margin-top: 15px !important;
+    }
+
+    #loader {
+        padding-top: 20px !important;
+    }
+
+    #zonaResultados {
+        padding: 0 !important;
+    }
+
+        #zonaResultados table {
+            width: 100% !important;
+            table-layout: auto;
+            margin: 0 !important;
+        }
+</style>
+
+<div class="container-fluid">
+    <div class="contenedor-titulo">
+        <h1 class="titulo-derecha">Detalle de Procesos Activos</h1>
+    </div>
+
+    <div class="panel-filtros">
+        <form id="formBusquedaProDet">
+            <div class="row">
+                @* COLUMNA 1 *@
+                <div class="col-md-2">
+                    <div class="form-group"><label>Fecha Inicio</label><input type="date" name="BUS_FEC_INI" class="form-control" value="@ViewBag.FEC_INI" /></div>
+                    <div class="form-group"><label>Fecha Fin</label><input type="date" name="BUS_FEC_FIN" class="form-control" value="@ViewBag.FEC_FIN" /></div>
+                </div>
+
+                @* COLUMNA 2 *@
+                <div class="col-md-3">
+                    <div class="form-group"><label>Material / Denominación</label><input type="text" name="BUS_DEN" class="form-control" placeholder="LIKE%" /></div>
+                    <div class="form-group"><label>ID Reutilizable</label><input type="text" name="BUS_REU_ID" class="form-control" /></div>
+                    <div class="form-group"><label>Sector Destino</label><input type="text" name="BUS_SEC_DES" class="form-control" /></div>
+                </div>
+
+                @* COLUMNA 3 *@
+                <div class="col-md-3">
+                    <div class="form-group"><label>Paciente</label><input type="text" name="BUS_PAC" class="form-control" /></div>
+                    <div class="form-group"><label>Profesional</label><input type="text" name="BUS_PRO" class="form-control" /></div>
+                    <div class="form-group"><label>Remitente</label><input type="text" name="BUS_REM" class="form-control" /></div>
+                </div>
+
+                @* COLUMNA 4: Operaciones *@
+                <div class="col-md-2 ml-auto">
+                    <div class="menu-operaciones">
+                        <button type="button" class="btn-menu" id="btnBuscarDetalle"><span class="material-icons">search</span> Buscar</button>
+                        <button type="button" class="btn-menu" onclick="location.reload()"><span class="material-icons">refresh</span> Limpiar</button>
+
+                        <div class="reporte-container">
+                            <button type="button" class="btn-menu" style="border-bottom:none"><span class="material-icons">description</span> Reporte</button>
+                            <div class="opciones-reporte">
+                                <button type="button" class="btn-menu btn-pdf"><span class="material-icons">picture_as_pdf</span> PDF</button>
+                                <button type="button" class="btn-menu btn-excel"><span class="material-icons">table_view</span> Excel</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-2">
+                        <span id="lblContadorDetalle" class="badge-contador-grande">Registros: 0</span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div id="zonaResultados-wrapper" style="position:relative;">
+        <div id="loader" style="display:none;">
+            <span class="brand-text">Baxen® Trazabilidad</span>
+            <div class="spinner"></div>
+            <span class="loading-text">Consultando detalle de procesos activos...</span>
+        </div>
+
+        <div id="divResultadosDetalle">
+            @Html.Partial("~/Views/ProBusqueda/_ResultadosBusProDet.cshtml", Model)
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#btnBuscarDetalle").click(function () {
+                const datos = $("#formBusquedaProDet").serialize();
+
+                $.ajax({
+                    url: '@Url.Action("Buscar", "BusProDet")',
+                    type: 'POST',
+                    data: datos,
+                    beforeSend: function() { $('#loader').css('display', 'flex'); },
+                    success: function (html) {
+                        $('#divResultadosDetalle').html(html);
+
+                        var filas = $('#divResultadosDetalle tbody tr').length;
+                        $('#lblContadorDetalle').html("Registros: " + (filas > 0 ? filas : 0));
+                    },
+                    complete: function() { $('#loader').hide(); }
+                });
+            });
+
+            // Enter key trigger
+            $('#formBusquedaProDet input').keypress(function (e) {
+                if (e.which == 13) { $("#btnBuscarDetalle").click(); return false; }
+            });
+            $("#btnBuscarDetalle").click();
+        });
+    </script>
+}
+
+

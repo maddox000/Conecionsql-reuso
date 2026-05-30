@@ -1,0 +1,484 @@
+﻿@{
+    /*ViewData["Title"] = "Estadística de Procesos";*/
+}
+
+<link rel="stylesheet" href="~/css/estadisticas-customs.css" />
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<style>
+    .panel-filtros {
+        height: auto !important;
+        padding: 15px 20px !important;
+        margin-bottom: 10px !important;
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+    }
+
+    #zonaResultados {
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 100px;
+        max-height: 1000px;
+        overflow: auto !important;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        background: #fff;
+        margin-top: 10px;
+        padding: 20px;
+        position: relative;
+    }
+
+    .table-estadistica {
+        width: 100% !important;
+        border-collapse: separate;
+        border-spacing: 0;
+        table-layout: auto;
+    }
+
+        .table-estadistica thead th {
+            position: sticky !important;
+            top: 0 !important;
+            background-color: #2c3e50 !important;
+            color: #ffffff !important;
+            z-index: 10;
+            padding: 8px 12px;
+            font-size: 0.85rem !important;
+            font-weight: normal !important;
+            border: 1px solid #3e4f5f !important;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .table-estadistica tbody td {
+            padding: 4px 12px !important;
+            font-size: 0.8rem !important;
+            color: #2c3e50 !important;
+            border: 1px solid #dee2e6 !important;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .table-estadistica tbody tr:nth-child(even) {
+            background-color: #e9ecef !important;
+        }
+
+    .border-right-strong {
+        border-right: 3px solid #2c3e50 !important;
+    }
+
+    .border-left-strong {
+        border-left: 3px solid #2c3e50 !important;
+    }
+
+    /* Efecto foco para inputs completados basado en el css institucional */
+    .form-control:not(:placeholder-shown),
+    .form-control.has-value {
+        border-color: #2980b9 !important;
+        background-color: #f0f7fc !important;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(41, 128, 185, 0.25) !important;
+    }
+
+    .spinner-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4) !important;
+        backdrop-filter: blur(8px) !important;
+        z-index: 9999;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .spinner-content-fluid {
+        text-align: center;
+        color: #fff;
+    }
+
+        .spinner-content-fluid i {
+            font-size: 4.5rem;
+            color: #3498db;
+            margin: 22px 0;
+        }
+
+    .wrapper-buscador-flotante {
+        position: relative;
+        width: 100%;
+    }
+
+    .sugerencias-autocompletar {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        max-height: 220px;
+        overflow-y: auto;
+        z-index: 10000;
+        margin-top: 3px;
+        padding: 0;
+        list-style: none;
+    }
+
+        .sugerencias-autocompletar li {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #2c3e50;
+            text-align: left;
+        }
+
+            .sugerencias-autocompletar li:hover, .sugerencias-autocompletar li.elemento-seleccionado {
+                background-color: #f0f7fc !important;
+                color: #2980b9 !important;
+                font-weight: 500;
+            }
+
+    .msg-vacio {
+        padding: 40px;
+        text-align: center;
+        color: #7f8c8d;
+        font-size: 1.1rem;
+    }
+</style>
+
+<div id="loadingOverlay" class="spinner-overlay">
+    <div class="spinner-content-fluid">
+        <h3>Baxen® Trazabilidad</h3>
+        <div><i class="fas fa-spinner fa-spin"></i></div>
+        <p>Buscando la información solicitada.</p>
+    </div>
+</div>
+
+<div class="contenedor-titulo">
+    <h1 class="titulo-derecha">Estadística de Materiales Procesados</h1>
+</div>
+
+<div class="panel-filtros">
+    <div class="row">
+        <div class="col-md-10">
+            <div class="row">
+                <div class="col-md-2.5" style="width: 20%;">
+                    <label>Desde:</label>
+                    <input type="date" id="txtFechaDesde" class="form-control" />
+                    <label style="margin-top: 4px;">Hasta:</label>
+                    <input type="date" id="txtFechaHasta" class="form-control" />
+                    <div class="badge-contador" style="margin-top: 10px; width: 100%; text-align: center; height:auto; padding: 4px;">
+                        Registros: <span id="lblTotal">0</span>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="wrapper-buscador-flotante">
+                        <label>Tipo de Proceso:</label>
+                        <input type="text" id="txtTipoProceso" class="form-control" placeholder="Buscar proceso..." autocomplete="off" />
+                    </div>
+                    <div class="wrapper-buscador-flotante" style="margin-top: 4px;">
+                        <label>Tipo de Ciclo:</label>
+                        <input type="text" id="txtTipoCiclo" class="form-control" placeholder="Buscar ciclo..." autocomplete="off" />
+                    </div>
+                    <div class="wrapper-buscador-flotante" style="margin-top: 4px;">
+                        <label>Estado:</label>
+                        <input type="text" id="txtEstado" class="form-control" placeholder="Buscar estado..." autocomplete="off" />
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="wrapper-buscador-flotante">
+                        <label>Equipo:</label>
+                        <input type="text" id="txtEquipo" class="form-control" placeholder="Equipo o Número..." autocomplete="off" />
+                    </div>
+                    <div class="wrapper-buscador-flotante" style="margin-top: 4px;">
+                        <label>Sector Origen:</label>
+                        <input type="text" id="txtSectorOrigen" class="form-control" placeholder="Buscar origen..." autocomplete="off" />
+                    </div>
+                    <div class="wrapper-buscador-flotante" style="margin-top: 4px;">
+                        <label>Sector Destino:</label>
+                        <input type="text" id="txtSectorDestino" class="form-control" placeholder="Buscar destino..." autocomplete="off" />
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="wrapper-buscador-flotante">
+                        <label>Denominación Material:</label>
+                        <input type="text" id="txtDenominacion" class="form-control" placeholder="Buscar material..." autocomplete="off" />
+                    </div>
+                    <div style="margin-top:30px; font-size: 0.85rem; color: #2c3e50;">
+                        <label style="cursor:pointer; font-weight: bold; color: #2c3e50;">
+                            <input type="checkbox" id="chkReuso"> Código de Reúso
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="menu-operaciones">
+                <button class="btn-menu" onclick="procesar()"><i class="fas fa-calculator"></i> &nbsp; Calcular</button>
+                <button class="btn-menu" onclick="alert('Exportando...')"><i class="fas fa-file-excel"></i> &nbsp; Exportar</button>
+                <button class="btn-menu" onclick="window.print()"><i class="fas fa-print"></i> &nbsp; Imprimir</button>
+                <button class="btn-menu" onclick="window.location.href='/'"><i class="fas fa-times"></i> &nbsp; Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="contenedorGraficos" class="row" style="margin-top: 10px; display: none;">
+    <div class="col-md-12">
+        <div style="background:#fff; border:1px solid #dee2e6; border-radius:8px; padding:15px; display: flex; align-items: center; height: 260px;">
+            <div style="flex: 2; height: 100%;"><canvas id="chartLineas"></canvas></div>
+            <div style="flex: 1; height: 100%;"><canvas id="chartDona"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<div id="zonaResultados"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    let miGraficoLineas = null;
+    let miGraficoDona = null;
+
+    $(document).ready(function () {
+        $('#txtFechaDesde').val("2026-01-01");
+        $('#txtFechaHasta').val(new Date().toISOString().split('T')[0]);
+
+        $('.form-control').on('input change keyup', function() {
+            actualizarEstiloFocoVisual(this);
+        });
+
+        enlazarBuscadorFlotante("#txtTipoProceso", "@Url.Action("GetTipoProceso", "EstProcesosDet")");
+        enlazarBuscadorFlotante("#txtTipoCiclo", "@Url.Action("GetTipoCiclo", "EstProcesosDet")");
+        enlazarBuscadorFlotante("#txtEstado", "@Url.Action("GetEstados", "EstProcesosDet")");
+        enlazarBuscadorFlotante("#txtEquipo", "@Url.Action("GetEquipos", "EstProcesosDet")");
+        enlazarBuscadorFlotante("#txtSectorOrigen", "@Url.Action("GetSectores", "EstProcesosDet")");
+        enlazarBuscadorFlotante("#txtSectorDestino", "@Url.Action("GetSectores", "EstProcesosDet")");
+        enlazarBuscadorFlotante("#txtDenominacion", "@Url.Action("GetDenominaciones", "EstProcesosDet")");
+
+        $('.form-control').each(function() {
+            actualizarEstiloFocoVisual(this);
+        });
+
+        procesar();
+    });
+
+    function actualizarEstiloFocoVisual(elemento) {
+        if ($(elemento).val() && $(elemento).val().trim() !== "") {
+            $(elemento).addClass('has-value');
+        } else {
+            $(elemento).removeClass('has-value');
+        }
+    }
+
+    function enlazarBuscadorFlotante(inputSelector, url) {
+        const inputEl = document.querySelector(inputSelector);
+        let indiceActual = -1;
+        const listaUl = document.createElement("ul");
+        listaUl.className = "sugerencias-autocompletar";
+        listaUl.style.display = "none";
+        inputEl.parentNode.appendChild(listaUl);
+
+        inputEl.addEventListener("input", function() {
+            const texto = this.value.trim();
+            listaUl.innerHTML = "";
+            listaUl.style.display = "none";
+            indiceActual = -1;
+
+            if (texto.toUpperCase() === "TODO" || texto.length < 1) return;
+
+            fetch(`${url}?term=${encodeURIComponent(texto)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || data.length === 0) return;
+                    data.forEach(item => {
+                        let li = document.createElement("li");
+                        li.textContent = item.label;
+                        li.addEventListener("click", function() {
+                            inputEl.value = item.label;
+                            listaUl.innerHTML = "";
+                            listaUl.style.display = "none";
+                            actualizarEstiloFocoVisual(inputEl);
+                        });
+                        listaUl.appendChild(li);
+                    });
+                    listaUl.style.display = "block";
+                });
+        });
+
+        inputEl.addEventListener("keydown", function(e) {
+            const elementosLi = listaUl.getElementsByTagName("li");
+            if (elementosLi.length === 0) return;
+
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                indiceActual = (indiceActual + 1) % elementosLi.length;
+                resaltarSugerencia(elementosLi);
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                indiceActual = (indiceActual - 1 + elementosLi.length) % elementosLi.length;
+                resaltarSugerencia(elementosLi);
+            } else if (e.key === "Enter") {
+                e.preventDefault();
+                if (indiceActual > -1 && elementosLi[indiceActual]) elementosLi[indiceActual].click();
+            }
+        });
+
+        function resaltarSugerencia(listado) {
+            for (let i = 0; i < listado.length; i++) listado[i].classList.remove("elemento-seleccionado");
+            if (indiceActual > -1 && listado[indiceActual]) {
+                listado[indiceActual].classList.add("elemento-seleccionado");
+                listado[indiceActual].scrollIntoView({ block: "nearest" });
+            }
+        }
+
+        document.addEventListener("click", function(e) {
+            if (e.target !== inputEl) {
+                listaUl.innerHTML = "";
+                listaUl.style.display = "none";
+            }
+        });
+    }
+
+    function procesar() {
+        $('#loadingOverlay').css('display', 'flex');
+
+        const limpiarTexto = (sel) => {
+            let v = $(sel).val();
+            if (!v || v.trim() === "") return null;
+            if (v.trim().toUpperCase() === "TODO" || v.trim().toUpperCase() === "TODOS") return "MUESTRA_COL_TODO";
+            return v;
+        };
+
+        const params = {
+            desde: $('#txtFechaDesde').val(),
+            hasta: $('#txtFechaHasta').val(),
+            tipoProceso: limpiarTexto('#txtTipoProceso'),
+            tipoCiclo: limpiarTexto('#txtTipoCiclo'),
+            estado: limpiarTexto('#txtEstado'),
+            equipo: limpiarTexto('#txtEquipo'),
+            sectorOrigen: limpiarTexto('#txtSectorOrigen'),
+            sectorDestino: limpiarTexto('#txtSectorDestino'),
+            denominacion: limpiarTexto('#txtDenominacion'),
+            codigoReuso: $('#chkReuso').is(':checked')
+        };
+
+        $.post('@Url.Action("ObtenerDatos", "EstProcesosDet")', params, function (data) {
+            $('#loadingOverlay').hide();
+
+            if (!data || data.length === 0 || data.error) {
+                $('#zonaResultados').html('<div class="msg-vacio">No hay registros para este periodo o filtros especificados.</div>');
+                $('#lblTotal').text(0);
+                $('#contenedorGraficos').hide();
+                return;
+            }
+
+            $('#contenedorGraficos').show();
+            actualizarPantalla(data);
+        }).fail(function() {
+            $('#loadingOverlay').hide();
+            $('#zonaResultados').html('<div class="msg-vacio" style="color: #c0392b;"><i class="fas fa-exclamation-triangle"></i> Error de comunicación con el servidor.</div>');
+        });
+    }
+
+    function actualizarPantalla(data) {
+        const keys = Object.keys(data[0]);
+
+        const ordenMeses = {
+            'enero': 1, 'febrero': 2, 'marzo': 3, 'abril': 4, 'mayo': 5, 'junio': 6,
+            'julio': 7, 'agosto': 8, 'septiembre': 9, 'octubre': 10, 'noviembre': 11, 'diciembre': 12
+        };
+
+        const colsMeses = keys.filter(k => k !== 'TipoProceso' && k !== 'TotalAnual').sort((a, b) => {
+            const [anioA, mesA] = a.split(' ');
+            const [anioB, mesB] = b.split(' ');
+            if (anioA !== anioB) return anioA - anioB;
+            return (ordenMeses[mesA.toLowerCase()] || 0) - (ordenMeses[mesB.toLowerCase()] || 0);
+        });
+
+        $('#lblTotal').text(data.length);
+        $('#zonaResultados').html('<table class="table-estadistica"><thead id="theadEst"></thead><tbody id="tbodyEst"></tbody></table>');
+
+        let cuentaAnios = {};
+        colsMeses.forEach(c => {
+            let anio = c.split(' ')[0];
+            cuentaAnios[anio] = (cuentaAnios[anio] || 0) + 1;
+        });
+
+        let h1 = `<tr><th rowspan="2" class="border-right-strong">Tipo Proceso</th>`;
+        h1 += `<th rowspan="2" class="border-left-strong border-right-strong" style="background-color: #1f2d3d !important; font-weight: bold;">Total Anual</th>`;
+        Object.keys(cuentaAnios).sort().forEach(a => {
+            h1 += `<th colspan="${cuentaAnios[a]}" class="text-center header-anio-0 border-left-strong">${a}</th>`;
+        });
+        h1 += `</tr><tr>`;
+
+        colsMeses.forEach((c, i) => {
+            const esNuevoAnio = i > 0 && c.split(' ')[0] !== colsMeses[i-1].split(' ')[0];
+            h1 += `<th class="text-center ${esNuevoAnio ? 'border-left-strong' : ''}">${c.split(' ')[1]}</th>`;
+        });
+        h1 += `</tr>`;
+        $('#theadEst').html(h1);
+
+        let htmlRows = "";
+        data.forEach(f => {
+            let proc = f.TipoProceso || 'NO REGISTRADO';
+            let total = f.TotalAnual !== undefined ? f.TotalAnual : 0;
+
+            htmlRows += `<tr><td class="border-right-strong" style="font-weight: 500; text-align: left;">${proc}</td>`;
+            htmlRows += `<td class="text-center total-cell border-left-strong border-right-strong" style="font-weight: bold;">${total}</td>`;
+
+            colsMeses.forEach((c, i) => {
+                const esNuevoAnio = i > 0 && c.split(' ')[0] !== colsMeses[i-1].split(' ')[0];
+                const val = f[c] || 0;
+                htmlRows += `<td class="text-center ${esNuevoAnio ? 'border-left-strong' : ''}" style="${val == 0 ? 'color:#ccc' : ''}">${val}</td>`;
+            });
+            htmlRows += `</tr>`;
+        });
+        $('#tbodyEst').html(htmlRows);
+
+        generarGraficos(data, colsMeses);
+    }
+
+    function generarGraficos(data, labelsMeses) {
+        const dataFiltrada = data.slice(0, 10);
+        const colVal = (i) => ['#2980b9', '#c0392b', '#27ae60', '#f39c12', '#8e44ad', '#34495e', '#16a085'][i % 7];
+
+        const ctxL = document.getElementById('chartLineas').getContext('2d');
+        if (miGraficoLineas) miGraficoLineas.destroy();
+        miGraficoLineas = new Chart(ctxL, {
+            type: 'line',
+            data: {
+                labels: labelsMeses.map(m => m.split(' ')[1]),
+                datasets: dataFiltrada.map((f, i) => ({
+                    label: f.TipoProceso || 'Proceso',
+                    data: labelsMeses.map(m => f[m] || 0),
+                    borderColor: colVal(i),
+                    tension: 0.3, fill: false
+                }))
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        const ctxD = document.getElementById('chartDona').getContext('2d');
+        if (miGraficoDona) miGraficoDona.destroy();
+        miGraficoDona = new Chart(ctxD, {
+            type: 'doughnut',
+            data: {
+                labels: dataFiltrada.map(f => f.TipoProceso || 'Proceso'),
+                datasets: [{ data: dataFiltrada.map(f => f.TotalAnual || 0), backgroundColor: dataFiltrada.map((_, i) => colVal(i)) }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+        });
+    }
+</script>

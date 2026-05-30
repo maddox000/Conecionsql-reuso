@@ -1,0 +1,139 @@
+﻿@model IEnumerable<ConexionSql.Models.SP_Busquedas.BusAcoDto>
+@{
+    ViewData["Title"] = "Búsqueda de Acondicionado - Baxen";
+}
+
+<link rel="stylesheet" href="~/css/busquedas-custom.css" />
+
+<div class="contenedor-titulo">
+    <h1 class="titulo-derecha">Búsqueda de Acondicionado</h1>
+</div>
+
+<div class="panel-filtros">
+    <form id="formBusquedaAco">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>ID ACONDICIONADO</label>
+                    <input type="text" name="BUS_ACO_ID" class="form-control campo-activo" placeholder="ID Exacto">
+                </div>
+                <div class="form-group">
+                    <label>FECHA INICIO</label>
+                    <input type="date" name="BUS_FEC_INI" id="BUS_FEC_INI" class="form-control" value="@ViewBag.FEC_INI">
+                </div>
+                <div class="form-group">
+                    <label>FECHA FIN</label>
+                    <input type="date" name="BUS_FEC_FIN" id="BUS_FEC_FIN" class="form-control" value="@ViewBag.FEC_FIN">
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>MATERIAL / DENOMINACIÓN</label>
+                    <input type="text" name="BUS_DEN" class="form-control" placeholder="LIKE%">
+                </div>
+                <div class="form-group">
+                    <label>ID REUTILIZABLE</label>
+                    <input type="text" name="BUS_REU_ID" class="form-control" placeholder="ID Exacto">
+                </div>
+                <div class="form-group">
+                    <label>CET (SECTOR DESTINO)</label>
+                    <input type="text" name="BUS_CET" class="form-control">
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>ID SECTOR</label>
+                    <input type="text" name="BUS_SEC" class="form-control">
+                </div>
+                <div style="margin-top: 25px; padding: 10px; border-left: 3px solid #3498db; background: #f8f9fa;">
+                    <small class="text-muted" style="display: block; line-height: 1.2;">
+                        <i class="fas fa-info-circle"></i> La búsqueda normaliza campos vacíos para incluir registros relacionados.
+                    </small>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="menu-operaciones">
+                    <button type="button" class="btn-menu" id="btnBuscar">
+                        <span class="material-icons">search</span> BUSCAR
+                    </button>
+                    <button type="button" class="btn-menu" onclick="location.reload()">
+                        <span class="material-icons">refresh</span> LIMPIAR
+                    </button>
+
+                    <div class="reporte-container">
+                        <button type="button" class="btn-menu" id="btnReporte">
+                            <span class="material-icons">description</span> REPORTES
+                        </button>
+                        <div class="opciones-reporte">
+                            <button type="button" class="btn-menu btn-pdf">
+                                <span class="material-icons">picture_as_pdf</span> PDF
+                            </button>
+                            <button type="button" class="btn-menu btn-excel">
+                                <span class="material-icons">table_view</span> EXCEL
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="badge-contador-grande">
+                    Resultados: <span id="lblContador">0</span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div id="zonaResultados">
+    <div id="loader" style="display:none;">
+        <div class="brand-text">Baxen® Trazabilidad</div>
+        <div class="spinner"></div>
+        <div class="loading-text">Consultando procesos de acondicionado...</div>
+    </div>
+
+    <div id="divResultadosAco">
+        <div style="padding: 40px; text-align: center; color: #bdc3c7;">
+            <span class="material-icons" style="font-size: 48px;">fact_check</span>
+            <p>Ingrese los filtros y presione Buscar para consultar el historial.</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#btnBuscar").click(function () {
+                const formData = $("#formBusquedaAco").serialize();
+
+                $("#loader").css("display", "flex");
+                $("#divResultadosAco").css("opacity", "0.4");
+
+                $.ajax({
+                    url: '@Url.Action("Buscar", "BusAco")',
+                    type: 'POST',
+                    data: formData,
+                    success: function (result) {
+                        $("#loader").hide();
+                        $("#divResultadosAco").css("opacity", "1");
+                        $("#divResultadosAco").html(result);
+                    },
+                    error: function () {
+                        $("#loader").hide();
+                        $("#divResultadosAco").css("opacity", "1");
+                        alert("Error al recuperar los datos de acondicionado.");
+                    }
+                });
+            });
+
+            $('#formBusquedaAco input').keypress(function (e) {
+                if (e.which == 13) {
+                    $("#btnBuscar").click();
+                    return false;
+                }
+            });
+            $("#btnBuscar").click();
+        });
+    </script>
+}

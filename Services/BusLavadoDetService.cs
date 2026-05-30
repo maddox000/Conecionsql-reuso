@@ -9,7 +9,7 @@ using ConexionSql.Services.SP_Busquedas.Interfaces; // Nueva referencia
 using Dapper;
 using Microsoft.Extensions.Configuration;
 
-namespace Baxen.Services
+namespace ConexionSql.Services
 {
     public class BusLavadoDetService : IBusLavadoDetService
     {

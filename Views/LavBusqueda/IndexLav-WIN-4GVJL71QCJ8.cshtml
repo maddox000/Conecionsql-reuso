@@ -1,0 +1,193 @@
+﻿@model List<ConexionSql.Models.SP_Busquedas.BusLavadoDto>
+
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="~/css/busquedas-custom.css" />
+
+<style>
+    /* Ajustes específicos para esta vista sin tocar el CSS externo */
+
+    /* 1. Control de ubicación del contenedor de resultados */
+    #zonaResultados-wrapper {
+        margin-top: 15px !important; /* Ajusta este valor para subir o bajar todo el bloque */
+    }
+
+    /* 2. Ajuste del Loader para que coincida con la nueva altura */
+    #loader {
+        padding-top: 20px !important;
+    }
+
+    /* 3. Ajuste para que el mensaje de alerta ocupe todo el ancho como en la imagen */
+    #zonaResultados {
+        padding: 0 !important;
+    }
+
+        #zonaResultados .alert-info {
+            width: 100% !important;
+            margin-top: 0 !important;
+            max-width: none !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            border-radius: 0 !important;
+            border: none !important;
+            background-color: #d1f2eb !important; /* Color exacto de tu captura */
+            color: #1abc9c !important;
+        }
+
+    
+    /* ... tus estilos actuales ... */
+    /* ESTO ASEGURA QUE LA TABLA OCUPE EL 100% */
+    #zonaResultados table {
+        width: 100% !important;
+        table-layout: auto; /* Permite que las columnas se ajusten al contenido pero ocupen todo el ancho */
+        margin: 0 !important;
+    }
+
+</style>
+
+<div class="container-fluid">
+    <div class="contenedor-titulo">
+        <h1 class="titulo-derecha">Búsqueda de procesos de lavado</h1>
+    </div>
+
+    <div class="panel-filtros">
+        <div class="row">
+            @* COLUMNA 1 *@
+            <div class="col-12 col-md-6 col-lg-2">
+                <div class="form-group"><label>Fecha Inicio</label><input type="date" id="BUS_FEC_INI" class="form-control" value="@ViewBag.FEC_INI" /></div>
+                <div class="form-group"><label>Fecha Fin</label><input type="date" id="BUS_FEC_FIN" class="form-control" value="@ViewBag.FEC_FIN" /></div>
+                <div class="text-center">
+                    <span id="contador" class="badge-contador-grande" style="display:none;"></span>
+                </div>
+            </div>
+
+            @* COLUMNA 2 *@
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="form-group"><label>Tipo de proceso</label><input type="text" id="BUS_PTI" class="form-control autocompletar" data-tabla="TB_PRO_LAV" data-campo="TB_PRO_LAV_PTI_DEN" /></div>
+                <div class="form-group"><label>Equipo (TEQ)</label><input type="text" id="BUS_EQU_TEQ" class="form-control autocompletar" data-tabla="IB_EQU_TEQ" data-campo="IB_EQU_TEQ_DEN" /></div>
+                <div class="form-group"><label>Número de equipo</label><input type="text" id="BUS_EQU_NUM" class="form-control autocompletar" data-tabla="IB_EQU" data-campo="IB_EQU_NUM" /></div>
+            </div>
+
+            @* COLUMNA 3 *@
+            <div class="col-12 col-md-6 col-lg-2">
+                <div class="form-group"><label>Lote Lavado</label><input type="text" id="BUS_LOT" class="form-control" /></div>
+                <div class="form-group"><label>Estado</label><input type="text" id="BUS_EST" class="form-control autocompletar" data-tabla="TB_PRO_LAV" data-campo="TB_PRO_LAV_EST_DEN" /></div>
+            </div>
+
+            @* COLUMNA 4: Espacio para mantener orden *@
+            <div class="col-12 col-md-6 col-lg-3"></div>
+
+            @* COLUMNA 5: Operaciones *@
+            <div class="col-12 col-md-6 col-lg-2 ml-auto">
+                <div class="menu-operaciones">
+                    <button class="btn-menu" onclick="Buscar()"><span class="material-icons">search</span> Buscar</button>
+                    <div class="reporte-container">
+                        <button id="btnReporte" class="btn-menu" style="border-bottom:none">
+                            <span class="material-icons">description</span> Reporte
+                        </button>
+                        <div class="opciones-reporte">
+                            <button class="btn-menu btn-pdf" onclick="GenerarReporte('pdf')"><span class="material-icons">picture_as_pdf</span> PDF</button>
+                            <button class="btn-menu btn-excel" onclick="GenerarReporte('excel')"><span class="material-icons">table_view</span> Excel</button>
+                        </div>
+                    </div>
+                    <button class="btn-menu" onclick="Limpiar()"><span class="material-icons">cleaning_services</span> Limpiar</button>
+                    <button class="btn-menu" onclick="location.href='@Url.Action("Index", "Home")'"><span class="material-icons">logout</span> Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="zonaResultados-wrapper" style="position:relative;">
+        <div id="loader">
+            <span class="brand-text">Baxen® Trazabilidad</span>
+            <div class="spinner"></div>
+            <span class="loading-text">Procesando búsqueda de datos...</span>
+        </div>
+
+        <div id="zonaResultados">
+            @* Se carga la parcial. Si Model está vacío, el IF dentro de la parcial mostrará solo el mensaje *@
+            @Html.Partial("~/Views/LavBusqueda/_ResultadosBusLavado.cshtml", Model)
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(document).on('input change', '.form-control', function() {
+                $(this).val() ? $(this).addClass('campo-activo') : $(this).removeClass('campo-activo');
+            }).trigger('change');
+
+            $(".autocompletar").each(function() {
+                var $el = $(this);
+                $el.autocomplete({
+                    source: function (request, response) {
+                        $.getJSON('@Url.Action("GetSugerencias", "BusLavado")', {
+                            term: request.term, campo: $el.data('campo'), tabla: $el.data('tabla')
+                        }, response);
+                    },
+                    minLength: 2
+                });
+            });
+            Buscar();
+        });
+
+        function Buscar() {
+            var datos = obtenerFiltros();
+            $.ajax({
+                url: '@Url.Action("Buscar", "BusLavado")',
+                type: 'POST',
+                data: datos,
+                beforeSend: function() { $('#loader').css('display', 'flex'); },
+                success: function (html) {
+                    $('#zonaResultados').html(html);
+
+                    // Lógica de contador: solo cuenta si hay tabla (tr con más de 1 td)
+                    var filas = $('#zonaResultados tbody tr').filter(function() {
+                        return $(this).find('td').length > 1;
+                    }).length;
+
+                    $('#contador').html("Registros: " + filas).show();
+                },
+                complete: function() { $('#loader').hide(); }
+            });
+        }
+
+        function GenerarReporte(tipo) {
+            var datos = obtenerFiltros();
+            datos.Formato = tipo;
+            var form = document.createElement("form");
+            form.method = "POST";
+            form.action = '@Url.Action("GenerarReporte", "BusLavado")';
+            for (var key in datos) {
+                var input = document.createElement("input");
+                input.type = "hidden"; input.name = key; input.value = datos[key];
+                form.appendChild(input);
+            }
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        }
+
+        function obtenerFiltros() {
+            return {
+                BUS_FEC_INI: $('#BUS_FEC_INI').val(),
+                BUS_FEC_FIN: $('#BUS_FEC_FIN').val(),
+                BUS_PTI: $('#BUS_PTI').val(),
+                BUS_EQU_TEQ: $('#BUS_EQU_TEQ').val(),
+                BUS_EQU_NUM: $('#BUS_EQU_NUM').val(),
+                BUS_LOT: $('#BUS_LOT').val(),
+                BUS_EST: $('#BUS_EST').val()
+            };
+        }
+
+        function Limpiar() {
+            $('.form-control').val('').removeClass('campo-activo');
+            $('#BUS_FEC_INI').val('@ViewBag.FEC_INI');
+            $('#BUS_FEC_FIN').val('@ViewBag.FEC_FIN');
+            $('#contador').hide();
+            Buscar();
+        }
+    </script>
+}

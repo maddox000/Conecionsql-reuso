@@ -1,0 +1,650 @@
+﻿@{
+
+}
+
+<link rel="stylesheet" href="~/css/estadisticas-customs.css" />
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<style>
+    .panel-filtros {
+        height: 190px !important;
+        padding: 15px 25px !important;
+        margin-bottom: 10px !important;
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+    }
+
+    #zonaResultados {
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 100px;
+        max-height: 1000px;
+        overflow: auto !important;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        background: #fff;
+        margin-top: 10px;
+        padding: 20px;
+        position: relative;
+    }
+
+    .table-estadistica {
+        width: 100% !important;
+        border-collapse: separate;
+        border-spacing: 0;
+        table-layout: auto;
+    }
+
+        .table-estadistica thead th {
+            position: sticky !important;
+            top: 0 !important;
+            background-color: #2c3e50 !important;
+            color: #ffffff !important;
+            z-index: 10;
+            padding: 8px 12px;
+            font-size: 0.85rem !important;
+            font-weight: normal !important;
+            border: 1px solid #3e4f5f !important;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+    .header-anio-0 {
+        font-size: 0.9rem !important;
+        font-weight: bold !important;
+        background-color: #34495e !important;
+        color: #fff !important;
+    }
+
+    .table-estadistica tbody td {
+        padding: 6px 12px !important;
+        font-size: 0.8rem !important;
+        color: #2c3e50 !important;
+        border: 1px solid #dee2e6 !important;
+        white-space: nowrap;
+    }
+
+    .table-estadistica tbody tr:nth-child(even) {
+        background-color: #e9ecef !important;
+    }
+
+    .border-right-strong {
+        border-right: 3px solid #2c3e50 !important;
+    }
+
+    .border-left-strong {
+        border-left: 3px solid #2c3e50 !important;
+    }
+
+    .form-control:not(:placeholder-shown),
+    .form-control.has-value {
+        border-color: #2980b9 !important;
+        background-color: #f0f7fc !important;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(41, 128, 185, 0.25) !important;
+    }
+
+    .spinner-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        z-index: 9999;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .spinner-content-fluid {
+        text-align: center;
+        background: transparent !important;
+        border: none !important;
+        padding: 0;
+        box-shadow: none !important;
+    }
+
+        .spinner-content-fluid h3 {
+            margin: 0 0 4px 0;
+            color: #ffffff;
+            font-family: 'Century Gothic', 'Apple Gothic', sans-serif;
+            font-size: 1.7rem;
+            font-weight: normal !important;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+    .spinner-icon-box {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 22px 0;
+    }
+
+    .spinner-content-fluid i {
+        font-size: 4.5rem;
+        color: #3498db;
+        position: relative;
+        z-index: 2;
+        filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+    }
+
+    .spinner-content-fluid p {
+        margin: 4px 0 0 0;
+        color: #e5e8e8;
+        font-size: 1.25rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .wrapper-buscador-flotante {
+        position: relative;
+        width: 100%;
+    }
+
+    .sugerencias-autocompletar {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        max-height: 220px;
+        overflow-y: auto;
+        z-index: 10000;
+        width: 100%;
+        margin-top: 3px;
+        padding: 0;
+        list-style: none;
+    }
+
+        .sugerencias-autocompletar li {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #2c3e50;
+            transition: background 0.1s ease;
+        }
+
+            .sugerencias-autocompletar li:hover,
+            .sugerencias-autocompletar li.elemento-seleccionado {
+                background-color: #f0f7fc !important;
+                color: #2980b9 !important;
+                font-weight: 500;
+            }
+</style>
+
+<div id="loadingOverlay" class="spinner-overlay">
+    <div class="spinner-content-fluid">
+        <h3>Baxen® Trazabilidad</h3>
+        <div class="spinner-icon-box">
+            <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <p>Buscando la información solicitada.</p>
+    </div>
+</div>
+
+<div class="contenedor-titulo">
+    <h1 class="titulo-derecha">Estadística de Procesos</h1>
+</div>
+
+<div class="panel-filtros">
+    <div class="row">
+        <div class="col-md-10">
+            <div class="row">
+                <div class="col-md-2">
+                    <label>Desde:</label>
+                    <input type="date" id="txtFechaDesde" class="form-control" />
+                    <label style="margin-top: 8px;">Hasta:</label>
+                    <input type="date" id="txtFechaHasta" class="form-control" />
+                    <div class="badge-contador" style="margin-top: 10px; width: 100%; text-align: center;">
+                        Registros: <span id="lblTotal">0</span>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="wrapper-buscador-flotante">
+                        <label>Tipo de Ciclo:</label>
+                        <input type="text" id="txtCicloDen" class="form-control" placeholder="Buscar tipo de ciclo..." autocomplete="off" />
+                        <input type="hidden" id="hdnCicloId" />
+                    </div>
+
+                    <div class="wrapper-buscador-flotante">
+                        <label>Estado:</label>
+                        <input type="text" id="txtEstadoDen" class="form-control" placeholder="Buscar estado..." autocomplete="off" />
+                        <input type="hidden" id="hdnEstadoId" />
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="wrapper-buscador-flotante">
+                        <label>Equipo:</label>
+                        <input type="text" id="txtEquipoDen" class="form-control" placeholder="Buscar equipo..." autocomplete="off" />
+                        <input type="hidden" id="hdnEquipoId" />
+                    </div>
+                    <div class="form-check" style="margin-top: 25px; padding-left: 25px;">
+                        <input class="form-check-input" type="checkbox" id="chkSoloControles" style="transform: scale(1.2); cursor: pointer;" />
+                        <label class="form-check-label fw-normal" for="chkSoloControles" style="cursor: pointer; padding-left: 5px; color: #2c3e50; font-size: 0.9rem;">
+                            Controles de proceso
+                        </label>
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="menu-operaciones">
+                <button class="btn-menu" onclick="procesar()"><i class="fas fa-calculator"></i> &nbsp; Calcular</button>
+                <button class="btn-menu" onclick="alert('Exportando...')"><i class="fas fa-file-excel"></i> &nbsp; Exportar</button>
+                <button class="btn-menu" onclick="window.print()"><i class="fas fa-print"></i> &nbsp; Imprimir</button>
+                <button class="btn-menu" onclick="window.location.href='/'"><i class="fas fa-times"></i> &nbsp; Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" style="margin-top: 10px;">
+    <div class="col-md-12">
+        <div style="background:#fff; border:1px solid #dee2e6; border-radius:8px; padding:15px; display: flex; align-items: center; height: 260px;">
+            <div style="flex: 2; height: 100%;">
+                <canvas id="chartLineas"></canvas>
+            </div>
+            <div style="flex: 1; height: 100%;">
+                <canvas id="chartDona"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="zonaResultados"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    let miGraficoLineas = null;
+    let miGraficoDona = null;
+
+    $(document).ready(function () {
+        $('#txtFechaDesde').val(new Date().getFullYear() + "-01-01");
+        $('#txtFechaHasta').val(new Date().toISOString().split('T')[0]);
+
+        $('.form-control').on('input change keyup', function() {
+            actualizarEstiloFocoVisual(this);
+        });
+
+        enlazarBuscadorFlotante("#txtCicloDen", "#hdnCicloId", "@Url.Action("GetCiclos", "EstProcesos")", ["TB_PRO_TCI_DEN", "label"]);
+        enlazarBuscadorFlotante("#txtEstadoDen", "#hdnEstadoId", "@Url.Action("GetEstados", "EstProcesos")", ["IB_PRO_EST_DEN", "label"]);
+        enlazarBuscadorFlotante("#txtEquipoDen", "#hdnEquipoId", "@Url.Action("GetEquipos", "EstProcesos")", ["EquipoCompleto", "label"]);
+
+        $('.form-control').each(function() {
+            actualizarEstiloFocoVisual(this);
+        });
+
+        procesar();
+    });
+
+    function actualizarEstiloFocoVisual(elemento) {
+        if ($(elemento).val() && $(elemento).val().trim() !== "") {
+            $(elemento).addClass('has-value');
+        } else {
+            $(elemento).removeClass('has-value');
+        }
+    }
+
+    function enlazarBuscadorFlotante(inputSelector, hiddenSelector, url, camposCamino) {
+        const inputEl = document.querySelector(inputSelector);
+        let indiceActual = -1;
+
+        const listaUl = document.createElement("ul");
+        listaUl.className = "sugerencias-autocompletar";
+        listaUl.style.display = "none";
+        inputEl.parentNode.appendChild(listaUl);
+
+        inputEl.addEventListener("input", function() {
+            const texto = this.value.trim();
+            listaUl.innerHTML = "";
+            listaUl.style.display = "none";
+            indiceActual = -1;
+            if (hiddenSelector) document.querySelector(hiddenSelector).value = "";
+
+            let txtUpper = texto.toUpperCase();
+            if (txtUpper === "TODO" || txtUpper === "TODOS" || texto.length < 1) return;
+
+            fetch(`${url}?term=${encodeURIComponent(texto)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || data.length === 0) return;
+
+                    data.forEach(item => {
+                        let li = document.createElement("li");
+                        let descText = "";
+
+                        if (typeof item === 'string') {
+                            descText = item;
+                        } else {
+                            for (let i = 0; i < camposCamino.length; i++) {
+                                if (item[camposCamino[i]]) {
+                                    descText = item[camposCamino[i]];
+                                    break;
+                                }
+                            }
+                            if(!descText) descText = item.label || item.text || item.descripcion || "";
+                        }
+
+                        let idValue = typeof item === 'string' ? item : (item.id || "");
+                        if(idValue === "NO REGISTRADO" || idValue === "") idValue = "";
+
+                        li.textContent = descText;
+                        li.dataset.id = idValue;
+
+                        li.addEventListener("click", function() {
+                            seleccionarElemento(descText, idValue);
+                        });
+                        listaUl.appendChild(li);
+                    });
+                    listaUl.style.display = "block";
+                });
+        });
+
+        inputEl.addEventListener("keydown", function(e) {
+            const elementosLi = listaUl.getElementsByTagName("li");
+            if (elementosLi.length === 0) return;
+
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                indiceActual++;
+                if (indiceActual >= elementosLi.length) indiceActual = 0;
+                resaltarSugerencia(elementosLi);
+            }
+            else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                indiceActual--;
+                if (indiceActual < 0) indiceActual = elementosLi.length - 1;
+                resaltarSugerencia(elementosLi);
+            }
+            else if (e.key === "Enter") {
+                e.preventDefault();
+                if (indiceActual > -1 && elementosLi[indiceActual]) {
+                    elementosLi[indiceActual].click();
+                }
+            }
+        });
+
+        function resaltarSugerencia(listado) {
+            for (let i = 0; i < listado.length; i++) {
+                listado[i].classList.remove("elemento-seleccionado");
+            }
+            if (indiceActual > -1 && listado[indiceActual]) {
+                listado[indiceActual].classList.add("elemento-seleccionado");
+                listado[indiceActual].scrollIntoView({ block: "nearest" });
+            }
+        }
+
+        function seleccionarElemento(texto, id) {
+            inputEl.value = texto;
+            if (hiddenSelector) document.querySelector(hiddenSelector).value = id;
+            listaUl.innerHTML = "";
+            listaUl.style.display = "none";
+            indiceActual = -1;
+            actualizarEstiloFocoVisual(inputEl);
+        }
+
+        document.addEventListener("click", function(e) {
+            if (e.target !== inputEl) {
+                listaUl.innerHTML = "";
+                listaUl.style.display = "none";
+                indiceActual = -1;
+            }
+        });
+    }
+
+    function procesar() {
+        $('#loadingOverlay').css('display', 'flex');
+
+        const limpiarTextoDenominacion = (sel) => {
+            let v = $(sel).val();
+            if (!v || v.trim() === "") return null;
+            return v.trim();
+        };
+
+        const params = {
+            desde: $('#txtFechaDesde').val(),
+            hasta: $('#txtFechaHasta').val(),
+            estadoDen: limpiarTextoDenominacion('#txtEstadoDen'),
+            cicloDen: limpiarTextoDenominacion('#txtCicloDen'),
+            equipoDen: limpiarTextoDenominacion('#txtEquipoDen'),
+            soloControles: $('#chkSoloControles').is(':checked')
+        };
+
+        $.post('@Url.Action("ObtenerDatos", "EstProcesos")', params, function (data) {
+            $('#loadingOverlay').hide();
+
+            if (!data || data.length === 0 || data[0].Mensaje === 'Sin datos') {
+                $('#zonaResultados').html('<div class="msg-vacio">No hay registros con los filtros seleccionados.</div>');
+                $('#lblTotal').text(0);
+                if (miGraficoLineas) miGraficoLineas.destroy();
+                if (miGraficoDona) miGraficoDona.destroy();
+                return;
+            }
+            actualizarPantalla(data);
+        }).fail(function() {
+            $('#loadingOverlay').hide();
+            $('#zonaResultados').html('<div class="msg-vacio" style="color: #c0392b;"><i class="fas fa-exclamation-triangle"></i> Error al intentar procesar los datos remotos.</div>');
+        });
+    }
+
+    function extraerTexto(obj) {
+        if (obj === undefined || obj === null || String(obj).trim() === "" || String(obj) === "null") return "NO REGISTRADO";
+        return String(obj).trim();
+    }
+
+    function actualizarPantalla(data) {
+        const colsMeses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+        const nombresMesesHeaders = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sept', 'oct', 'nov', 'dic'];
+
+        let txtEstado = $('#txtEstadoDen').val() ? $('#txtEstadoDen').val().trim() : "";
+        let txtCiclo = $('#txtCicloDen').val() ? $('#txtCicloDen').val().trim() : "";
+        let txtEquipo = $('#txtEquipoDen').val() ? $('#txtEquipoDen').val().trim() : "";
+
+        // REGLA DE NEGOCIO: Evaluamos si realmente se aplicó un filtro específico y no la palabra "Todos"
+        let filtrarEst = (txtEstado !== "" && txtEstado.toLowerCase() !== "todos");
+        let filtrarCic = (txtCiclo !== "" && txtCiclo.toLowerCase() !== "todos");
+        let filtrarEqu = (txtEquipo !== "" && txtEquipo.toLowerCase() !== "todos");
+
+        // Decidimos mostrar la columna si el usuario escribió algo (así sea "Todos" para ver el dato plano)
+        let mostrarEst = (txtEstado !== "");
+        let mostrarCic = (txtCiclo !== "");
+        let mostrarEqu = (txtEquipo !== "");
+
+        // Obtener la lista única de años presentes en el resultado de la base de datos
+        let listaAnios = [...new Set(data.map(item => item["ANIO"]))].sort();
+
+        // Estructura para pivotar y consolidar filas de manera horizontal
+        let filasAgrupadas = {};
+
+        data.forEach(item => {
+            let proc = item["TB_PRO_PTI_DEN"] || "NO REGISTRADO";
+            let est = item["IB_PRO_EST_DEN"] || "NO REGISTRADO";
+            let cic = item["TB_PRO_TCI_DEN"] || "NO REGISTRADO";
+            let equ = item["TB_PRO_EQU_COMPLETO"] || "NO REGISTRADO";
+
+            // CONSTRUCCIÓN DE CLAVE: Si NO se filtra, agrupamos todo bajo el mismo Proceso (así no se duplica por año)
+            let key = proc;
+            if (filtrarEst) key += "_" + est;
+            if (filtrarCic) key += "_" + cic;
+            if (filtrarEqu) key += "_" + equ;
+
+            if (!filasAgrupadas[key]) {
+                filasAgrupadas[key] = {
+                    proceso: proc,
+                    estado: est,
+                    ciclo: cic,
+                    equipo: equ,
+                    totalGeneral: 0,
+                    valoresAnuales: {}
+                };
+            }
+
+            let anio = item["ANIO"];
+            if (!filasAgrupadas[key].valoresAnuales[anio]) {
+                filasAgrupadas[key].valoresAnuales[anio] = {};
+                colsMeses.forEach(m => { filasAgrupadas[key].valoresAnuales[anio][m] = 0; });
+            }
+
+            // Acumulación segura de los totales mensuales adentro del bloque anual correspondiente
+            colsMeses.forEach(m => {
+                let v = item[m] || 0;
+                filasAgrupadas[key].valoresAnuales[anio][m] += v;
+                filasAgrupadas[key].totalGeneral += v;
+            });
+        });
+
+        let listaFilas = Object.values(filasAgrupadas);
+
+        // Fijamos la cantidad de filas maestras finales en el contador de la pantalla
+        $('#lblTotal').text(listaFilas.length);
+        $('#zonaResultados').html('<table class="table-estadistica"><thead id="theadEst"></thead><tbody id="tbodyEst"></tbody></table>');
+
+        // 1) RENDER DE CABECERAS (THEAD)
+        let h1 = `<tr><th rowspan="2" class="border-right-strong">Tipo de Proceso</th>`;
+        if (mostrarEst) h1 += `<th rowspan="2">Estado</th>`;
+        if (mostrarCic) h1 += `<th rowspan="2">Ciclo</th>`;
+        if (mostrarEqu) h1 += `<th rowspan="2">Equipo</th>`;
+        h1 += `<th rowspan="2" class="border-right-strong" style="background-color: #1f2d3d !important; font-weight: bold;">Total</th>`;
+
+        listaAnios.forEach(anio => {
+            h1 += `<th colspan="12" class="text-center header-anio-0 border-left-strong border-right-strong">${anio}</th>`;
+        });
+        h1 += `</tr>`;
+
+        let h2 = `<tr>`;
+        listaAnios.forEach(anio => {
+            nombresMesesHeaders.forEach(m => {
+                h2 += `<th class="text-center">${m}</th>`;
+            });
+        });
+        h2 += `</tr>`;
+        $('#theadEst').html(h1 + h2);
+
+        // 2) RENDER DE FILAS CONSOLIDADAS (TBODY)
+        let htmlRows = "";
+        listaFilas.forEach(f => {
+            htmlRows += `<tr><td class="border-right-strong" style="font-weight: 500;">${f.proceso}</td>`;
+            if (mostrarEst) htmlRows += `<td>${f.estado}</td>`;
+            if (mostrarCic) htmlRows += `<td>${f.ciclo}</td>`;
+            if (mostrarEqu) htmlRows += `<td>${f.equipo}</td>`;
+
+            htmlRows += `<td class="text-center border-right-strong fw-bold" style="background-color: #ebf5fb; color: #2980b9;">${f.totalGeneral}</td>`;
+
+            // Despliegue horizontal continuo de todos los años seleccionados
+            listaAnios.forEach(anio => {
+                let datosAnio = f.valoresAnuales[anio];
+                colsMeses.forEach(m => {
+                    let val = datosAnio ? (datosAnio[m] || 0) : 0;
+                    htmlRows += `<td class="text-center" style="${val == 0 ? 'color:#ccc' : 'font-weight: 500;'}">${val}</td>`;
+                });
+            });
+            htmlRows += `</tr>`;
+        });
+
+        $('#tbodyEst').html(htmlRows);
+
+        generarGraficos(data, colsMeses);
+    }
+
+    function generarGraficos(data, labelsMeses) {
+        // Consolidación de gráficos por tipo de proceso global
+        let procesosUnicos = [...new Set(data.map(item => item["TB_PRO_PTI_DEN"]))];
+
+        const ctxL = document.getElementById('chartLineas').getContext('2d');
+        if (miGraficoLineas) miGraficoLineas.destroy();
+        miGraficoLineas = new Chart(ctxL, {
+            type: 'line',
+            data: {
+                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                datasets: procesosUnicos.map((proc, i) => {
+                    // Sumar meses de todos los años para el gráfico comparativo anual
+                    let dataMeses = new Array(12).fill(0);
+                    data.filter(x => x["TB_PRO_PTI_DEN"] === proc).forEach(item => {
+                        labelsMeses.forEach((m, idx) => {
+                            dataMeses[idx] += (item[m] || 0);
+                        });
+                    });
+
+                    return {
+                        label: proc,
+                        data: dataMeses,
+                        borderColor: generadorColor(i),
+                        backgroundColor: generadorColor(i),
+                        tension: 0.3,
+                        pointRadius: 3
+                    };
+                })
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        const ctxD = document.getElementById('chartDona').getContext('2d');
+        if (miGraficoDona) miGraficoDona.destroy();
+
+        let totalesDona = {};
+        procesosUnicos.forEach(p => { totalesDona[p] = 0; });
+        data.forEach(item => {
+            totalesDona[item["TB_PRO_PTI_DEN"]] += (item["TOTAL_ANUAL"] || 0);
+        });
+
+        miGraficoDona = new Chart(ctxD, {
+            type: 'doughnut',
+            data: {
+                labels: procesosUnicos,
+                datasets: [{
+                    data: procesosUnicos.map(p => totalesDona[p]),
+                    backgroundColor: procesosUnicos.map((_, i) => generadorColor(i)),
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        labels: { boxWidth: 12, font: { size: 11 }, padding: 15 }
+                    }
+                },
+                cutout: '60%'
+            }
+        });
+    }
+
+    function generadorColor(i) {
+        const colores = ['#2980b9', '#c0392b', '#27ae60', '#f39c12', '#8e44ad', '#34495e', '#16a085', '#d35400', '#7f8c8d'];
+        return colores[i % colores.length];
+    }
+</script>

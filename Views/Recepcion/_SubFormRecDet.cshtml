@@ -719,15 +719,18 @@
         codigoProductoInput.addEventListener("blur", async function () {
             const valor = (this.value || "").trim();
 
-                console.log("BLUR CODIGO PRODUCTO, valor:", valor);
-                 // debugger;
+                // console.log("BLUR CODIGO PRODUCTO, valor:", valor);
+                //  // debugger;
 
                 if (valor === "") {
 
-        const modalOrtopedia =
-            document.getElementById("modalRegistroOrtopedia");
+            const modalOrtopedia =
+                    document.getElementById("modalRegistroOrtopedia");
 
-                if (!modalOrtopedia) {
+                const modalProfesional =
+                    document.getElementById("modalRegistroProfesional");
+
+                if (!modalOrtopedia && !modalProfesional) {
 
                     setTimeout(() => {
                         materialBusqueda.focus();
@@ -875,7 +878,7 @@
 
             if (texto.length < 1) return;
 
-            console.log("buscando texto:", texto);
+            // console.log("buscando texto:", texto);
 
             fetch(`/TbRecDet/BuscarMaterial?texto=${encodeURIComponent(texto)}`)
                 .then(res => res.json())
@@ -981,6 +984,7 @@
         const btnPrioridadSi = document.getElementById("btnPrioridadSi");
         const btnPrioridadNo = document.getElementById("btnPrioridadNo");
 
+            
         let ejecutandoGuardado = false;
         let vieneDeReuso = false;
         let requiereControlAdicional = false;
@@ -989,6 +993,7 @@
         let resolverPrioridadProceso = null;
         let confirmarReusoExcedido = false;
         let requiereRegistroPaciente = false;
+        window.ortopedia = null;
 
         if (inputReuVisible) {
         inputReuVisible.addEventListener("keydown", async function (e) {
@@ -1043,7 +1048,7 @@
                     if (comboMaterial) {
                         comboMaterial.value = String(result.ibMatId);
                         comboMaterial.dispatchEvent(new Event("change", { bubbles: true }));
-                        console.log("valor combo después:", comboMaterial.value);
+                        // console.log("valor combo después:", comboMaterial.value);
                     }
 
                     if (hiddenMatId) {
@@ -1055,7 +1060,7 @@
                     }
 
                     mostrarOk(result.mensaje || "Reuso encontrado correctamente.");
-                        console.log("Respuesta reuso:", result);
+                        // console.log("Respuesta reuso:", result);
 
                         if (requiereRegistroPaciente) {
                             if (document.getElementById("pacienteCodigoReuso")) {
@@ -1436,7 +1441,7 @@
             if (comboMaterial) {
                 comboMaterial.value = String(result.ibMatId);
                 comboMaterial.dispatchEvent(new Event("change", { bubbles: true }));
-                console.log("valor combo después:", comboMaterial.value);
+                // console.log("valor combo después:", comboMaterial.value);
             }
 
             if (hiddenMatId) {
@@ -1606,6 +1611,8 @@
                     TB_REC_DET_ENT_CANT: parseInt(entCantInput?.value) || 0,
 
                     ConfirmarReusoExcedido: confirmarReusoExcedido,
+                        Ortopedia: window.ortopedia,
+                            Profesional: window.profesional,
 
                     RegistroControlArmado: datosControlAdicional
                 };

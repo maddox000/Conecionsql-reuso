@@ -527,6 +527,41 @@
             });
         </script>
     }
+
+    @if (ViewBag.AbrirModalProfesional == true)
+    {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+
+                fetch("/TbRecProfesional/AbrirModalProfesional?tbRecId=@ViewBag.TbRecIdProfesional")
+                    .then(response => response.text())
+                    .then(html => {
+
+                        const contenedor =
+                            document.getElementById("contenedorModalOrtopedia");
+
+                        contenedor.innerHTML = html;
+
+                        contenedor.querySelectorAll("script").forEach(script => {
+                            const nuevo = document.createElement("script");
+                            nuevo.text = script.innerHTML;
+                            document.body.appendChild(nuevo);
+                        });
+
+                        const modal =
+                            document.getElementById("modalRegistroProfesional");
+
+                        if (modal) {
+                            modal.style.display = "flex";
+                        }
+
+                        console.log("MODAL PROFESIONAL CARGADO");
+
+                    });
+
+            });
+        </script>
+    }
     
 
 }

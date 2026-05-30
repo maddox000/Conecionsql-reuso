@@ -577,14 +577,14 @@
 </div>
 
 <script>
-    console.log('>> Script cargado');
+    @* console.log('>> Script cargado'); *@
 
 var productoSeleccionado = null;
 var btnEditarProductoHabilitado = false;
 
 // FUNCIÓN GLOBAL PARA GUARDAR EDICIÓN
 function guardarEdicion() {
-    console.log('>> guardarEdicion() llamada');
+    @* console.log('>> guardarEdicion() llamada'); *@
     
     const productoModificado = {
         id: parseInt(document.getElementById('editarProductoId').value),
@@ -598,7 +598,7 @@ function guardarEdicion() {
         oculto: document.getElementById('editarProductoOculto').checked
     };
     
-    console.log('Enviando:', productoModificado);
+    @* console.log('Enviando:', productoModificado); *@
     
     fetch('/Home/ModificarProducto', {
         method: 'POST',
@@ -620,10 +620,10 @@ function guardarEdicion() {
 
 // FUNCIÓN GLOBAL PARA ABRIR MODAL
 function abrirModalEditar() {
-    console.log('*** FUNCIÓN abrirModalEditar() EJECUTADA ***');
+    @* console.log('*** FUNCIÓN abrirModalEditar() EJECUTADA ***'); *@
     
     const modalEditarProducto = document.getElementById('modalEditarProducto');
-    console.log('Modal exists:', !!modalEditarProducto);
+    @* console.log('Modal exists:', !!modalEditarProducto); *@
     
     if (!btnEditarProductoHabilitado) {
         alert('Por favor selecciona un producto primero');
@@ -635,7 +635,7 @@ function abrirModalEditar() {
         return;
     }
     
-    console.log('Llenando formulario con:', productoSeleccionado);
+    @* console.log('Llenando formulario con:', productoSeleccionado); *@
     
     // Fill form
     document.getElementById('editarProductoId').value = productoSeleccionado.id || '';
@@ -651,16 +651,16 @@ function abrirModalEditar() {
     if (chk1) chk1.checked = productoSeleccionado.controlado;
     if (chk2) chk2.checked = productoSeleccionado.oculto;
     
-    console.log('Abriendo modal...');
+    @* console.log('Abriendo modal...'); *@
     if (modalEditarProducto) {
         modalEditarProducto.style.display = 'flex';
-        console.log('*** MODAL ABIERTO ***');
+        @* console.log('*** MODAL ABIERTO ***'); *@
     }
 }
 
 // INICIALIZAR (compatible con SPA shell re-ejecución)
 (function() {
-    console.log('>> Inicializando script productos');
+    @* console.log('>> Inicializando script productos'); *@
     
     const modalEditarProducto = document.getElementById('modalEditarProducto');
     const formEditarProducto = document.getElementById('formEditarProducto');
@@ -686,7 +686,7 @@ function abrirModalEditar() {
                 oculto: this.getAttribute('data-oculto') === 'True'
             };
             
-            console.log('✓ Producto seleccionado:', productoSeleccionado);
+            @* console.log('✓ Producto seleccionado:', productoSeleccionado); *@
             
             // Update detail panel
             document.getElementById('detalle-codigo-sistema').textContent = productoSeleccionado.id;
@@ -708,7 +708,7 @@ function abrirModalEditar() {
                 btnEditarProducto.style.backgroundColor = '#2c3e50';
                 btnEditarProducto.classList.remove('disabled');
                 btnEditarProducto.removeAttribute('aria-disabled');
-                console.log('✓ Botón Editar habilitado');
+                @* console.log('✓ Botón Editar habilitado'); *@
             }
         });
     });
@@ -749,7 +749,7 @@ function abrirModalEditar() {
         });
     }
     
-    console.log('>> Inicialización completada');
+    @* console.log('>> Inicialización completada'); *@
 })();
 
 // === EQUIPOS: selección de fila y editar ===

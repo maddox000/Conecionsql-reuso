@@ -1,0 +1,199 @@
+﻿@model List<ConexionSql.Models.SP_Busquedas.BusProDto>
+
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="~/css/busquedas-custom.css" />
+
+<style>
+    /* Ajustes específicos para esta vista */
+    #zonaResultados-wrapper {
+        margin-top: 15px !important;
+    }
+
+    #loader {
+        padding-top: 20px !important;
+    }
+
+    #zonaResultados {
+        padding: 0 !important;
+    }
+
+        #zonaResultados .alert-info {
+            width: 100% !important;
+            margin-top: 0 !important;
+            max-width: none !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            border-radius: 0 !important;
+            border: none !important;
+            background-color: #d1f2eb !important;
+            color: #1abc9c !important;
+        }
+
+        #zonaResultados table {
+            width: 100% !important;
+            table-layout: auto;
+            margin: 0 !important;
+        }
+</style>
+
+<div class="container-fluid">
+    <div class="contenedor-titulo">
+        <h1 class="titulo-derecha">Búsqueda de procesos generales</h1>
+    </div>
+
+    <div class="panel-filtros">
+        <div class="row">
+            @* COLUMNA 1: Fechas y Contador *@
+            <div class="col-12 col-md-6 col-lg-2">
+                <div class="form-group">
+                    <label>Fecha Inicio</label>
+                    <input type="date" id="FEC_INI" class="form-control" value="@ViewBag.FEC_INI" />
+                </div>
+                <div class="form-group">
+                    <label>Fecha Fin</label>
+                    <input type="date" id="FEC_FIN" class="form-control" value="@ViewBag.FEC_FIN" />
+                </div>
+                <div class="text-center">
+                    <span id="contador" class="badge-contador-grande" style="display:none;"></span>
+                </div>
+            </div>
+
+            @* COLUMNA 2: Filtros de Programa *@
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="form-group">
+                    <label>Programa / PTI</label>
+                    <input type="text" id="BUS_PTI_DEN" class="form-control autocompletar"
+                           data-tabla="TB_PRO" data-campo="TB_PRO_PTI_DEN" placeholder="Nombre del programa..." />
+                </div>
+            </div>
+
+            @* COLUMNA 3: Filtros de Estado *@
+            <div class="col-12 col-md-6 col-lg-2">
+                <div class="form-group">
+                    <label>Estado del proceso</label>
+                    <input type="text" id="BUS_EST_DEN" class="form-control autocompletar"
+                           data-tabla="TB_PRO" data-campo="IB_PRO_EST_DEN" placeholder="Estado..." />
+                </div>
+            </div>
+
+            @* COLUMNA 4: Espacio *@
+            <div class="col-12 col-md-6 col-lg-3"></div>
+
+            @* COLUMNA 5: Operaciones *@
+            <div class="col-12 col-md-6 col-lg-2 ml-auto">
+                <div class="menu-operaciones">
+                    <button class="btn-menu" onclick="Buscar()"><span class="material-icons">search</span> Buscar</button>
+
+                    <div class="reporte-container">
+                        <button id="btnReporte" class="btn-menu" style="border-bottom:none">
+                            <span class="material-icons">description</span> Reporte
+                        </button>
+                        <div class="opciones-reporte">
+                            <button class="btn-menu btn-pdf" onclick="GenerarReporte('pdf')"><span class="material-icons">picture_as_pdf</span> PDF</button>
+                            <button class="btn-menu btn-excel" onclick="GenerarReporte('excel')"><span class="material-icons">table_view</span> Excel</button>
+                        </div>
+                    </div>
+
+                    <button class="btn-menu" onclick="Limpiar()"><span class="material-icons">cleaning_services</span> Limpiar</button>
+                    <button class="btn-menu" onclick="location.href='@Url.Action("Index", "Home")'"><span class="material-icons">logout</span> Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="zonaResultados-wrapper" style="position:relative;">
+        <div id="loader">
+            <span class="brand-text">Baxen® Trazabilidad</span>
+            <div class="spinner"></div>
+            <span class="loading-text">Procesando búsqueda de procesos...</span>
+        </div>
+
+        <div id="zonaResultados">
+            @* Carga inicial de la parcial *@
+            @Html.Partial("~/Views/ProBusqueda/_ResultadosBusPro.cshtml", Model)
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Manejo de etiquetas activas
+            $(document).on('input change', '.form-control', function() {
+                $(this).val() ? $(this).addClass('campo-activo') : $(this).removeClass('campo-activo');
+            }).trigger('change');
+
+            // Autocomplete genérico
+            $(".autocompletar").each(function() {
+                var $el = $(this);
+                $el.autocomplete({
+                    source: function (request, response) {
+                        $.getJSON('@Url.Action("GetSugerencias", "BusPro")', {
+                            term: request.term, campo: $el.data('campo'), tabla: $el.data('tabla')
+                        }, response);
+                    },
+                    minLength: 2
+                });
+            });
+
+            // Disparar búsqueda inicial
+            Buscar();
+        });
+
+        function Buscar() {
+            var datos = obtenerFiltros();
+            $.ajax({
+                url: '@Url.Action("Buscar", "BusPro")',
+                type: 'POST',
+                data: datos,
+                beforeSend: function() { $('#loader').css('display', 'flex'); },
+                success: function (html) {
+                    $('#zonaResultados').html(html);
+
+                    // Contador de filas reales
+                    var filas = $('#zonaResultados tbody tr').filter(function() {
+                        return $(this).find('td').length > 1;
+                    }).length;
+
+                    $('#contador').html("Registros: " + filas).show();
+                },
+                complete: function() { $('#loader').hide(); }
+            });
+        }
+
+        function obtenerFiltros() {
+            return {
+                FEC_INI: $('#FEC_INI').val(),
+                FEC_FIN: $('#FEC_FIN').val(),
+                BUS_PTI_DEN: $('#BUS_PTI_DEN').val(),
+                BUS_EST_DEN: $('#BUS_EST_DEN').val()
+            };
+        }
+
+        function GenerarReporte(tipo) {
+            var datos = obtenerFiltros();
+            datos.Formato = tipo;
+            var form = document.createElement("form");
+            form.method = "POST";
+            form.action = '@Url.Action("GenerarReporte", "BusPro")';
+            for (var key in datos) {
+                var input = document.createElement("input");
+                input.type = "hidden"; input.name = key; input.value = datos[key];
+                form.appendChild(input);
+            }
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        }
+
+        function Limpiar() {
+            $('.form-control').val('').removeClass('campo-activo');
+            $('#FEC_INI').val('@ViewBag.FEC_INI');
+            $('#FEC_FIN').val('@ViewBag.FEC_FIN');
+            $('#contador').hide();
+            Buscar();
+        }
+    </script>
+}

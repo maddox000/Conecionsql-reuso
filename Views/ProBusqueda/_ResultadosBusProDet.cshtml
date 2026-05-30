@@ -1,0 +1,64 @@
+﻿@model IEnumerable<ConexionSql.Models.SP_Busquedas.BusProDetDto>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table-baxen-resultados">
+        <thead>
+            <tr>
+                <th>ID Rec.</th>
+                <th>Material / Denominación</th>
+                <th style="text-align: center;">Cant.</th>
+                <th>Sector Destino</th>
+                <th>Equipo / Proceso</th>
+                <th>Fecha / Inicio</th>
+                <th style="text-align: center;">Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td style="font-weight: bold; color: #2c3e50; cursor:pointer;"
+                        ondblclick="window.location.href='/Traza/TrazaRecDetID/@item.TB_PRO_DET_REC_DET_ID'">
+                        @item.TB_PRO_DET_REC_DET_ID
+                    </td>
+                    <td>
+                        <div style="font-weight: 600;">@item.TB_PRO_DET_REC_DET_MAT_DEN</div>
+                        <small class="text-muted">Mat. ID: @item.TB_PRO_DET_REC_DET_MAT_ID</small>
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="badge" style="background-color: #ebedef; color: #2c3e50; font-size: 0.9rem; border: 1px solid #d5dbdb;">
+                            @(item.TB_PRO_DET_CANT_MULT ?? item.TB_PRO_DET_CANT)
+                        </span>
+                    </td>
+                    <td>
+                        <i class="material-icons" style="font-size: 14px; vertical-align: middle; color: #7f8c8d;">room</i>
+                        @item.TB_REC_SEC_DES_DEN
+                    </td>
+                    <td>
+                        <div style="color: #2980b9; font-weight: 600;">@item.EQUIPO</div>
+                        <small class="text-muted">Proc. ID: @item.TB_PRO_ID</small>
+                    </td>
+                    <td>
+                        <div style="font-weight: 500;">
+                            @(item.TB_PRO_FEC.HasValue? item.TB_PRO_FEC.Value.ToString("dd/MM/yyyy") : "-")
+                        </div>
+                        <small class="text-muted">@item.TB_PRO_HOR_INI hs</small>
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn-ver-detalle" onclick="verTrazabilidad(@item.TB_PRO_DET_REC_DET_ID)" title="Ver Trazabilidad Completa">
+                            <span class="material-icons">account_tree</span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info" role="alert" style="margin-bottom: 0;">
+        <i class="material-icons" style="vertical-align: middle;">info</i>
+        No hay detalles de procesos activos que coincidan con los filtros seleccionados.
+    </div>
+}

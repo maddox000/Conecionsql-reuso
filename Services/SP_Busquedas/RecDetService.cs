@@ -129,17 +129,5 @@ namespace ConexionSql.Services.SP_Busquedas
             }
             return sugerencias;
         }
-
-        public IEnumerable<object> GetRecolecciones(
-                DateTime d1,
-                DateTime d2,
-                string s1,
-                string s2,
-                string s3,
-                string s4,
-                string s5)
-        {
-            return new List<object>();
-        }
     }
 }

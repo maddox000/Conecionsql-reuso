@@ -1,0 +1,78 @@
+﻿@{
+    ViewData["Title"] = "Búsqueda Detalle Lavado";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5>Filtros de Búsqueda</h5>
+    </div>
+    <div class="card-body">
+        <form id="formBusqueda" class="row g-3">
+            <div class="col-md-3">
+                <label>Fecha Inicio</label>
+                <input type="date" name="fecIni" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label>Fecha Fin</label>
+                <input type="date" name="fecFin" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label>ID Proceso</label>
+                <input type="number" name="proId" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label>Lote</label>
+                <input type="text" name="lot" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label>Tipo Proceso</label>
+                <input type="text" name="pti" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label>Estado</label>
+                <input type="text" name="est" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label>Etiqueta (CET)</label>
+                <input type="number" name="cet" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label>ID Reúso</label>
+                <input type="text" name="reuId" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label>Denominación</label>
+                <input type="text" name="den" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label>Sector</label>
+                <input type="text" name="sec" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label>Test Proteínas</label>
+                <input type="text" name="tprot" class="form-control" />
+            </div>
+            <div class="col-12 text-end">
+                <button type="button" onclick="EjecutarBusqueda()" class="btn btn-primary">Buscar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="divResultados" class="mt-4">
+</div>
+
+@section Scripts {
+    <script src="~/js/busquedas-custom.js"></script>
+    <script>
+        function EjecutarBusqueda() {
+            const formData = $('#formBusqueda').serialize();
+            $.post('/BusLavadoDet/Buscar', formData, function (data) {
+                $('#divResultados').html(data);
+                if (typeof InicializarDataTable === 'function') {
+                    InicializarDataTable();
+                }
+            });
+        }
+    </script>
+}

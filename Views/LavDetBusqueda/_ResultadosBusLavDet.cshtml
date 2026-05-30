@@ -1,0 +1,42 @@
+﻿@model IEnumerable<ConexionSql.Models.SP_Busquedas.BusLavadoDetDto>
+
+<table class="table table-hover table-striped">
+    <thead>
+        <tr>
+            <th>Lavado</th>
+            <th>Fecha</th>
+            <th>Lote</th>
+            <th>Tipo lavado</th>
+            <th>Estado</th>
+            <th>Denominación</th>
+            <th>Código reúso</th>
+            <th>Sector</th>
+            <th>Cantidad</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.TB_PRO_LAV_ID</td>
+                    <td>@item.FechaStr</td>
+                    <td>@item.TB_PRO_LAV_NUM</td>
+                    <td>@item.TB_PRO_LAV_PTI_DEN</td>
+                    <td>@item.TB_PRO_LAV_EST_DEN</td>
+                    <td>@item.TB_REC_DET_MAT_DEN</td>
+                    <td>@item.TB_PRO_LAV_DET_REU_ID</td>
+                    <td>@item.TB_PRO_LAV_DET_IB_MAT_DEN</td>
+                    <td>@item.TB_PRO_LAV_DET_SEC_DES_ID</td>
+                    <td>@item.TB_PRO_LAV_DET_PTEST</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr><td colspan="9" class="text-center">Sin resultados.</td></tr>
+        }
+    </tbody>
+</table>

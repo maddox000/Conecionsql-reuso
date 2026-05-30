@@ -1,0 +1,309 @@
+﻿@model IEnumerable<ConexionSql.Models.InfoBasica.IbEquDto>
+
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<link rel="stylesheet" href="~/css/infobasica-custom.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/area-sistema.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
+
+<style>
+    .rec-screen-table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .rec-screen-table tbody tr:hover {
+        background-color: #f0f0f0 !important;
+    }
+
+    .rec-screen-table tbody tr.fila-seleccionada {
+        background-color: #e2e2e2 !important;
+    }
+
+    .rec-screen-table tbody tr.fila-inhabilitada {
+        background-color: #fafafa !important;
+        opacity: 0.55;
+    }
+
+        .rec-screen-table tbody tr.fila-inhabilitada td {
+            color: #999999 !important;
+        }
+
+    .rec-screen-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        table-layout: fixed;
+        text-align: left;
+    }
+
+        .rec-screen-table th {
+            position: sticky;
+            top: 0;
+            background-color: #34495e;
+            color: white;
+            padding: 10px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            z-index: 10;
+            border-bottom: none;
+            border-right: 1px solid #576d82;
+        }
+
+            .rec-screen-table th:last-child {
+                border-right: none;
+            }
+
+            .rec-screen-table th:first-child {
+                border-top-left-radius: 6px;
+            }
+
+            .rec-screen-table th:last-child {
+                border-top-right-radius: 6px;
+            }
+
+        .rec-screen-table td {
+            border-bottom: 1px solid #eee;
+            padding: 10px;
+            font-size: 0.85rem;
+            color: #444;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+    .campo-detalle {
+        height: 26px;
+        padding: 2px 8px;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        color: #333;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        box-sizing: border-box;
+    }
+
+    .campo-centrado {
+        justify-content: center !important;
+        text-align: center;
+    }
+
+    .label-detalle {
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: #666;
+        margin-bottom: 3px;
+        display: block;
+    }
+
+    .baxen-switch-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 26px;
+    }
+
+    .baxen-switch {
+        position: relative;
+        display: inline-block;
+        width: 42px;
+        height: 20px;
+    }
+
+        .baxen-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+    .baxen-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .3s;
+        border-radius: 20px;
+    }
+
+        .baxen-slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+    input:checked + .baxen-slider {
+        background-color: #34495e;
+    }
+
+        input:checked + .baxen-slider:before {
+            transform: translateX(22px);
+        }
+
+    .switch-readonly {
+        pointer-events: none;
+    }
+</style>
+
+<div style="height: calc(100vh - 80px); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; padding: 0 10px;">
+    <div class="contenedor-titulo" style="flex-shrink: 0; padding-bottom: 5px; margin-bottom: 10px;">
+        <h1 class="titulo-derecha" style="margin: 0; font-size: 1.5rem; color: #34495e; font-weight: 400;">Listado de equipos</h1>
+    </div>
+
+    <div style="flex-shrink: 0; display: flex; gap: 20px; padding: 15px 20px; background: white; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 15px;">
+        <div style="width: 200px; height: 180px; background: white; border: 1px solid #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">
+            <div id="equipoImagenContainer" style="text-align: center;">
+                <div style="color: #d8d8d8; font-size: 1.3rem; font-weight: bold; line-height: 1.1; letter-spacing: -1px; text-transform: lowercase;">imagen<br>no<br>disponible</div>
+            </div>
+        </div>
+        <div style="flex: 1; display: flex; gap: 25px; padding-top: 2px;">
+            <div style="width: 150px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0;">
+                <div><label class="label-detalle">Código de equipo</label><div id="detalle-codigo" class="campo-detalle campo-centrado" style="width: 100%;">-</div></div>
+            </div>
+            <div style="width: 280px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0;">
+                <div><label class="label-detalle">Tipo de equipo</label><div id="detalle-tipo" class="campo-detalle" style="width: 100%;">-</div></div>
+                <div><label class="label-detalle">Marca</label><div id="detalle-marca" class="campo-detalle" style="width: 100%;">-</div></div>
+            </div>
+            <div style="width: 280px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0;">
+                <div><label class="label-detalle">Modelo</label><div id="detalle-modelo" class="campo-detalle" style="width: 100%;">-</div></div>
+                <div><label class="label-detalle">Serie</label><div id="detalle-serie" class="campo-detalle" style="width: 100%;">-</div></div>
+            </div>
+            <div style="width: 150px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0;">
+                <div>
+                    <label class="label-detalle" style="text-align: center;">Inhabilitado</label>
+                    <div class="baxen-switch-container">
+                        <label class="baxen-switch switch-readonly"><input type="checkbox" id="detalle-inhabilitado-switch"><span class="baxen-slider"></span></label>
+                    </div>
+                </div>
+            </div>
+            <div style="flex: 1;"></div>
+        </div>
+    </div>
+
+    <div id="zonaResultados-wrapper" style="flex: 1; overflow-y: auto; overflow-x: hidden; border: 1px solid #dcdcdc; border-radius: 4px; margin-bottom: 15px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); padding: 0 12px 0 6px;">
+        <table class="rec-screen-table">
+            <thead>
+                <tr>
+                    <th style="width: 10%; text-align: center;">Código equipo</th>
+                    <th style="width: 25%;">Tipo de equipo</th>
+                    <th style="width: 20%;">Marca</th>
+                    <th style="width: 20%;">Modelo</th>
+                    <th style="width: 15%;">Serie</th>
+                    <th style="width: 10%; text-align: center;">Inhabilitados</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr class="fila-equipo @(item.IbEquOcu ? "fila-inhabilitada" : "")"
+                            data-id="@item.IbEquId"
+                            data-img-url="@Url.Action("Imagen", "Equipos", new { id = item.IbEquId })"
+                            data-tipo="@item.IbEquTeqDen"
+                            data-marca="@item.IbEquMarDen"
+                            data-modelo="@item.IbEquMod"
+                            data-serie="@item.IbEquSer"
+                            data-inhabilitado="@(item.IbEquOcu ? "true" : "false")">
+                            <td style="text-align: center;">@item.IbEquId.ToString("000")</td>
+                            <td>@item.IbEquTeqDen</td>
+                            <td>@item.IbEquMarDen</td>
+                            <td>@item.IbEquMod</td>
+                            <td>@item.IbEquSer</td>
+                            <td style="text-align: center; vertical-align: middle; padding: 6px 10px;">
+                                <div class="baxen-switch-container">
+                                    <label class="baxen-switch switch-readonly"><input type="checkbox" disabled @(item.IbEquOcu ? "checked" : "") /><span class="baxen-slider"></span></label>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="panel-pie" style="flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: white; border-top: 1px solid #ddd; border-radius: 6px; box-shadow: 0 -2px 6px rgba(0,0,0,0.03); margin-bottom: 5px;">
+        <span id="contador" style="background-color: #34495e; color: white; padding: 6px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">Registros: @(Model?.Count() ?? 0)</span>
+        <div style="display: flex; align-items: center;">
+            <span style="border: 1px solid #34495e; border-right: none; background: #34495e; padding: 4px 12px; font-size: 0.85rem; color: white; height: 30px; display: flex; align-items: center; border-radius: 4px 0 0 4px; font-weight: 500;">Buscar</span>
+            <input type="text" id="buscarEquipo" placeholder="Por tipo, marca o modelo..." style="border: 1px solid #34495e; padding: 4px 12px; font-size: 0.85rem; outline: none; width: 250px; height: 30px; border-left: none; background: #34495e; color: white; border-radius: 0 4px 4px 0;" />
+        </div>
+        <div class="menu-operaciones-grid" style="display: grid; grid-template-columns: repeat(2, 135px); gap: 1px; background: #34495e; border-radius: 4px; overflow: hidden; padding: 1px;">
+            <button class="btn-menu" style="margin:0; border:none; height:38px; display:flex; align-items:center; justify-content: center; gap:6px; background: #34495e; color: white; cursor: pointer;">
+                <span class="material-icons" style="font-size: 1.1rem;">add</span> Nuevo
+            </button>
+            <div class="btn-menu export-wrapper" style="margin:0; padding:0; border:none; height:38px; position: relative; background: #34495e; color: white; cursor: pointer;">
+                <div class="export-frontal" style="height:100%; display:flex; align-items:center; justify-content: center; gap:6px;">
+                    <span class="material-icons" style="font-size: 1.1rem;">file_download</span> Exportar
+                </div>
+                <div class="export-oculto">
+                    <button class="btn-sub" onclick="location.href='@Url.Action("ExportarExcel", "IB_Equipos")'">
+                        <i class="bi bi-filetype-xlsx icono-excel"></i> Excel
+                    </button>
+                    <button class="btn-sub" onclick="location.href='@Url.Action("ExportarPdf", "IB_Equipos")'">
+                        <i class="bi bi-filetype-pdf icono-pdf"></i> PDF
+                    </button>
+                </div>
+            </div>
+            <button class="btn-menu" style="margin:0; border:none; height:38px; display:flex; align-items:center; justify-content: center; gap:6px; background: #34495e; color: white; border-top: 1px solid #4a6278; cursor: pointer;">
+                <span class="material-icons" style="font-size: 1.1rem;">edit</span> Editar
+            </button>
+            <button class="btn-menu" onclick="location.href='@Url.Action("Index", "Home")'" style="margin:0; border:none; height:38px; display:flex; align-items:center; justify-content: center; gap:6px; background: #34495e; color: white; border-top: 1px solid #4a6278; cursor: pointer;">
+                <span class="material-icons" style="font-size: 1.1rem;">logout</span> Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function mostrarImagenNoDisponible(elemento) {
+        elemento.outerHTML = `<div id="equipoImagenContainer" style="text-align: center; color: #d8d8d8; font-size: 1.3rem; font-weight: bold; line-height: 1.1; letter-spacing: -1px; text-transform: lowercase;">imagen<br>no<br>disponible</div>`;
+    }
+
+    document.querySelector('.rec-screen-table tbody').addEventListener('click', function(e) {
+        const fila = e.target.closest('.fila-equipo');
+        if (!fila) return;
+
+        document.getElementById('detalle-codigo').innerHTML = fila.dataset.id ? String(fila.dataset.id).padStart(3, '0') : '-';
+        document.getElementById('detalle-tipo').innerHTML = fila.dataset.tipo || '-';
+        document.getElementById('detalle-marca').innerHTML = fila.dataset.marca || '-';
+        document.getElementById('detalle-modelo').innerHTML = fila.dataset.modelo || '-';
+        document.getElementById('detalle-serie').innerHTML = fila.dataset.serie || '-';
+        document.getElementById('detalle-inhabilitado-switch').checked = (fila.dataset.inhabilitado === 'true');
+
+        document.querySelectorAll('.fila-equipo').forEach(f => f.classList.remove('fila-seleccionada'));
+        fila.classList.add('fila-seleccionada');
+
+        const contenedorImagen = document.getElementById('equipoImagenContainer');
+        if (fila.dataset.imgUrl) {
+            contenedorImagen.innerHTML = `<img src="${fila.dataset.imgUrl}" alt="Imagen equipo" style="max-width:180px; max-height:160px; object-fit:contain;" onerror="mostrarImagenNoDisponible(this)" />`;
+        } else {
+            mostrarImagenNoDisponible(contenedorImagen);
+        }
+    });
+
+    document.getElementById('buscarEquipo').addEventListener('keyup', function () {
+        const texto = this.value.toLowerCase();
+        document.querySelectorAll('.fila-equipo').forEach(function (fila) {
+            const busqueda = (fila.dataset.tipo + fila.dataset.marca + fila.dataset.modelo).toLowerCase();
+            fila.style.display = busqueda.includes(texto) ? '' : 'none';
+        });
+    });
+</script>

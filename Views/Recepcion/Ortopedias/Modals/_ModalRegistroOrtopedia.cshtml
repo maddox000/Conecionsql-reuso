@@ -308,9 +308,9 @@
         const listaOrtopedias =
             document.getElementById("listaOrtopedias");
 
-        document.addEventListener("focusin", function () {
-                console.log("FOCO EN:", document.activeElement?.id, document.activeElement);
-            });
+        // document.addEventListener("focusin", function () {
+        //         console.log("FOCO EN:", document.activeElement?.id, document.activeElement);
+        //     });
 
         setTimeout(function () {
             if (inputOrtopedia) {
@@ -514,7 +514,7 @@
         }
 
         inputProfesional?.addEventListener("input", async function () {
-            console.log("BUSCANDO PROFESIONAL:", this.value);
+            // console.log("BUSCANDO PROFESIONAL:", this.value);
 
             indiceProfesional = -1;
 
@@ -670,15 +670,21 @@
                         return;
                     }
 
+                    window.ortopedia = resultado.ortopedia;
+
                     document.getElementById("modalRegistroOrtopedia")?.remove();
 
                     setTimeout(() => {
 
-                            document
-                                .getElementById("codigoProducto")
-                                ?.focus();
+                    const codigoProducto =
+                        document.getElementById("TB_REC_DET_MAT_PR");
 
-                        }, 100);
+                    if (codigoProducto) {
+                        codigoProducto.focus();
+                        codigoProducto.select?.();
+                    }
+
+                    }, 100);
                 });
 
     })();

@@ -1,0 +1,261 @@
+﻿@model List<ConexionSql.Models.SP_Busquedas.BusLavadoDetDto>
+
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="~/css/busquedas-custom.css" />
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+<style>
+    body {
+        font-size: 110%;
+    }
+
+    .form-control, label {
+        font-size: 1.15em;
+    }
+
+    /* PARÁMETRO DE ALTURA DEL PANEL */
+    .panel-filtros {
+        height: 330px !important;
+        padding: 15px 25px !important;
+    }
+
+    .form-group input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Estandarización de Anchos Modelo Baxen 2026 */
+    #BUS_DEN, #BUS_SEC, #BUS_PTI, #BUS_EST, #BUS_REU_ID {
+        width: 300px !important;
+        display: inline-block;
+    }
+
+    .badge-contador-grande {
+        font-size: 1.2em;
+        width: 270px !important;
+        height: 45px;
+        background-color: #2c3e50;
+        color: white;
+        border-radius: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 80px;
+        font-weight: normal;
+    }
+
+    .col-operaciones-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        margin-left: auto;
+    }
+
+    .menu-operaciones {
+        background-color: #2c3e50;
+        border-radius: 6px;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        width: 300px;
+        border: 1px solid #1a252f;
+    }
+
+    .btn-menu {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        color: #ecf0f1;
+        padding: 18px 20px;
+        text-align: left;
+        font-size: 1.1em !important;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        width: 100%;
+    }
+
+        .btn-menu:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .btn-menu .material-icons {
+            margin-right: 15px;
+            font-size: 22px;
+            
+        }
+
+    .campo-activo {
+        border: 2px solid #007bff !important;
+    }
+
+    #loader {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.9);
+        z-index: 9999;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .spinner {
+        width: 60px;
+        height: 60px;
+        border: 6px solid #f3f3f3;
+        border-top: 6px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    thead th {
+        font-weight: normal !important;
+    }
+</style>
+
+<div class="contenedor-titulo"><h1 class="titulo-derecha">Búsqueda Detalle de Lavados</h1></div>
+
+<div class="panel-filtros">
+    <div class="row" style="display: flex; flex-wrap: wrap;">
+
+        @* Bloque 1: Fechas y Etiqueta (Misma Columna) *@
+        <div class="col-md-2">
+            <div class="form-group">
+                <label>Fecha Inicio</label>
+                <input type="date" id="FEC_INI" class="form-control" value="@ViewBag.FecIni" />
+            </div>
+            <div class="form-group">
+                <label>Fecha Fin</label>
+                <input type="date" id="FEC_FIN" class="form-control" value="@ViewBag.FecFin" />
+            </div>
+            <div class="form-group">
+                <label>Código Etiqueta</label>
+                <input type="text" id="BUS_CET" class="form-control" />
+            </div>
+            <div id="contador" class="badge-contador-grande" style="display:none;"></div>
+        </div>
+
+        @* Bloque 2: Material y Sector (Anchos 350px) *@
+        <div class="col-auto">
+            <div class="form-group">
+                <label>Denominación (Material)</label>
+                <input type="text" id="BUS_DEN" class="form-control autocompletar" data-tabla="TB_REC_DET" data-campo="TB_REC_DET_MAT_DEN" autocomplete="off" />
+            </div>
+            <div class="form-group">
+                <label>Sectores / Origen</label>
+                <input type="text" id="BUS_SEC" class="form-control autocompletar" data-tabla="TB_REC" data-campo="TB_REC_SEC_DES_DEN" autocomplete="off" />
+            </div>
+            <div class="form-group">
+                <label>Tipo de Proceso</label>
+                <input type="text" id="BUS_PTI" class="form-control autocompletar" data-tabla="TB_PRO_LAV" data-campo="TB_PRO_LAV_PTI_DEN" autocomplete="off" />
+            </div>
+        </div>
+
+        @* Bloque 3: Estado y Reúso *@
+        <div class="col-auto">
+            <div class="form-group">
+                <label>Estado</label>
+                <input type="text" id="BUS_EST" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>ID Reúso</label>
+                <input type="text" id="BUS_REU_ID" class="form-control" />
+            </div>
+        </div>
+
+        @* Bloque 5: Operaciones *@
+        <div class="col-md-2 col-operaciones-container">
+            <div class="menu-operaciones">
+                <button id="btnBuscar" class="btn-menu" onclick="Buscar()"><span class="material-icons">search</span> Buscar</button>
+                <button class="btn-menu" onclick="Limpiar()"><span class="material-icons">cleaning_services</span> Limpiar</button>
+                <button class="btn-menu" onclick="location.href='@Url.Action("Index", "Home")'"><span class="material-icons">logout</span> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="zonaResultados-wrapper" style="position:relative; min-height: 200px;">
+    <div id="loader">
+        <span style="margin-bottom: 10px; font-weight: normal; color: #2c3e50; font-size: 1.2em;">Baxen® Trazabilidad</span>
+        <div class="spinner"></div>
+        <span style="margin-top: 20px; color: #555; font-style: italic;">Buscando información solicitada...</span>
+    </div>
+    <div id="zonaResultados">
+        @Html.Partial("~/Views/LavDetBusqueda/_ResultadosBusLavDet.cshtml", Model)
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(document).on('input change', '.form-control', function() {
+                $(this).val() ? $(this).addClass('campo-activo') : $(this).removeClass('campo-activo');
+            }).trigger('change');
+
+            $(".autocompletar").each(function() {
+                var $el = $(this);
+                $el.autocomplete({
+                    source: function (request, response) {
+                        $.getJSON('@Url.Action("GetSugerencias", "BusLavadoDet")', {
+                            term: request.term,
+                            campo: $el.data('campo'),
+                            tabla: $el.data('tabla')
+                        }, response);
+                    },
+                    minLength: 2
+                });
+            });
+            Buscar();
+        });
+
+        function Buscar() {
+            var datos = {
+                FEC_INI: $('#FEC_INI').val(),
+                FEC_FIN: $('#FEC_FIN').val(),
+                BUS_CET: $.trim($('#BUS_CET').val()),
+                BUS_DEN: $.trim($('#BUS_DEN').val()),
+                BUS_SEC: $.trim($('#BUS_SEC').val()),
+                BUS_PTI: $.trim($('#BUS_PTI').val()),
+                BUS_EST: $.trim($('#BUS_EST').val()),
+                BUS_REU_ID: $.trim($('#BUS_REU_ID').val())
+            };
+
+            $.ajax({
+                url: '@Url.Action("Buscar", "BusLavadoDet")',
+                type: 'POST',
+                data: datos,
+                timeout: 30000,
+                beforeSend: function() { $('#loader').css('display', 'flex'); },
+                success: function (html) {
+                    $('#zonaResultados').html(html);
+                    var num = $('#zonaResultados tbody tr').filter(function() {
+                        return $(this).find('td').length > 1;
+                    }).length;
+                    $('#contador').html("Registros: " + num).show();
+                },
+                error: function (xmlhttprequest, textstatus, message) {
+                    console.error("Error en la búsqueda");
+                },
+                complete: function() { $('#loader').hide(); }
+            });
+        }
+
+        function Limpiar() {
+            $('.form-control').not('input[type="date"]').val('').removeClass('campo-activo');
+            $('#FEC_INI').val('@ViewBag.FecIni').addClass('campo-activo');
+            $('#FEC_FIN').val('@ViewBag.FecFin').addClass('campo-activo');
+            Buscar();
+        }
+    </script>
+}

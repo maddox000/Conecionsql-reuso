@@ -1,0 +1,37 @@
+﻿@model IEnumerable<ConexionSql.Models.SP_Busquedas.BusLavadoDetDto>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover" id="tablaResultados">
+        <thead>
+            <tr>
+                <th>Proceso</th>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+                <th>Lote</th>
+                <th>Etiqueta</th>
+                <th>Reúso</th>
+                <th>Denominación</th>
+                <th>Sector</th>
+                <th>Test</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.TB_PRO_LAV_ID</td>
+                    <td>@item.FechaStr</td>
+                    <td>@item.TB_PRO_LAV_PTI_DEN</td>
+                    <td>@item.TB_PRO_LAV_EST_DEN</td>
+                    <td>@item.TB_PRO_LAV_NUM</td>
+                    <td>@item.TB_REC_DET_ID</td>
+                    <td>@item.TB_REC_DET_REU_ID</td>
+                    <td>@item.TB_PRO_LAV_DET_IB_MAT_DEN</td>
+                    <td>@item.TB_PRO_LAV_DET_SEC_DES_ID</td>
+                    <td>@item.TB_PRO_LAV_DET_PTEST</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

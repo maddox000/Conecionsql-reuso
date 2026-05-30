@@ -1,0 +1,635 @@
+﻿@using ConexionSql.Views.Lavado.Estadisticas
+@{
+
+}
+
+<link rel="stylesheet" href="~/css/estadisticas-customs.css" />
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<style>
+    /* 1. Panel de Filtros Institucional - Altura Ajustada */
+    .panel-filtros {
+        height: 190px !important;
+        padding: 15px 25px !important;
+        margin-bottom: 10px !important;
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+    }
+
+    /* 2. Contenedor de Resultados Dinámico */
+    #zonaResultados {
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 100px;
+        max-height: 1000px;
+        overflow: auto !important;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        background: #fff;
+        margin-top: 10px;
+        padding: 20px;
+        position: relative;
+    }
+
+    /* 3. Tabla con Ancho Total */
+    .table-estadistica {
+        width: 100% !important;
+        border-collapse: separate;
+        border-spacing: 0;
+        table-layout: auto;
+    }
+
+        /* 4. Cabeceras Persistentes */
+        .table-estadistica thead th {
+            position: sticky !important;
+            top: 0 !important;
+            background-color: #2c3e50 !important;
+            color: #ffffff !important;
+            z-index: 10;
+            padding: 8px 12px;
+            font-size: 0.85rem !important;
+            font-weight: normal !important;
+            border: 1px solid #3e4f5f !important;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+    .header-anio-0 {
+        font-size: 0.9rem !important;
+        font-weight: normal !important;
+        background-color: #2c3e50 !important;
+    }
+
+    /* 5. Celdas de Datos */
+    .table-estadistica tbody td {
+        padding: 4px 12px !important;
+        font-size: 0.8rem !important;
+        color: #2c3e50 !important;
+        border: 1px solid #dee2e6 !important;
+        white-space: nowrap;
+        text-align: center;
+    }
+
+    .table-estadistica tbody tr:nth-child(even) {
+        background-color: #e9ecef !important;
+    }
+
+    .border-right-strong {
+        border-right: 3px solid #2c3e50 !important;
+    }
+
+    .border-left-strong {
+        border-left: 3px solid #2c3e50 !important;
+    }
+
+    /* Estilo que replica el foco cuando el input tiene datos cargados */
+    .form-control:not(:placeholder-shown),
+    .form-control.has-value {
+        border-color: #2980b9 !important;
+        background-color: #f0f7fc !important;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(41, 128, 185, 0.25) !important;
+    }
+
+    .spinner-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        z-index: 9999;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .spinner-content-fluid {
+        text-align: center;
+        background: transparent !important;
+        border: none !important;
+        padding: 0;
+        box-shadow: none !important;
+    }
+
+        .spinner-content-fluid h3 {
+            margin: 0 0 4px 0;
+            color: #ffffff;
+            font-family: 'Century Gothic', 'Apple Gothic', sans-serif;
+            font-size: 1.7rem;
+            font-weight: normal !important;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+    .spinner-icon-box {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 22px 0;
+    }
+
+    .spinner-content-fluid i {
+        font-size: 4.5rem;
+        color: #3498db;
+        filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+    }
+
+    .spinner-content-fluid p {
+        margin: 4px 0 0 0;
+        color: #e5e8e8;
+        font-size: 1.25rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .wrapper-buscador-flotante {
+        position: relative;
+        width: 100%;
+    }
+
+    .sugerencias-autocompletar {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        max-height: 220px;
+        overflow-y: auto;
+        z-index: 10000;
+        width: 100%;
+        margin-top: 3px;
+        padding: 0;
+        list-style: none;
+    }
+
+        .sugerencias-autocompletar li {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #2c3e50;
+            text-align: left;
+        }
+
+            .sugerencias-autocompletar li:hover,
+            .sugerencias-autocompletar li.elemento-seleccionado {
+                background-color: #f0f7fc !important;
+                color: #2980b9 !important;
+                font-weight: 500;
+            }
+
+    .msg-vacio {
+        padding: 40px;
+        text-align: center;
+        color: #7f8c8d;
+        font-size: 1.1rem;
+    }
+</style>
+
+<div id="loadingOverlay" class="spinner-overlay">
+    <div class="spinner-content-fluid">
+        <h3>Baxen® Trazabilidad</h3>
+        <div class="spinner-icon-box">
+            <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <p>Buscando la información solicitada.</p>
+    </div>
+</div>
+
+<div class="contenedor-titulo">
+    <h1 class="titulo-derecha">Estadística de Materiales Lavados</h1>
+</div>
+
+<div class="panel-filtros">
+    <div class="row">
+        <div class="col-md-10">
+            <div class="row">
+                <div class="col-md-2">
+                    <label>Desde:</label>
+                    <input type="date" id="txtFechaDesde" class="form-control" />
+                    <label style="margin-top: 8px;">Hasta:</label>
+                    <input type="date" id="txtFechaHasta" class="form-control" />
+                    <div class="badge-contador" style="margin-top: 10px; width: 100%; text-align: center;">
+                        Registros: <span id="lblTotal">0</span>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="wrapper-buscador-flotante">
+                        <label>Código Producto:</label>
+                        <input type="text" id="txtCodProd" class="form-control" placeholder="Código de producto..." autocomplete="off" />
+                        <input type="hidden" id="hdnCodProdId" />
+                    </div>
+
+                    <div class="wrapper-buscador-flotante" style="margin-top: 8px;">
+                        <label>Denominación:</label>
+                        <input type="text" id="txtDen" class="form-control" placeholder="Buscar denominación..." autocomplete="off" />
+                        <input type="hidden" id="hdnDenId" />
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="wrapper-buscador-flotante">
+                        <label>Equipo:</label>
+                        <input type="text" id="txtEquipo" class="form-control" placeholder="Equipo o Número..." autocomplete="off" />
+                        <input type="hidden" id="hdnEquipoId" />
+                    </div>
+
+                    <div class="wrapper-buscador-flotante" style="margin-top: 8px;">
+                        <label>Estado del proceso:</label>
+                        <input type="text" id="txtEstado" class="form-control" placeholder="Buscar estado..." autocomplete="off" />
+                        <input type="hidden" id="hdnEstadoId" />
+                    </div>
+
+                    <div style="display:flex; gap:15px; margin-top:10px; font-size: 0.85rem; color: #2c3e50;">
+                        <label style="cursor:pointer;"><input type="checkbox" id="chkLavado"> Control de lavado</label>
+                        <label style="cursor:pointer;"><input type="checkbox" id="chkProteinas"> Test Proteínas</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="menu-operaciones">
+                <button class="btn-menu" onclick="procesar()"><i class="fas fa-calculator"></i> &nbsp; Calcular</button>
+                <button class="btn-menu" onclick="alert('Exportando...')"><i class="fas fa-file-excel"></i> &nbsp; Exportar</button>
+                <button class="btn-menu" onclick="window.print()"><i class="fas fa-print"></i> &nbsp; Imprimir</button>
+                <button class="btn-menu" onclick="window.location.href='/'"><i class="fas fa-times"></i> &nbsp; Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="contenedorGraficos" class="row" style="margin-top: 10px; display: none;">
+    <div class="col-md-12">
+        <div style="background:#fff; border:1px solid #dee2e6; border-radius:8px; padding:15px; display: flex; align-items: center; height: 260px;">
+            <div style="flex: 2; height: 100%;">
+                <canvas id="chartLineas"></canvas>
+            </div>
+            <div style="flex: 1; height: 100%;">
+                <canvas id="chartDona"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="zonaResultados"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    let miGraficoLineas = null;
+    let miGraficoDona = null;
+
+    $(document).ready(function () {
+        $('#txtFechaDesde').val(new Date().getFullYear() + "-01-01");
+        $('#txtFechaHasta').val(new Date().toISOString().split('T')[0]);
+
+        $('.form-control').on('input change keyup', function() {
+            actualizarEstiloFocoVisual(this);
+        });
+
+        enlazarBuscadorFlotante("#txtCodProd", "#hdnCodProdId", "@Url.Action("GetProductosCod", "EstLavadoDet")", ["label"]);
+        enlazarBuscadorFlotante("#txtDen", "#hdnDenId", "@Url.Action("GetProductosDen", "EstLavadoDet")", ["label"]);
+        enlazarBuscadorFlotante("#txtEquipo", "#hdnEquipoId", "@Url.Action("GetEquipos", "EstLavadoDet")", ["label"]);
+        enlazarBuscadorFlotante("#txtEstado", "#hdnEstadoId", "@Url.Action("GetEstadosReporte", "EstLavadoDet")", ["label"]);
+
+        $('.form-control').each(function() {
+            actualizarEstiloFocoVisual(this);
+        });
+
+        procesar();
+    });
+
+    function actualizarEstiloFocoVisual(elemento) {
+        if ($(elemento).val() && $(elemento).val().trim() !== "") {
+            $(elemento).addClass('has-value');
+        } else {
+            $(elemento).removeClass('has-value');
+        }
+    }
+
+    function enlazarBuscadorFlotante(inputSelector, hiddenSelector, url, camposCamino) {
+        const inputEl = document.querySelector(inputSelector);
+        let indiceActual = -1;
+
+        const listaUl = document.createElement("ul");
+        listaUl.className = "sugerencias-autocompletar";
+        listaUl.style.display = "none";
+        inputEl.parentNode.appendChild(listaUl);
+
+        inputEl.addEventListener("input", function() {
+            const texto = this.value.trim();
+            listaUl.innerHTML = "";
+            listaUl.style.display = "none";
+            indiceActual = -1;
+            if (hiddenSelector) document.querySelector(hiddenSelector).value = "";
+
+            let txtUpper = texto.toUpperCase();
+            if (txtUpper === "TODO" || txtUpper === "TODOS" || texto.length < 1) return;
+
+            fetch(`${url}?term=${encodeURIComponent(texto)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || data.length === 0) return;
+
+                    data.forEach(item => {
+                        let li = document.createElement("li");
+                        let descText = "";
+
+                        if (typeof item === 'string') {
+                            descText = item;
+                        } else {
+                            for (let i = 0; i < camposCamino.length; i++) {
+                                if (item[camposCamino[i]]) {
+                                    descText = item[camposCamino[i]];
+                                    break;
+                                }
+                            }
+                            if(!descText) descText = item.label || item.text || item.descripcion || "";
+                        }
+
+                        let idValue = typeof item === 'string' ? item : (item.id || item.IB_EQU_NUM || "");
+                        if(idValue === "NO REGISTRADO" || idValue === "") idValue = "";
+
+                        li.textContent = descText;
+                        li.dataset.id = idValue;
+
+                        li.addEventListener("click", function() {
+                            seleccionarElemento(descText, idValue);
+                        });
+                        listaUl.appendChild(li);
+                    });
+                    listaUl.style.display = "block";
+                });
+        });
+
+        inputEl.addEventListener("keydown", function(e) {
+            const elementosLi = listaUl.getElementsByTagName("li");
+            if (elementosLi.length === 0) return;
+
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                indiceActual++;
+                if (indiceActual >= elementosLi.length) indiceActual = 0;
+                resaltarSugerencia(elementosLi);
+            }
+            else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                indiceActual--;
+                if (indiceActual < 0) indiceActual = elementosLi.length - 1;
+                resaltarSugerencia(elementosLi);
+            }
+            else if (e.key === "Enter") {
+                e.preventDefault();
+                if (indiceActual > -1 && elementosLi[indiceActual]) {
+                    elementosLi[indiceActual].click();
+                }
+            }
+        });
+
+        function resaltarSugerencia(listado) {
+            for (let i = 0; i < listado.length; i++) {
+                listado[i].classList.remove("elemento-seleccionado");
+            }
+            if (indiceActual > -1 && listado[indiceActual]) {
+                listado[indiceActual].classList.add("elemento-seleccionado");
+                listado[indiceActual].scrollIntoView({ block: "nearest" });
+            }
+        }
+
+        function seleccionarElemento(texto, id) {
+            inputEl.value = texto;
+            if (hiddenSelector) document.querySelector(hiddenSelector).value = id;
+            listaUl.innerHTML = "";
+            listaUl.style.display = "none";
+            indiceActual = -1;
+            actualizarEstiloFocoVisual(inputEl);
+        }
+
+        document.addEventListener("click", function(e) {
+            if (e.target !== inputEl) {
+                listaUl.innerHTML = "";
+                listaUl.style.display = "none";
+                indiceActual = -1;
+            }
+        });
+    }
+
+    function procesar() {
+        $('#loadingOverlay').css('display', 'flex');
+
+        const limpiarTextoDenominacion = (sel) => {
+            let v = $(sel).val();
+            if (!v || v.trim() === "") return null;
+            let vUpper = v.trim().toUpperCase();
+            if (vUpper === "TODO" || vUpper === "TODOS") return "MUESTRA_COL_TODO";
+            return v;
+        };
+
+        const params = {
+            desde: $('#txtFechaDesde').val(),
+            hasta: $('#txtFechaHasta').val(),
+            estado: limpiarTextoDenominacion('#txtEstado'),
+            codProd: limpiarTextoDenominacion('#txtCodProd'),
+            den: limpiarTextoDenominacion('#txtDen'),
+            equipo: limpiarTextoDenominacion('#txtEquipo'),
+            ctrlLav: $('#chkLavado').is(':checked'),
+            ctrlProt: $('#chkProteinas').is(':checked')
+        };
+
+        $.post('@Url.Action("ObtenerDatos", "EstLavadoDet")', params, function (data) {
+            $('#loadingOverlay').hide();
+
+            if (!data || data.length === 0 || data.error || (data.length === 1 && data[0].TipoProceso === null) || data[0].Mensaje === 'Sin datos') {
+                $('#zonaResultados').html('<div class="msg-vacio">No hay registros para este periodo o filtro.</div>');
+                $('#lblTotal').text(0);
+                $('#contenedorGraficos').hide();
+
+                if (miGraficoLineas) miGraficoLineas.destroy();
+                if (miGraficoDona) miGraficoDona.destroy();
+                return;
+            }
+
+            $('#contenedorGraficos').show();
+            actualizarPantalla(data);
+        }).fail(function() {
+            $('#loadingOverlay').hide();
+            $('#contenedorGraficos').hide();
+            $('#zonaResultados').html('<div class="msg-vacio" style="color: #c0392b;"><i class="fas fa-exclamation-triangle"></i> Error al intentar procesar los datos remotos.</div>');
+        });
+    }
+
+    function actualizarPantalla(data) {
+        const keys = Object.keys(data[0]);
+
+        const ordenMeses = {
+            'ene': 1, 'feb': 2, 'mar': 3, 'abr': 4, 'may': 5, 'jun': 6,
+            'jul': 7, 'ago': 8, 'sept': 9, 'oct': 10, 'nov': 11, 'dic': 12
+        };
+
+        const colsMeses = keys.filter(k => k.includes(' ')).sort((a, b) => {
+            const [anioA, mesA] = a.split(' ');
+            const [anioB, mesB] = b.split(' ');
+            if (anioA !== anioB) return anioA - anioB;
+            return (ordenMeses[mesA.toLowerCase()] || 0) - (ordenMeses[mesB.toLowerCase()] || 0);
+        });
+
+        let txtCodProd = $('#txtCodProd').val() ? $('#txtCodProd').val().trim() : "";
+        let txtDen = $('#txtDen').val() ? $('#txtDen').val().trim() : "";
+        let txtEquipo = $('#txtEquipo').val() ? $('#txtEquipo').val().trim() : "";
+        let txtEstado = $('#txtEstado').val() ? $('#txtEstado').val().trim() : "";
+
+        let extras = [];
+        if (txtCodProd !== "") extras.push({ t: "Código", inputVal: txtCodProd, prop: ["TB_PRO_LAV_DET_IB_MAT_PR", "tb_pro_lav_det_ib_mat_pr", "IB_MAT_PR", "ib_mat_pr", "CodigoProducto", "codigo", "Código"] });
+        if (txtDen !== "")     extras.push({ t: "Denominación", inputVal: txtDen, prop: ["TB_PRO_LAV_DET_IB_MAT_DEN", "tb_pro_lav_det_ib_mat_den", "IB_MAT_DEN", "ib_mat_den", "Denominacion", "denominacion", "Den"] });
+        if (txtEquipo !== "")  extras.push({ t: "Equipo", inputVal: txtEquipo, prop: ["TB_PRO_LAV_EQU_DEN", "tb_pro_lav_equ_den", "IB_EQU_TEQ_DEN", "ib_equ_teq_den", "Equipo", "equipo"] });
+        if (txtEstado !== "")  extras.push({ t: "Estado", inputVal: txtEstado, prop: ["TB_PRO_LAV_EST_DEN", "tb_pro_lav_est_den", "IB_PRO_EST_DEN", "ib_pro_est_den", "Estado", "estado"] });
+
+        $('#lblTotal').text(data.length);
+        $('#zonaResultados').html('<table class="table-estadistica"><thead id="theadEst"></thead><tbody id="tbodyEst"></tbody></table>');
+
+        let cuentaAnios = {};
+        colsMeses.forEach(c => {
+            let anio = c.split(' ')[0];
+            cuentaAnios[anio] = (cuentaAnios[anio] || 0) + 1;
+        });
+
+        let h1 = `<tr><th rowspan="2" class="border-right-strong">Tipo Lavado</th>`;
+        extras.forEach(ex => { h1 += `<th rowspan="2" class="border-right-strong">${ex.t}</th>`; });
+        h1 += `<th rowspan="2" class="border-left-strong border-right-strong" style="background-color: #1f2d3d !important; font-weight: bold;">Total</th>`;
+
+        Object.keys(cuentaAnios).sort().forEach(a => {
+            h1 += `<th colspan="${cuentaAnios[a]}" class="text-center header-anio-0 border-left-strong">${a}</th>`;
+        });
+        h1 += `</tr>`;
+
+        let h2 = `<tr>`;
+        colsMeses.forEach((c, i) => {
+            const esNuevoAnio = i > 0 && c.split(' ')[0] !== colsMeses[i-1].split(' ')[0];
+            h2 += `<th class="text-center ${esNuevoAnio ? 'border-left-strong' : ''}">${c.split(' ')[1]}</th>`;
+        });
+        h2 += `</tr>`;
+        $('#theadEst').html(h1 + h2);
+
+        let htmlRows = "";
+        data.forEach(f => {
+            let tipoProcesoVal = f.TipoProceso || f.tipoproceso || 'NO REGISTRADO';
+            let totalValor = f.TotalAnual !== undefined ? f.TotalAnual : (f.totalanual !== undefined ? f.totalanual : (f.TOTAL_GENERAL || f.total_general || 0));
+
+            htmlRows += `<tr><td class="border-right-strong" style="font-weight: 500; text-align: left;">${tipoProcesoVal}</td>`;
+
+            extras.forEach(ex => {
+                let valorCelda = "";
+
+                // 1. Intentar leer el valor exacto de la base de datos (f[p])
+                for (let p of ex.prop) {
+                    if (f[p] !== undefined && f[p] !== null && String(f[p]).trim() !== "") {
+                        valorCelda = String(f[p]).trim();
+                        break;
+                    }
+                }
+
+                // 2. CORRECCIÓN LÓGICA INTEGRADORA:
+                // Si la celda está vacía porque el SP agrupado omitió la columna al enviar null:
+                if (valorCelda === "") {
+                    let upperInput = ex.inputVal.toUpperCase();
+                    // Si el usuario ingresó un filtro individual específico (como 'MANGOV00'), respetamos ese valor en la celda
+                    if (upperInput !== "TODO" && upperInput !== "TODOS" && upperInput !== "MUESTRA_COL_TODO") {
+                        valorCelda = ex.inputVal;
+                    } else {
+                        // Si el usuario tipeó "Todos", mostramos "TODOS" indicando que abarca el universo completo de la fila agrupada
+                        valorCelda = "TODOS";
+                    }
+                }
+
+                htmlRows += `<td class="border-right-strong">${valorCelda}</td>`;
+            });
+
+            htmlRows += `<td class="text-center border-left-strong border-right-strong" style="background-color: #ebf5fb; color: #2980b9; font-weight: bold;">${totalValor}</td>`;
+
+            colsMeses.forEach((c, i) => {
+                const esNuevoAnio = i > 0 && c.split(' ')[0] !== colsMeses[i-1].split(' ')[0];
+                const val = f[c] || 0;
+                htmlRows += `<td class="text-center ${esNuevoAnio ? 'border-left-strong' : ''}" style="${val == 0 ? 'color:#ccc' : ''}">${val}</td>`;
+            });
+            htmlRows += `</tr>`;
+        });
+        $('#tbodyEst').html(htmlRows);
+
+        generarGraficos(data, colsMeses);
+    }
+
+    function generarGraficos(data, labelsMeses) {
+        const dataFiltrada = data.slice(0, 10);
+
+        const ctxL = document.getElementById('chartLineas').getContext('2d');
+        if (miGraficoLineas) miGraficoLineas.destroy();
+        miGraficoLineas = new Chart(ctxL, {
+            type: 'line',
+            data: {
+                labels: labelsMeses.map(m => m.split(' ')[1]),
+                datasets: dataFiltrada.map((f, i) => ({
+                    label: f.TipoProceso || f.tipoproceso || 'Proceso',
+                    data: labelsMeses.map(m => f[m] || 0),
+                    borderColor: generadorColor(i),
+                    backgroundColor: generadorColor(i),
+                    tension: 0.3,
+                    pointRadius: 3,
+                    fill: false
+                }))
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        const ctxD = document.getElementById('chartDona').getContext('2d');
+        if (miGraficoDona) miGraficoDona.destroy();
+        miGraficoDona = new Chart(ctxD, {
+            type: 'doughnut',
+            data: {
+                labels: dataFiltrada.map(f => f.TipoProceso || f.tipoproceso || 'Proceso'),
+                datasets: [{
+                    data: dataFiltrada.map(f => f.TotalAnual !== undefined ? f.TotalAnual : (f.totalanual !== undefined ? f.totalanual : (f.TOTAL_GENERAL || f.total_general || 0))),
+                    backgroundColor: dataFiltrada.map((_, i) => generadorColor(i)),
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        labels: { boxWidth: 12, font: { size: 11 }, padding: 15 }
+                    }
+                },
+                cutout: '60%'
+            }
+        });
+    }
+
+    function generadorColor(i) {
+        const colores = ['#2980b9', '#c0392b', '#27ae60', '#f39c12', '#8e44ad', '#34495e', '#16a085', '#d35400', '#7f8c8d'];
+        return colores[i % colores.length];
+    }
+</script>

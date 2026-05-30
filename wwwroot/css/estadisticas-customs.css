@@ -1,0 +1,169 @@
+﻿/* ==========================================
+   ESTILOS GENERALES Y TÍTULO
+   ========================================== */
+body {
+    background-color: #f4f7f9;
+    color: #34495e;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.contenedor-titulo {
+    text-align: right;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.titulo-derecha {
+    font-family: 'Century Gothic', AppleGothic, 'Segoe UI', sans-serif;
+    color: #2c3e50;
+    font-weight: normal;
+    font-size: 1.8rem;          /*Alto letra titulo derecha*/
+    letter-spacing: -0.5px;
+    margin: 0;
+    display: inline-block;
+}
+
+/* ==========================================
+   PANEL DE FILTROS (BOX SUPERIOR)
+   ========================================== */
+.panel-filtros {
+    background: #ffffff !important;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 15px 25px;
+    height: auto !important; /* Altura automática basada en contenido */
+    min-height: 165px; /* Un poco más largo que el panel de botones */
+    margin-bottom: 10px;
+    border: 1px solid #e1e4e8;
+}
+
+label {
+    font-size: 0.85rem;     /*Etiquetas de los campos de búsqueda*/
+    color: #7f8c8d;
+    font-weight: normal;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.form-control {
+    border-radius: 4px;
+    border: 1px solid #ccd1d9;
+    font-size: 0.85rem;
+    padding: 5px 10px;
+    height: 34px;
+    width: 100%;
+}
+
+/* ==========================================
+   MENÚ DE OPERACIONES (BOTONERA)
+   ========================================== */
+.menu-operaciones {
+    display: flex;
+    flex-direction: column;
+    background-color: #2c3e50;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.btn-menu {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 18px;
+    text-align: left;
+    font-size: 0.85rem;         /*Textos de los botones de búsquedas*/
+    color: #bdc3c7;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    text-decoration: none !important;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+    .btn-menu:hover:not(:disabled) {
+        background-color: #34495e;
+        color: #ffffff;
+    }
+
+.badge-contador {
+    display: inline-block;
+    height: 35px; /* 105px para que baje a la altura de los campos inferiores */
+    font-weight: normal;
+    margin-top: 80px;
+    padding: 5px 15px;
+    background-color: #34495e;
+    color: #bdc3c7;
+    border-radius: 50px;
+    font-size: 1.0rem;          /*Letras contador*/
+    border: 1px solid #d6eaf8;
+}
+
+/* ==========================================
+   GRILLA DE RESULTADOS (CONTENEDOR Y TABLA)
+   ========================================== */
+.panel-resultados {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #3e4f5f;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-top: 10px;
+}
+
+.table-estadistica {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.header-anio-0 {
+    background-color: #2c3e50 !important;
+    color: #ffffff !important;
+    font-size: 0.80rem !important;
+    font-weight: normal !important;
+    text-align: center !important;
+    border: 1px solid #3e4f5f !important;
+}
+
+.table-estadistica thead tr:first-child th:first-child {
+    border-top-left-radius: 12px;
+}
+
+.table-estadistica thead tr:first-child th:last-child {
+    border-top-right-radius: 12px;
+}
+
+.table-estadistica thead th {
+    background-color: #2c3e50 !important;
+    color: #ffffff !important;
+    font-size: 0.80rem !important;
+    font-weight: normal !important;
+    padding: 6px 12px !important;
+    border: 1px solid #3e4f5f !important;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.table-estadistica tbody td {
+    font-size: 0.85rem !important;
+    font-weight: normal !important;
+    color: #2c3e50 !important;
+    padding: 4px 12px !important;
+    border: 1px solid #dee2e6 !important;
+    white-space: nowrap;
+}
+
+.table-estadistica tbody tr:nth-child(even) {
+    background-color: #e9ecef !important;
+}
+
+.table-estadistica tbody tr:hover {
+    background-color: #d1e3f2 !important;
+}
+
+.total-cell {
+    background-color: #ebf5fb !important;
+    color: #2980b9 !important;
+    font-weight: normal !important;
+}

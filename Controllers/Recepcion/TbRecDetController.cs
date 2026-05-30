@@ -944,6 +944,39 @@ namespace ConexionSql.Controllers
                 }
 
                 // =========================================================
+                // PASO 5.5: OBTENER DATOS ORTOPEDIA
+                // =========================================================
+
+                Console.WriteLine("========= ORTOPEDIA =========");
+                Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(detalle.Ortopedia));
+                Console.WriteLine("=============================");
+
+                var ortopedia = detalle.Ortopedia;
+
+                int ortId = 0;
+                string ortDen = "NO REGISTRA";
+                int proId = 1;
+                string proNom = "NO REGISTRA";
+                string proApe = "NO REGISTRA";
+                string paciente = "NO REGISTRA";
+                string remito = "0";
+                DateTime? fecProc = null;
+                DateTime? horProc = null;
+
+                if (ortopedia != null)
+                {
+                    ortId = ortopedia.TB_REC_ORT_ORT_ID ?? 0;
+                    ortDen = ortopedia.TB_REC_ORT_ORT_DEN ?? "NO REGISTRA";
+                    proId = ortopedia.TB_REC_ORT_PRO_ID ?? 1;
+                    proNom = ortopedia.TB_REC_ORT_PRO_APE ?? "NO REGISTRA";
+                    proApe = "NO REGISTRA";
+                    paciente = ortopedia.TB_REC_ORT_PAC ?? "NO REGISTRA";
+                    remito = ortopedia.TB_REC_ORT_REM ?? "0";
+                    fecProc = ortopedia.TB_REC_ORT_FEC_PROC;
+                    horProc = ortopedia.TB_REC_ORT_HOR_PROC;
+                }
+
+                // =========================================================
                 // PASO 6: ARMAR DETALLE
                 // =========================================================
                 var registro = detalle.RegistroControlArmado;
@@ -967,8 +1000,8 @@ namespace ConexionSql.Controllers
                     TbRecSecOriDen = tbRec.TbRecSecOriDen,
                     TbRecSecDesId = tbRec.TbRecSecDesId,
                     TbRecSecDesDen = tbRec.TbRecSecDesDen,
-                    TbRecOrtId = tbRec.TbRecOrtId,
-                    TbRecOrtDen = tbRec.TbRecOrtDen,
+                    TbRecOrtId = ortId,
+                    TbRecOrtDen = ortDen,
                     TbRecSecPer = tbRec.TbRecSecPer,
 
                     // DATOS DEL MATERIAL
@@ -1007,24 +1040,31 @@ namespace ConexionSql.Controllers
                     : "NO REGISTRADO",
 
                     TbRecDetReuCant = detalle.TB_REC_DET_REU_CANT ?? 0,
-                    TbRecDetOrtId = 0,
-                    TbRecDetOrtDen = "NO REGISTRA",
+                    TbRecDetOrtId = ortId,
+                    TbRecDetOrtDen = ortDen,
 
                     // CAMPOS QUE VENÍAN CARGADOS
-                    TbRecDetProId = 1,
-                    TbRecDetProNom = "NO REGISTRA",
-                    TbRecDetProApe = "NO REGISTRA",
+                    TbRecDetProId = proId,
+                    TbRecDetProNom = proNom,
+                    TbRecDetProApe = proApe,
                     TbRecDetProPtiId = 1,
                     TbRecDetProPtiDen = "NO REGISTRA",
-                    TbRecDetPac = "NO REGISTRA",
-                    TbRecDetRem = "0",
+                    TbRecDetPac = paciente,
+                    TbRecDetRem = remito,
                     TbRecDetDat = "NO REGISTRA",
-                    TbRecDetTxt1 = "NO REGISTRA",
+                    TbRecDetTxt1 = ortopedia != null
+                        ? proNom
+                        : "NO REGISTRA",
                     TbRecDetTxt2 = "NO REGISTRA",
                     TbRecDetObs = detalle.TbRecDetObs,
                     TbRecDetMde = registro?.TbRecDetMde ?? false,
                     TbRecDetMort = 1,
                     TbRecDetCantMult = 1,
+                    TbRecDetFentStock = 0,
+                    TbRecDetFentTot = 0,
+                    TbRecDetFrecStock = 0,
+                    TbRecDetFrecTot = 0,
+                    TbRecDetCantElim = 1,
 
                     // STOCKS DE RECEPCIÓN
                     TbRecDetRecCant = 0,
@@ -1083,8 +1123,10 @@ namespace ConexionSql.Controllers
                     TbRecDetNum2 = registro?.CantidadElementos ?? detalle.TB_REC_DET_NUM_2,
                     TbRecDetNum3 = detalle.TB_REC_DET_NUM_3,
                     TbRecDetTxt3 = registro?.TbRecDetTxt3 ?? detalle.TB_REC_DET_TXT_3,
-                    TbRecDetMem1 = registro?.TbRecDetMem1 ?? detalle.TB_REC_DET_MEM_1,
+                    TbRecDetMem1 = ortopedia != null ? proNom : (registro?.TbRecDetMem1 ?? detalle.TB_REC_DET_MEM_1),
                     TbRecDetDti1 = detalle.TB_REC_DET_DTI_1,
+                    TbRecDetFen = fecProc,
+                    TbRecDetHen = horProc,
                     TbRecDetVen = detalle.TB_REC_DET_VEN,
 
                     // STOCKS EXISTENTES
@@ -1183,17 +1225,70 @@ namespace ConexionSql.Controllers
                 await _context.SaveChangesAsync();
 
 
-                string zpl = Etiquetas.RecepcionDetalle(
-                    sector: tbRec.TbRecSecOriDen,
-                    material: nombreMaterial,
-                    fechaRecepcion: tbRec.TbRecFec ?? DateTime.Now,
-                    vencimiento: DateTime.Now.AddMonths(6),
-                    nroRecepcion: tbRec.TbRecId,
-                    idDetalle: entidad.TbRecDetId,
-                    codigoReuso: entidad.TbRecDetReuId,
-                    tipoMaterial: entidad.TbRecDetMatMtiDen
+                // etiqueta especial
 
-                );
+                string zpl = "";
+
+                if (ortopedia != null)
+                {
+                    if (ortDen == "NO REGISTRADO")
+                    {
+                        zpl = Etiquetas.RecepcionDetalleProfesional(
+                            sector: tbRec.TbRecSecDesDen,
+                            material: nombreMaterial,
+                            fechaRecepcion: tbRec.TbRecFec ?? DateTime.Now,
+                            vencimiento: DateTime.Now.AddMonths(12),
+                            nroRecepcion: tbRec.TbRecId,
+                            idDetalle: entidad.TbRecDetId,
+                            profesional: entidad.TbRecDetProNom ?? "NO REGISTRA",
+                            fechaProc: entidad.TbRecDetFen,
+                            horaProc: entidad.TbRecDetHen,
+                            cantidad: entidad.TbRecDetCant
+                        );
+                    }
+                    else
+                    {
+                        zpl = Etiquetas.RecepcionDetalleOrtopedia(
+                            sector: tbRec.TbRecSecOriDen,
+                            material: nombreMaterial,
+                            fechaRecepcion: tbRec.TbRecFec ?? DateTime.Now,
+                            nroRecepcion: tbRec.TbRecId,
+                            idDetalle: entidad.TbRecDetId,
+                            profesional: entidad.TbRecDetProNom ?? "NO REGISTRA",
+                            paciente: entidad.TbRecDetPac ?? "NO REGISTRA",
+                            remito: entidad.TbRecDetRem ?? "0",
+                            ortopedia: entidad.TbRecDetOrtDen ?? "NO REGISTRA",
+                            fechaProc: entidad.TbRecDetFen,
+                            horaProc: entidad.TbRecDetHen
+                        );
+                    }
+                }
+                else
+                {
+                    string zplNormal = Etiquetas.RecepcionDetalle(
+                        sector: tbRec.TbRecSecDesDen,
+                        material: nombreMaterial,
+                        fechaRecepcion: tbRec.TbRecFec ?? DateTime.Now,
+                        vencimiento: DateTime.Now.AddMonths(6),
+                        nroRecepcion: tbRec.TbRecId,
+                        idDetalle: entidad.TbRecDetId,
+                        codigoReuso: entidad.TbRecDetReuId,
+                        tipoMaterial: entidad.TbRecDetMatMtiDen
+                    );
+
+                    zpl = zplNormal;
+                }
+                //string zpl = Etiquetas.RecepcionDetalle(
+                //    sector: tbRec.TbRecSecOriDen,
+                //    material: nombreMaterial,
+                //    fechaRecepcion: tbRec.TbRecFec ?? DateTime.Now,
+                //    vencimiento: DateTime.Now.AddMonths(6),
+                //    nroRecepcion: tbRec.TbRecId,
+                //    idDetalle: entidad.TbRecDetId,
+                //    codigoReuso: entidad.TbRecDetReuId,
+                //    tipoMaterial: entidad.TbRecDetMatMtiDen
+
+                //);
 
                 var cfgImpresion = await _context.APanOpc
                          .FirstOrDefaultAsync(x => x.IdDenominacion == "A_PAN_IMP_ETI_EN" && x.Valor == true);

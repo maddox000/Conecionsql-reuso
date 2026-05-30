@@ -1,8 +1,10 @@
 ﻿using ConexionSql.Data;
+using ConexionSql.Interfaces;
 using ConexionSql.Services.SP_Busquedas;
 using ConexionSql.Services.SP_Busquedas.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,6 +37,13 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IRecDetService, RecDetService>();
+builder.Services.AddScoped<IBusProService, BusProService>();
+builder.Services.AddScoped<IBusLavadoDetService, BusLavadoDetService>();
+builder.Services.AddScoped<IBusProDetService, BusProDetService>();
+builder.Services.AddScoped<IBusRecService, BusRecService>();
+builder.Services.AddScoped<IBusLavadoService, BusLavadoService>();
+builder.Services.AddScoped<IBusAcoService, BusAcoService>();
+builder.Services.AddScoped<IBusAcondicionadoService, BusAcondicionadoService>();
 
 var app = builder.Build();
 

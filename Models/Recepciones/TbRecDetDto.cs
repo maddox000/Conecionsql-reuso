@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ConexionSql.Models.Recepciones.Ortopedias;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace ConexionSql.Models.Recepciones
 {
@@ -176,5 +178,7 @@ namespace ConexionSql.Models.Recepciones
         public string? TbRecDetMem1 { get; set; }
 
         public string? TbRecDetTxt3 { get; set; }
+
+        public TbRecOrtDto? Ortopedia { get; set; }
     }
 }

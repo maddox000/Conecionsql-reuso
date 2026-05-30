@@ -5,145 +5,101 @@
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
 <style>
-    body {
-        font-size: 110%;
-    }
-
-    .form-control, label {
-        font-size: 1.15em;
-    }
-
-    /* PARÁMETRO DE ALTURA DEL PANEL */
     .panel-filtros {
-        height: 330px !important;
+        height: 270px !important;
         padding: 15px 25px !important;
+        margin-bottom: 10px !important;
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
     }
 
-    .form-group input {
-        width: 100%;
-        box-sizing: border-box;
+    #zonaResultados {
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 100px;
+        max-height: 1000px;
+        overflow: auto !important;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        background: #fff;
+        margin-top: 10px;
+        padding: 20px;
     }
 
-    /* Anchos específicos de campos */
-    #BUS_PTI, #BUS_EST,#BUS_EQU_TEQ,#BUS_LOT {
-        width: 300px !important;
-        display: inline-block;
+    .table-estadistica {
+        width: 100% !important;
+        border-collapse: separate;
+        border-spacing: 0;
+        table-layout: auto;
     }
 
-    .badge-contador-grande {
-        font-size: 1.2em;
-        width: 270px !important;
-        height: 45px;
-        background-color: #2c3e50;
-        color: white;
-        border-radius: 20px;
-        text-align: center;
-        
-        
-        display: inline-block;
-        margin-top: 25px;
-    }
-
-    /* Contenedor de operaciones a la derecha */
-    .col-operaciones-container {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        margin-left: auto;
-    }
-
-    .menu-operaciones {
-        background-color: #2c3e50;
-        border-radius: 6px;
-        padding: 5px;
-        display: flex;
-        flex-direction: column;
-        width: 300px;
-        border: 1px solid #1a252f;
-    }
-
-    .btn-menu {
-        background: transparent;
-        border: none;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        color: #ecf0f1;
-        padding: 18px 20px;
-        text-align: left;
-        font-size: 1.1em !important;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        width: 100%;
-    }
-
-        .btn-menu:hover {
-            background: rgba(255,255,255,0.1);
+        .table-estadistica thead th {
+            position: sticky !important;
+            top: 0 !important;
+            background-color: #2c3e50 !important;
+            color: #ffffff !important;
+            z-index: 10;
+            padding: 8px 12px;
+            font-size: 0.85rem !important;
+            border: 1px solid #3e4f5f !important;
+            white-space: nowrap;
+            text-align: center;
         }
 
-        .btn-menu .material-icons {
-            margin-right: 15px;
-            font-size: 22px;
-            color: inherit;
+        .table-estadistica tbody td {
+            padding: 4px 12px !important;
+            font-size: 0.8rem !important;
+            color: #2c3e50 !important;
+            border: 1px solid #dee2e6 !important;
+            white-space: nowrap;
         }
 
-    .campo-activo {
-        border: 2px solid #007bff !important;
+        .table-estadistica tbody tr:nth-child(even) {
+            background-color: #e9ecef !important;
+        }
+
+    .border-right-strong {
+        border-right: 3px solid #2c3e50 !important;
     }
 
-    /* Autocomplete */
-    .ui-autocomplete {
-        z-index: 999999 !important;
-        background-color: #ffffff !important;
-        border: 1px solid #2c3e50 !important;
-        max-height: 250px;
-        overflow-y: auto;
+    .border-left-strong {
+        border-left: 3px solid #2c3e50 !important;
     }
 
-    .ui-menu-item {
-        padding: 8px 12px;
-        border-bottom: 1px solid #eee;
-        color: #333;
-        cursor: pointer;
+    /* Estilo para resaltar campos con valor */
+    .form-control.con-valor {
+        border-color: #2980b9 !important;
+        background-color: #f0f7fc !important;
+        box-shadow: 0 0 0 0.2rem rgba(41, 128, 185, 0.25) !important;
     }
 
-    .ui-state-active {
-        background-color: #007bff !important;
-        color: white !important;
-    }
-
-    /* LOADER PERSONALIZADO SIN BOTÓN */
-    #loader {
-        display: none;
+    /* Estilos Autocompletado */
+    .autocomplete-list {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(255, 255, 255, 0.9);
-        z-index: 9999;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+        z-index: 1000;
+        background: white;
+        border: 1px solid #ddd;
+        width: 90%;
+        max-height: 180px;
+        overflow-y: auto;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        list-style: none;
+        padding: 0;
+        margin: 0;
     }
 
-    .spinner {
-        width: 60px;
-        height: 60px;
-        border: 6px solid #f3f3f3;
-        border-top: 6px solid #007bff;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @@keyframes spin {
-        0% {
-            transform: rotate(0deg);
+        .autocomplete-list li {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
         }
 
-        100% {
-            transform: rotate(360deg);
-        }
-    }
+            .autocomplete-list li:hover, .autocomplete-list li.selected {
+                background-color: #2980b9 !important;
+                color: white !important;
+            }
 </style>
 
 <div class="contenedor-titulo"><h1 class="titulo-derecha">Búsqueda de materiales recibidos</h1></div>
@@ -159,21 +115,21 @@
         </div>
 
         @* Bloque 2 *@
-        <div class="col-auto">
+        <div class="col-md-3">
             <div class="form-group"><label>Denominación</label><input type="text" id="BUS_DEN" class="form-control autocompletar" data-tabla="IB_MAT" data-campo="IB_MAT_DEN" autocomplete="off" /></div>
             <div class="form-group"><label>Código Producto</label><input type="text" id="BUS_MAT_PR" class="form-control autocompletar" data-tabla="IB_MAT" data-campo="IB_MAT_PR" autocomplete="off" /></div>
             <div class="form-group"><label>Código Reúso</label><input type="text" id="BUS_REU_ID" class="form-control autocompletar" data-tabla="TB_REU" data-campo="TB_REU_ID_FORM" autocomplete="off" /></div>
         </div>
 
         @* Bloque 3 *@
-        <div class="col-auto">
+        <div class="col-md-2">
             <div class="form-group"><label>Sector Origen</label><input type="text" id="BUS_SEC_ORI" class="form-control autocompletar" data-tabla="IB_SEC" data-campo="IB_SEC_DEN" autocomplete="off" /></div>
             <div class="form-group"><label>Sector Destino</label><input type="text" id="BUS_SEC_DES" class="form-control autocompletar" data-tabla="IB_SEC" data-campo="IB_SEC_DEN" autocomplete="off" /></div>
             <div class="form-group"><label>Estado</label><input type="text" id="BUS_EST" class="form-control autocompletar" data-tabla="IB_MAT_EST_ING" data-campo="IB_MAT_EST_ING_DEN" autocomplete="off" /></div>
         </div>
 
         @* Bloque 4 *@
-        <div class="col-auto">
+        <div class="col-md-3">
             <div class="form-group"><label>Paciente</label><input type="text" id="BUS_PAC" class="form-control autocompletar" data-tabla="TB_REC_DET" data-campo="TB_REC_DET_PAC" autocomplete="off" /></div>
             <div class="form-group"><label>Profesional</label><input type="text" id="BUS_PRO" class="form-control autocompletar" data-tabla="IB_PRO" data-campo="IB_PRO_APE" autocomplete="off" /></div>
             <div class="form-group"><label>Proveedor</label><input type="text" id="BUS_ORT_DEN" class="form-control autocompletar" data-tabla="IB_ORT" data-campo="IB_ORT_DEN" autocomplete="off" /></div>

@@ -225,6 +225,15 @@ namespace ConexionSql.Controllers.reuepcion
                     ViewBag.TbRecIdOrtopedia = nuevaRecepcion.TbRecId;
                 }
 
+                // 📦 ==============================
+                // LLAMA MODAL PROFESIONAL
+                // ==============================
+                if (nuevaRecepcion.TbRecSecOriId == 902)
+                {
+                    ViewBag.AbrirModalProfesional = true;
+                    ViewBag.TbRecIdProfesional = nuevaRecepcion.TbRecId;
+                }
+
                 TempData["MensajeExito"] = "Recepción guardada correctamente.";
 
                 // 📦 ==============================

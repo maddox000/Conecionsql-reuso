@@ -1,0 +1,289 @@
+﻿/* ==========================================================================
+   🛠️ PANEL DE CONTROL BAXEN (Modificá colores y tamaños desde acá)
+   ========================================================================== */
+:root {
+    /* -- COLORES -- */
+    --color-gris-baxen: #34495e;
+    --color-excel: #2ecc71;
+    --color-pdf: #e74c3c;
+    /* -- DISEÑO GENERAL -- */
+    --sombra-baxen: 0 4px 12px rgba(0, 0, 0, 0.08);
+    /* -- TAMAÑOS DE FUENTE CENTRALIZADOS -- */
+    --fuente-titulo-pantalla: 1.6rem; /* Título principal arriba a la derecha */
+    --fuente-destacada: 0.85rem; /* Títulos de columnas, Botones y Contador */
+    --fuente-normal: 0.85rem; /* Datos de la tabla, inputs y textos comunes */
+    --fuente-chica: 0.85rem; /* Sub-botones desplegables (Excel/PDF) */
+}
+
+/* ==========================================================================
+   ESTILOS GLOBALES Y PARAMETRIZACIÓN DE TEXTOS
+   ========================================================================== */
+body, label, input, button, .form-control {
+    font-size: var(--fuente-normal) !important;
+    font-family: Arial, sans-serif !important;
+    font-weight: normal !important;
+}
+
+/* Títulos de Pantalla */
+.contenedor-titulo {
+    text-align: right;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.titulo-derecha {
+    color: #2c3e50;
+    font-weight: normal;
+    font-size: var(--fuente-titulo-pantalla) !important;
+    margin: 0;
+    display: inline-block;
+}
+
+/* ==========================================================================
+   COMPONENTES COMPARTIDOS (Para uso en todos los formularios)
+   ========================================================================== */
+/* Contenedor de Filtros Superior */
+.panel-filtros {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: var(--sombra-baxen);
+    padding: 15px 25px;
+    margin-bottom: 10px;
+    border: 1px solid #e1e4e8;
+}
+
+/* ==========================================================================
+   GRILLA DE RESULTADOS (Tablas con Scroll)
+   ========================================================================== */
+#zonaResultados {
+    display: block !important;
+    width: 100% !important;
+    height: 500px !important;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 1px solid #dee2e6;
+    border-radius: 8px !important;
+    background: #fff;
+    padding-right: 10px;
+    box-shadow: var(--sombra-baxen);
+}
+
+    #zonaResultados table {
+        width: 100%;
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
+        font-size: var(--fuente-normal) !important;
+    }
+
+    #zonaResultados thead th {
+        position: sticky !important;
+        top: 0 !important;
+        background-color: #2c3e50 !important;
+        color: #ffffff !important;
+        padding: 10px;
+        font-weight: normal !important;
+        font-size: var(--fuente-destacada) !important;
+    }
+
+        #zonaResultados thead th:last-child {
+            padding-right: 30px !important;
+            border-top-right-radius: 7px;
+        }
+
+        #zonaResultados thead th:first-child {
+            border-top-left-radius: 7px;
+            text-align: center !important;
+        }
+
+    #zonaResultados tbody tr td {
+        padding: 8px !important;
+        border-bottom: 1px solid #eee !important;
+        font-weight: normal !important;
+    }
+
+        #zonaResultados tbody tr td:first-child {
+            text-align: center !important;
+        }
+
+/* ==========================================================================
+   PANEL INFERIOR (Contador y Botonera)
+   ========================================================================== */
+.panel-pie {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: var(--sombra-baxen);
+    padding: 15px 25px;
+    margin-top: 15px;
+    border: 1px solid #e1e4e8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.badge-contador {
+    padding: 8px 20px;
+    background-color: var(--color-gris-baxen);
+    color: #ffffff;
+    border-radius: 20px;
+    font-size: var(--fuente-destacada) !important;
+    min-width: 140px;
+    text-align: center;
+    margin: 0;
+}
+
+.menu-operaciones-grid {
+    background-color: var(--color-gris-baxen);
+    border-radius: 6px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 320px;
+}
+
+.btn-menu {
+    background: transparent;
+    border: none;
+    color: #ecf0f1;
+    padding: 12px 15px;
+    text-align: left;
+    font-size: var(--fuente-destacada) !important;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+    .btn-menu:nth-child(even) {
+        border-left: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .btn-menu:nth-last-child(-n+2) {
+        border-bottom: none;
+    }
+
+    .btn-menu:not(.export-wrapper):hover {
+        background: rgba(255,255,255,0.1);
+        border-radius: 6px;
+    }
+
+/* ==========================================================================
+   EFECTO EXPORTAR Y SUB-BOTONES
+   ========================================================================== */
+.export-wrapper {
+    padding: 0 !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.export-frontal {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 12px 15px;
+    transition: transform 0.3s ease;
+}
+
+.export-oculto {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+}
+
+.export-wrapper:hover .export-frontal {
+    transform: translateY(-100%);
+}
+
+.export-wrapper:hover .export-oculto {
+    transform: translateY(0);
+}
+
+.btn-sub {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #ecf0f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--fuente-chica) !important;
+    cursor: pointer;
+    gap: 5px;
+    transition: background 0.2s;
+}
+
+    .btn-sub:first-child {
+        border-right: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .btn-sub:hover {
+        background: rgba(255,255,255,0.2);
+    }
+
+/* Clases de apoyo para íconos de exportación (Bootstrap Icons) */
+.icono-excel {
+    color: var(--color-excel);
+    font-size: 1.1rem;
+}
+
+.icono-pdf {
+    color: var(--color-pdf);
+    font-size: 1.1rem;
+}
+
+/* ==========================================================================
+   MODAL INFO BÁSICA
+   ========================================================================== */
+.infobasica-modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.infobasica-modal-contenido {
+    background-color: white;
+    margin: 5% auto;
+    width: 700px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    overflow: hidden;
+    border: 1px solid var(--color-gris-baxen);
+}
+
+.infobasica-modal-header {
+    background-color: var(--color-gris-baxen);
+    color: white;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.infobasica-modal-body {
+    padding: 20px;
+}
+
+.infobasica-modal-footer {
+    padding: 15px;
+    border-top: 1px solid #eee;
+    text-align: right;
+    background-color: #f4f6f8;
+}
+
+.infobasica-campo {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}

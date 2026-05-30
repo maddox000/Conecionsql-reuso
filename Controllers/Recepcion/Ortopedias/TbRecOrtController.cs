@@ -173,8 +173,24 @@ namespace ConexionSql.Controllers.Recepcion.Ortopedias
 
             return Json(new
             {
-                success = true
-                tbRecOrtId = nuevaOrtopedia.TbRecOrtId
+                success = true,
+                tbRecOrtId = nuevaOrtopedia.TbRecOrtId,
+
+                ortopedia = new
+                {
+                    TB_REC_ORT_ORT_ID = nuevaOrtopedia.TbRecOrtOrtId,
+                    TB_REC_ORT_ORT_DEN = nuevaOrtopedia.TbRecOrtOrtDen,
+
+                    TB_REC_ORT_PRO_ID = nuevaOrtopedia.TbRecOrtProId,
+                    TB_REC_ORT_PRO_NOM = nuevaOrtopedia.TbRecOrtProNom,
+                    TB_REC_ORT_PRO_APE = nuevaOrtopedia.TbRecOrtProApe,
+
+                    TB_REC_ORT_PAC = nuevaOrtopedia.TbRecOrtPac,
+                    TB_REC_ORT_REM = nuevaOrtopedia.TbRecOrtRem,
+
+                    TB_REC_ORT_FEC_PROC = nuevaOrtopedia.TbRecOrtFecProc,
+                    TB_REC_ORT_HOR_PROC = nuevaOrtopedia.TbRecOrtHorProc
+                }
             });
         }
 

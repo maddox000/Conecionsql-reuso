@@ -1,0 +1,86 @@
+﻿@{
+    ViewData["Title"] = "Baxen - Acondicionado";
+}
+<link rel="stylesheet" href="~/css/busquedas-custom.css" />
+
+<div id="baxen-loader" style="display:none;">
+    <div class="loader-content">
+        <h1>Baxen® Trazabilidad</h1>
+        <div class="spinner"></div>
+    </div>
+</div>
+
+<div class="container-fluid d-flex p-0">
+    <div class="flex-grow-1 d-flex justify-content-end align-items-start gap-30 flex-wrap p-4" style="margin-right: 300px;">
+        <form id="formBusqueda" class="d-flex gap-30 flex-wrap justify-content-end">
+            <div class="form-group col-auto">
+                <label>Desde</label>
+                <input type="date" name="fecIni" class="form-control campo-corto" value="@ViewBag.FecIni" />
+            </div>
+            <div class="form-group col-auto">
+                <label>Hasta</label>
+                <input type="date" name="fecFin" class="form-control campo-corto" value="@ViewBag.FecFin" />
+            </div>
+            <div class="form-group col-auto">
+                <label>ACO ID</label>
+                <input type="text" name="acoId" class="form-control campo-corto" />
+            </div>
+            <div class="form-group col-auto">
+                <label>Denominación Material</label>
+                <input type="text" name="den" class="form-control campo-largo" id="txtDen" />
+            </div>
+            <div class="form-group col-auto">
+                <label>Reúso ID</label>
+                <input type="text" name="reuId" class="form-control campo-largo" />
+            </div>
+        </form>
+
+        <div id="gridResultados" class="w-100 mt-4">
+        </div>
+    </div>
+
+    <div class="panel-operaciones">
+        <button type="button" onclick="ejecutarBusqueda()" class="btn-baxen">
+            <span class="material-icons">search</span> BUSCAR
+        </button>
+        <button type="button" onclick="limpiarCampos()" class="btn-baxen">
+            <span class="material-icons">filter_alt_off</span> LIMPIAR
+        </button>
+
+        <div class="contador-registros">
+            <span id="lblContador">0</span> REGISTROS
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            ejecutarBusqueda();
+
+            $('input').on('change keyup', function() {
+                $(this).toggleClass('campo-activo', $(this).val() !== "");
+            });
+        });
+
+        function ejecutarBusqueda() {
+            $("#baxen-loader").fadeIn(150);
+            $.ajax({
+                url: '@Url.Action("Filtrar", "BusAcondicionado")',
+                type: 'POST',
+                data: $("#formBusqueda").serialize(),
+                success: function (data) {
+                    $("#gridResultados").html(data);
+                    $("#lblContador").text($(".baxen-row").length);
+                    $("#baxen-loader").fadeOut(150);
+                }
+            });
+        }
+
+        function limpiarCampos() {
+            $("#formBusqueda")[0].reset();
+            $("input").removeClass("campo-activo");
+            ejecutarBusqueda();
+        }
+    </script>
+}

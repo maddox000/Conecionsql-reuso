@@ -1,9 +1,11 @@
-﻿using ConexionSql.Models.A_PAN_OPC;
+﻿using ConexionSql.InfoBasica.Models;
+using ConexionSql.Models.A_PAN_OPC;
 using ConexionSql.Models.Acondicionado;
 using ConexionSql.Models.Entrega;
 using ConexionSql.Models.Equipos;
 using ConexionSql.Models.Estados;
 using ConexionSql.Models.IbPer;
+using ConexionSql.Models.InfoBasica;
 using ConexionSql.Models.Instrumental;
 using ConexionSql.Models.Lavado;
 using ConexionSql.Models.Lavado.Controles;
@@ -13,11 +15,12 @@ using ConexionSql.Models.Procesos.Controles;
 using ConexionSql.Models.Profesionales;
 using ConexionSql.Models.Proveedores;
 using ConexionSql.Models.Recepciones;
+using ConexionSql.Models.Recepciones.Ortopedias;
 using ConexionSql.Models.Reuso;
 using ConexionSql.Models.Reusos;
 using ConexionSql.Models.Sectores;
+using ConexionSql.Models.SP_Busquedas;
 using Microsoft.EntityFrameworkCore;
-using ConexionSql.Models.Recepciones.Ortopedias;
 
 
 
@@ -73,6 +76,10 @@ namespace ConexionSql.Data
         public DbSet<TbProLavNco> TbProLavNco { get; set; }
         public DbSet<TbProLavPendienteDto> TbProLavPendienteDto { get; set; }
         public DbSet<TbRecOrt> TbRecOrt { get; set; }
+        public DbSet<BusLavadoDetDto> BusLavadoDetDto { get; set; }
+        public DbSet<IBSector> IBSectores { get; set; }
+        public DbSet<IBProveedor> IBProveedores { get; set; }
+        public DbSet<IBPersonalDto> IBPersonalListado { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -145,6 +152,7 @@ namespace ConexionSql.Data
             modelBuilder.Entity<TbProDto>().HasNoKey();
             modelBuilder.Entity<TbProPendienteDto>().HasNoKey();
             modelBuilder.Entity<TbProLavPendienteDto>().HasNoKey();
+            modelBuilder.Entity<BusLavadoDetDto>().HasNoKey();
         }
     }
 }

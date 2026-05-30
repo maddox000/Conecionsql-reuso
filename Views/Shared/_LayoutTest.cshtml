@@ -129,6 +129,10 @@
                 activarSubmenuExtendido(".submenu a[href='/ProcesoMateriales']");
                 activarSubmenuExtendido(".submenu a[href='/Entregas']");
                 activarSubmenuExtendido("#btnIdentificar");
+                activarSubmenuExtendido("#btnBusquedaRecepciones");
+                activarSubmenuExtendido("#btnProcesoEsterilizacion");
+                activarSubmenuExtendido("#btnBusquedaLavado");
+                activarSubmenuExtendido("#btnProcesoEsterilizacion");
 
                 /* --- RESALTAR ÍTEMS INTERNOS --- */
                 const menuLinks = document.querySelectorAll(".submenu a, .submenu-extra a");
@@ -153,7 +157,7 @@
 
                             const btnReusosAsignar = document.getElementById("btnReusosAsignar");
             // llama a modal debugger reuso
-                    
+
                 if (btnReusosAsignar) {
                 btnReusosAsignar.addEventListener("click", function (e) {
                     e.preventDefault();
@@ -257,134 +261,186 @@
 
         <div class="menu-logo">
             <img src="~/img/BAXEN - Logo.png" alt="Baxen® Trazabilidad">
-            </div>
-
-            <ul class="menu-lista">
-
-                <li class="menu-item">
-                    <button type="button" class="menu-titulo toggle-submenu">
-                        <i class="bi bi-collection"></i> Información básica
-                    </button>
-                    <ul class="submenu">
-                        <li><a href="/Equipos">Equipos</a></li>
-                        <li><a href="/Materiales/ListaMateriales">Productos médicos</a></li>
-                        <li><a href="/Instrumental">Instrumental</a></li>
-                        <li><a asp-controller="IbPer" asp-action="Index">Personal</a></li>
-                        <a href="/Proveedores/ListaProveedores">Proveedores</a>
-                        <a href="/Profesionales/ListaProfesionales">Profesionales</a>
-                        <a href="/Sectores/ListaSectores">Sectores</a>
-                    </ul>
-                </li>
-
-                <li class="menu-item">
-                    <button type="button" class="menu-titulo toggle-submenu">
-                        <i class="bi bi-list-check"></i> Tareas
-                    </button>
-                    <ul class="submenu">
-
-                        <li><a href="#" id="btnRecepcion">Recepción</a></li>
-
-                        <li><a href="/ProcesoMateriales">Proceso de materiales</a></li>
-                        <li class="submenu-extra">
-                            <a href="#" id="btnLavado">Proceso de lavado</a>
-                            <a href="/ControlInstrumental">Control de instrumental</a>
-                            <a href="#" id="btnAcondicionado">Registro acondicionado</a>
-                            <a href="#" id="btnProcesos">Proceso esterilización</a>
-                            <a href="/RegistroDesinfeccion">Registro desinfección</a>
-                        </li>
-
-                        <li><a href="/Entregas">Entregas</a></li>
-                        <li class="submenu-extra">
-                            <a href="#" id="btnEntrega">Entregas a sectores</a>
-                            <a href="/CarroQuirurgico">Preparar carro</a>
-                            <a href="/PanelSalas">Panel salas quirúrgicas</a>
-                            <a href="/BuscarProcedimientos">Buscar procedimientos</a>
-                        </li>
-                    <li><a href="#" id="btnIdentificar">Identificar materiales</a></li>
-                            <li class="submenu-extra">
-                                <a href="/Trazabilidad">Producción</a>
-                                <a href="/Reusos">Generar código de reúso</a>
-                                <a href="#" id="btnReusosAsignar">Asignar código de reúso</a>
-                                <a href="/Reusos">Baja código de reúso</a>
-                                <a href="/Reusos">Liberar código de reúso</a>
-                            </li>
-                        <li><a href="/Transito">Instrumental en tránsito</a></li>
-                        <li><a href="/Stock">Transacciones de stock</a></li>
-                    </ul>
-                </li>
-
-                <li class="menu-item">
-                    <button type="button" class="menu-titulo toggle-submenu">
-                        <i class="bi bi-search"></i> Búsqueda de datos
-                    </button>
-                    <ul class="submenu">
-                        <li><a href="/Materiales">Materiales</a></li>
-                        <li><a asp-controller="Busquedas" asp-action="BusquedasFecha">Recepciones</a></li>
-                        <li><a asp-controller="Procesos" asp-action="BuscarProcesos">Proceso de materiales</a></li>
-                        <li><a href="/Entregas">Entregas</a></li>
-                        <li><a href="/ControlPM">Control productos médicos</a></li>
-                        <li><a href="/Transito">Instrumental en tránsito</a></li>
-                        <li><a href="/Stock">Stock</a></li>
-                        <li><a href="/Clientes">Búsqueda de datos cliente</a></li>
-                    </ul>
-                </li>
-
-                <li class="menu-item">
-                    <button type="button" class="menu-titulo toggle-submenu">
-                        <i class="bi bi-qr-code"></i> Trazabilidad
-                    </button>
-                    <ul class="submenu">
-                        <li><a href="#">(Opciones futuras)</a></li>
-                    </ul>
-                </li>
-
-                <li class="menu-item">
-                    <button type="button" class="menu-titulo toggle-submenu">
-                        <i class="bi bi-bar-chart"></i> Estadísticas
-                    </button>
-                    <ul class="submenu">
-                        <li><a href="#">(Opciones futuras)</a></li>
-                    </ul>
-                </li>
-
-                <li class="menu-item">
-                    <button type="button" class="menu-titulo toggle-submenu">
-                        <i class="bi bi-gear"></i> Área de sistemas
-                    </button>
-                    <ul class="submenu">
-                        <li><a href="#">(Opciones futuras)</a></li>
-                    </ul>
-                </li>
-
-                <li class="menu-item">
-                    <button type="button" class="menu-titulo" id="btnSalir">
-                        <i class="bi bi-box-arrow-right"></i> Salir del sistema
-                    </button>
-                </li>
-
-            </ul>
-        </aside>
-
-        <nav class="navbar-principal">
-            <div class="titulo-navbar">@ViewData["Title"]</div>
-        </nav>
-
-        <div class="breadcrumbs">
-            @RenderSection("Breadcrumbs", required: false)
         </div>
 
-        <main class="contenido">
-            @RenderBody()
-        </main>
+        <ul class="menu-lista">
 
-        <partial name="_LoginModal" />
-        <div id="contenedorModalReuso"></div>
+            <li class="menu-item">
+                <button type="button" class="menu-titulo toggle-submenu">
+                    <i class="bi bi-collection"></i> Información básica
+                </button>
+                <ul class="submenu">
+                    <li><a href="/Equipos">Equipos</a></li>
+                    <li><a href="/Materiales/ListaMateriales">Productos médicos</a></li>
+                    <li><a href="/Instrumental">Instrumental</a></li>
+                    <li><a href="/IBPersonal/IBPersonalListado">Personal</a></li>
+                    <a href="/IBProveedor/IBProveedor">Proveedores</a>
+                    <a href="/Profesionales/ListaProfesionales">Profesionales</a>
+                    <a href="/IBSector/IBSector">Sectores</a>
+                </ul>
+            </li>
 
-        <script src="~/lib/jquery/dist/jquery.min.js"></script>
-        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="~/js/login.js" asp-append-version="true"></script>
+            <li class="menu-item">
+                <button type="button" class="menu-titulo toggle-submenu">
+                    <i class="bi bi-list-check"></i> Tareas
+                </button>
+                <ul class="submenu">
 
-        @await RenderSectionAsync("Scripts", required: false)
+                    <li><a href="#" id="btnRecepcion">Recepción</a></li>
 
-    </body>
+                    <li><a href="/ProcesoMateriales">Proceso de materiales</a></li>
+                    <li class="submenu-extra">
+                        <a href="#" id="btnLavado">Proceso de lavado</a>
+                        <a href="/ControlInstrumental">Control de instrumental</a>
+                        <a href="#" id="btnAcondicionado">Registro acondicionado</a>
+                        <a href="#" id="btnProcesos">Proceso esterilización</a>
+                        <a href="/RegistroDesinfeccion">Registro desinfección</a>
+                    </li>
+
+                    <li><a href="/Entregas">Entregas</a></li>
+                    <li class="submenu-extra">
+                        <a href="#" id="btnEntrega">Entregas a sectores</a>
+                        <a href="/CarroQuirurgico">Preparar carro</a>
+                        <a href="/PanelSalas">Panel salas quirúrgicas</a>
+                        <a href="/BuscarProcedimientos">Buscar procedimientos</a>
+                    </li>
+                    <li><a href="#" id="btnIdentificar">Identificar materiales</a></li>
+                    <li class="submenu-extra">
+                        <a href="/Trazabilidad">Producción</a>
+                        <a href="/Reusos">Generar código de reúso</a>
+                        <a href="#" id="btnReusosAsignar">Asignar código de reúso</a>
+                        <a href="/Reusos">Baja código de reúso</a>
+                        <a href="/Reusos">Liberar código de reúso</a>
+                    </li>
+                    <li><a href="/Transito">Instrumental en tránsito</a></li>
+                    <li><a href="/Stock">Transacciones de stock</a></li>
+                </ul>
+            </li>
+
+            <li class="menu-item">
+                <button type="button" class="menu-titulo toggle-submenu">
+                    <i class="bi bi-search"></i> Búsqueda de datos
+                </button>
+                <ul class="submenu">
+                    <li><a href="/Materiales">Materiales</a></li>
+                    @* <li><a asp-controller="Busquedas" asp-action="BusquedasFecha">Recepciones</a></li> *@
+                    <li><a href="#" id="btnBusquedaRecepciones">Recepciones</a></li>
+
+                    <li class="submenu-extra">
+                        <a href="/BusRec/Index">Búsqueda recepciones</a>
+                        <a href="/RecDetBusqueda/Index">Búsqueda materiales recibidos</a>
+                    </li>
+                    @* <li><a asp-controller="Procesos" asp-action="BuscarProcesos">Proceso de materiales</a></li> *@
+                    @* <li><a asp-controller="Procesos" asp-action="BuscarProcesos">Proceso de materiales</a></li> *@
+                    <li class="submenu-extra">
+                        <a href="/ProcesoMateriales">Proceso de materiales</a>
+
+                        <ul>
+                            <li>
+                                <a href="#" id="btnBusquedaLavado">Lavado</a>
+
+                                <ul>
+                                    <li>
+                                        <a href="/BusLavado/IndexLav">Búsqueda lavado</a>
+                                    </li>
+
+                                    <li>
+                                        <a href="/BusLavadoDet/IndexLavDet">Búsqueda materiales lavados</a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li>
+                                <a href="/BusAco/IndexAcondicionado">Acondicionado</a>
+                            </li>
+
+                            <li>
+                                <a href="#">Control de instrumental</a>
+                            </li>
+
+                            <li>
+                                <a href="#" id="btnProcesoEsterilizacion">Proceso esterilización</a>
+
+                                <ul>
+                                    <li>
+                                        <a href="/BusPro/IndexProcesos">Búsqueda procesos</a>
+                                    </li>
+
+                                    <li>
+                                        <a href="/BusProDet/IndexProDet">Búsqueda materiales procesados</a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li>
+                                <a href="#">Registro desinfección</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><a href="/Entregas">Entregas</a></li>
+                    <li><a href="/ControlPM">Control productos médicos</a></li>
+                    <li><a href="/Transito">Instrumental en tránsito</a></li>
+                    <li><a href="/Stock">Stock</a></li>
+                    <li><a href="/Clientes">Búsqueda de datos cliente</a></li>
+                </ul>
+            </li>
+
+            <li class="menu-item">
+                <button type="button" class="menu-titulo toggle-submenu">
+                    <i class="bi bi-qr-code"></i> Trazabilidad
+                </button>
+                <ul class="submenu">
+                    <li><a href="#">(Opciones futuras)</a></li>
+                </ul>
+            </li>
+
+            <li class="menu-item">
+                <button type="button" class="menu-titulo toggle-submenu">
+                    <i class="bi bi-bar-chart"></i> Estadísticas
+                </button>
+                <ul class="submenu">
+                    <li><a href="#">(Opciones futuras)</a></li>
+                </ul>
+            </li>
+
+            <li class="menu-item">
+                <button type="button" class="menu-titulo toggle-submenu">
+                    <i class="bi bi-gear"></i> Área de sistemas
+                </button>
+                <ul class="submenu">
+                    <li><a href="#">(Opciones futuras)</a></li>
+                </ul>
+            </li>
+
+            <li class="menu-item">
+                <button type="button" class="menu-titulo" id="btnSalir">
+                    <i class="bi bi-box-arrow-right"></i> Salir del sistema
+                </button>
+            </li>
+
+        </ul>
+    </aside>
+
+    <nav class="navbar-principal">
+        <div class="titulo-navbar">@ViewData["Title"]</div>
+    </nav>
+
+    <div class="breadcrumbs">
+        @RenderSection("Breadcrumbs", required: false)
+    </div>
+
+    <main class="contenido">
+        @RenderBody()
+    </main>
+
+    <partial name="_LoginModal" />
+    <div id="contenedorModalReuso"></div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/login.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
 </html>

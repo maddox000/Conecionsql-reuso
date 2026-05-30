@@ -1,0 +1,62 @@
+﻿@model List<ConexionSql.Models.SP_Busquedas.BusLavadoDto>
+
+<div class="table-responsive" style="margin-top: 20px;">
+    <table class="table table-hover table-striped" id="tablaLavados">
+        <thead>
+            <tr style="background-color: #2c3e50; color: white;">
+                <th>Proceso</th>
+                <th>Lote</th>
+                <th>Fecha</th>
+                <th>Tipo de proceso</th>
+                <th>Equipo</th>
+                <th>Número equipo</th>
+                <th>Estado proceso</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td ondblclick="VerDetalle(@item.TB_PRO_LAV_ID)"
+                            style="font-weight: bold; color: #2c3e50; cursor:pointer;">
+                            @item.TB_PRO_LAV_ID
+                        </td>
+                        <td><strong>@item.TB_PRO_LAV_NUM</strong></td>
+                        <td>@item.TB_PRO_LAV_FEC.ToString("dd/MM/yyyy")</td>
+                        <td>@item.TB_PRO_LAV_PTI_DEN</td>
+                        <td>@item.TB_PRO_IB_EQU_TEQ_DEN</td>
+                        <td>@(string.IsNullOrEmpty(item.TB_PRO_LAV_EQU_NUM) || item.TB_PRO_LAV_EQU_NUM == "0" ? "-" : item.TB_PRO_LAV_EQU_NUM)</td>
+                        <td>
+                            <span class="badge" style="background-color: #e3f2fd; color: #2c3e50; border: 1px solid #2c3e50; padding: 5px 10px;">
+                                @item.TB_PRO_LAV_EST_DEN
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-primary" title="Ver Detalle" onclick="VerDetalle(@item.TB_PRO_LAV_ID)">
+                                <span class="material-icons" style="font-size: 18px;">visibility</span>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="8" class="text-center" style="padding: 40px; color: #666; font-style: italic;">
+                        No se encontraron registros de lavados para los filtros seleccionados.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function VerDetalle(tbProLavId) {
+        window.location.href = '/TbProLavBusqueda/ConsultaLavado?tbProLavId=' + tbProLavId;
+    }
+</script>
+

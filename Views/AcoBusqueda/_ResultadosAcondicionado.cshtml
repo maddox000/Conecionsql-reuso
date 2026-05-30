@@ -1,0 +1,29 @@
+﻿@model IEnumerable<ConexionSql.Models.SP_Busquedas.BusAcondicionadoDetDto>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ACO ID</th>
+            <th>Fecha</th>
+            <th>Material</th>
+            <th>ID Reúso</th>
+            <th>Cant. Det</th>
+            <th>Sector</th>
+            <th>Usuario</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="baxen-row">
+                <td><strong>@item.TB_PRO_ACO_ID</strong></td>
+                <td>@item.TB_PRO_ACO_FEC.ToShortDateString()</td>
+                <td>@item.TB_REC_DET_MAT_DEN</td>
+                <td>@item.TB_REC_DET_REU_ID</td>
+                <td>@item.TB_PRO_ACO_DET_CANT</td>
+                <td>@item.TB_REC_SEC_DES_DEN</td>
+                <td>@item.TB_PRO_ACO_UPRO</td>
+            </tr>
+        }
+    </tbody>
+</table>

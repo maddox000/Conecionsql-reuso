@@ -1,0 +1,76 @@
+﻿@model IEnumerable<ConexionSql.Models.SP_Busquedas.BusAcoDto>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table-baxen-resultados">
+        <thead>
+            <tr>
+                <th>ID ACO</th>
+                <th>Fecha / Hora</th>
+                <th>Material</th>
+                <th>Reutilizable ID</th>
+                <th>Cant.</th>
+                <th>Sector Destino</th>
+                <th>Usuario</th>
+                <th style="text-align: center;">Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td style="font-weight: bold; color: #2c3e50;">
+                        @item.TB_PRO_ACO_ID
+                    </td>
+                    <td>
+                        <div style="font-weight: 600;">
+                            @(item.TB_PRO_ACO_FEC.HasValue? item.TB_PRO_ACO_FEC.Value.ToString("dd/MM/yyyy") : "-")
+                        </div>
+                        <small class="text-muted">@item.TB_PRO_ACO_HOR_INI hs</small>
+                    </td>
+                    <td>
+                        <div style="font-weight: 600;">@item.TB_REC_DET_MAT_DEN</div>
+                        <small class="text-muted">ID Mat: @item.TB_REC_DET_MAT_ID</small>
+                    </td>
+                    <td>
+                        <span class="badge" style="background-color: #ecf0f1; color: #2c3e50; border: 1px solid #bdc3c7;">
+                            @item.TB_REC_DET_REU_ID
+                        </span>
+                    </td>
+                    <td style="text-align: center;">
+                        @item.TB_PRO_ACO_DET_CANT
+                    </td>
+                    <td>
+                        @item.TB_REC_SEC_DES_DEN
+                    </td>
+                    <td>
+                        <span style="font-size: 0.85rem; color: #34495e;">
+                            <i class="fas fa-user-circle"></i> @item.TB_PRO_ACO_UPRO
+                        </span>
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn-ver-detalle" onclick="verDetalleAco(@item.TB_PRO_ACO_ID)" title="Ver Proceso">
+                            <span class="material-icons">visibility</span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <script>
+        // Actualizamos el contador de resultados
+        document.getElementById('lblContador').innerText = '@Model.Count()';
+    </script>
+}
+else
+{
+    <div style="padding: 20px; text-align: center; color: #7f8c8d;">
+        <span class="material-icons" style="font-size: 48px; display: block; margin-bottom: 10px;">assignment_late</span>
+        No se encontraron registros de acondicionado para los filtros ingresados.
+    </div>
+
+    <script>
+        document.getElementById('lblContador').innerText = '0';
+    </script>
+}

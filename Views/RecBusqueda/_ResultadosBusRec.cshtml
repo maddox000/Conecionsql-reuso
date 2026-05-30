@@ -1,0 +1,74 @@
+﻿@model IEnumerable<ConexionSql.Models.SP_Busquedas.BusRecDto>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table-baxen-resultados">
+        <thead>
+            <tr>
+                <th>ID REC</th>
+                <th>Fecha</th>
+                <th>Hora Inicio</th>
+                <th>Hora Fin</th>
+                <th>Sector Origen</th>
+                <th>Sector Destino</th>
+                <th>Orden / Denominación</th>
+                <th style="text-align: center;">Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td ondblclick="window.location.href='/Busquedas/ConsultaRecepcion/@item.TB_REC_ID'"
+                        style="font-weight: bold; color: #2c3e50; cursor:pointer;">
+                        @item.TB_REC_ID
+                    </td>
+                    <td>
+                        @(item.TB_REC_FEC.HasValue? item.TB_REC_FEC.Value.ToString("dd/MM/yyyy") : "-")
+                    </td>
+                    <td>@item.TB_REC_HOR_INI</td>
+                    <td>@item.TB_REC_HOR_FIN</td>
+                    <td>@item.TB_REC_SEC_ORI_DEN</td>
+                    <td>@item.TB_REC_SEC_DES_DEN</td>
+                    <td>
+                        <div style="font-weight: 600;">@item.TB_REC_ORT_DEN</div>
+                        @if (!string.IsNullOrEmpty(item.TB_REC_OBS))
+                        {
+                            <small class="text-muted" title="@item.TB_REC_OBS">
+                                Obs: @(item.TB_REC_OBS.Length > 20 ? item.TB_REC_OBS.Substring(0, 20) + "..." : item.TB_REC_OBS)
+                            </small>
+                        }
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn-ver-detalle" onclick="verDetalleRecepcion(@item.TB_REC_ID)" title="Ver Detalle Completo">
+                            <span class="material-icons">visibility</span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <script>
+        var contador = document.getElementById('contador');
+        if (contador) {
+            contador.innerText = 'Registros: @Model.Count()';
+        }
+    </script>
+}
+else
+{
+    <div style="padding: 20px; text-align: center; color: #7f8c8d;">
+        <span class="material-icons" style="font-size: 48px; display: block; margin-bottom: 10px;">inventory_2</span>
+        No se encontraron registros de recepción en este rango.
+    </div>
+
+    <script>
+        var contador = document.getElementById('contador');
+        if (contador) {
+            contador.innerText = 'Registros: 0';
+        }
+    </script>
+}
+
+

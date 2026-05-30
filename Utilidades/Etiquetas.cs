@@ -318,7 +318,7 @@ namespace ConexionSql.Utilidades
                 // =============================
                 "^FO20,150^GB410,80,80^FS\n" +     // 🔴 relleno completo (alto=grosor)
                 "^CF0,40\n" +                      // 🔴 texto más grande
-                "^FO20,180^FB410,1,0,C^FR^FDPRIORIDAD DE PROCESO^FS\n"+
+                "^FO20,180^FB410,1,0,C^FR^FDPRIORIDAD DE PROCESO^FS\n" +
 
                 // =============================
                 // 🟦 ID
@@ -396,6 +396,122 @@ namespace ConexionSql.Utilidades
                 $"^FO60,320^BCN,45,N,N,N^FD{idDetalle}^FS\n" +
 
                 "^XZ";
+        }
+
+
+        //etiqueta de ortopedia
+
+        public static string RecepcionDetalleOrtopedia(
+        string sector,
+        string material,
+        DateTime fechaRecepcion,
+        int nroRecepcion,
+        int idDetalle,
+        string profesional,
+        string paciente,
+        string remito,
+        string ortopedia,
+        DateTime? fechaProc,
+        DateTime? horaProc)
+                {
+                    return
+                        "^XA\n" +
+
+                        "^CI28\n" +
+                        "^PW480\n" +
+                        "^LL360\n" +
+
+                        "^LH20,0\n" +
+
+                        "^A0N,26,26\n" +
+                        "^FO20,30^FDRecepcion^FS\n" +
+                        $"^FO150,30^FD{nroRecepcion}^FS\n" +
+                        $"^FO320,30^FD{fechaRecepcion:dd/MM/yyyy}^FS\n" +
+
+                        "^A0N,26,26\n" +
+                        $"^FO20,65^FDSector {sector}^FS\n" +
+
+                        "^A0N,30,30\n" +
+                        $"^FO20,100^FD{material}^FS\n" +
+
+                        "^A0N,24,24\n" +
+                        $"^FO20,140^FDProfesional {profesional}^FS\n" +
+
+                        "^A0N,24,24\n" +
+                        $"^FO20,175^FDPaciente {paciente}^FS\n" +
+
+                        "^A0N,24,24\n" +
+                        $"^FO20,210^FDRemito {remito}^FS\n" +
+                        $"^FO250,210^FD{ortopedia}^FS\n" +
+
+                        "^A0N,24,24\n" +
+                        $"^FO20,245^FDFecha pro {fechaProc:dd/MM/yyyy}^FS\n" +
+                        $"^FO250,245^FD{horaProc:HH:mm}^FS\n" +
+
+                        "^A0N,24,24\n" +
+                        $"^FO190,295^FD{idDetalle}^FS\n" +
+
+                        "^BY3,2,45\n" +
+                        $"^FO60,315^BCN,40,N,N,N^FD{idDetalle}^FS\n" +
+
+                        "^XZ";
+        }
+
+        //etiqueta profesional
+
+        public static string RecepcionDetalleProfesional(
+        string sector,
+        string material,
+        DateTime fechaRecepcion,
+        DateTime vencimiento,
+        int nroRecepcion,
+        int idDetalle,
+        string profesional,
+        DateTime? fechaProc,
+        DateTime? horaProc,
+        int cantidad)
+                {
+                    return
+                        "^XA\n" +
+
+                        "^CI28\n" +
+                        "^PW480\n" +
+                        "^LL360\n" +
+
+                        "^LH20,0\n" +
+
+                        "^A0N,26,26\n" +
+                        "^FO20,30^FDRecepcion^FS\n" +
+                        $"^FO150,30^FD{nroRecepcion}^FS\n" +
+                        $"^FO320,30^FD{fechaRecepcion:dd/MM/yyyy}^FS\n" +
+
+                        "^A0N,26,26\n" +
+                        $"^FO20,65^FDSector {sector}^FS\n" +
+
+                        "^A0N,30,30\n" +
+                        $"^FO20,100^FD{material}^FS\n" +
+
+                        "^A0N,24,24\n" +
+                        $"^FO20,145^FDProfesional {profesional}^FS\n" +
+
+                        "^A0N,24,24\n" +
+                        $"^FO20,180^FDFecha proc {fechaProc:dd/MM/yyyy}^FS\n" +
+                        $"^FO250,180^FD{horaProc:HH:mm}^FS\n" +
+
+                        "^A0N,24,24\n" +
+                        $"^FO20,215^FDCant Piezas {cantidad}^FS\n" +
+
+                        "^FO20,250^GB420,28,28^FS\n" +
+                        "^CF0,24\n" +
+                        $"^FO30,252^FR^FDVencimiento {vencimiento:dd/MM/yyyy}^FS\n" +
+
+                        "^A0N,24,24\n" +
+                        $"^FO190,295^FD{idDetalle}^FS\n" +
+
+                        "^BY3,2,45\n" +
+                        $"^FO60,315^BCN,40,N,N,N^FD{idDetalle}^FS\n" +
+
+                        "^XZ";
         }
     }
 

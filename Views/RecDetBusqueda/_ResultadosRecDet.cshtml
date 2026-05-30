@@ -44,8 +44,15 @@
         @foreach (var x in Model)
         {
             <tr>
-                <td class="text-center">@x.TB_REC_DET_ID</td>
-                <td>@x.TB_REC_ID</td>
+                <td class="text-center"
+                    ondblclick="window.location.href='/Traza/TrazaRecDetID/@x.TB_REC_DET_ID'"
+                    style="cursor:pointer;">
+                    @x.TB_REC_DET_ID
+                </td>
+                <td ondblclick="window.location.href='/Busquedas/ConsultaRecepcion/@x.TB_REC_ID'"
+                    style="cursor:pointer;">
+                    @x.TB_REC_ID
+                </td>
                 <td>@x.TB_REC_FEC?.ToString("dd/MM/yyyy")</td>
                 <td>@x.TB_REC_HOR_INI?.ToString("HH:mm")</td>
                 <td>@x.TB_REC_SEC_ORI_DEN</td>

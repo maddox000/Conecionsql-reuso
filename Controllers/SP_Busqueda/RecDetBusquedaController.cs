@@ -4,11 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 
-namespace ConexionSql.Controllers.SP_Busquedas
+namespace ConexionSql.Controllers.SP_Busqueda
 {
-    public class RecDetBusquedaController(IRecDetService recDetService) : Controller
+    public class RecDetBusquedaController : Controller
     {
-        private readonly IRecDetService _recDetService = recDetService;
+        private readonly IRecDetService _recDetService;
+
+        public RecDetBusquedaController(IRecDetService recDetService)
+        {
+            _recDetService = recDetService;
+        }
 
         public IActionResult Index()
         {

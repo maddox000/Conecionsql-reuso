@@ -1,0 +1,482 @@
+﻿@model ConexionSql.Models.Recepciones.Profesionales.TbRecProfDto
+
+<link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
+
+<div id="modalRegistroProfesional" class="modal-overlay">
+
+    <div class="modal-box"
+         style="width:700px; max-width:96%; min-height:420px;">
+
+        <div class="rec-screen">
+
+            <div class="rec-screen-banner">
+                Registro profesional particular
+            </div>
+
+            <form id="formRegistroProfesional"
+                  asp-action="InsertarProfesional"
+                  asp-controller="TbRecProfesional"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       id="TB_REC_ID"
+                       name="TB_REC_ID"
+                       value="@Model.TB_REC_ID" />
+
+                <div class="rec-screen-panel">
+
+                    <div class="rec-screen-kv">
+                        <div class="rec-screen-k">Usuario</div>
+                        <div class="rec-screen-v">
+                            @Model.Cabecera?.TbRecPerNom
+                        </div>
+                    </div>
+
+                    <div class="rec-screen-kv">
+                        <div class="rec-screen-k">Cargo</div>
+                        <div class="rec-screen-v">
+                            @Model.Cabecera?.TbRecPerCarDen
+                        </div>
+                    </div>
+
+                    <div class="rec-screen-kv">
+
+                        <div class="rec-screen-k">
+                            Profesional
+                        </div>
+
+                        <div class="rec-screen-v"
+                             style="position:relative;">
+
+                            <input type="text"
+                                   id="profesionalBusqueda"
+                                   class="form-control campo-profesional-enter"
+                                   autocomplete="off" />
+
+                            <div id="listaProfesionales"
+                                 class="list-group"
+                                 style="position:absolute;
+                                top:100%;
+                                left:0;
+                                right:0;
+                                z-index:9999;
+                                max-height:220px;
+                                overflow-y:auto;
+                                display:none;">
+                            </div>
+
+                            <input type="hidden"
+                                   id="TB_REC_ORT_PRO_ID"
+                                   name="TB_REC_ORT_PRO_ID" />
+
+                        </div>
+
+                    </div>
+
+                    <div class="rec-screen-kv"
+                         style="grid-template-columns: 120px 1fr 90px 1fr;">
+
+                        <div class="rec-screen-k">
+                            Fecha entrega
+                        </div>
+
+                        <div class="rec-screen-v">
+
+                            <input type="date"
+                                   class="form-control campo-profesional-enter"
+                                   id="TB_REC_ORT_FEC_PROC"
+                                   name="TB_REC_ORT_FEC_PROC" />
+
+                        </div>
+
+                        <div class="rec-screen-k">
+                            Hora
+                        </div>
+
+                        <div class="rec-screen-v">
+
+                            <input type="time"
+                                   class="form-control campo-profesional-enter"
+                                   id="TB_REC_ORT_HOR_PROC"
+                                   name="TB_REC_ORT_HOR_PROC" />
+
+                        </div>
+
+                    </div>
+
+                    <div class="rec-screen-kv">
+
+                        <div class="rec-screen-k">
+                            Paciente
+                        </div>
+
+                        <div class="rec-screen-v">
+
+                            <input class="form-control campo-profesional-enter campo-profesional-mayus"
+                                   id="TB_REC_ORT_PAC"
+                                   name="TB_REC_ORT_PAC"
+                                   style="border:0;
+                            background:transparent;
+                            width:100%;
+                            box-shadow:none;" />
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="rec-screen-table-wrap">
+
+                    <table class="rec-screen-table">
+
+                        <thead>
+                            <tr>
+                                <th>Cajas instrumental</th>
+                                <th>Instrumental suelto</th>
+                                <th>Elementos estériles</th>
+                                <th>Otros elementos</th>
+                                <th>Total unidades</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+
+                                <td>
+                                    <input type="number"
+                                           class="campo-profesional-enter campo-profesional-cantidad"
+                                           id="TB_REC_ORT_CANT_REC_CIN"
+                                           name="TB_REC_ORT_CANT_REC_CIN"
+                                           value="0"
+                                           style="width:60px;
+                                    border:none;
+                                    background:transparent;
+                                    text-align:center;" />
+                                </td>
+
+                                <td>
+                                    <input type="number"
+                                           class="campo-profesional-enter campo-profesional-cantidad"
+                                           id="TB_REC_ORT_CANT_REC_INS"
+                                           name="TB_REC_ORT_CANT_REC_INS"
+                                           value="0"
+                                           style="width:60px;
+                                    border:none;
+                                    background:transparent;
+                                    text-align:center;" />
+                                </td>
+
+                                <td>
+                                    <input type="number"
+                                           class="campo-profesional-enter campo-profesional-cantidad"
+                                           id="TB_REC_ORT_CANT_REC_EST"
+                                           name="TB_REC_ORT_CANT_REC_EST"
+                                           value="0"
+                                           style="width:60px;
+                                    border:none;
+                                    background:transparent;
+                                    text-align:center;" />
+                                </td>
+
+                                <td>
+                                    <input type="number"
+                                           class="campo-profesional-enter campo-profesional-cantidad"
+                                           id="TB_REC_ORT_CANT_REC_VS"
+                                           name="TB_REC_ORT_CANT_REC_VS"
+                                           value="0"
+                                           style="width:60px;
+                                    border:none;
+                                    background:transparent;
+                                    text-align:center;" />
+                                </td>
+
+                                <td>
+                                    <input type="number"
+                                           id="TB_REC_ORT_CANT_REC"
+                                           name="TB_REC_ORT_CANT_REC"
+                                           value="0"
+                                           readonly
+                                           style="width:60px;
+                                    border:none;
+                                    background:transparent;
+                                    text-align:center;" />
+                                </td>
+
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="rec-screen-actions">
+
+                    <button type="submit"
+                            class="btn btn-secondary">
+                        Volver a recepción
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    (function () {
+
+        const inputProfesional = document.getElementById("profesionalBusqueda");
+        const hiddenProfesional = document.getElementById("TB_REC_ORT_PRO_ID");
+        const listaProfesionales = document.getElementById("listaProfesionales");
+
+        let profesionalesFiltrados = [];
+        let indiceProfesional = -1;
+
+        setTimeout(function () {
+
+                if (inputProfesional) {
+                    inputProfesional.focus();
+                    inputProfesional.select();
+                }
+
+            }, 300);
+
+            //revisar foco
+
+            document.addEventListener("focusin", function () {
+                    console.log("FOCO EN:", document.activeElement?.id, document.activeElement);
+                });
+
+        function renderProfesionales(items) {
+            profesionalesFiltrados = items || [];
+            listaProfesionales.innerHTML = "";
+
+            if (!items.length) {
+                listaProfesionales.style.display = "none";
+                return;
+            }
+
+            items.forEach((p, i) => {
+                const item = document.createElement("button");
+                item.type = "button";
+                item.tabIndex = -1;
+                item.className = "list-group-item list-group-item-action";
+                item.textContent = p.den;
+
+                if (i === indiceProfesional) {
+                    item.classList.add("active");
+                }
+
+                item.onclick = () => {
+                    inputProfesional.value = p.den;
+                    hiddenProfesional.value = p.id;
+                    listaProfesionales.style.display = "none";
+                    document.getElementById("TB_REC_ORT_FEC_PROC")?.focus();
+                };
+
+                listaProfesionales.appendChild(item);
+            });
+
+            listaProfesionales.style.display = "block";
+        }
+
+        inputProfesional?.addEventListener("input", async function () {
+            indiceProfesional = -1;
+            hiddenProfesional.value = "";
+
+            const texto = this.value || "";
+
+            if (texto.length < 1) {
+                listaProfesionales.style.display = "none";
+                return;
+            }
+
+            const response = await fetch(`/TbRecOrt/BuscarProfesionales?texto=${texto}`);
+            const datos = await response.json();
+
+            const filtrados = datos.map(x => ({
+                id: x.id,
+                den: x.denominacion
+            }));
+
+            renderProfesionales(filtrados);
+        });
+
+        inputProfesional?.addEventListener("keydown", function (e) {
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                indiceProfesional = (indiceProfesional + 1) % profesionalesFiltrados.length;
+                renderProfesionales(profesionalesFiltrados);
+            }
+
+            if (e.key === "ArrowUp") {
+                e.preventDefault();
+                indiceProfesional = (indiceProfesional - 1 + profesionalesFiltrados.length) % profesionalesFiltrados.length;
+                renderProfesionales(profesionalesFiltrados);
+            }
+
+            if (e.key === "Enter") {
+                e.preventDefault();
+
+                if (indiceProfesional >= 0) {
+                    const seleccionado = profesionalesFiltrados[indiceProfesional];
+
+                    inputProfesional.value = seleccionado.den;
+                    hiddenProfesional.value = seleccionado.id;
+                    listaProfesionales.style.display = "none";
+
+                    document.getElementById("TB_REC_ORT_FEC_PROC")?.focus();
+                }
+            }
+        });
+
+        document.querySelectorAll(".campo-profesional-mayus").forEach(function (campo) {
+            campo.addEventListener("input", function () {
+                this.value = this.value.toUpperCase();
+            });
+        });
+
+        const cantidades = document.querySelectorAll(".campo-profesional-cantidad");
+        const total = document.getElementById("TB_REC_ORT_CANT_REC");
+
+        function calcularTotalProfesional() {
+            let suma = 0;
+
+            cantidades.forEach(function (campo) {
+                suma += parseInt(campo.value || 0);
+            });
+
+            total.value = suma;
+        }
+
+        cantidades.forEach(function (campo) {
+            campo.addEventListener("input", calcularTotalProfesional);
+        });
+
+       
+
+            //validacion de fecha
+
+            const camposEnter = Array.from(document.querySelectorAll(".campo-profesional-enter"));
+
+            const fechaEntrega = document.getElementById("TB_REC_ORT_FEC_PROC");
+            const horaEntrega = document.getElementById("TB_REC_ORT_HOR_PROC");
+
+            let validandoFechaHora = false;
+
+            function validarFechaHoraEntrega() {
+
+                console.log("VALIDANDO FECHA/HORA");
+                console.log("FECHA:", fechaEntrega?.value);
+                console.log("HORA:", horaEntrega?.value);
+
+                if (validandoFechaHora)
+                    return;
+
+                if (!fechaEntrega || !horaEntrega)
+                    return;
+
+                if (!fechaEntrega.value || !horaEntrega.value)
+                    return;
+
+                const partesFecha = fechaEntrega.value.split("-");
+                const partesHora = horaEntrega.value.split(":");
+
+                const fechaHoraEntrega = new Date(
+                    parseInt(partesFecha[0]),
+                    parseInt(partesFecha[1]) - 1,
+                    parseInt(partesFecha[2]),
+                    parseInt(partesHora[0]),
+                    parseInt(partesHora[1]),
+                    0
+                );
+
+                const ahora = new Date();
+                ahora.setSeconds(0);
+                ahora.setMilliseconds(0);
+
+                if (fechaHoraEntrega < ahora) {
+
+                    validandoFechaHora = true;
+
+                    alert("La fecha y hora de entrega no pueden ser inferiores a la fecha y hora actual.");
+
+                    horaEntrega.value = "";
+
+                    setTimeout(function () {
+                        horaEntrega.focus();
+                        validandoFechaHora = false;
+                    }, 100);
+                }
+            }
+
+            fechaEntrega?.addEventListener("blur", validarFechaHoraEntrega);
+            horaEntrega?.addEventListener("blur", validarFechaHoraEntrega);
+
+                camposEnter.forEach(function (campo, index) {
+
+            
+
+            campo.addEventListener("keydown", function (e) {
+                if (e.key !== "Enter") return;
+
+                e.preventDefault();
+
+                if (campo.id === "profesionalBusqueda") {
+                    return;
+                }
+
+                const siguiente = camposEnter[index + 1];
+
+                if (siguiente) {
+                    siguiente.focus();
+
+                    if (typeof siguiente.select === "function") {
+                        siguiente.select();
+                    }
+                }
+            });
+        });
+
+        const formRegistroProfesional = document.getElementById("formRegistroProfesional");
+
+        formRegistroProfesional?.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            const response = await fetch(this.action, {
+                method: "POST",
+                body: formData
+            });
+
+            const resultado = await response.json();
+
+            if (!resultado.success) {
+                alert(resultado.mensaje || "No se pudo guardar.");
+                return;
+            }
+
+            window.ortopedia = resultado.profesional;
+
+            document.getElementById("modalRegistroProfesional")?.remove();
+
+            setTimeout(() => {
+
+                    document
+                        .getElementById("TB_REC_DET_MAT_PR")
+                        ?.focus();
+
+                }, 100);
+            });
+
+    })();
+</script>

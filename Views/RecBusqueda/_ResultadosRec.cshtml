@@ -1,0 +1,49 @@
+﻿@model List<ConexionSql.Models.SP_Busquedas.RecBusquedaDto>
+
+<div class="table-responsive">
+    <table class="table table-hover" style="width:100%; font-size: 0.95em;">
+        <thead style="background-color: #2c3e50; color: white;">
+            <tr>
+                <th style="width: 70px;">ID</th>
+                <th style="width: 100px;">Fecha</th>
+                <th style="width: 80px;">H. Ini</th>
+                <th style="width: 80px;">H. Fin</th>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Proveedor</th>
+                <th>Observaciones</th>
+                <th style="width: 60px;">MDE</th>
+                <th style="width: 60px;">MCO</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td><strong>@item.TB_REC_ID</strong></td>
+                        <td>@item.TB_REC_FEC.ToShortDateString()</td>
+                        <td>@item.TB_REC_HOR_INI</td>
+                        <td>@item.TB_REC_HOR_FIN</td>
+                        <td>@item.TB_REC_SEC_ORI_DEN</td>
+                        <td>@item.TB_REC_SEC_DES_DEN</td>
+                        <td>@item.TB_REC_ORT_DEN</td>
+                        <td>@item.TB_REC_OBS</td>
+                        <td>@item.TB_REC_MDE</td>
+                        <td>@item.TB_REC_MCO</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="10" class="text-center" style="padding: 40px; color: #666;">
+                        <i class="material-icons" style="vertical-align: middle;">info</i>
+                        No se encontraron registros para los filtros seleccionados.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

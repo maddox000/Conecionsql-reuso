@@ -1,0 +1,263 @@
+﻿@model ConexionSql.Models.InfoBasica.IbEquDto
+
+<link rel="stylesheet" href="~/css/infobasica-custom.css" asp-append-version="true" />
+
+<form asp-action="Guardar" asp-controller="IbEquipos" method="post" autocomplete="off" id="formEquipo">
+    @Html.AntiForgeryToken()
+
+    @* --- CAMPOS OCULTOS --- *@
+    <input type="hidden" asp-for="IbEquId" />
+    <input type="hidden" asp-for="IbEquTeqDen" id="IB_EQU_TEQ_DEN" />
+    <input type="hidden" asp-for="IbEquPtiId" id="IB_EQU_PTI_ID" />
+    <input type="hidden" asp-for="IbEquPtiDen" id="IB_EQU_PTI_DEN" />
+    <input type="hidden" asp-for="IbEquMarDen" id="IB_EQU_MAR_DEN" />
+
+    @* --- ENCABEZADO SUPERIOR --- *@
+    <div class="d-flex justify-content-between align-items-end mb-3 border-bottom pb-2">
+        <div class="d-flex align-items-center">
+            <label class="fw-bold me-2 mb-0" style="color: #2c3e50; font-size: 0.9rem;">Código</label>
+            <input type="text" class="form-control form-control-sm text-center fw-bold" value="@(Model != null && Model.IbEquId > 0 ? Model.IbEquId.ToString("00") : "Auto")" style="width: 90px; background-color: #f8f9fa; color: #7f8c8d;" readonly />
+        </div>
+        <h4 class="mb-0" style="color: #2c3e50;">@(Model != null && Model.IbEquId > 0 ? "Modificación de Equipo" : "Alta de Equipo")</h4>
+    </div>
+
+    @* --- FILA PRINCIPAL: 50% DATOS / 50% CARACTERÍSTICAS --- *@
+    <div class="row g-3 align-items-stretch">
+
+        @* CONTENEDOR 1: DATOS DEL EQUIPO (Mitad Izquierda) *@
+        <div class="col-md-6">
+            <h6 class="fw-bold mb-2" style="color: #34495e;">Datos del equipo</h6>
+            <div class="panel-filtros p-3 h-100">
+                <div class="row align-items-center mb-2">
+                    <label class="col-sm-3 col-form-label col-form-label-sm fw-bold text-end">Tipo de equipo</label>
+                    <div class="col-sm-8">
+                        <select asp-for="IbEquTeqId" class="form-select form-select-sm select-autocompletar" id="IB_EQU_TEQ_ID" required>
+                            <option value="">Seleccione un tipo..</option>
+                            @if (ViewBag.TiposEquipo != null)
+                            {
+                                foreach (var t in (IEnumerable<ConexionSql.Models.InfoBasica.IbEquTeqDto>)ViewBag.TiposEquipo)
+                                {
+                                    <option value="@t.IbEquTeqId" data-den="@t.IbEquTeqDen" data-pti-id="@t.IbEquPtiId" data-pti-den="@t.IbEquPtiDen">@t.IbEquTeqDen</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row align-items-center mb-2">
+                    <label class="col-sm-3 col-form-label col-form-label-sm fw-bold text-end">Marca</label>
+                    <div class="col-sm-8">
+                        <select asp-for="IbEquMarId" class="form-select form-select-sm select-autocompletar" id="IB_EQU_MAR_ID" required>
+                            <option value="">Seleccione una marca...</option>
+                            @if (ViewBag.Marcas != null)
+                            {
+                                foreach (var m in (IEnumerable<ConexionSql.Models.InfoBasica.IbEquMarDto>)ViewBag.Marcas)
+                                {
+                                    <option value="@m.IbEquMarId" data-den="@m.IbEquMarDen">@m.IbEquMarDen</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row align-items-center mb-2">
+                    <label class="col-sm-3 col-form-label col-form-label-sm fw-bold text-end">Modelo</label>
+                    <div class="col-sm-8">
+                        <input asp-for="IbEquMod" class="form-control form-control-sm" />
+                    </div>
+                </div>
+
+                <div class="row align-items-center mb-2">
+                    <label class="col-sm-3 col-form-label col-form-label-sm fw-bold text-end">Serie</label>
+                    <div class="col-sm-8">
+                        <input asp-for="IbEquSer" class="form-control form-control-sm" />
+                    </div>
+                </div>
+
+                <div class="row align-items-center mb-1">
+                    <label class="col-sm-3 col-form-label col-form-label-sm fw-bold text-end">Número</label>
+                    <div class="col-sm-8">
+                        <input asp-for="IbEquNum" class="form-control form-control-sm" />
+                    </div>
+                </div>
+
+                @* Oculto alineado justo debajo del input de Número *@
+                <div class="row align-items-center">
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-8">
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox" asp-for="IbEquOcu" id="switchEstado">
+                            <label class="form-check-label ms-1 fw-bold" for="switchEstado" style="font-size: 0.85rem;">Oculto</label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        @* CONTENEDOR 2: CARACTERÍSTICAS Y VALORES (Mitad Derecha) *@
+        <div class="col-md-6">
+            <h6 class="fw-bold mb-2" style="color: #34495e;">Características y valores de proceso</h6>
+            <div class="panel-filtros p-3 h-100 d-flex flex-column justify-content-between">
+
+                @* Grilla compacta de Características *@
+                <div class="row mb-1">
+                    <div class="col-6">
+                        <div class="row align-items-center">
+                            <label class="col-6 col-form-label col-form-label-sm fw-bold text-end">Altura cámara</label>
+                            <div class="col-6"><input asp-for="IbEquAlt" class="form-control form-control-sm" /></div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="row align-items-center">
+                            <label class="col-6 col-form-label col-form-label-sm fw-bold text-end">Capacidad total</label>
+                            <div class="col-6"><input asp-for="IbEquCap" class="form-control form-control-sm" /></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-1">
+                    <div class="col-6">
+                        <div class="row align-items-center">
+                            <label class="col-6 col-form-label col-form-label-sm fw-bold text-end">Ancho cámara</label>
+                            <div class="col-6"><input asp-for="IbEquAnc" class="form-control form-control-sm" /></div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="row align-items-center">
+                            <label class="col-6 col-form-label col-form-label-sm fw-bold text-end">% de cámara</label>
+                            <div class="col-6">
+                                <div class="input-group input-group-sm">
+                                    <input asp-for="IbEquPorc" class="form-control" />
+                                    <span class="input-group-text bg-light">%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-1">
+                    <div class="col-6">
+                        <div class="row align-items-center">
+                            <label class="col-6 col-form-label col-form-label-sm fw-bold text-end">Profundidad</label>
+                            <div class="col-6"><input asp-for="IbEquPro" class="form-control form-control-sm" /></div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="row align-items-center">
+                            <label class="col-6 col-form-label col-form-label-sm fw-bold text-end">Capacidad útil</label>
+                            <div class="col-6"><input asp-for="IbEquCapu" class="form-control form-control-sm" /></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-1">
+                    <div class="col-6">
+                        <div class="row align-items-center">
+                            <label class="col-6 col-form-label col-form-label-sm fw-bold text-end" style="line-height: 1.1;">Cap. de lavado</label>
+                            <div class="col-6">
+                                <div class="input-group input-group-sm">
+                                    <input asp-for="IbEquLmat" class="form-control form-control-sm" />
+                                    <span class="input-group-text bg-light px-1" style="font-size: 0.75rem;">Bandejas</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="mt-2 mb-2" style="opacity: 0.1;" />
+
+                @* Valores de proceso *@
+                <div class="row text-center px-2">
+                    <div class="col-4">
+                        <label class="fw-bold mb-1" style="font-size: 0.8rem;">Costo de proceso</label>
+                        <div class="input-group input-group-sm mx-auto" style="width: 85%;">
+                            <span class="input-group-text bg-light">$</span>
+                            <input asp-for="IbEquPco" class="form-control text-end" />
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <label class="fw-bold mb-1" style="font-size: 0.8rem;">Ganancia</label>
+                        <div class="input-group input-group-sm mx-auto" style="width: 85%;">
+                            <input asp-for="IbEquPcoCoef" class="form-control text-end" />
+                            <span class="input-group-text bg-light">%</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <label class="fw-bold mb-1" style="font-size: 0.8rem;">Precio de proceso</label>
+                        <div class="input-group input-group-sm mx-auto" style="width: 85%;">
+                            <span class="input-group-text bg-light">$</span>
+                            <input asp-for="IbEquPve" class="form-control text-end" />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    @* --- CONTENEDOR 3: DETALLE DE VOLUMEN (Separado con un margen mayor) --- *@
+    <div class="row mb-4" style="margin-top: 4rem;">
+        <div class="col-12">
+            <h6 class="fw-bold mb-2" style="color: #34495e;">Detalle de volumen por proceso</h6>
+            <div class="panel-filtros p-4" style="min-height: 300px;">
+                <table class="table table-sm mb-2" id="tablaDetalles">
+                    <thead style="background-color: transparent; border-bottom: 2px solid #ecf0f1;">
+                        <tr>
+                            <th style="color: #7f8c8d; font-size: 0.9rem;">Tipo de Ciclo</th>
+                            <th style="color: #7f8c8d; font-size: 0.9rem;">Volumen</th>
+                            <th style="color: #7f8c8d; font-size: 0.9rem;" class="text-center">Oculto</th>
+                            <th style="color: #7f8c8d; font-size: 0.9rem;" class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyDetalles"></tbody>
+                </table>
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-2 fw-bold" onclick="agregarDetalle()" style="font-size: 0.85rem;">
+                    <i class="bi bi-plus-circle"></i> Agregar Fila
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @* --- BOTONERA FINAL --- *@
+    <div class="d-flex justify-content-end gap-2 mb-4">
+        <button type="submit" class="btn text-white px-4 py-2 fw-bold" style="background-color: #34495e; min-width: 120px;">Aceptar</button>
+        <a asp-action="Index" class="btn text-white px-4 py-2 fw-bold" style="background-color: #e74c3c; min-width: 120px;">Cancelar</a>
+    </div>
+
+</form>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.select-autocompletar').select2({
+                theme: "classic",
+                width: '100%',
+                placeholder: "Seleccione...",
+                allowClear: true
+            });
+
+            $('#IB_EQU_TEQ_ID').on('select2:select', function (e) {
+                var opcionSeleccionada = $(e.params.data.element);
+                $('#IB_EQU_TEQ_DEN').val(opcionSeleccionada.data('den'));
+                $('#IB_EQU_PTI_ID').val(opcionSeleccionada.data('pti-id'));
+                $('#IB_EQU_PTI_DEN').val(opcionSeleccionada.data('pti-den'));
+            });
+
+            $('#IB_EQU_TEQ_ID').on('select2:unselect', function (e) {
+                $('#IB_EQU_TEQ_DEN').val('');
+                $('#IB_EQU_PTI_ID').val('');
+                $('#IB_EQU_PTI_DEN').val('');
+            });
+
+            $('#IB_EQU_MAR_ID').on('select2:select', function (e) {
+                var opcionSeleccionada = $(e.params.data.element);
+                $('#IB_EQU_MAR_DEN').val(opcionSeleccionada.data('den'));
+            });
+
+            $('#IB_EQU_MAR_ID').on('select2:unselect', function (e) {
+                $('#IB_EQU_MAR_DEN').val('');
+            });
+        });
+    </script>
+}
