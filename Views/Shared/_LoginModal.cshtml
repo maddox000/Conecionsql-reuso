@@ -1,40 +1,173 @@
-﻿<div class="modal fade"
+﻿<style>
+    /* Estilos específicos para el nuevo diseño del Modal de Login */
+    .login-modal-content {
+        border-radius: 12px;
+        padding: 35px 45px; /* Ajuste de padding lateral para calcar el modelo */
+        border: none;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .logo-top {
+        max-width: 220px;
+        margin: 0 auto 25px auto;
+        display: block;
+    }
+
+    .titulo-login {
+        color: #333;
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    /* Input idéntico al de la izquierda (borde azul con halo suave y puntos más juntos) */
+    .pin-input {
+        border: 2px solid #4A90E2 !important;
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15) !important;
+        border-radius: 6px !important;
+        font-size: 2.2rem !important;
+        text-align: center;
+        letter-spacing: 0.25em; /* Puntos más cercanos */
+        color: #6c757d;
+        height: 60px;
+    }
+
+        .pin-input:focus {
+            box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.25) !important;
+            outline: none;
+        }
+
+    .form-check-custom {
+        color: #666;
+        font-size: 0.95rem;
+    }
+
+    /* Botones unidos como en la imagen modelo */
+    .btn-login-custom {
+        background-color: #2c3e50;
+        color: #ffffff;
+        border: none;
+        padding: 12px 0;
+        font-weight: bold;
+        font-size: 1.1rem;
+        width: 50%;
+        transition: background-color 0.2s ease;
+    }
+
+        .btn-login-custom:hover {
+            background-color: #1a252f;
+            color: #ffffff;
+        }
+
+    /* Redondeo solo en las esquinas exteriores para que parezcan un solo bloque */
+    .btn-ingresar {
+        border-radius: 6px 0 0 6px;
+        border-right: 1px solid #3f5367; /* Línea sutil de separación */
+    }
+
+    .btn-cerrar {
+        border-radius: 0 6px 6px 0;
+    }
+
+    .separador-login {
+        border-top: 1px solid #dee2e6;
+        margin-top: 30px;
+        margin-bottom: 20px;
+    }
+
+    .logo-bottom {
+        max-width: 140px;
+        display: block;
+        margin: 0 auto;
+    }
+</style>
+
+<div class="modal fade"
      id="loginTareasModal"
      tabindex="-1"
      data-bs-backdrop="static"
      data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content login-modal-content">
+            <div class="modal-body p-0 text-center">
 
-    <div class="modal-dialog">
-        <div class="modal-content">
+                <img src="~/img/LogoCliente.png" alt="Logo Cliente" class="logo-top" />
 
-            <div class="modal-header">
-                <h5 class="modal-title">Validación de acceso</h5>
-            </div>
+                <h5 class="titulo-login" id="lblTituloLogin">Ingrese su PIN de identificación:</h5>
 
-            <div class="modal-body">
-
-                <div class="mb-3">
-                    <label>Nombre</label>
+                <div id="contenedorUsuario" class="mb-3 text-start d-none">
+                    <label class="fw-bold mb-1">Nombre</label>
                     <input type="text" class="form-control" id="loginNombre" autocomplete="off" />
-
                     <div id="listaUsuarios" class="list-group mt-2"></div>
                     <input type="hidden" id="loginUsuarioId" />
                 </div>
 
                 <div class="mb-3">
-                    <label>Clave</label>
-                    <input type="password" class="form-control" id="loginClave" />
+                    <input type="password" class="form-control pin-input" id="loginClave" placeholder="••••" />
                 </div>
 
-                <div id="loginMensaje" class="text-danger"></div>
+                <div class="d-flex justify-content-start align-items-center mb-4 ps-1">
+                    <div class="form-check m-0 d-flex align-items-center">
+                        <input class="form-check-input mt-0" type="checkbox" id="chkModoUsuario">
+                        <label class="form-check-label ms-2 form-check-custom" for="chkModoUsuario" style="padding-top: 2px;">
+                            Ingresar con usuario y contraseña
+                        </label>
+                    </div>
+                </div>
+
+                <div id="loginMensaje" class="text-danger fw-bold mb-3 text-start"></div>
+
+                <div class="d-flex w-100">
+                    <button class="btn-login-custom btn-ingresar" id="btnValidarLogin">Ingresar</button>
+                    <button class="btn-login-custom btn-cerrar" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+
+                <div class="separador-login"></div>
+
+                <img src="~/img/BAXEN_Trazabilidad.png" alt="Baxen Trazabilidad" class="logo-bottom" />
 
             </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button class="btn btn-primary" id="btnValidarLogin">Ingresar</button>
-            </div>
-
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const chkModoUsuario = document.getElementById("chkModoUsuario");
+        const contenedorUsuario = document.getElementById("contenedorUsuario");
+        const lblTituloLogin = document.getElementById("lblTituloLogin");
+        const inputClave = document.getElementById("loginClave");
+        const inputNombre = document.getElementById("loginNombre");
+
+        if (chkModoUsuario) {
+            chkModoUsuario.addEventListener("change", function () {
+                if (this.checked) {
+                    // Mostrar modo completo
+                    contenedorUsuario.classList.remove("d-none");
+                    lblTituloLogin.textContent = "Ingrese su usuario y contraseña:";
+
+                    // Adaptar input clave a formato normal
+                    inputClave.classList.remove("pin-input");
+                    inputClave.classList.add("form-control-lg");
+                    inputClave.placeholder = "";
+                    inputClave.value = "";
+                    inputNombre.focus();
+                } else {
+                    // Volver a modo PIN
+                    contenedorUsuario.classList.add("d-none");
+                    lblTituloLogin.textContent = "Ingrese su PIN de identificación:";
+
+                    // Restaurar formato PIN
+                    inputClave.classList.add("pin-input");
+                    inputClave.classList.remove("form-control-lg");
+                    inputClave.placeholder = "••••";
+                    inputClave.value = "";
+                    inputClave.focus();
+
+                    // Limpiar el campo nombre
+                    inputNombre.value = "";
+                }
+            });
+        }
+    });
+</script>

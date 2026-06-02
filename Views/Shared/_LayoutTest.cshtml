@@ -2,9 +2,11 @@
 Layout = null;
 }
 
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Baxen® Trazabilidad</title>
@@ -18,6 +20,12 @@ Layout = null;
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
     <style>
+            /* --- ANCHO DEL MENÚ --- */
+            .menu-lateral {
+                min-width: 270px !important;
+                width: 270px !important;
+            }
+
             /* Alineación uniforme */
             .menu-lista .menu-item button,
             .menu-lista .menu-item a {
@@ -75,6 +83,18 @@ Layout = null;
                 .submenu.visible {
                     max-height: 800px;
                 }
+
+            .icon-guion {
+                font-size: 1.2rem;
+                margin-right: 6px;
+                vertical-align: middle;
+            }
+
+            .icon-cuadro {
+                font-size: 0.55rem;
+                margin-right: 8px;
+                vertical-align: middle;
+            }
     </style>
 </head>
 
@@ -271,13 +291,13 @@ Layout = null;
                     <i class="bi bi-collection"></i> Información básica
                 </button>
                 <ul class="submenu">
-                    <li><a href="/IB_Equipos/IB_Equipos">Equipos</a></li>
-                    <li><a href="/Materiales/ListaMateriales">Productos médicos</a></li>
-                    <li><a href="/Instrumental">Instrumental</a></li>
-                    <li><a href="/IBPersonal/IBPersonalListado">Personal</a></li>
-                    <a href="/IBProveedor/IBProveedor">Proveedores</a>
-                    <a href="/IBProfesional/IBProfesional">Profesionales</a>
-                    <a href="/IBSector/IBSector">Sectores</a>
+                    <li><a href="/IB_Equipos/IB_Equipos"><i class="bi bi-dash icon-guion"></i> Equipos</a></li>
+                    <li><a href="/Materiales/ListaMateriales"><i class="bi bi-dash icon-guion"></i> Productos médicos</a></li>
+                    <li><a href="/Instrumental"><i class="bi bi-dash icon-guion"></i> Instrumental</a></li>
+                    <li><a href="/IBPersonal/IBPersonalListado"><i class="bi bi-dash icon-guion"></i> Personal</a></li>
+                    <li><a href="/IBProveedor/IBProveedor"><i class="bi bi-dash icon-guion"></i> Proveedores</a></li>
+                    <li><a href="/IBProfesional/IBProfesional"><i class="bi bi-dash icon-guion"></i> Profesionales</a></li>
+                    <li><a href="/IBSector/IBSector"><i class="bi bi-dash icon-guion"></i> Sectores</a></li>
                 </ul>
             </li>
 
@@ -287,9 +307,9 @@ Layout = null;
                 </button>
                 <ul class="submenu">
 
-                    <li><a href="#" id="btnRecepcion">Recepción</a></li>
+                    <li><a href="#" id="btnRecepcion"><i class="bi bi-dash icon-guion"></i> Recepción</a></li>
 
-                    <li><a href="/ProcesoMateriales">Proceso de materiales</a></li>
+                    <li><a href="/ProcesoMateriales"><i class="bi bi-dash icon-guion"></i> Proceso de materiales</a></li>
                     <li class="submenu-extra">
                         <a href="#" id="btnLavado">Proceso de lavado</a>
                         <a href="/ControlInstrumental">Control de instrumental</a>
@@ -298,14 +318,14 @@ Layout = null;
                         <a href="/RegistroDesinfeccion">Registro desinfección</a>
                     </li>
 
-                    <li><a href="/Entregas">Entregas</a></li>
+                    <li><a href="/Entregas"><i class="bi bi-dash icon-guion"></i> Entregas</a></li>
                     <li class="submenu-extra">
                         <a href="#" id="btnEntrega">Entregas a sectores</a>
                         <a href="/CarroQuirurgico">Preparar carro</a>
                         <a href="/PanelSalas">Panel salas quirúrgicas</a>
                         <a href="/BuscarProcedimientos">Buscar procedimientos</a>
                     </li>
-                    <li><a href="#" id="btnIdentificar">Identificar materiales</a></li>
+                    <li><a href="#" id="btnIdentificar"><i class="bi bi-dash icon-guion"></i> Identificar materiales</a></li>
                     <li class="submenu-extra">
                         <a href="/Trazabilidad">Producción</a>
                         <a href="/Reusos">Generar código de reúso</a>
@@ -313,8 +333,8 @@ Layout = null;
                         <a href="/Reusos">Baja código de reúso</a>
                         <a href="/Reusos">Liberar código de reúso</a>
                     </li>
-                    <li><a href="/Transito">Instrumental en tránsito</a></li>
-                    <li><a href="/Stock">Transacciones de stock</a></li>
+                    <li><a href="/Transito"><i class="bi bi-dash icon-guion"></i> Instrumental en tránsito</a></li>
+                    <li><a href="/Stock"><i class="bi bi-dash icon-guion"></i> Transacciones de stock</a></li>
                 </ul>
             </li>
 
@@ -323,17 +343,16 @@ Layout = null;
                     <i class="bi bi-search"></i> Búsqueda de datos
                 </button>
                 <ul class="submenu">
-                    <li><a href="/Materiales">Materiales</a></li>
-                    @* <li><a asp-controller="Busquedas" asp-action="BusquedasFecha">Recepciones</a></li> *@
-                    <li><a href="#" id="btnBusquedaRecepciones">Recepciones</a></li>
+                    <li><a href="/Materiales"><i class="bi bi-dash icon-guion"></i> Materiales</a></li>
+                    
+                    <li><a href="#" id="btnBusquedaRecepciones"><i class="bi bi-dash icon-guion"></i> Recepciones</a></li>
 
                     <li class="submenu-extra">
                         <a href="/BusRec/Index">Búsqueda recepciones</a>
                         <a href="/RecDetBusqueda/Index">Búsqueda materiales recibidos</a>
                     </li>
-                    @* <li><a asp-controller="Procesos" asp-action="BuscarProcesos">Proceso de materiales</a></li> *@
-                    @* <li><a asp-controller="Procesos" asp-action="BuscarProcesos">Proceso de materiales</a></li> *@
-                    <li><a href="#" id="btnBusquedaProcesoMateriales">Proceso de materiales</a></li>
+                    
+                    <li><a href="#" id="btnBusquedaProcesoMateriales"><i class="bi bi-dash icon-guion"></i> Proceso de materiales</a></li>
 
                     <li class="submenu-extra">
                         <a href="#" id="btnBusquedaLavado">Lavado</a>
@@ -366,11 +385,11 @@ Layout = null;
 
                         <a href="#">Registro desinfección</a>
                     </li>
-                    <li><a href="/Entregas">Entregas</a></li>
-                    <li><a href="/ControlPM">Control productos médicos</a></li>
-                    <li><a href="/Transito">Instrumental en tránsito</a></li>
-                    <li><a href="/Stock">Stock</a></li>
-                    <li><a href="/Clientes">Búsqueda de datos cliente</a></li>
+                    <li><a href="/Entregas"><i class="bi bi-dash icon-guion"></i> Entregas</a></li>
+                    <li><a href="/ControlPM"><i class="bi bi-dash icon-guion"></i> Control productos médicos</a></li>
+                    <li><a href="/Transito"><i class="bi bi-dash icon-guion"></i> Instrumental en tránsito</a></li>
+                    <li><a href="/Stock"><i class="bi bi-dash icon-guion"></i> Stock</a></li>
+                    <li><a href="/Clientes"><i class="bi bi-dash icon-guion"></i> Búsqueda de datos cliente</a></li>
                 </ul>
             </li>
 

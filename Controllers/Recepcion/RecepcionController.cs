@@ -111,6 +111,86 @@ namespace ConexionSql.Controllers.reuepcion
             return View("~/Views/Recepcion/CrearRecepcion.cshtml", new TbRec());
         }
 
+        //get para evitar reenvio de formulario de recepcion
+
+        [HttpGet]
+        public IActionResult SubFormulario(int id)
+        {
+            var recepcion = _context.TbRec.FirstOrDefault(x => x.TbRecId == id);
+
+            if (recepcion == null)
+                return RedirectToAction("CrearRecepcion");
+
+            ViewBag.ListaSectores = _context.IbSectores
+                .OrderBy(s => s.IbSecDen)
+                .ToList();
+
+            var usuarioIdSesion = HttpContext.Session.GetString("UsuarioId");
+
+            if (!string.IsNullOrEmpty(usuarioIdSesion) && int.TryParse(usuarioIdSesion, out int usuarioId))
+            {
+                var usuario = _context.IbPers.FirstOrDefault(p => p.IbPerId == usuarioId);
+
+                if (usuario != null)
+                {
+                    ViewBag.UsuarioId = usuario.IbPerId;
+                    ViewBag.UsuarioLogueado = $"{usuario.IbPerApe}, {usuario.IbPerNom}";
+                }
+            }
+
+            var materiales = _context.IbMat
+                .Select(m => new IbMatDto
+                {
+                    IbMatId = m.IB_MAT_ID,
+                    IbMatDen = m.IB_MAT_DEN,
+                    IbMatMarDen = m.IB_MAT_MAR_DEN,
+                    IbMatProDen = m.IB_MAT_PRO_DEN,
+                    IbMatMtiDen = m.IB_MAT_MTI_DEN
+                })
+                .ToList();
+
+            var revisiones = _context.IbMatRevisiones
+                .Where(r => !r.IbMatRevOcu)
+                .OrderBy(r => r.IbMatRevDen)
+                .Select(r => new IbMatRevDto
+                {
+                    IbMatRevId = r.IbMatRevId,
+                    IbMatRevDen = r.IbMatRevDen
+                })
+                .ToList();
+
+            var estados = _context.IbEst
+                .OrderBy(e => e.IbEstDen)
+                .Select(e => new IbEstDto
+                {
+                    IbEstId = e.IbEstId,
+                    IbEstDen = e.IbEstDen
+                })
+                .ToList();
+
+            var configEstado = _context.APanOpc
+                .FirstOrDefault(x => x.IdDenominacion == "A_PAN_EST_DEFAULT" && x.Valor == true);
+
+            var estadoDefaultId = configEstado?.ValorId;
+
+            ViewBag.SubFormularioDetalle = new TbRecDetFormDto
+            {
+                Detalle = new TbRecDetDto
+                {
+                    TB_REC_ID = recepcion.TbRecId,
+                    IB_EST_ID = estadoDefaultId
+                },
+                Materiales = materiales,
+                Revisiones = revisiones,
+                Estados = estados,
+                EstadoDefaultId = estadoDefaultId
+            };
+
+            ViewBag.Detalles = new List<TbRecDetDto>();
+
+            return View("~/Views/Recepcion/CrearRecepcion.cshtml", recepcion);
+        }
+
         // 💾 POST: Guardar nueva recepción
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -330,7 +410,8 @@ namespace ConexionSql.Controllers.reuepcion
                 }
             }
 
-            return View("~/Views/Recepcion/CrearRecepcion.cshtml", nuevaRecepcion);
+            //return View("~/Views/Recepcion/CrearRecepcion.cshtml", nuevaRecepcion);
+            return RedirectToAction("SubFormulario", new { id = nuevaRecepcion.TbRecId });
         }
 
         

@@ -5,11 +5,10 @@
 
 @{
 
-    
-    
-
     var listaSectores = ViewBag.ListaSectores as List<IbSec>;
     var subFormModel = ViewBag.SubFormularioDetalle as TbRecDetFormDto;
+
+    var cabeceraCreada = Model != null && Model.TbRecId > 0;
 
     var numeroRecepcion = Model != null && Model.TbRecId > 0 ? Model.TbRecId.ToString() : "Pendiente";
     var fechaRecepcion = Model?.TbRecFec?.ToString("dd/MM/yyyy") ?? DateTime.Now.ToString("dd/MM/yyyy");
@@ -61,6 +60,7 @@
                                id="TbRecSecOriBusqueda"
                                class="form-control"
                                autocomplete="off"
+                               readonly="@cabeceraCreada"
                                value="@(listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecOriId)?.IbSecDen ?? "")" />
 
                         <div id="listaSectoresOrigen" class="list-group mt-2"></div>
@@ -77,6 +77,7 @@
                                id="TbRecSecDesBusqueda"
                                class="form-control"
                                autocomplete="off"
+                               readonly="@cabeceraCreada"
                                value="@(listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecDesId)?.IbSecDen ?? "")" />
 
                         <div id="listaSectoresDestino" class="list-group mt-2"></div>
@@ -302,9 +303,16 @@
             if (inputSectorDestino) {
 
                 inputSectorDestino.addEventListener("click", () => {
+                    if (inputSectorDestino.readOnly) return;
+
                     indiceDestino = -1;
                     renderDestino(sectores);
                 });
+
+                // inputSectorDestino.addEventListener("click", () => {
+                //     indiceDestino = -1;
+                //     renderDestino(sectores);
+                // });
 
                 inputSectorDestino.addEventListener("input", function () {
                     indiceDestino = -1;
@@ -411,12 +419,26 @@
 
             if (inputSectorOrigen) {
 
-                inputSectorOrigen.addEventListener("focus", () => {
+            inputSectorOrigen.addEventListener("focus", () => {
+            if (inputSectorOrigen.readOnly) return;
+
                     indiceOrigen = -1;
                     renderOrigen(sectores);
                 });
 
-                inputSectorOrigen.addEventListener("click", () => { indiceOrigen = -1; renderOrigen(sectores); });
+                inputSectorOrigen.addEventListener("click", () => {
+                    if (inputSectorOrigen.readOnly) return;
+
+                    indiceOrigen = -1;
+                    renderOrigen(sectores);
+                });
+
+                // inputSectorOrigen.addEventListener("focus", () => {
+                //     indiceOrigen = -1;
+                //     renderOrigen(sectores);
+                // });
+
+                // inputSectorOrigen.addEventListener("click", () => { indiceOrigen = -1; renderOrigen(sectores); });
 
                 inputSectorOrigen.addEventListener("input", function () {
                     indiceOrigen = -1;

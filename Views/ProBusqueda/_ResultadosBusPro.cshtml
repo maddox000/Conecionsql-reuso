@@ -19,7 +19,10 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td style="font-weight: bold; color: #2c3e50;">@item.TB_PRO_ID</td>
+                    <td ondblclick="verDetalleProceso(@item.TB_PRO_ID)"
+                        style="font-weight: bold; color: #2c3e50; cursor:pointer;">
+                        @item.TB_PRO_ID
+                    </td>
                     <td>@item.TB_PRO_NUM_1</td>
                     <td>
                         <div style="font-weight: 600;">
@@ -65,3 +68,10 @@ else
         <i class="fas fa-info-circle"></i> No se encontraron procesos que coincidan con los filtros aplicados.
     </div>
 }
+
+
+<script>
+    function verDetalleProceso(tbProId) {
+        window.location.href = '/TbProBusqueda/VerProceso?tbProId=' + tbProId;
+    }
+</script>

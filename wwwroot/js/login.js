@@ -135,8 +135,19 @@ let indiceSeleccionado = -1;
 // ==========================================
 // FOCO AL ABRIR MODAL
 // ==========================================
+// document.getElementById('loginTareasModal')?.addEventListener('shown.bs.modal', function () {
+//     document.getElementById('loginNombre').focus();
+// });
 document.getElementById('loginTareasModal')?.addEventListener('shown.bs.modal', function () {
-    document.getElementById('loginNombre').focus();
+
+    const modoUsuario =
+        document.getElementById('chkModoUsuario')?.checked === true;
+
+    if (modoUsuario) {
+        document.getElementById('loginNombre').focus();
+    } else {
+        document.getElementById('loginClave').focus();
+    }
 });
 
 // ==========================================
@@ -187,13 +198,22 @@ document.getElementById('btnValidarLogin')?.addEventListener('click', async func
     const inputNombre = document.getElementById('loginNombre');
     const inputClave = document.getElementById('loginClave');
 
+    const modoUsuario =
+        document.getElementById('chkModoUsuario')?.checked === true;
+
     mensaje.innerText = "";
 
-    if (!id) {
+    if (modoUsuario && !id) {
         mensaje.innerText = "Debe seleccionar un usuario de la lista.";
         inputNombre.focus();
         return;
     }
+
+    // if (!id) {
+    //     mensaje.innerText = "Debe seleccionar un usuario de la lista.";
+    //     inputNombre.focus();
+    //     return;
+    // }
 
     if (!clave) {
         mensaje.innerText = "Debe ingresar la clave.";
@@ -202,11 +222,16 @@ document.getElementById('btnValidarLogin')?.addEventListener('click', async func
     }
 
     try {
-        const response = await fetch('/APswLog/Validar', {
+        // const response = await fetch('/APswLog/Validar', {
+        const response = await fetch(
+            modoUsuario
+                ? '/APswLog/Validar'
+                : '/APswLog/ValidarPin',
+            {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                id: parseInt(id),
+                id: modoUsuario ? parseInt(id) : 0,
                 clave: clave
             })
         });

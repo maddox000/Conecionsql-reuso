@@ -154,8 +154,8 @@ namespace ConexionSql.Controllers
                     TbEntDti1 = null,
                     TbEntDti2 = null,
                     TbEntDti3 = null,
-                    TbEntDti4 = null,
-                    TbEntDti5 = null,
+                    //TbEntDti4 = null,
+                    //TbEntDti5 = null,
 
                     // 🔧 MEMOS
                     TbEntMem1 = null,
@@ -221,7 +221,8 @@ namespace ConexionSql.Controllers
                 return Json(new
                 {
                     success = false,
-                    mensaje = "ERROR: " + ex.Message
+                    mensaje = "ERROR: " + ex.Message,
+                    detalle = ex.InnerException?.Message
                 });
             }
         }

@@ -84,6 +84,45 @@ namespace ConexionSql.Controllers.A_PSW_LOG
 
             return Json(lista);
         }
+
+        //loguin con pin
+
+        [HttpPost]
+        public IActionResult ValidarPin([FromBody] LoginRequest request)
+        {
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                using (SqlCommand cmd = new SqlCommand("SP_A_PSW_LOG_VALIDAR_PIN", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@Pin", request.Clave ?? "");
+
+                    conn.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            HttpContext.Session.SetString("UsuarioId", dr["IB_PER_ID"]?.ToString() ?? "");
+
+                            return Json(new
+                            {
+                                ok = true,
+                                id = dr["IB_PER_ID"].ToString(),
+                                nivelUsuarioId = Convert.ToInt32(dr["IB_PER_UNI_ID"])
+                            });
+                        }
+
+                        return Json(new
+                        {
+                            ok = false,
+                            mensaje = "PIN incorrecto."
+                        });
+                    }
+                }
+            }
+        }
     }
 }
 

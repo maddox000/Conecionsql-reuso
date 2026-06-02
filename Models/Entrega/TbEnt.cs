@@ -111,11 +111,11 @@ namespace ConexionSql.Models.Entrega
         [Column("TB_ENT_DTI_3")]
         public DateTime? TbEntDti3 { get; set; }
 
-        [Column("TB_ENT_DTI_4")]
-        public DateTime? TbEntDti4 { get; set; }
+        //[Column("TB_ENT_DTI_4")]
+        //public DateTime? TbEntDti4 { get; set; }
 
-        [Column("TB_ENT_DTI_5")]
-        public DateTime? TbEntDti5 { get; set; }
+        //[Column("TB_ENT_DTI_5")]
+        //public DateTime? TbEntDti5 { get; set; }
 
         [Column("TB_ENT_MEM_1")]
         public string? TbEntMem1 { get; set; }
