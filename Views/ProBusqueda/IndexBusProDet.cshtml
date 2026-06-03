@@ -4,87 +4,301 @@
 <link rel="stylesheet" href="~/css/busquedas-custom.css" />
 
 <style>
-    #zonaResultados-wrapper {
-        margin-top: 15px !important;
+    /* =========================================
+                   ESTILOS DEL NUEVO DISEÑO (MATERIALES/LAVADO)
+                   ========================================= */
+    .campo-detalle {
+        height: 26px;
+        padding: 2px 8px;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        color: #333;
+        box-sizing: border-box;
+        width: 100%;
     }
+
+        .campo-detalle:focus {
+            border-color: #34495e;
+            outline: none;
+        }
+
+    .campo-activo {
+        border: 1px solid #34495e !important;
+        background-color: #f8fbfd;
+    }
+
+    .label-detalle {
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: #666;
+        margin-bottom: 3px;
+        display: block;
+    }
+
+    .ui-autocomplete {
+        z-index: 999999 !important;
+        background-color: #ffffff !important;
+        border: 1px solid #ccc !important;
+        border-radius: 4px;
+        max-height: 200px;
+        overflow-y: auto;
+        font-size: 0.75rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .ui-menu-item {
+        padding: 6px 10px;
+        border-bottom: 1px solid #f1f1f1;
+        color: #333;
+        cursor: pointer;
+    }
+
+    .ui-state-active {
+        background-color: #34495e !important;
+        color: white !important;
+        border: none !important;
+        margin: 0 !important;
+    }
+
+    .menu-operaciones-vertical {
+        background-color: #34495e;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        width: 220px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .btn-menu-vertical {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        color: white;
+        height: 45px;
+        padding: 0 15px;
+        text-align: left;
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .btn-menu-vertical:last-child {
+            border-bottom: none;
+        }
+
+        .btn-menu-vertical:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+    #divResultadosDetalle,
+    #divResultadosDetalle .table-responsive {
+        overflow: visible !important;
+    }
+
+        #divResultadosDetalle table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            min-width: 1400px;
+            table-layout: auto;
+            text-align: left;
+        }
+
+        #zonaResultados th {
+            position: sticky;
+            top: 0;
+            background-color: #34495e;
+            color: white;
+            padding: 10px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            z-index: 10;
+            border-bottom: none;
+            border-right: 1px solid #576d82;
+        }
+
+            #zonaResultados th:last-child {
+                border-right: none;
+            }
+
+        #zonaResultados td {
+            border-bottom: 1px solid #eee;
+            padding: 10px;
+            font-size: 0.75rem;
+            color: #444;
+            white-space: nowrap;
+        }
+
+        #zonaResultados tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        #zonaResultados tbody tr:hover {
+            background-color: #f0f0f0 !important;
+        }
+
+        #zonaResultados .alert-info {
+            width: 100% !important;
+            margin-top: 0 !important;
+            max-width: none !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            border-radius: 0 !important;
+            border: none !important;
+            background-color: #d1f2eb !important;
+            color: #1abc9c !important;
+        }
 
     #loader {
-        padding-top: 20px !important;
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        z-index: 9999;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
 
-    #zonaResultados {
-        padding: 0 !important;
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #34495e;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
     }
 
-        #zonaResultados table {
-            width: 100% !important;
-            table-layout: auto;
-            margin: 0 !important;
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
         }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
 </style>
 
-<div class="container-fluid">
-    <div class="contenedor-titulo">
-        <h1 class="titulo-derecha">Detalle de Procesos Activos</h1>
-    </div>
+<div style="height: calc(100vh - 80px); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; padding: 0 10px;">
+        <div class="contenedor-titulo" style="flex-shrink: 0; padding-bottom: 5px; margin-bottom: 10px;">
+            <h1 class="titulo-derecha" style="margin: 0; font-size: 1.5rem; color: #34495e; font-weight: 400;">Detalle de Procesos Activos</h1>
+        </div>
 
-    <div class="panel-filtros">
-        <form id="formBusquedaProDet">
-            <div class="row">
-                @* COLUMNA 1 *@
-                <div class="col-md-2">
-                    <div class="form-group"><label>Fecha Inicio</label><input type="date" name="BUS_FEC_INI" class="form-control" value="@ViewBag.FEC_INI" /></div>
-                    <div class="form-group"><label>Fecha Fin</label><input type="date" name="BUS_FEC_FIN" class="form-control" value="@ViewBag.FEC_FIN" /></div>
+    <form id="formBusquedaProDet" style="flex-shrink: 0; display: flex; gap: 20px; padding: 15px 20px; background: white; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 15px;">
+               
+                @* COLUMNA 1: Fechas y Contador *@
+                <div style="width: 140px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0;">
+                    <div>
+                        <label class="label-detalle">Fecha Inicio</label>
+                        <input type="date" name="BUS_FEC_INI" class="campo-detalle" value="@ViewBag.FEC_INI" />
+                    </div>
+
+                    <div>
+                        <label class="label-detalle">Fecha Fin</label>
+                        <input type="date" name="BUS_FEC_FIN" class="campo-detalle" value="@ViewBag.FEC_FIN" />
+                    </div>
+
+                    <div style="margin-top: auto; padding-top: 5px;">
+                        <span id="contador-span"
+                              style="background-color: #34495e; color: white; padding: 6px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; display: inline-block;">
+                            Registros: <span id="lblContadorDetalle">0</span>
+                        </span>
+                    </div>
                 </div>
 
                 @* COLUMNA 2 *@
-                <div class="col-md-3">
-                    <div class="form-group"><label>Material / Denominación</label><input type="text" name="BUS_DEN" class="form-control" placeholder="LIKE%" /></div>
-                    <div class="form-group"><label>ID Reutilizable</label><input type="text" name="BUS_REU_ID" class="form-control" /></div>
-                    <div class="form-group"><label>Sector Destino</label><input type="text" name="BUS_SEC_DES" class="form-control" /></div>
+                <div style="flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 12px;">
+                    <div>
+                        <label class="label-detalle">Material / Denominación</label>
+                        <input type="text" name="BUS_DEN" class="campo-detalle" placeholder="LIKE%" />
+                    </div>
+
+                    <div>
+                        <label class="label-detalle">ID Reutilizable</label>
+                        <input type="text" name="BUS_REU_ID" class="campo-detalle" />
+                    </div>
+
+                    <div>
+                        <label class="label-detalle">Sector Destino</label>
+                        <input type="text" name="BUS_SEC_DES" class="campo-detalle" />
+                    </div>
                 </div>
 
                 @* COLUMNA 3 *@
-                <div class="col-md-3">
-                    <div class="form-group"><label>Paciente</label><input type="text" name="BUS_PAC" class="form-control" /></div>
-                    <div class="form-group"><label>Profesional</label><input type="text" name="BUS_PRO" class="form-control" /></div>
-                    <div class="form-group"><label>Remitente</label><input type="text" name="BUS_REM" class="form-control" /></div>
+                <div style="flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 12px;">
+                    <div>
+                        <label class="label-detalle">Paciente</label>
+                        <input type="text" name="BUS_PAC" class="campo-detalle" />
+                    </div>
+
+                    <div>
+                        <label class="label-detalle">Profesional</label>
+                        <input type="text" name="BUS_PRO" class="campo-detalle" />
+                    </div>
+
+                    <div>
+                        <label class="label-detalle">Remitente</label>
+                        <input type="text" name="BUS_REM" class="campo-detalle" />
+                    </div>
                 </div>
 
                 @* COLUMNA 4: Operaciones *@
-                <div class="col-md-2 ml-auto">
-                    <div class="menu-operaciones">
-                        <button type="button" class="btn-menu" id="btnBuscarDetalle"><span class="material-icons">search</span> Buscar</button>
-                        <button type="button" class="btn-menu" onclick="location.reload()"><span class="material-icons">refresh</span> Limpiar</button>
+                <div style="width: 160px; display: flex; flex-direction: column; flex-shrink: 0; margin-right: 50px;">
+                    <div class="menu-operaciones-vertical">
 
-                        <div class="reporte-container">
-                            <button type="button" class="btn-menu" style="border-bottom:none"><span class="material-icons">description</span> Reporte</button>
-                            <div class="opciones-reporte">
-                                <button type="button" class="btn-menu btn-pdf"><span class="material-icons">picture_as_pdf</span> PDF</button>
-                                <button type="button" class="btn-menu btn-excel"><span class="material-icons">table_view</span> Excel</button>
+                        <button type="button" id="btnBuscarDetalle" class="btn-menu-vertical">
+                            <span class="material-icons" style="font-size: 1.1rem;">search</span> Buscar
+                        </button>
+
+                        <button type="button" class="btn-menu-vertical" onclick="location.reload()">
+                            <span class="material-icons" style="font-size: 1.1rem;">refresh</span> Limpiar
+                        </button>
+
+                        <div style="display: flex; flex-direction: column; width: 100%;">
+                            <button type="button" class="btn-menu-vertical" id="btnReporte" style="width: 100%; justify-content: space-between;">
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <span class="material-icons" style="font-size: 1.1rem;">description</span> Reportes
+                                </div>
+                                <span class="material-icons" id="icono-desplegable" style="font-size: 1.1rem;">expand_more</span>
+                            </button>
+
+                            <div id="opciones-reporte" style="display: none; background-color: #243442; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <button type="button" class="btn-menu-vertical" style="width: 100%; padding-left: 30px; border-bottom: none;">
+                                    <span class="material-icons" style="font-size: 1.1rem;">picture_as_pdf</span> PDF
+                                </button>
+
+                                <button type="button" class="btn-menu-vertical" style="width: 100%; padding-left: 30px; border-bottom: none;">
+                                    <span class="material-icons" style="font-size: 1.1rem;">table_view</span> Excel
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <div class="text-center mt-2">
-                        <span id="lblContadorDetalle" class="badge-contador-grande">Registros: 0</span>
-                    </div>
                 </div>
-            </div>
         </form>
-    </div>
+   
 
-    <div id="zonaResultados-wrapper" style="position:relative;">
-        <div id="loader" style="display:none;">
-            <span class="brand-text">Baxen® Trazabilidad</span>
-            <div class="spinner"></div>
-            <span class="loading-text">Consultando detalle de procesos activos...</span>
-        </div>
+        <div id="zonaResultados-wrapper" style="flex: 1; overflow: auto; border: 1px solid #dcdcdc; border-radius: 4px; margin-bottom: 15px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: relative; padding: 0;">
+            <div id="loader">
+                <span style="margin-bottom: 10px; font-weight: 600; color: #34495e; font-size: 1.1em;">Baxen® Trazabilidad</span>
+                <div class="spinner"></div>
+                <span style="margin-top: 15px; color: #666; font-size: 0.9em; font-style: italic;">Consultando detalle de procesos activos...</span>
+            </div>
 
-        <div id="divResultadosDetalle">
-            @Html.Partial("~/Views/ProBusqueda/_ResultadosBusProDet.cshtml", Model)
+            <div id="divResultadosDetalle">
+                @Html.Partial("~/Views/ProBusqueda/_ResultadosBusProDet.cshtml", Model)
+            </div>
         </div>
     </div>
-</div>
 
 @section Scripts {
     <script>
@@ -101,7 +315,7 @@
                         $('#divResultadosDetalle').html(html);
 
                         var filas = $('#divResultadosDetalle tbody tr').length;
-                        $('#lblContadorDetalle').html("Registros: " + (filas > 0 ? filas : 0));
+                        $('#lblContadorDetalle').text(filas > 0 ? filas : 0);
                     },
                     complete: function() { $('#loader').hide(); }
                 });

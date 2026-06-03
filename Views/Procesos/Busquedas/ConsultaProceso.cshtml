@@ -496,7 +496,11 @@
         // LIBERACION DE PROCESO
         // =========================
 
-        let usuarioLiberacionValidado = sessionStorage.getItem("editarProceso") === "2";
+        const tbProIdActual = parseInt(document.getElementById("tbProId")?.value) || 0;
+
+        let usuarioLiberacionValidado =
+                sessionStorage.getItem("editarProceso") === "2" &&
+                parseInt(sessionStorage.getItem("editarProcesoTbProId")) === tbProIdActual;
 
         window.addEventListener("loginTareasValidado", function () {
                         usuarioLiberacionValidado = true;
@@ -602,7 +606,8 @@
                     alert("Debe validar usuario antes de liberar el proceso.");
 
                     sessionStorage.setItem("editarProceso", "2");
-                    localStorage.setItem("loginDestino", window.location.pathname + window.location.search);
+                        sessionStorage.setItem("editarProcesoTbProId", tbProIdActual);
+                        localStorage.setItem("loginDestino", window.location.pathname + window.location.search);
 
                     const modalLogin = document.getElementById("loginTareasModal");
 
@@ -632,6 +637,34 @@
                         TbProIbrn: document.getElementById("chkResNegativoBiologico")?.checked || false,
                         TbProIbre: document.getElementById("chkLiberarCicloEsterilizacion")?.checked || false
                     })
+                })
+                .then(response => response.json())
+                .then(json => {
+                    if (!json.success) {
+                        alert(json.mensaje);
+
+                        document.querySelectorAll('.proceso-tab').forEach(t => t.classList.remove('is-active'));
+                        document.querySelectorAll('.proceso-tab-panel').forEach(p => p.classList.remove('is-active'));
+
+                        document.querySelector('[data-tab-target="proceso-tab-controles"]')?.classList.add('is-active');
+                        document.getElementById('proceso-tab-controles')?.classList.add('is-active');
+
+                        document.getElementById("chkLiberarCicloEsterilizacion").checked = false;
+
+                        bloqueResultadoFinal.style.display = "none";
+
+                        radiosResultadoFinal.forEach(function (radio) {
+                            radio.checked = false;
+                            radio.disabled = true;
+                        });
+
+                        document.getElementById("panelEstadoCiclo").textContent = json.estadoDen || "EN PROCESO";
+
+                        return;
+                    }
+
+                    document.getElementById("panelEstadoCiclo").textContent = json.estadoDen;
+                    console.log("ESTADO:", json.estadoDen);
                 });
 
             });
@@ -890,20 +923,27 @@
 
                         modal.style.display = "flex";
                     }
-
-                    // 👉 actualizar estado del ciclo
-                    document.getElementById("panelEstadoCiclo").textContent = json.estadoDen;
-
-                    // 👉 actualizar texto de la fila
-                    // const span = document.querySelector(`.resultado-texto[data-id='${tbProDetPteId}']`);
-                    // if (span) span.textContent = tbProPteResDen;
-
-                    // 👉 ocultar combos si finaliza
-                    // if (json.estadoDen === "FINALIZADO") {
-                    //     document.querySelectorAll(".combo-resultado").forEach(c => c.classList.add("d-none"));
-                    //     document.querySelectorAll(".resultado-texto").forEach(t => t.classList.remove("d-none"));
-                    // }
+                document.getElementById("panelEstadoCiclo").textContent = json.estadoDen;
+                    
                 const celdaResultado = document.querySelector(`.resultado-valor[data-id='${tbProDetPteId}']`);
+
+                    if (json.estadoDen === "FINALIZADO") {
+                        document.getElementById("chkLiberarCicloEsterilizacion").checked = true;
+                        document.querySelector('input[name="resultadoFinalProceso"][value="LIBERAR_PROCESO"]').checked = true;
+
+                        bloqueResultadoFinal.style.display = "block";
+
+                        radiosResultadoFinal.forEach(function (radio) {
+                            radio.disabled = false;
+                        });
+
+                        document.querySelectorAll('.proceso-tab').forEach(t => t.classList.remove('is-active'));
+                        document.querySelectorAll('.proceso-tab-panel').forEach(p => p.classList.remove('is-active'));
+
+                        document.querySelector('[data-tab-target="proceso-tab-liberacion"]')?.classList.add('is-active');
+                        document.getElementById('proceso-tab-liberacion')?.classList.add('is-active');
+    }
+
                     if (celdaResultado) {
                         celdaResultado.textContent = tbProPteResDen;
                     }

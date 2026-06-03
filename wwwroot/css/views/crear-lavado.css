@@ -282,3 +282,20 @@
         flex: 1 1 46%;
     }
 }
+
+
+.btn-guardar-lavado {
+    background: #3d525c;
+    color: white;
+    border: none;
+    min-width: 120px;
+    height: 40px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+    .btn-guardar-lavado:hover {
+        background: #34495e;
+        color: white;
+    }

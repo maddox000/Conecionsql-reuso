@@ -605,5 +605,49 @@ namespace ConexionSql.Controllers
                 requiereFinalizarLavado = false
             });
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> CerrarProceso(int tbProAcoId)
+        {
+            try
+            {
+                var cabecera = await _context.TbProAco
+                    .FirstOrDefaultAsync(x => x.TbProAcoId == tbProAcoId);
+
+                if (cabecera == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        mensaje = "❌ No se encontró el proceso."
+                    });
+                }
+
+                cabecera.TbProAcoHorFin = new DateTime(
+                    1899,
+                    12,
+                    30,
+                    DateTime.Now.Hour,
+                    DateTime.Now.Minute,
+                    DateTime.Now.Second
+                );
+
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    mensaje = ex.Message
+                });
+            }
+        }
     }
 }

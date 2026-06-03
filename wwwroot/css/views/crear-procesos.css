@@ -549,4 +549,23 @@
     overflow-y: auto;
 }
 
-/*--- ingreso etiqueta*/
+.proceso-operativo-actions .btn-primary {
+    background-color: #34495e;
+    border-color: #34495e;
+}
+
+    .proceso-operativo-actions .btn-primary:hover {
+        background-color: #2f3e46;
+        border-color: #2f3e46;
+    }
+
+.proceso-actions .btn-primary {
+    background-color: #34495e;
+    border-color: #34495e;
+}
+
+    .proceso-actions .btn-primary:hover {
+        background-color: #2f3e46;
+        border-color: #2f3e46;
+    }
+

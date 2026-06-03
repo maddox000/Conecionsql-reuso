@@ -3,137 +3,339 @@
     ViewData["Title"] = "Búsqueda de Acondicionado - Baxen";
 }
 
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="~/css/busquedas-custom.css" />
 
-<div class="contenedor-titulo">
-    <h1 class="titulo-derecha">Búsqueda de Acondicionado</h1>
-</div>
+<style>
+    /* =========================================
+               ESTILOS CLONADOS DE LISTADO DE EQUIPOS
+               ========================================= */
+    .campo-detalle {
+        height: 26px;
+        padding: 2px 8px;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        color: #333;
+        box-sizing: border-box;
+        width: 100%;
+    }
 
-<div class="panel-filtros">
-    <form id="formBusquedaAco">
-        <div class="row">
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label>ID ACONDICIONADO</label>
-                    <input type="text" name="BUS_ACO_ID" class="form-control campo-activo" placeholder="ID Exacto">
-                </div>
-                <div class="form-group">
-                    <label>FECHA INICIO</label>
-                    <input type="date" name="BUS_FEC_INI" id="BUS_FEC_INI" class="form-control" value="@ViewBag.FEC_INI">
-                </div>
-                <div class="form-group">
-                    <label>FECHA FIN</label>
-                    <input type="date" name="BUS_FEC_FIN" id="BUS_FEC_FIN" class="form-control" value="@ViewBag.FEC_FIN">
-                </div>
+        .campo-detalle:focus {
+            border-color: #34495e;
+            outline: none;
+        }
+
+    .campo-activo {
+        border: 1px solid #34495e !important;
+        background-color: #f8fbfd;
+    }
+
+    .label-detalle {
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: #666;
+        margin-bottom: 3px;
+        display: block;
+    }
+
+    /* Autocomplete adaptado al nuevo tamaño */
+    .ui-autocomplete {
+        z-index: 999999 !important;
+        background-color: #ffffff !important;
+        border: 1px solid #ccc !important;
+        border-radius: 4px;
+        max-height: 200px;
+        overflow-y: auto;
+        font-size: 0.75rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .ui-menu-item {
+        padding: 6px 10px;
+        border-bottom: 1px solid #f1f1f1;
+        color: #333;
+        cursor: pointer;
+    }
+
+    .ui-state-active {
+        background-color: #34495e !important;
+        color: white !important;
+        border: none !important;
+        margin: 0 !important;
+    }
+
+    /* =========================================
+               ESTILOS DEL MENÚ VERTICAL
+               ========================================= */
+    .menu-operaciones-vertical {
+        background-color: #34495e;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        width: 220px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .btn-menu-vertical {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        color: white;
+        height: 45px;
+        padding: 0 15px;
+        text-align: left;
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .btn-menu-vertical:last-child {
+            border-bottom: none;
+        }
+
+        .btn-menu-vertical:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+    /* =========================================
+               CORRECCIÓN DEL SCROLL Y TÍTULOS (TABLA)
+               ========================================= */
+    /* Apagamos el scroll interno de Bootstrap para que lo maneje el contenedor general */
+    #divResultadosAco,
+    #divResultadosAco .table-responsive {
+        overflow: visible !important;
+    }
+
+    #zonaResultados-wrapper table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        min-width: 1400px;
+        table-layout: auto;
+        text-align: left;
+    }
+
+    #zonaResultados-wrapper th {
+        position: sticky;
+        top: 0;
+        background-color: #34495e;
+        color: white;
+        padding: 10px;
+        font-weight: 500;
+        font-size: 0.75rem;
+        z-index: 10;
+        border-bottom: none;
+        border-right: 1px solid #576d82;
+    }
+
+        #zonaResultados-wrapper th:last-child {
+            border-right: none;
+        }
+
+    #zonaResultados-wrapper td {
+        border-bottom: 1px solid #eee;
+        padding: 10px;
+        font-size: 0.75rem;
+        color: #444;
+        white-space: nowrap;
+    }
+
+    #zonaResultados-wrapper tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    #zonaResultados-wrapper tbody tr:hover {
+        background-color: #f0f0f0 !important;
+    }
+
+    /* Loader */
+    #loader {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        z-index: 9999;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #34495e;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+<div style="height: calc(100vh - 80px); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; padding: 0 10px;">
+
+    <div class="contenedor-titulo">
+        <h1 class="titulo-derecha">Búsqueda de Acondicionado</h1>
+    </div>
+
+    <form id="formBusquedaAco" style="flex-shrink: 0; display: flex; gap: 20px; padding: 15px 20px; background: white; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 15px;">
+
+        <div style="width: 140px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0;">
+            <div><label class="label-detalle">Fecha Inicio</label><input type="date" id="BUS_FEC_INI" name="BUS_FEC_INI" class="campo-detalle" value="@ViewBag.FEC_INI" /></div>
+            <div><label class="label-detalle">Fecha Fin</label><input type="date" id="BUS_FEC_FIN" name="BUS_FEC_FIN" class="campo-detalle" value="@ViewBag.FEC_FIN" /></div>
+
+            <div style="margin-top: auto; padding-top: 5px;">
+                <span id="contador-span" style="background-color: #34495e; color: white; padding: 6px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; display: inline-block;">Registros: <span id="lblContador">0</span></span>
             </div>
+        </div>
 
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label>MATERIAL / DENOMINACIÓN</label>
-                    <input type="text" name="BUS_DEN" class="form-control" placeholder="LIKE%">
-                </div>
-                <div class="form-group">
-                    <label>ID REUTILIZABLE</label>
-                    <input type="text" name="BUS_REU_ID" class="form-control" placeholder="ID Exacto">
-                </div>
-                <div class="form-group">
-                    <label>CET (SECTOR DESTINO)</label>
-                    <input type="text" name="BUS_CET" class="form-control">
-                </div>
+        <div style="flex: 1; min-width: 160px; display: flex; flex-direction: column; gap: 12px;">
+            <div><label class="label-detalle">Acondicionado</label><input type="text" name="BUS_ACO_ID" class="campo-detalle" autocomplete="off" /></div>
+            <div><label class="label-detalle">Código de reuso</label><input type="text" name="BUS_REU_ID" class="campo-detalle" autocomplete="off" /></div>
+        </div>
+
+        <div style="flex: 1; min-width: 160px; display: flex; flex-direction: column; gap: 12px;">
+            <div><label class="label-detalle">Denominación</label><input type="text" name="BUS_DEN" class="campo-detalle" autocomplete="off" /></div>
+        </div>
+
+        <div style="flex: 1.2; min-width: 240px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; gap: 10px; width: 85%;">
+                <div style="flex: 1;"><label class="label-detalle">Sector Destino</label><input type="text" name="BUS_CET" class="campo-detalle" autocomplete="off" /></div>
+                <div style="flex: 1;"><label class="label-detalle">ID Sector</label><input type="text" name="BUS_SEC" class="campo-detalle" autocomplete="off" /></div>
             </div>
+        </div>
 
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label>ID SECTOR</label>
-                    <input type="text" name="BUS_SEC" class="form-control">
-                </div>
-                <div style="margin-top: 25px; padding: 10px; border-left: 3px solid #3498db; background: #f8f9fa;">
-                    <small class="text-muted" style="display: block; line-height: 1.2;">
-                        <i class="fas fa-info-circle"></i> La búsqueda normaliza campos vacíos para incluir registros relacionados.
-                    </small>
-                </div>
-            </div>
+        <div style="width: 160px; display: flex; flex-direction: column; flex-shrink: 0; margin-right: 50px;">
+            <div class="menu-operaciones-vertical">
+                <button type="button" id="btnBuscar" class="btn-menu-vertical">
+                    <span class="material-icons" style="font-size: 1.1rem;">search</span> Buscar
+                </button>
+                <button type="button" class="btn-menu-vertical" onclick="Limpiar()">
+                    <span class="material-icons" style="font-size: 1.1rem;">cleaning_services</span> Limpiar
+                </button>
 
-            <div class="col-md-3">
-                <div class="menu-operaciones">
-                    <button type="button" class="btn-menu" id="btnBuscar">
-                        <span class="material-icons">search</span> BUSCAR
-                    </button>
-                    <button type="button" class="btn-menu" onclick="location.reload()">
-                        <span class="material-icons">refresh</span> LIMPIAR
-                    </button>
-
-                    <div class="reporte-container">
-                        <button type="button" class="btn-menu" id="btnReporte">
-                            <span class="material-icons">description</span> REPORTES
-                        </button>
-                        <div class="opciones-reporte">
-                            <button type="button" class="btn-menu btn-pdf">
-                                <span class="material-icons">picture_as_pdf</span> PDF
-                            </button>
-                            <button type="button" class="btn-menu btn-excel">
-                                <span class="material-icons">table_view</span> EXCEL
-                            </button>
+                <div style="display: flex; flex-direction: column; width: 100%;">
+                    <button type="button" class="btn-menu-vertical" id="btnReporte" style="width: 100%; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span class="material-icons" style="font-size: 1.1rem;">description</span> Reportes
                         </div>
+                        <span class="material-icons" id="icono-desplegable" style="font-size: 1.1rem;">expand_more</span>
+                    </button>
+                    <div id="opciones-reporte" style="display: none; background-color: #243442; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <button type="button" class="btn-menu-vertical" style="width: 100%; padding-left: 30px; border-bottom: none;" id="btnReportePdf">
+                            <span class="material-icons" style="font-size: 1.1rem;">picture_as_pdf</span> PDF
+                        </button>
+                        <button type="button" class="btn-menu-vertical" style="width: 100%; padding-left: 30px; border-bottom: none;" id="btnReporteExcel">
+                            <span class="material-icons" style="font-size: 1.1rem;">table_view</span> Excel
+                        </button>
                     </div>
                 </div>
 
-                <div class="badge-contador-grande">
-                    Resultados: <span id="lblContador">0</span>
-                </div>
+                <button type="button" class="btn-menu-vertical" onclick="location.href='@Url.Action("Index", "Home")'">
+                    <span class="material-icons" style="font-size: 1.1rem;">logout</span> Cerrar
+                </button>
             </div>
         </div>
     </form>
-</div>
 
-<div id="zonaResultados">
-    <div id="loader" style="display:none;">
-        <div class="brand-text">Baxen® Trazabilidad</div>
-        <div class="spinner"></div>
-        <div class="loading-text">Consultando procesos de acondicionado...</div>
-    </div>
+    <div id="zonaResultados-wrapper" style="flex: 1; overflow: auto; border: 1px solid #dcdcdc; border-radius: 4px; margin-bottom: 15px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: relative; padding: 0;">
+        <div id="loader">
+            <span style="margin-bottom: 10px; font-weight: 600; color: #34495e; font-size: 1.1em;">Baxen® Trazabilidad</span>
+            <div class="spinner"></div>
+            <span style="margin-top: 15px; color: #666; font-size: 0.9em; font-style: italic;">Consultando procesos de acondicionado...</span>
+        </div>
 
-    <div id="divResultadosAco">
-        <div style="padding: 40px; text-align: center; color: #bdc3c7;">
-            <span class="material-icons" style="font-size: 48px;">fact_check</span>
-            <p>Ingrese los filtros y presione Buscar para consultar el historial.</p>
+        <div id="divResultadosAco" style="width: 100%;">
+            <div style="padding: 40px; text-align: center; color: #bdc3c7;">
+                <span class="material-icons" style="font-size: 48px;">fact_check</span>
+                <p>Ingrese los filtros y presione Buscar para consultar el historial.</p>
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
         $(document).ready(function () {
-            $("#btnBuscar").click(function () {
-                const formData = $("#formBusquedaAco").serialize();
+        // Activar clase campo-activo
+        $(document).on('input change', '.campo-detalle', function() {
+        $(this).val() ? $(this).addClass('campo-activo') : $(this).removeClass('campo-activo');
+        }).trigger('change');
 
-                $("#loader").css("display", "flex");
-                $("#divResultadosAco").css("opacity", "0.4");
-
-                $.ajax({
-                    url: '@Url.Action("Buscar", "BusAco")',
-                    type: 'POST',
-                    data: formData,
-                    success: function (result) {
-                        $("#loader").hide();
-                        $("#divResultadosAco").css("opacity", "1");
-                        $("#divResultadosAco").html(result);
-                    },
-                    error: function () {
-                        $("#loader").hide();
-                        $("#divResultadosAco").css("opacity", "1");
-                        alert("Error al recuperar los datos de acondicionado.");
-                    }
-                });
-            });
-
-            $('#formBusquedaAco input').keypress(function (e) {
-                if (e.which == 13) {
-                    $("#btnBuscar").click();
-                    return false;
-                }
-            });
-            $("#btnBuscar").click();
+        // Presionar Enter ejecuta la búsqueda
+        $('#formBusquedaAco input').keypress(function (e) {
+        if (e.which == 13) {
+        $("#btnBuscar").click();
+        return false;
+        }
         });
+
+        // Lógica para desplegar el submenú de Reportes
+        $("#btnReporte").click(function () {
+        $("#opciones-reporte").slideToggle("fast");
+        let icono = $("#icono-desplegable");
+        if (icono.text() === "expand_more") {
+        icono.text("expand_less");
+        } else {
+        icono.text("expand_more");
+        }
+        });
+
+        // Llamada AJAX Búsqueda
+        $("#btnBuscar").click(function () {
+        const formData = $("#formBusquedaAco").serialize();
+
+        $("#loader").css("display", "flex");
+        $("#divResultadosAco").css("opacity", "0.4");
+
+        $.ajax({
+        url: '@Url.Action("Buscar", "BusAco")',
+        type: 'POST',
+        data: formData,
+        success: function (result) {
+        $("#loader").hide();
+        $("#divResultadosAco").css("opacity", "1");
+        $("#divResultadosAco").html(result);
+        },
+        error: function () {
+        $("#loader").hide();
+        $("#divResultadosAco").css("opacity", "1");
+        alert("Error al recuperar los datos de acondicionado.");
+        }
+        });
+        });
+
+        $("#btnBuscar").click(); // Dispara la primera búsqueda al cargar
+        });
+
+        function Limpiar() {
+        $("#formBusquedaAco")[0].reset();
+        $('.campo-detalle').removeClass('campo-activo');
+
+        $('#BUS_FEC_INI').val('@ViewBag.FEC_INI').addClass('campo-activo');
+        $('#BUS_FEC_FIN').val('@ViewBag.FEC_FIN').addClass('campo-activo');
+
+        $("#lblContador").text("0");
+        $("#btnBuscar").click();
+        }
     </script>
 }

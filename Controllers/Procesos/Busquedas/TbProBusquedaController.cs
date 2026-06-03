@@ -92,6 +92,22 @@ namespace ConexionSql.Controllers.Procesos.Busquedas
             return Json(new { success = true, data = lista });
         }
 
+        // revisa controles pendientes 
+
+        private async Task<bool> ControlesPendientesProceso(int tbProId)
+        {
+            var pendientes = await _context.TbProDetPte
+                .CountAsync(x =>
+                    x.TbProId == tbProId &&
+                    (
+                        x.TbProPteResId == null ||
+                        !new[] { 2, 5, 7 }.Contains(x.TbProPteResId.Value)
+                    ));
+
+            return pendientes > 0;
+        }
+
+
         [HttpPost]
         public IActionResult ActualizarResultadoControl([FromBody] TbProDetPteResultadoDto dto)
         {
@@ -285,7 +301,9 @@ namespace ConexionSql.Controllers.Procesos.Busquedas
                         cmd.CommandText = @"
                     UPDATE TB_PRO
                     SET IB_PRO_EST_ID = @estadoId,
-                        IB_PRO_EST_DEN = @estadoDen
+                        IB_PRO_EST_DEN = @estadoDen,
+                        TB_PRO_IBRE = 1,
+                        TB_PRO_IBRN = 1
                     WHERE TB_PRO_ID = @tbProId
                     ";
 
@@ -361,6 +379,16 @@ namespace ConexionSql.Controllers.Procesos.Busquedas
 
             if (dto.TbProIbre)
             {
+                if (await ControlesPendientesProceso(dto.TbProId))
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        mensaje = "Existen controles pendientes. No es posible finalizar el proceso.",
+                        estadoDen = "EN PROCESO"
+                    });
+                }
+
                 proceso.IbProEstId = 2;
                 proceso.IbProEstDen = "FINALIZADO";
             }

@@ -4,140 +4,255 @@
 @using ConexionSql.Models.Recepciones
 
 @{
-
     var listaSectores = ViewBag.ListaSectores as List<IbSec>;
     var subFormModel = ViewBag.SubFormularioDetalle as TbRecDetFormDto;
 
     var cabeceraCreada = Model != null && Model.TbRecId > 0;
 
     var numeroRecepcion = Model != null && Model.TbRecId > 0 ? Model.TbRecId.ToString() : "Pendiente";
-    var fechaRecepcion = Model?.TbRecFec?.ToString("dd/MM/yyyy") ?? DateTime.Now.ToString("dd/MM/yyyy");
-    var horaRecepcion = Model?.TbRecHorIni?.ToString("HH:mm") ?? DateTime.Now.ToString("HH:mm");
+    var fec = Model?.TbRecFec?.ToString("dd/MM/yyyy") ?? DateTime.Now.ToString("dd/MM/yyyy");
+    var hor = Model?.TbRecHorIni?.ToString("HH:mm") ?? DateTime.Now.ToString("HH:mm");
+    var fechaHora = $"{fec} {hor}";
+
+    var usuarioLogueadoApe = ViewBag.UsuarioApe ?? "DA COSTA MARQUEZ";
+    var usuarioLogueadoNom = ViewBag.UsuarioNom ?? "HERNAN";
+    var usuarioCompleto = $"{usuarioLogueadoApe}, {usuarioLogueadoNom}";
+    var cargoUsuario = ViewBag.UsuarioCargo ?? "ENFERMERO/A";
+
+    var personalSector = ViewBag.PersonalSector ?? "SIN ASIGNAR";
+    var proveedor = ViewBag.ProveedorOrt ?? "SIN PROVEEDOR";
+
+    var totalRecibido = (Model?.TbRecCantTot ?? 0).ToString() + " unidades";
+    var observaciones = Model?.TbRecObs ?? "";
+
     var sectorOrigenTexto = listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecOriId)?.IbSecDen ?? "";
     var sectorDestinoTexto = listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecDesId)?.IbSecDen ?? "";
-    var usuarioLogueado = ViewBag.UsuarioLogueado ?? "NO REGISTRADO";
-    var totalRecibido = Model?.TbRecCantTot ?? 0;
 }
 
 <link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
 
-<div class="bx-card rec-screen">
-    <div class="rec-screen-banner">Recepcion de materiales</div>
+<style>
+    :root {
+        --ancho-mitad-izquierda: 40%;
+        --ancho-campos-sectores: 400px;
+        --ancho-recuadro-imagen: 80%;
+        --margen-superior-grilla: -50px;
+        --gap-entre-filas: 12px;
+        --alto-campo: 28px;
+        --color-borde: #dcdcdc;
+        --color-fondo-blanco: #ffffff;
+        --color-texto-valor: #333333;
+        --color-texto-label: #666666;
+        --color-titulo: #34495e;
+    }
 
-    <form asp-action="CrearRecepcion" method="post">
+    .baxen-panel {
+        background: var(--color-fondo-blanco);
+        border: 1px solid var(--color-borde);
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        padding: 15px 20px;
+    }
+
+    .campo-detalle {
+        height: var(--alto-campo);
+        padding: 2px 8px;
+        background: white;
+        border: 1px solid var(--color-borde);
+        border-radius: 4px;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        color: var(--color-texto-valor);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        box-sizing: border-box;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    input.campo-detalle:focus,
+    input#TbRecObs:focus {
+        border: 1px solid #80bdff !important;
+        box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25) !important;
+        outline: none !important;
+        background-color: #ffffff !important;
+    }
+
+    input.campo-detalle::placeholder,
+    input#TbRecObs::placeholder {
+        color: #999999;
+        font-style: italic;
+    }
+
+    .campo-centrado {
+        justify-content: center !important;
+        text-align: center;
+    }
+
+    .label-detalle {
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: var(--color-texto-label);
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .list-group-flotante {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    }
+</style>
+
+<div class="rec-screen" style="padding: 0 10px; display: flex; flex-direction: column;">
+
+    <div style="display: flex; justify-content: flex-end; padding-bottom: 5px; margin-bottom: 10px; flex-shrink: 0;">
+        <h1 style="margin: 0; font-size: 1.5rem; color: var(--color-titulo); font-weight: 400;">Recepción de materiales</h1>
+    </div>
+
+    <form asp-action="CrearRecepcion" method="post" style="margin-bottom: 0; flex: 0 0 auto;">
         @Html.AntiForgeryToken()
 
-        <div class="rec-screen-head">
-            <div class="rec-screen-panel">
-                <div class="rec-screen-kv">
-                    <div class="rec-screen-k">Numero de recepcion</div>
-                    <div class="rec-screen-v">@numeroRecepcion</div>
+        <div class="baxen-panel" style="display: flex; margin-bottom: 8px; align-items: stretch;">
+
+            <div style="flex: 0 0 calc(var(--ancho-mitad-izquierda) - 10px); display: flex; flex-direction: column; gap: var(--gap-entre-filas); padding-right: 20px;">
+                <div style="display: flex; gap: 15px;">
+                    <div style="width: 140px;">
+                        <label class="label-detalle">Número de recepción</label>
+                        <div class="campo-detalle campo-centrado" style="width: 100%;">@numeroRecepcion</div>
+                    </div>
+                    <div style="width: 140px;">
+                        <label class="label-detalle">Fecha / Hora</label>
+                        <div class="campo-detalle campo-centrado" style="width: 100%;">@fechaHora</div>
+                    </div>
                 </div>
 
-                <div class="rec-screen-kv">
-                    <div class="rec-screen-k">Fecha</div>
-                    <div class="rec-screen-v">@fechaRecepcion</div>
+                <div style="width: 295px;">
+                    <label class="label-detalle">Usuario</label>
+                    <div class="campo-detalle" style="width: 100%;" title="@usuarioCompleto">@usuarioCompleto</div>
                 </div>
 
-                <div class="rec-screen-kv">
-                    <div class="rec-screen-k">Hora</div>
-                    <div class="rec-screen-v">@horaRecepcion</div>
+                <div style="width: 295px;">
+                    <div class="campo-detalle" style="font-weight: 500; width: 100%;" title="@cargoUsuario">
+                        @cargoUsuario
+                    </div>
                 </div>
 
-                <div class="rec-screen-kv">
-                    <div class="rec-screen-k">Usuario</div>
-                    <div class="rec-screen-v">@usuarioLogueado</div>
+                <div style="width: 295px; margin-top: auto; padding-top: 5px;">
+                    <label class="label-detalle">Total recibido</label>
+                    <div class="campo-detalle campo-centrado" style="font-weight: bold; background-color: #f8f9fa; border-color: #dcdcdc; width: 100%;">
+                        @totalRecibido
+                    </div>
                 </div>
             </div>
 
-            <div class="rec-screen-panel">
-                <div class="rec-screen-kv">
-                    <div class="rec-screen-k">Sector Origen</div>
+            <div style="flex: 1; display: flex; gap: 20px; border-left: 1px solid #eeeeee; padding-left: 20px;">
 
-                    <div class="rec-screen-v" style="flex-direction: column; align-items: stretch;">
+                <div style="width: var(--ancho-campos-sectores); display: flex; flex-direction: column; gap: var(--gap-entre-filas); flex-shrink: 0;">
+                    <div style="position: relative;">
+                        <label class="label-detalle">Sector Origen</label>
                         <input type="text"
                                id="TbRecSecOriBusqueda"
-                               class="form-control"
+                               class="campo-detalle"
+                               style="width: 100%; outline: none;"
                                autocomplete="off"
                                readonly="@cabeceraCreada"
-                               value="@(listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecOriId)?.IbSecDen ?? "")" />
-
-                        <div id="listaSectoresOrigen" class="list-group mt-2"></div>
-
+                               value="@sectorOrigenTexto" />
+                        <div id="listaSectoresOrigen" class="list-group list-group-flotante mt-1" style="display: none;"></div>
                         <input type="hidden" asp-for="TbRecSecOriId" id="TbRecSecOriId" />
                     </div>
-                </div>
 
-                <div class="rec-screen-kv">
-                    <div class="rec-screen-k">Sector Destino</div>
-
-                    <div class="rec-screen-v" style="flex-direction: column; align-items: stretch;">
+                    <div style="position: relative;">
+                        <label class="label-detalle">Sector Destino</label>
                         <input type="text"
                                id="TbRecSecDesBusqueda"
-                               class="form-control"
+                               class="campo-detalle"
+                               style="width: 100%; outline: none;"
                                autocomplete="off"
                                readonly="@cabeceraCreada"
-                               value="@(listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecDesId)?.IbSecDen ?? "")" />
-
-                        <div id="listaSectoresDestino" class="list-group mt-2"></div>
-
+                               value="@sectorDestinoTexto" />
+                        <div id="listaSectoresDestino" class="list-group list-group-flotante mt-1" style="display: none;"></div>
                         <input type="hidden" asp-for="TbRecSecDesId" id="TbRecSecDesId" />
                     </div>
-                </div>
 
-                <div class="rec-screen-kv">
-                    <div class="rec-screen-k">Total recibido</div>
-                    <div class="rec-screen-v">
+                    <div>
+                        <label class="label-detalle">Personal del sector</label>
                         <input type="text"
-                               id="TbRecCantTot"
-                               class="form-control form-control-sm"
-                               value="@totalRecibido"
-                               readonly />
+                               id="PersonalSectorBusqueda"
+                               name="PersonalSectorBusqueda"
+                               class="campo-detalle"
+                               style="width: 100%; outline: none;"
+                               autocomplete="off"
+                               value="@personalSector" />
+                    </div>
+
+                    <div>
+                        <label class="label-detalle">Proveedor</label>
+                        <div class="campo-detalle" style="width: 100%;" title="@proveedor">@proveedor</div>
                     </div>
                 </div>
-            </div>
 
-            <div class="rec-screen-image" style="display:flex; align-items:center; justify-content:center;">
-
-                <div id="productoImagenContainer" style="text-align:center;">
-                    <div style="color:#999; font-size:0.8rem;">
-                        Sin imagen
+                <div style="flex: 1; display: flex; align-items: stretch; justify-content: flex-end;">
+                    <div style="width: var(--ancho-recuadro-imagen); background: white; border: 1px solid #ccc; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; min-height: 180px;">
+                        <div id="productoImagenContainer" style="text-align: center;">
+                            <div style="color: #d8d8d8; font-size: 1.5rem; font-weight: bold; line-height: 1.1; letter-spacing: -1px; text-transform: lowercase;">imagen<br>no<br>disponible</div>
+                        </div>
                     </div>
                 </div>
 
             </div>
         </div>
 
-        <div class="rec-screen-actions mt-3">
-            <button type="submit" class="btn btn-primary btn-sm">Guardar Recepción</button>
+        <div class="baxen-panel" style="margin-bottom: 0; padding: 12px 20px;">
+            <label class="label-detalle">Observaciones</label>
+            <input type="text"
+                   id="TbRecObs"
+                   name="TbRecObs"
+                   class="auto-save"
+                   style="width: 100%; outline: none; border: none; border-bottom: 1px solid var(--color-borde); font-size: 0.85rem; color: var(--color-texto-valor); padding: 6px 0; background: transparent;"
+                   placeholder="Ingrese observaciones aquí..."
+                   value="@observaciones" />
         </div>
+
+        <button type="submit" id="btnGuardarRecepcionOculto" style="display:none;">Guardar</button>
     </form>
-</div>
-<div>
+    <div style="flex: 1; overflow-y: auto; margin-top: var(--margen-superior-grilla);">
     @* detalle *@
-    @if (Model == null || Model.TbRecId <= 0)
-    {
-        <div class="rec-screen-table-wrap mt-3">
-            <div class="rec-screen-table-title">Materiales ingresados</div>
+        
+        @if (Model == null || Model.TbRecId <= 0)
+        {
+            <div class="rec-screen-table-wrap" style="margin-top: 0;">
+                <div class="rec-screen-table-title"
+                     style="background: var(--color-titulo); color: white; padding: 6px 12px; border-radius: 4px 4px 0 0; font-size: 0.85rem; font-weight: 500;">
+                    Materiales ingresados
+                </div>
 
-            <table class="rec-screen-table">
-                <thead>
+                <table class="rec-screen-table"
+                       style="width: 100%; border: 1px solid var(--color-borde); border-top: none; border-collapse: collapse;">
+                    <thead style="background: #f1f1f1; border-bottom: 1px solid var(--color-borde);">
                     <tr>
-                        <th>Codigo etiqueta</th>
-                        <th>Denominacion</th>
-                        <th>Estado</th>
-                        <th>Cantidad</th>
-                        <th style="width:72px;"></th>
+                            <th style="width: 33.3%; padding: 8px; font-size: 0.8rem; color: #555; font-weight: 600; text-align: left;">Codigo etiqueta</th>
+                            <th style="padding: 8px; font-size: 0.8rem; color: #555; font-weight: 600; text-align: left;">Denominacion</th>
+                            <th style="padding: 8px; font-size: 0.8rem; color: #555; font-weight: 600; text-align: left;">Estado</th>
+                            <th style="padding: 8px; font-size: 0.8rem; color: #555; font-weight: 600; text-align: left;">Cantidad</th>
+                            <th style="width:72px;"></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="5" class="text-center text-muted">
-                            No hay detalles cargados.
-                        </td>
+                            <td colspan="5"
+                                style="text-align: center; padding: 20px; color: #999; font-size: 0.85rem;">
+                                No hay detalles cargados.
+                            </td>
                     </tr>
-                    <tr style="height:200px;">
+                    <tr style="height:150px;">
                         <td colspan="5"></td>
                     </tr>
                 </tbody>
@@ -145,33 +260,35 @@
         </div>
 
         <div class="rec-screen-table-wrap rec-wrap-detalle" style="margin-top:10px;">
+                <div style="padding: 10px; background: white; border: 1px solid var(--color-borde); border-radius: 4px;">
             <div class="p-3">
-                <table class="rec-screen-table rec-screen-table-entry mb-3">
-                    <thead>
-                        <tr>
-                            <th>Codigo Producto</th>
-                            <th>Material</th>
-                            <th>Codigo Reuso</th>
-                            <th>Revision</th>
-                            <th>Estado</th>
-                            <th>Cantidad</th>
-                            <th style="width:110px; display:none;">Accion</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><input class="form-control form-control-sm" disabled /></td>
-                            <td><input class="form-control form-control-sm" disabled /></td>
-                            <td><input class="form-control form-control-sm" disabled /></td>
-                            <td><input class="form-control form-control-sm" disabled /></td>
-                            <td><input class="form-control form-control-sm" disabled /></td>
-                            <td><input class="form-control form-control-sm" disabled /></td>
-                            <td style="display:none;"></td>
-                        </tr>
-                    </tbody>
+                 <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 33.3%; font-size: 0.75rem; color: #666; padding-bottom: 5px; text-align: left;">Codigo Producto</th>
+                                    <th style="font-size: 0.75rem; color: #666; padding-bottom: 5px; text-align: left;">Material</th>
+                                    <th style="font-size: 0.75rem; color: #666; padding-bottom: 5px; text-align: left;">Codigo Reuso</th>
+                                    <th style="font-size: 0.75rem; color: #666; padding-bottom: 5px; text-align: left;">Revision</th>
+                                    <th style="font-size: 0.75rem; color: #666; padding-bottom: 5px; text-align: left;">Estado</th>
+                                    <th style="font-size: 0.75rem; color: #666; padding-bottom: 5px; text-align: left;">Cantidad</th>
+                                    <th style="width:110px; display:none;">Accion</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input class="campo-detalle" style="width: 95%;" disabled /></td>
+                                    <td><input class="campo-detalle" style="width: 95%;" disabled /></td>
+                                    <td><input class="campo-detalle" style="width: 95%;" disabled /></td>
+                                    <td><input class="campo-detalle" style="width: 95%;" disabled /></td>
+                                    <td><input class="campo-detalle" style="width: 95%;" disabled /></td>
+                                    <td><input class="campo-detalle" style="width: 100%;" disabled /></td>
+                                    <td style="display:none;"></td>
+                                </tr>
+                            </tbody>
                 </table>
             </div>
         </div>
+       </div>
     }
 
     <form id="formEliminarDetalle" asp-action="EliminarDetalleMaterial" asp-controller="Recepcion" method="post" style="display:none;">
@@ -223,6 +340,17 @@
     
 
     <script>
+
+     document.addEventListener("DOMContentLoaded", function () {
+            const inputsAutoSave = document.querySelectorAll('.auto-save');
+            const btnOculto = document.getElementById('btnGuardarRecepcionOculto');
+
+            inputsAutoSave.forEach(input => {
+            input.addEventListener('change', function () {
+            if (btnOculto) btnOculto.click();
+         });
+       });
+     });
         document.addEventListener("DOMContentLoaded", function () {
 
             // setTimeout(function () {

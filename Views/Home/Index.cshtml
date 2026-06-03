@@ -1,15 +1,63 @@
 ﻿@{
-    ViewData["Title"] = "Página de Inicio";
+    var nombreCliente = "Hospital Cental de Mendoza";
+    var nombreServicio = "Servicio de Esterilización";
+    var desplazamientoHorizontal = "-50px"; // Cambia este valor para mover el contenido
 }
 
-<!-- Contenido principal -->
-<div class="text-center" style="margin-left: 200px;">
-    <h1 class="display-4">Bienvenido</h1>
-    <p>Aprende sobre <a href="https://learn.microsoft.com/aspnet/core">cómo construir aplicaciones web con ASP.NET Core</a>.</p>
-</div>
+<style>
+    .main-display-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 85vh;
+        width: 100%;
+        text-align: center;
+        overflow: hidden;
+        position: relative;
+        left: @desplazamientoHorizontal;
+    }
 
-<div style="padding: 20px;">
-    <form asp-action="ImprimirEtiqueta" method="post">
-        <button type="submit" class="btn btn-primary">Imprimir Etiqueta</button>
-    </form>
+    .nombre-cliente-display {
+        font-family: 'Century Gothic', sans-serif;
+        font-weight: normal;
+        font-size: 1.5rem;
+        color: #666;
+        text-decoration: underline;
+        margin-top: 10px;
+    }
+
+    .nombre-servicio-display {
+        font-family: 'Century Gothic', sans-serif;
+        font-size: 1.4rem;
+        color: #666;
+        margin-top: 5px;
+    }
+
+    .logo-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .logo-cliente {
+        max-width: 300px;
+    }
+
+    .logo-baxen-footer {
+        max-width: 180px;
+        margin-top: 5px;
+    }
+</style>
+
+<div id="mainContent" class="main-display-container">
+    <div class="logo-container">
+        <img src="~/img/Cliente - Logo.png" class="logo-cliente" alt="Logo Cliente">
+        <div>
+            <div class="nombre-cliente-display">@nombreCliente</div>
+            <div class="nombre-servicio-display">@nombreServicio</div>
+        </div>
+        <img src="~/img/BAXEN_Trazabilidad.png" class="logo-baxen-footer" alt="Baxen">
+    </div>
 </div>

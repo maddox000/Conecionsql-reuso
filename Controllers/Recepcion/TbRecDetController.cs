@@ -640,9 +640,13 @@ namespace ConexionSql.Controllers
                 }
 
                 texto = texto.Trim();
-
+                //controla materiales ocultos en denominacion
                 var materiales = _context.IbMat
-                    .Where(m => m.IB_MAT_DEN != null && m.IB_MAT_DEN.Contains(texto))
+                    .Where(m =>
+                        m.IB_MAT_DEN != null
+                        && m.IB_MAT_DEN.Contains(texto)
+                        && m.IB_MAT_OCU != true
+                    )
                     .OrderBy(m => m.IB_MAT_DEN)
                     .Take(20)
                     .Select(m => new
@@ -691,15 +695,36 @@ namespace ConexionSql.Controllers
                 int codigoNumerico = 0;
                 int.TryParse(codigo, out codigoNumerico);
 
+                if (codigoNumerico > 0)
+                {
+                    var materialOculto = _context.IbMat.FirstOrDefault(m =>
+                        m.IB_MAT_ID == codigoNumerico
+                        && m.IB_MAT_OCU == true
+                    );
+
+                    if (materialOculto != null)
+                    {
+                        return Json(new
+                        {
+                            ok = false,
+                            mensaje = "El material seleccionado se encuentra inhabilitado y no puede ser recepcionado."
+                        });
+                    }
+                }
+
                 // =========================================================
                 // 3) BUSCAR DIRECTO EN IB_MAT
                 //    a) por IB_MAT_ID
                 //    b) por IB_MAT_PR
                 // =========================================================
                 var material = _context.IbMat.FirstOrDefault(m =>
-                    (codigoNumerico > 0 && m.IB_MAT_ID == codigoNumerico)
-                    || m.IB_MAT_PR == codigo
-                || m.IB_MAT_DEN == codigo);
+                    (
+                        (codigoNumerico > 0 && m.IB_MAT_ID == codigoNumerico)
+                        || m.IB_MAT_PR == codigo
+                        || m.IB_MAT_DEN == codigo
+                    )
+                    && m.IB_MAT_OCU != true
+);
 
                 if (material != null)
                 {

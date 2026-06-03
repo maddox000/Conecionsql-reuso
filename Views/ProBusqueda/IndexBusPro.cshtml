@@ -5,18 +5,144 @@
 <link rel="stylesheet" href="~/css/busquedas-custom.css" />
 
 <style>
-    /* Ajustes específicos para esta vista */
-    #zonaResultados-wrapper {
-        margin-top: 15px !important;
+    /* =========================================
+               ESTILOS DEL NUEVO DISEÑO (MATERIALES/LAVADO)
+               ========================================= */
+    .campo-detalle {
+        height: 26px;
+        padding: 2px 8px;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        color: #333;
+        box-sizing: border-box;
+        width: 100%;
     }
 
-    #loader {
-        padding-top: 20px !important;
+        .campo-detalle:focus {
+            border-color: #34495e;
+            outline: none;
+        }
+
+    .campo-activo {
+        border: 1px solid #34495e !important;
+        background-color: #f8fbfd;
     }
 
-    #zonaResultados {
-        padding: 0 !important;
+    .label-detalle {
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: #666;
+        margin-bottom: 3px;
+        display: block;
     }
+
+    .ui-autocomplete {
+        z-index: 999999 !important;
+        background-color: #ffffff !important;
+        border: 1px solid #ccc !important;
+        border-radius: 4px;
+        max-height: 200px;
+        overflow-y: auto;
+        font-size: 0.75rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .ui-menu-item {
+        padding: 6px 10px;
+        border-bottom: 1px solid #f1f1f1;
+        color: #333;
+        cursor: pointer;
+    }
+
+    .ui-state-active {
+        background-color: #34495e !important;
+        color: white !important;
+        border: none !important;
+        margin: 0 !important;
+    }
+
+    .menu-operaciones-vertical {
+        background-color: #34495e;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        width: 220px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .btn-menu-vertical {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        color: white;
+        height: 45px;
+        padding: 0 15px;
+        text-align: left;
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .btn-menu-vertical:last-child {
+            border-bottom: none;
+        }
+
+        .btn-menu-vertical:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+    #zonaResultados,
+    #zonaResultados .table-responsive {
+        overflow: visible !important;
+    }
+
+        #zonaResultados table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            min-width: 1400px;
+            table-layout: auto;
+            text-align: left;
+        }
+
+        #zonaResultados th {
+            position: sticky;
+            top: 0;
+            background-color: #34495e;
+            color: white;
+            padding: 10px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            z-index: 10;
+            border-bottom: none;
+            border-right: 1px solid #576d82;
+        }
+
+            #zonaResultados th:last-child {
+                border-right: none;
+            }
+
+        #zonaResultados td {
+            border-bottom: 1px solid #eee;
+            padding: 10px;
+            font-size: 0.75rem;
+            color: #444;
+            white-space: nowrap;
+        }
+
+        #zonaResultados tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        #zonaResultados tbody tr:hover {
+            background-color: #f0f0f0 !important;
+        }
 
         #zonaResultados .alert-info {
             width: 100% !important;
@@ -30,84 +156,145 @@
             color: #1abc9c !important;
         }
 
-        #zonaResultados table {
-            width: 100% !important;
-            table-layout: auto;
-            margin: 0 !important;
+    #loader {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        z-index: 9999;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #34495e;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
         }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
 </style>
 
-<div class="container-fluid">
-    <div class="contenedor-titulo">
-        <h1 class="titulo-derecha">Búsqueda de procesos generales</h1>
+<div style="height: calc(100vh - 80px); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; padding: 0 10px;">
+    <div class="contenedor-titulo" style="flex-shrink: 0; padding-bottom: 5px; margin-bottom: 10px;">
+        <h1 class="titulo-derecha" style="margin: 0; font-size: 1.5rem; color: #34495e; font-weight: 400;">Búsqueda de procesos generales</h1>
     </div>
 
-    <div class="panel-filtros">
-        <div class="row">
-            @* COLUMNA 1: Fechas y Contador *@
-            <div class="col-12 col-md-6 col-lg-2">
-                <div class="form-group">
-                    <label>Fecha Inicio</label>
-                    <input type="date" id="FEC_INI" class="form-control" value="@ViewBag.FEC_INI" />
+    <form id="formBusquedaPro" style="flex-shrink: 0; display: flex; gap: 20px; padding: 15px 20px; background: white; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 15px;">
+            
+        @* COLUMNA 1: Fechas y Contador *@
+        <div style="width: 140px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0;">
+                <div>
+                    <label class="label-detalle">Fecha Inicio</label>
+                    <input type="date" id="FEC_INI" class="campo-detalle" value="@ViewBag.FEC_INI" />
                 </div>
-                <div class="form-group">
-                    <label>Fecha Fin</label>
-                    <input type="date" id="FEC_FIN" class="form-control" value="@ViewBag.FEC_FIN" />
+
+                <div>
+                    <label class="label-detalle">Fecha Fin</label>
+                    <input type="date" id="FEC_FIN" class="campo-detalle" value="@ViewBag.FEC_FIN" />
                 </div>
-                <div class="text-center">
-                    <span id="contador" class="badge-contador-grande" style="display:none;"></span>
+
+                <div style="margin-top: auto; padding-top: 5px;">
+                    <span id="contador-span"
+                          style="background-color: #34495e; color: white; padding: 6px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; display: inline-block;">
+                        Registros: <span id="lblContador">0</span>
+                    </span>
                 </div>
             </div>
 
             @* COLUMNA 2: Filtros de Programa *@
-            <div class="col-12 col-md-6 col-lg-3">
-                <div class="form-group">
-                    <label>Programa / PTI</label>
-                    <input type="text" id="BUS_PTI_DEN" class="form-control autocompletar"
-                           data-tabla="TB_PRO" data-campo="TB_PRO_PTI_DEN" placeholder="Nombre del programa..." />
+            <div style="flex: 1; min-width: 160px; display: flex; flex-direction: column; gap: 12px;">
+                <div>
+                    <label class="label-detalle">Tipo de proceso</label>
+                    <input type="text"
+                           id="BUS_PTI_DEN"
+                           name="BUS_PTI_DEN"
+                           class="campo-detalle autocompletar"
+                           data-tabla="TB_PRO"
+                           data-campo="TB_PRO_PTI_DEN"
+                           autocomplete="off"
+                           placeholder="Nombre del programa..." />
                 </div>
             </div>
-
+            
             @* COLUMNA 3: Filtros de Estado *@
-            <div class="col-12 col-md-6 col-lg-2">
-                <div class="form-group">
-                    <label>Estado del proceso</label>
-                    <input type="text" id="BUS_EST_DEN" class="form-control autocompletar"
-                           data-tabla="TB_PRO" data-campo="IB_PRO_EST_DEN" placeholder="Estado..." />
+            <div style="flex: 1; min-width: 160px; display: flex; flex-direction: column; gap: 12px;">
+                <div>
+                    <label class="label-detalle">Estado del proceso</label>
+                    <input type="text"
+                           id="BUS_EST_DEN"
+                           name="BUS_EST_DEN"
+                           class="campo-detalle autocompletar"
+                           data-tabla="TB_PRO"
+                           data-campo="IB_PRO_EST_DEN"
+                           autocomplete="off"
+                           placeholder="Estado..." />
                 </div>
             </div>
 
             @* COLUMNA 4: Espacio *@
-            <div class="col-12 col-md-6 col-lg-3"></div>
+            <div style="flex: 1.2;"></div>
 
             @* COLUMNA 5: Operaciones *@
-            <div class="col-12 col-md-6 col-lg-2 ml-auto">
-                <div class="menu-operaciones">
-                    <button class="btn-menu" onclick="Buscar()"><span class="material-icons">search</span> Buscar</button>
+            <div style="width: 160px; display: flex; flex-direction: column; flex-shrink: 0; margin-right: 50px;">
+                <div class="menu-operaciones-vertical">
 
-                    <div class="reporte-container">
-                        <button id="btnReporte" class="btn-menu" style="border-bottom:none">
-                            <span class="material-icons">description</span> Reporte
+                    <button type="button" id="btnBuscar" class="btn-menu-vertical" onclick="Buscar()">
+                        <span class="material-icons" style="font-size: 1.1rem;">search</span> Buscar
+                    </button>
+
+                    <button type="button" class="btn-menu-vertical" onclick="Limpiar()">
+                        <span class="material-icons" style="font-size: 1.1rem;">cleaning_services</span> Limpiar
+                    </button>
+
+                    <div style="display: flex; flex-direction: column; width: 100%;">
+                        <button type="button" class="btn-menu-vertical" id="btnReporte" style="width: 100%; justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <span class="material-icons" style="font-size: 1.1rem;">description</span> Reportes
+                            </div>
+                            <span class="material-icons" id="icono-desplegable" style="font-size: 1.1rem;">expand_more</span>
                         </button>
-                        <div class="opciones-reporte">
-                            <button class="btn-menu btn-pdf" onclick="GenerarReporte('pdf')"><span class="material-icons">picture_as_pdf</span> PDF</button>
-                            <button class="btn-menu btn-excel" onclick="GenerarReporte('excel')"><span class="material-icons">table_view</span> Excel</button>
+
+                        <div id="opciones-reporte" style="display: none; background-color: #243442; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <button type="button" class="btn-menu-vertical" style="width: 100%; padding-left: 30px; border-bottom: none;" onclick="GenerarReporte('pdf')">
+                                <span class="material-icons" style="font-size: 1.1rem;">picture_as_pdf</span> PDF
+                            </button>
+
+                            <button type="button" class="btn-menu-vertical" style="width: 100%; padding-left: 30px; border-bottom: none;" onclick="GenerarReporte('excel')">
+                                <span class="material-icons" style="font-size: 1.1rem;">table_view</span> Excel
+                            </button>
                         </div>
                     </div>
 
-                    <button class="btn-menu" onclick="Limpiar()"><span class="material-icons">cleaning_services</span> Limpiar</button>
-                    <button class="btn-menu" onclick="location.href='@Url.Action("Index", "Home")'"><span class="material-icons">logout</span> Cerrar</button>
+                    <button type="button" class="btn-menu-vertical" onclick="location.href='@Url.Action("Index", "Home")'">
+                        <span class="material-icons" style="font-size: 1.1rem;">logout</span> Cerrar
+                    </button>
+
                 </div>
             </div>
-        </div>
-    </div>
+    </form>
 
-    <div id="zonaResultados-wrapper" style="position:relative;">
-        <div id="loader">
-            <span class="brand-text">Baxen® Trazabilidad</span>
-            <div class="spinner"></div>
-            <span class="loading-text">Procesando búsqueda de procesos...</span>
-        </div>
+        <div id="zonaResultados-wrapper" style="flex: 1; overflow: auto; border: 1px solid #dcdcdc; border-radius: 4px; margin-bottom: 15px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: relative; padding: 0;">
+            <div id="loader">
+                <span style="margin-bottom: 10px; font-weight: 600; color: #34495e; font-size: 1.1em;">Baxen® Trazabilidad</span>
+                <div class="spinner"></div>
+                <span style="margin-top: 15px; color: #666; font-size: 0.9em; font-style: italic;">Procesando búsqueda de procesos...</span>
+            </div>
 
         <div id="zonaResultados">
             @* Carga inicial de la parcial *@
@@ -157,7 +344,7 @@
                         return $(this).find('td').length > 1;
                     }).length;
 
-                    $('#contador').html("Registros: " + filas).show();
+                    $('#lblContador').text(filas);
                 },
                 complete: function() { $('#loader').hide(); }
             });

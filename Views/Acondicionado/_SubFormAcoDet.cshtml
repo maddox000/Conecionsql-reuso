@@ -170,7 +170,11 @@
                 </button>
                 <button type="button" class="btn btn-outline-primary btn-sm">Nuevo</button>
                 <button type="button" class="btn btn-outline-primary btn-sm">Editar</button>
-                <button type="button" class="btn btn-secondary btn-sm">Cerrar</button>
+                <button type="button"
+                        id="btnCerrarModulo"
+                        class="btn btn-secondary btn-sm">
+                    Cerrar
+                </button>
             </div>
         </form>
         <div id="mensajeAco" class="mt-3"></div>
@@ -517,6 +521,27 @@
                         }
                     });
             }
+
+            document.getElementById("btnCerrarModulo")
+                ?.addEventListener("click", async function (e) {
+
+                e.preventDefault();
+
+                const tbProAcoId = parseInt(
+                    document.getElementById("tbProAcoIdHidden").value
+                );
+
+                if (!tbProAcoId || tbProAcoId <= 0) {
+                    window.location.href = "/";
+                    return;
+                }
+
+                await fetch(`/TbProAcoDet/CerrarProceso?tbProAcoId=${tbProAcoId}`, {
+                    method: "POST"
+                });
+
+                window.location.href = "/";
+            });
 
     </script>
 

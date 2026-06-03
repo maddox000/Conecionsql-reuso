@@ -103,6 +103,19 @@ Layout = null;
     <script>
             document.addEventListener("DOMContentLoaded", function () {
 
+            /* --- BÚSQUEDAS EN NUEVA PESTAÑA --- */
+            document.querySelectorAll(".link-busqueda").forEach(link => {
+                link.addEventListener("click", function (e) {
+                    e.preventDefault();
+
+                    const url = this.getAttribute("href");
+
+                    if (url && url !== "#") {
+                        window.open(url, "_blank");
+                    }
+                });
+            });
+
                 /* --- SUBMENÚS PRINCIPALES --- */
                 const botones = document.querySelectorAll(".toggle-submenu");
                 const submenus = document.querySelectorAll(".submenu");
@@ -343,13 +356,13 @@ Layout = null;
                     <i class="bi bi-search"></i> Búsqueda de datos
                 </button>
                 <ul class="submenu">
-                    <li><a href="/Materiales"><i class="bi bi-dash icon-guion"></i> Materiales</a></li>
+                    
                     
                     <li><a href="#" id="btnBusquedaRecepciones"><i class="bi bi-dash icon-guion"></i> Recepciones</a></li>
 
                     <li class="submenu-extra">
-                        <a href="/BusRec/Index">Búsqueda recepciones</a>
-                        <a href="/RecDetBusqueda/Index">Búsqueda materiales recibidos</a>
+                        <a href="/BusRec/Index" class="link-busqueda">Búsqueda recepciones</a>
+                        <a href="/RecDetBusqueda/Index" class="link-busqueda">Búsqueda materiales recibidos</a>
                     </li>
                     
                     <li><a href="#" id="btnBusquedaProcesoMateriales"><i class="bi bi-dash icon-guion"></i> Proceso de materiales</a></li>
@@ -359,15 +372,15 @@ Layout = null;
 
                         <ul>
                             <li>
-                                <a href="/BusLavado/IndexLav">Búsqueda lavado</a>
+                                <a href="/BusLavado/IndexLav" class="link-busqueda">Búsqueda lavado</a>
                             </li>
 
                             <li>
-                                <a href="/BusLavadoDet/IndexLavDet">Búsqueda materiales lavados</a>
+                                <a href="/BusLavadoDet/IndexLavDet" class="link-busqueda">Búsqueda materiales lavados</a>
                             </li>
                         </ul>
 
-                        <a href="/BusAco/IndexAcondicionado">Acondicionado</a>
+                        <a href="/BusAco/IndexAcondicionado" class="link-busqueda">Acondicionado</a>
 
                         <a href="#">Control de instrumental</a>
 
@@ -375,11 +388,11 @@ Layout = null;
 
                         <ul>
                             <li>
-                                <a href="/BusPro/IndexProcesos">Búsqueda procesos</a>
+                                <a href="/BusPro/IndexProcesos" class="link-busqueda">Búsqueda procesos</a>
                             </li>
 
                             <li>
-                                <a href="/BusProDet/IndexProDet">Búsqueda materiales procesados</a>
+                                <a href="/BusProDet/IndexProDet" class="link-busqueda">Búsqueda materiales procesados</a>
                             </li>
                         </ul>
 
