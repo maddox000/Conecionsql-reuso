@@ -1,0 +1,56 @@
+﻿@model List<ConexionSql.Models.SP_Busquedas.Bus_EntDetDto>
+
+<table>
+    <thead>
+        <tr>
+            <th>Entrega</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Sector</th>
+            <th>Denominación / Material</th>
+            <th>Tipo Material</th>
+            <th>Código de reúso</th>
+            <th>Paciente</th>
+            <th>Proveedor</th>
+            <th>Remito</th>
+            <th class="text-right">Cantidad</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Count > 0)
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td ondblclick="window.location.href='/Entrega/ConsultaEntrega?tbEntId=@item.TB_ENT_ID'"
+                        style="font-weight: bold; color: #2c3e50; cursor:pointer;">
+                        @item.TB_ENT_ID
+                    </td>
+                    <td>@(item.TB_ENT_FEC.HasValue? item.TB_ENT_FEC.Value.ToString("dd/MM/yyyy") : "")</td>
+                    <td>@(item.TB_ENT_HOR_INI.HasValue? item.TB_ENT_HOR_INI.Value.ToString(@"hh\:mm") : "-")</td>
+                    <td>@(item.TB_ENT_HOR_FIN.HasValue? item.TB_ENT_HOR_FIN.Value.ToString(@"hh\:mm") : "-")</td>
+                    <td>@item.TB_ENT_SEC_DEN</td>
+                    <td>@item.TB_ENT_DET_REC_DET_MAT_DEN</td>
+                    <td>@item.TB_ENT_DET_REC_DET_MAT_TIP_DEN</td>
+                    <td>@(item.TB_ENT_DET_REC_DET_REU_ID.HasValue? item.TB_ENT_DET_REC_DET_REU_ID.Value.ToString() : "-")</td>
+                    <td>@item.TB_ENT_DET_REC_DET_PAC</td>
+                    <td>@item.TB_REC_DET_PRO_NOM</td>
+                    <td>@item.TB_REC_DET_REM</td>
+                    <td style="text-align: right; font-weight: 500;">@(item.TB_ENT_DET_CANT.HasValue? item.TB_ENT_DET_CANT.Value.ToString("N2") : "")</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="12" style="text-align: center;">No se encontraron registros en el rango especificado.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    function verDetalleEntrega(tbEntId) {
+        window.location.href = '/Entrega/ConsultaEntrega?tbEntId=' + tbEntId;
+    }
+</script>

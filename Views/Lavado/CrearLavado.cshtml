@@ -360,6 +360,7 @@
 
             const tipoLavadoId = parseInt(this.value) || 0;
             const esManual = tipoLavadoId === 4;
+            const requiereEquipo = tipoLavadoId === 2 || tipoLavadoId === 5;
 
             const comboEquipo = document.getElementById("EquipoId");
             const comboCiclo = document.getElementById("TipoCicloId");
@@ -386,7 +387,17 @@
             comboCiclo.innerHTML = '<option value="">-- Cargando ciclos... --</option>';
 
             const resp = await fetch(`/Lavado/ObtenerEquiposPorTipo`);
-            const data = await resp.json();
+                const data = await resp.json();
+
+                if (requiereEquipo && data.length === 0) {
+
+                    alert("No hay lavadoras configuradas. Debe utilizar lavado manual.");
+
+                    this.value = "4";
+                    this.dispatchEvent(new Event("change"));
+
+                    return;
+                }
 
             comboEquipo.innerHTML = '<option value="">-- Seleccionar equipo --</option>';
             data.forEach(e => {

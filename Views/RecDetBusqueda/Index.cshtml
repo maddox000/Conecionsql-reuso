@@ -1,234 +1,363 @@
 ﻿@model List<ConexionSql.Models.SP_Busquedas.RecDetBusquedaDto>
 
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<link rel="stylesheet" href="~/css/busquedas-custom.css" />
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="~/css/busquedas-custom.css" />
 
 <style>
-    .panel-filtros {
-        height: 270px !important;
-        padding: 15px 25px !important;
-        margin-bottom: 10px !important;
-        background: #fff;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
+    .campo-detalle {
+        height: 26px;
+        padding: 2px 8px;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        color: #333;
+        box-sizing: border-box;
+        width: 100%;
     }
 
-    #zonaResultados {
-        display: block !important;
-        width: 100% !important;
-        height: auto !important;
-        min-height: 100px;
-        max-height: 1000px;
-        overflow: auto !important;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        background: #fff;
-        margin-top: 10px;
-        padding: 20px;
+        .campo-detalle:focus {
+            border-color: #34495e;
+            outline: none;
+        }
+
+    .campo-activo {
+        border: 1px solid #34495e !important;
+        background-color: #f8fbfd;
     }
 
-    .table-estadistica {
-        width: 100% !important;
+    .label-detalle {
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: #666;
+        margin-bottom: 3px;
+        display: block;
+    }
+
+    .ui-autocomplete {
+        z-index: 999999 !important;
+        background-color: #ffffff !important;
+        border: 1px solid #ccc !important;
+        border-radius: 4px;
+        max-height: 200px;
+        overflow-y: auto;
+        font-size: 0.75rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .ui-menu-item {
+        padding: 6px 10px;
+        border-bottom: 1px solid #f1f1f1;
+        color: #333;
+        cursor: pointer;
+    }
+
+    .ui-state-active {
+        background-color: #34495e !important;
+        color: white !important;
+        border: none !important;
+        margin: 0 !important;
+    }
+
+    .menu-operaciones-vertical {
+        background-color: #34495e;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        width: 220px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .btn-menu-vertical {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        color: white;
+        height: 45px;
+        padding: 0 15px;
+        text-align: left;
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .btn-menu-vertical:last-child {
+            border-bottom: none;
+        }
+
+        .btn-menu-vertical:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+    #zonaResultados table {
         border-collapse: separate;
         border-spacing: 0;
+        width: 100%;
+        min-width: 1200px;
         table-layout: auto;
+        text-align: left;
     }
 
-        .table-estadistica thead th {
-            position: sticky !important;
-            top: 0 !important;
-            background-color: #2c3e50 !important;
-            color: #ffffff !important;
-            z-index: 10;
-            padding: 8px 12px;
-            font-size: 0.85rem !important;
-            border: 1px solid #3e4f5f !important;
-            white-space: nowrap;
-            text-align: center;
+    #zonaResultados th {
+        position: sticky;
+        top: 0;
+        background-color: #34495e;
+        color: white;
+        padding: 10px;
+        font-weight: 500;
+        font-size: 0.75rem;
+        z-index: 10;
+        border-bottom: none;
+        border-right: 1px solid #576d82;
+    }
+
+        #zonaResultados th:last-child {
+            border-right: none;
         }
 
-        .table-estadistica tbody td {
-            padding: 4px 12px !important;
-            font-size: 0.8rem !important;
-            color: #2c3e50 !important;
-            border: 1px solid #dee2e6 !important;
-            white-space: nowrap;
-        }
-
-        .table-estadistica tbody tr:nth-child(even) {
-            background-color: #e9ecef !important;
-        }
-
-    .border-right-strong {
-        border-right: 3px solid #2c3e50 !important;
+    #zonaResultados td {
+        border-bottom: 1px solid #eee;
+        padding: 10px;
+        font-size: 0.75rem;
+        color: #444;
+        white-space: nowrap;
     }
 
-    .border-left-strong {
-        border-left: 3px solid #2c3e50 !important;
+    #zonaResultados tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
     }
 
-    /* Estilo para resaltar campos con valor */
-    .form-control.con-valor {
-        border-color: #2980b9 !important;
-        background-color: #f0f7fc !important;
-        box-shadow: 0 0 0 0.2rem rgba(41, 128, 185, 0.25) !important;
+    #zonaResultados tbody tr:hover {
+        background-color: #f0f0f0 !important;
     }
 
-    /* Estilos Autocompletado */
-    .autocomplete-list {
+    #loader {
+        display: none;
         position: absolute;
-        z-index: 1000;
-        background: white;
-        border: 1px solid #ddd;
-        width: 90%;
-        max-height: 180px;
-        overflow-y: auto;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        list-style: none;
-        padding: 0;
-        margin: 0;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        z-index: 9999;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
 
-        .autocomplete-list li {
-            padding: 8px 12px;
-            cursor: pointer;
-            font-size: 0.85rem;
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #34495e;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
         }
 
-            .autocomplete-list li:hover, .autocomplete-list li.selected {
-                background-color: #2980b9 !important;
-                color: white !important;
-            }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
 </style>
 
-<div class="contenedor-titulo"><h1 class="titulo-derecha">Búsqueda de materiales recibidos</h1></div>
+<div style="height: calc(100vh - 80px); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; padding: 0 10px;">
 
-<div class="panel-filtros">
-    <div class="row" style="display: flex; flex-wrap: wrap;">
-        @* Bloque 1 *@
-        <div class="col-md-2">
-            <div class="form-group"><label>Fecha Inicio</label><input type="date" id="BUS_FEC_INI" class="form-control" value="@ViewBag.FEC_INI" /></div>
-            <div class="form-group"><label>Fecha Fin</label><input type="date" id="BUS_FEC_FIN" class="form-control" value="@ViewBag.FEC_FIN" /></div>
-            <div class="form-group"><label>Código Etiqueta</label><input type="text" id="BUS_CET" class="form-control" /></div>
-            <div class="text-left"><span id="contador" class="badge-contador-grande" style="display:none;"></span></div>
-        </div>
+    <div class="contenedor-titulo" style="flex-shrink: 0; padding-bottom: 5px; margin-bottom: 10px;">
+        <h1 class="titulo-derecha" style="margin: 0; font-size: 1.5rem; color: #34495e; font-weight: 400;">Búsqueda de materiales recibidos</h1>
+    </div>
 
-        @* Bloque 2 *@
-        <div class="col-md-3">
-            <div class="form-group"><label>Denominación</label><input type="text" id="BUS_DEN" class="form-control autocompletar" data-tabla="IB_MAT" data-campo="IB_MAT_DEN" autocomplete="off" /></div>
-            <div class="form-group"><label>Código Producto</label><input type="text" id="BUS_MAT_PR" class="form-control autocompletar" data-tabla="IB_MAT" data-campo="IB_MAT_PR" autocomplete="off" /></div>
-            <div class="form-group"><label>Código Reúso</label><input type="text" id="BUS_REU_ID" class="form-control autocompletar" data-tabla="TB_REU" data-campo="TB_REU_ID_FORM" autocomplete="off" /></div>
-        </div>
+    <div style="flex-shrink: 0; display: flex; gap: 15px; padding: 15px 20px; background: white; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 15px; flex-wrap: wrap;">
 
-        @* Bloque 3 *@
-        <div class="col-md-2">
-            <div class="form-group"><label>Sector Origen</label><input type="text" id="BUS_SEC_ORI" class="form-control autocompletar" data-tabla="IB_SEC" data-campo="IB_SEC_DEN" autocomplete="off" /></div>
-            <div class="form-group"><label>Sector Destino</label><input type="text" id="BUS_SEC_DES" class="form-control autocompletar" data-tabla="IB_SEC" data-campo="IB_SEC_DEN" autocomplete="off" /></div>
-            <div class="form-group"><label>Estado</label><input type="text" id="BUS_EST" class="form-control autocompletar" data-tabla="IB_MAT_EST_ING" data-campo="IB_MAT_EST_ING_DEN" autocomplete="off" /></div>
-        </div>
-
-        @* Bloque 4 *@
-        <div class="col-md-3">
-            <div class="form-group"><label>Paciente</label><input type="text" id="BUS_PAC" class="form-control autocompletar" data-tabla="TB_REC_DET" data-campo="TB_REC_DET_PAC" autocomplete="off" /></div>
-            <div class="form-group"><label>Profesional</label><input type="text" id="BUS_PRO" class="form-control autocompletar" data-tabla="IB_PRO" data-campo="IB_PRO_APE" autocomplete="off" /></div>
-            <div class="form-group"><label>Proveedor</label><input type="text" id="BUS_ORT_DEN" class="form-control autocompletar" data-tabla="IB_ORT" data-campo="IB_ORT_DEN" autocomplete="off" /></div>
-            <div class="row">
-                <div class="col-md-6"><label>Remito</label><input type="text" id="BUS_REM" class="form-control autocompletar" data-tabla="TB_REC_DET" data-campo="TB_REC_DET_REM" autocomplete="off" /></div>
-                <div class="col-md-6"><label>Fecha Procedimiento</label><input type="date" id="BUS_FEN" class="form-control" /></div>
+        <div style="width: 140px; display: flex; flex-direction: column; gap: 10px; flex-shrink: 0;">
+            <div>
+                <label class="label-detalle">Fecha Inicio</label>
+                <input type="date" id="BUS_FEC_INI" class="campo-detalle" value="@ViewBag.FEC_INI" />
+            </div>
+            <div>
+                <label class="label-detalle">Fecha Fin</label>
+                <input type="date" id="BUS_FEC_FIN" class="campo-detalle" value="@ViewBag.FEC_FIN" />
+            </div>
+            <div>
+                <label class="label-detalle">Código Etiqueta</label>
+                <input type="text" id="BUS_CET" class="campo-detalle" />
             </div>
         </div>
 
-        @* Bloque 5 *@
-        <div class="col-md-2 col-operaciones-container">
-            <div class="menu-operaciones">
-                <button id="btnBuscar" class="btn-menu" onclick="Buscar()"><span class="material-icons">search</span> Buscar</button>
-                <button id="btnReporte" class="btn-menu" onclick="Reporte()"><span class="material-icons">description</span> Reporte</button>
-                <button class="btn-menu" onclick="Limpiar()"><span class="material-icons">cleaning_services</span> Limpiar</button>
-                <button class="btn-menu" onclick="location.href='@Url.Action("Index", "Home")'"><span class="material-icons">logout</span> Cerrar</button>
+        <div style="flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 10px;">
+            <div>
+                <label class="label-detalle">Denominación</label>
+                <input type="text" id="BUS_DEN" class="campo-detalle autocompletar" data-tabla="IB_MAT" data-campo="IB_MAT_DEN" autocomplete="off" />
+            </div>
+            <div>
+                <label class="label-detalle">Código Producto</label>
+                <input type="text" id="BUS_MAT_PR" class="campo-detalle autocompletar" data-tabla="IB_MAT" data-campo="IB_MAT_PR" autocomplete="off" />
+            </div>
+            <div>
+                <label class="label-detalle">Código Reúso</label>
+                <input type="text" id="BUS_REU_ID" class="campo-detalle autocompletar" data-tabla="TB_REU" data-campo="TB_REU_ID_FORM" autocomplete="off" />
+            </div>
+        </div>
+
+        <div style="flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 10px;">
+            <div>
+                <label class="label-detalle">Sector Origen</label>
+                <input type="text" id="BUS_SEC_ORI" class="campo-detalle autocompletar" data-tabla="IB_SEC" data-campo="IB_SEC_DEN" autocomplete="off" />
+            </div>
+            <div>
+                <label class="label-detalle">Sector Destino</label>
+                <input type="text" id="BUS_SEC_DES" class="campo-detalle autocompletar" data-tabla="IB_SEC" data-campo="IB_SEC_DEN" autocomplete="off" />
+            </div>
+            <div>
+                <label class="label-detalle">Estado</label>
+                <input type="text" id="BUS_EST" class="campo-detalle autocompletar" data-tabla="IB_MAT_EST_ING" data-campo="IB_MAT_EST_ING_DEN" autocomplete="off" />
+            </div>
+        </div>
+
+        <div style="flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 10px;">
+            <div>
+                <label class="label-detalle">Paciente</label>
+                <input type="text" id="BUS_PAC" class="campo-detalle autocompletar" data-tabla="TB_REC_DET" data-campo="TB_REC_DET_PAC" autocomplete="off" />
+            </div>
+            <div>
+                <label class="label-detalle">Profesional</label>
+                <input type="text" id="BUS_PRO" class="campo-detalle autocompletar" data-tabla="IB_PRO" data-campo="IB_PRO_APE" autocomplete="off" />
+            </div>
+            <div>
+                <label class="label-detalle">Proveedor</label>
+                <input type="text" id="BUS_ORT_DEN" class="campo-detalle autocompletar" data-tabla="IB_ORT" data-campo="IB_ORT_DEN" autocomplete="off" />
+            </div>
+        </div>
+
+        <div style="flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 10px;">
+            <div>
+                <label class="label-detalle">Remito</label>
+                <input type="text" id="BUS_REM" class="campo-detalle autocompletar" data-tabla="TB_REC_DET" data-campo="TB_REC_DET_REM" autocomplete="off" style="width: 50%;" />
+            </div>
+            <div>
+                <label class="label-detalle">Fecha Proc.</label>
+                <input type="date" id="BUS_FEN" class="campo-detalle" style="width: 50%;" />
+            </div>
+
+            <div style="margin-top: 15px; padding-top: 5px; display: flex; justify-content: flex-start;">
+                <span id="contador" style="background-color: #34495e; color: white; padding: 6px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; display: none;">
+                    Resultados: 0
+                </span>
+            </div>
+        </div>
+
+        <div style="width: 160px; display: flex; flex-direction: column; flex-shrink: 0; margin-right: 50px;">
+            <div class="menu-operaciones-vertical">
+                <button id="btnBuscar" class="btn-menu-vertical" onclick="Buscar()">
+                    <span class="material-icons" style="font-size: 1.1rem;">search</span>
+                    Buscar
+                </button>
+                <button id="btnReporte" class="btn-menu-vertical" onclick="Reporte()">
+                    <span class="material-icons" style="font-size: 1.1rem;">description</span>
+                    Reporte
+                </button>
+                <button class="btn-menu-vertical" onclick="Limpiar()">
+                    <span class="material-icons" style="font-size: 1.1rem;">cleaning_services</span>
+                    Limpiar
+                </button>
+                <button class="btn-menu-vertical" onclick="location.href='@Url.Action("Index", "Home")'">
+                    <span class="material-icons" style="font-size: 1.1rem;">logout</span>
+                    Cerrar
+                </button>
             </div>
         </div>
     </div>
-</div>
 
-<div id="zonaResultados-wrapper" style="position:relative;">
-    <div id="loader">
-        <span style="margin-bottom: 10px; font-weight: normal; color: #2c3e50; font-size: 1.2em;">Baxen® Trazabilidad</span>
-        <div class="spinner"></div>
-        <span style="margin-top: 20px; color: #555; font-style: italic;">Buscando información solicitada...</span>
+    <div id="zonaResultados-wrapper" style="position:relative; flex-grow: 1; overflow-y: auto;">
+        <div id="loader">
+            <span style="margin-bottom: 10px; font-weight: normal; color: #2c3e50; font-size: 1.2em;">Baxen® Trazabilidad</span>
+            <div class="spinner"></div>
+            <span style="margin-top: 20px; color: #555; font-style: italic;">Buscando información solicitada...</span>
+        </div>
+        <div id="zonaResultados">@Html.Partial("_ResultadosRecDet", Model)</div>
     </div>
-    <div id="zonaResultados">@Html.Partial("_ResultadosRecDet", Model)</div>
 </div>
 
 @section Scripts {
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
         $(document).ready(function () {
-            $(document).on('input change', '.form-control', function() {
-                $(this).val() ? $(this).addClass('campo-activo') : $(this).removeClass('campo-activo');
-            }).trigger('change');
+        $(document).on('input change', '.campo-detalle', function() {
+        $(this).val() ? $(this).addClass('campo-activo') : $(this).removeClass('campo-activo');
+        }).trigger('change');
 
-            $(".autocompletar").each(function() {
-                var $el = $(this);
-                $el.autocomplete({
-                    source: function (request, response) {
-                        $.getJSON('@Url.Action("GetSugerencias", "RecDetBusqueda")', {
-                            term: request.term,
-                            campo: $el.data('campo'),
-                            tabla: $el.data('tabla')
-                        }, response);
-                    },
-                    minLength: 2
-                });
-            });
-            Buscar();
+        $(".autocompletar").each(function() {
+        var $el = $(this);
+        $el.autocomplete({
+        source: function (request, response) {
+        $.getJSON('@Url.Action("GetSugerencias", "RecDetBusqueda")', {
+        term: request.term,
+        campo: $el.data('campo'),
+        tabla: $el.data('tabla')
+        }, response);
+        },
+        minLength: 2
+        });
+        });
+        Buscar();
         });
 
         function Buscar() {
-            var datos = {
-                BUS_CET: $.trim($('#BUS_CET').val()),
-                BUS_FEC_INI: $('#BUS_FEC_INI').val(),
-                BUS_FEC_FIN: $('#BUS_FEC_FIN').val(),
-                BUS_DEN: $.trim($('#BUS_DEN').val()),
-                BUS_SEC_ORI: $.trim($('#BUS_SEC_ORI').val()),
-                BUS_SEC_DES: $.trim($('#BUS_SEC_DES').val()),
-                BUS_EST: $.trim($('#BUS_EST').val()),
-                BUS_MAT_PR: $.trim($('#BUS_MAT_PR').val()),
-                BUS_ORT_DEN: $.trim($('#BUS_ORT_DEN').val()),
-                BUS_PAC: $.trim($('#BUS_PAC').val()),
-                BUS_PRO: $.trim($('#BUS_PRO').val()),
-                BUS_REM: $.trim($('#BUS_REM').val()),
-                BUS_REU_ID: $.trim($('#BUS_REU_ID').val()),
-                BUS_FEN: $('#BUS_FEN').val()
-            };
+        var datos = {
+        BUS_CET: $.trim($('#BUS_CET').val()),
+        BUS_FEC_INI: $('#BUS_FEC_INI').val(),
+        BUS_FEC_FIN: $('#BUS_FEC_FIN').val(),
+        BUS_DEN: $.trim($('#BUS_DEN').val()),
+        BUS_SEC_ORI: $.trim($('#BUS_SEC_ORI').val()),
+        BUS_SEC_DES: $.trim($('#BUS_SEC_DES').val()),
+        BUS_EST: $.trim($('#BUS_EST').val()),
+        BUS_MAT_PR: $.trim($('#BUS_MAT_PR').val()),
+        BUS_ORT_DEN: $.trim($('#BUS_ORT_DEN').val()),
+        BUS_PAC: $.trim($('#BUS_PAC').val()),
+        BUS_PRO: $.trim($('#BUS_PRO').val()),
+        BUS_REM: $.trim($('#BUS_REM').val()),
+        BUS_REU_ID: $.trim($('#BUS_REU_ID').val()),
+        BUS_FEN: $('#BUS_FEN').val()
+        };
 
-            $.ajax({
-                url: '@Url.Action("Buscar", "RecDetBusqueda")',
-                type: 'POST',
-                data: datos,
-                timeout: 30000,
-                beforeSend: function() { $('#loader').css('display', 'flex'); },
-                success: function (html) {
-                    $('#zonaResultados').html(html);
-                    var num = $('#zonaResultados tbody tr').length;
-                    $('#contador').html("Registros: " + num).show();
-                },
-                error: function (xmlhttprequest, textstatus, message) {
-                    if (textstatus === "timeout") alert("Tiempo de espera agotado.");
-                    else console.error("Error en la búsqueda");
-                },
-                complete: function() { $('#loader').hide(); }
-            });
+        $.ajax({
+        url: '@Url.Action("Buscar", "RecDetBusqueda")',
+        type: 'POST',
+        data: datos,
+        timeout: 30000,
+        beforeSend: function() { $('#loader').css('display', 'flex'); },
+        success: function (html) {
+        $('#zonaResultados').html(html);
+        var num = $('#zonaResultados tbody tr').length;
+
+        $('#contador').html("Resultados: " + num).css('display', 'inline-block');
+        },
+        error: function (xmlhttprequest, textstatus, message) {
+        if (textstatus === "timeout") alert("Tiempo de espera agotado.");
+        else console.error("Error en la búsqueda");
+        },
+        complete: function() { $('#loader').hide(); }
+        });
         }
 
         function Reporte() { alert("Generando reporte..."); }
 
         function Limpiar() {
-            $('.form-control').val('').removeClass('campo-activo');
-            $('#BUS_FEC_INI').val('@ViewBag.FEC_INI');
-            $('#BUS_FEC_FIN').val('@ViewBag.FEC_FIN');
-            $('#contador').hide();
-            Buscar();
+        $('.campo-detalle').not('input[type="date"]').val('').removeClass('campo-activo');
+        $('#BUS_FEC_INI').val('@ViewBag.FEC_INI').addClass('campo-activo');
+        $('#BUS_FEC_FIN').val('@ViewBag.FEC_FIN').addClass('campo-activo');
+
+        $('#contador').hide();
+        Buscar();
         }
     </script>
 }

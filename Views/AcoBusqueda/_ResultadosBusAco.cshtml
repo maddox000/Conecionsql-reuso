@@ -19,7 +19,8 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td style="font-weight: bold; color: #2c3e50;">
+                    <td ondblclick="window.location.href='/AcoBusqueda/ConsultaAcondicionado?tbProAcoId=@item.TB_PRO_ACO_ID'"
+                        style="font-weight: bold; color: #2c3e50; cursor:pointer;">
                         @item.TB_PRO_ACO_ID
                     </td>
                     <td>
@@ -72,5 +73,9 @@ else
 
     <script>
         document.getElementById('lblContador').innerText = '0';
+
+        function verDetalleAco(tbProAcoId) {
+            window.location.href = '/AcoBusqueda/ConsultaAcondicionado?tbProAcoId=' + tbProAcoId;
+        }
     </script>
 }

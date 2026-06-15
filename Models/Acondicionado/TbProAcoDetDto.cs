@@ -82,5 +82,11 @@ namespace ConexionSql.Models.Acondicionado
         // TB_PRO_ACO_DET_MAT_ETI_DEN
         [Column("TB_PRO_ACO_DET_MAT_ETI_DEN")]
         public string? TbProAcoDetMatEtiDen { get; set; }
+
+        [Column("TB_PRO_ACO_DET_CANT_ELIM")]
+        public int? TbProAcoDetCantElim { get; set; }
+
+        [Column("TB_PRO_ACO_DET_DAT")]
+        public string? TbProAcoDetDat { get; set; }
     }
 }

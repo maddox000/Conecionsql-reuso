@@ -1,6 +1,7 @@
 ﻿using ConexionSql.Data;
 using ConexionSql.Models.Procesos;
 using ConexionSql.Models.Procesos.Controles;
+using ConexionSql.Models.Reuso;
 using ConexionSql.Utilidades;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -47,6 +48,7 @@ namespace ConexionSql.Controllers.Procesos
                         TB_PRO_DET_REC_DET_ID = d.TbProDetRecDetId ?? 0,
                         TB_PRO_DET_REC_DET_MAT_DEN = d.TbProDetRecDetMatDen,
                         TB_PRO_DET_CANT = d.TbProDetCant,
+                        TB_PRO_DET_EST_DEN = d.TbProDetEstDen,
                         TB_PRO_DET_PC_USR = d.TbProDetPcUsr,
                         TB_PRO_FEC = d.TbProFec
                     })
@@ -87,6 +89,65 @@ namespace ConexionSql.Controllers.Procesos
 
             if (cantidad > stock)
                 return Json(new { success = false, mensaje = $"❌ Stock insuficiente. Disponible: {stock}" });
+
+            // =========================================================
+            // VALIDAR Y PREPARAR ESTADO TB_REU PARA PROCESO
+            // =========================================================
+            TbReu? reusoActualizar = null;
+
+            if (!string.IsNullOrWhiteSpace(recDet.TbRecDetReuId) && recDet.TbRecDetReuId != "1")
+            {
+                reusoActualizar = await _context.TbReu
+                    .FirstOrDefaultAsync(x => x.TbReuIdForm == recDet.TbRecDetReuId);
+
+                if (reusoActualizar == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        mensaje = "❌ No se encontró el código de reuso asociado a la etiqueta."
+                    });
+                }
+
+                int sectorReusoId = reusoActualizar.TbReuSecId ?? 0;
+                int estadoActualReusoId = reusoActualizar.TbReuEstIngId ?? 0;
+
+                // HMD
+                if (sectorReusoId == 905)
+                {
+                    if (estadoActualReusoId != 133)
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            mensaje = $"El código de reuso se encuentra en etapa {reusoActualizar.TbReuEstIngDen}. No corresponde a Proceso."
+                        });
+                    }
+
+                    reusoActualizar.TbReuEstIngId = 24;
+                    reusoActualizar.TbReuEstIngDen = "CE - Registrado en proceso.";
+                    reusoActualizar.TbReuEstIngFec = DateTime.Now;
+                }
+
+                // CCV / Farmacia
+                else if (sectorReusoId == 929 || sectorReusoId == 936)
+                {
+                    if (estadoActualReusoId != 19)
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            mensaje = $"El código de reuso se encuentra en etapa {reusoActualizar.TbReuEstIngDen}. No corresponde a Proceso."
+                        });
+                    }
+
+                    reusoActualizar.TbReuEstIngId = 20;
+                    reusoActualizar.TbReuEstIngDen = "CE - Registrado en proceso.";
+                    reusoActualizar.TbReuEstIngFec = DateTime.Now;
+                }
+            }
+
+            //termina estados de reusos
 
             recDet.TbRecDetProStock = stock - cantidad;
             recDet.TbRecDetProTot = (recDet.TbRecDetProTot ?? 0) + cantidad;
@@ -207,6 +268,7 @@ namespace ConexionSql.Controllers.Procesos
                     TB_PRO_DET_REC_DET_PRO_STOCK = d.TbProDetRecDetProStock,
 
                     TB_PRO_DET_CANT = d.TbProDetCant,
+                    TB_PRO_DET_EST_DEN = d.TbProDetEstDen,
                     TB_PRO_DET_PC_USR = d.TbProDetPcUsr,
                     TB_PRO_FEC = d.TbProFec
                 })
@@ -237,6 +299,17 @@ namespace ConexionSql.Controllers.Procesos
                 return Json(new { success = false, mensaje = "❌ Etiqueta no encontrada." });
 
             int sinProcesar = recDet.TbRecDetProStock ?? 0;
+
+            if (sinProcesar <= 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    mensaje = "❌ No hay stock disponible para Proceso.",
+                    autoInsertar = false,
+                    cantidadAuto = 0
+                });
+            }
 
             return Json(new
             {
@@ -305,6 +378,71 @@ namespace ConexionSql.Controllers.Procesos
                 return Json(new { success = false, mensaje = "No se encontró el proceso." });
 
             proceso.TbProHorFin = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true });
+        }
+
+        //elimina detalle
+
+        [HttpPost]
+        public async Task<IActionResult> EliminarDetalle([FromBody] int tbProDetId)
+        {
+            var detalle = await _context.TbProDet
+                .FirstOrDefaultAsync(x => x.TbProDetId == tbProDetId);
+
+            if (detalle == null)
+                return Json(new { success = false, mensaje = "Detalle no encontrado." });
+
+            if (detalle.TbProDetEstDen == "ELIMINADO" || (detalle.TbProDetCantElim ?? 0) > 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    mensaje = "Este material ya fue eliminado del proceso."
+                });
+            }
+
+
+
+            var recDet = await _context.TbRecDet
+                .FirstOrDefaultAsync(x => x.TbRecDetId == detalle.TbProDetRecDetId);
+
+            if (recDet == null)
+                return Json(new { success = false, mensaje = "No se encontró la etiqueta original." });
+
+            int cantidad = detalle.TbProDetCant ?? 0;
+
+            if (cantidad <= 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    mensaje = "La cantidad del detalle no es válida."
+                });
+            }
+
+            if ((recDet.TbRecDetEntStock ?? 0) < cantidad)
+            {
+                return Json(new
+                {
+                    success = false,
+                    mensaje = "No hay stock suficiente para revertir el proceso."
+                });
+            }
+
+
+
+            recDet.TbRecDetProStock = (recDet.TbRecDetProStock ?? 0) + cantidad;
+            recDet.TbRecDetProTot = (recDet.TbRecDetProTot ?? 0) - cantidad;
+            recDet.TbRecDetEntStock = (recDet.TbRecDetEntStock ?? 0) - cantidad;
+
+            detalle.TbProDetCantElim = cantidad;
+            detalle.TbProDetCantAbo = 0;
+            detalle.TbProDetEstId = 4;
+            detalle.TbProDetEstDen = "ELIMINADO";
+            detalle.TbProDetEstFec = DateTime.Now;
 
             await _context.SaveChangesAsync();
 

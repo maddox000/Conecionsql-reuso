@@ -4,8 +4,13 @@
 {
     foreach (var item in Model)
     {
-        <tr>
-            <td>@(item.TbProAcoDetRecDetId ?? 0)</td>
+        var estiloFila = item.TbProAcoDetDat == "ELIMINADO" ? "opacity:0.5;" : "";
+
+        <tr id="fila-aco-det-@item.TbProAcoDetId" style="@estiloFila">
+            <td ondblclick="window.location.href='/Traza/TrazaRecDetID/@(item.TbProAcoDetRecDetId ?? 0)'"
+                style="cursor:pointer;">
+                @(item.TbProAcoDetRecDetId ?? 0)
+            </td>
             <td>@(item.TbProAcoDetMatDen ?? "")</td>
             <td>@(item.TbProAcoDetSecDesDen ?? "")</td>
             <td>@(item.TbProAcoDetReuId?.ToString() ?? "")</td>
@@ -14,13 +19,22 @@
             <td>@(item.TbProAcoDetEmpTot ?? 0)</td>
             <td>@(item.TbProAcoDetEmpStock ?? 0)</td>
             <td>@(item.TbProAcoDetCant ?? 0)</td>
+            <td style="text-align:center;">
+                <button type="button"
+                        class="btn btn-link text-danger p-0 js-aco-eliminar-detalle"
+                        data-aco-det-id="@item.TbProAcoDetId"
+                        title="Eliminar"
+                    @(item.TbProAcoDetDat == "ELIMINADO" ? "disabled" : "")>
+                    <i class="bi bi-trash-fill"></i>
+                </button>
+            </td>
         </tr>
     }
 }
 else
 {
     <tr>
-        <td colspan="9" class="text-center text-muted">
+        <td colspan="10" class="text-center text-muted">
             ⚠️ No hay detalles cargados.
         </td>
     </tr>

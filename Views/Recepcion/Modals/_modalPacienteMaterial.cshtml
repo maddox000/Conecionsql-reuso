@@ -1,158 +1,149 @@
 ﻿<!-- MODAL REGISTRO DE PACIENTE -->
-<div class="modal fade"
-     id="modalPacienteMaterial"
-     tabindex="-1"
-     aria-labelledby="modalPacienteMaterialLabel"
-     aria-hidden="true"
-     data-bs-backdrop="static"
-     data-bs-keyboard="false">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content" style="border-radius: 14px; overflow: hidden;">
 
-            <div class="modal-header" style="background: #e9ecef;">
-                <h5 class="modal-title" id="modalPacienteMaterialLabel">DAT®8S Esterilizacion</h5>
-            </div>
+    <link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
 
-            <div class="modal-body" style="background: #f4f4f4;">
+    <div class="modal fade"
+         id="modalPacienteMaterial"
+         tabindex="-1"
+         aria-labelledby="modalPacienteMaterialLabel"
+         aria-hidden="true"
+         data-bs-backdrop="static"
+         data-bs-keyboard="false">
 
-                <div class="mb-3">
-                    <div style="background:#1f3b73; color:white; padding:8px 14px; border-radius:4px; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,.2);">
-                        Datos de registro de pacientes:
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 760px;">
+
+            <div class="modal-content" style="border-radius: 8px; overflow: hidden;">
+
+                <div class="rec-screen">
+
+                    <div class="rec-screen-banner" id="modalPacienteMaterialLabel">
+                        Registro de paciente
                     </div>
+
+                    <div class="rec-screen-panel">
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Código de reuso</div>
+                            <div class="rec-screen-v">
+                                <input type="text"
+                                       id="pacienteCodigoReuso"
+                                       class="form-control"
+                                       readonly
+                                       tabindex="-1"
+                                       data-reu-id="0" />
+                            </div>
+                        </div>
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Denominación</div>
+                            <div class="rec-screen-v">
+                                <input type="text"
+                                       id="pacienteDenominacion"
+                                       class="form-control"
+                                       readonly
+                                       tabindex="-1" />
+                            </div>
+                        </div>
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Recepción</div>
+                            <div class="rec-screen-v">
+                                <input type="text"
+                                       id="pacienteRecepcion"
+                                       class="form-control"
+                                       readonly
+                                       tabindex="-1" />
+                            </div>
+                        </div>
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Fecha</div>
+                            <div class="rec-screen-v">
+                                <input type="text"
+                                       id="pacienteFecha"
+                                       class="form-control"
+                                       readonly
+                                       tabindex="-1" />
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="rec-screen-panel" style="margin-top: 10px;">
+
+                        <div class="rec-screen-banner" style="margin-bottom: 10px;">
+                            Datos de registro de pacientes
+                        </div>
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Historia Clínica</div>
+                            <div class="rec-screen-v">
+                                <input type="text" id="pacienteHistoriaClinica" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Documento</div>
+                            <div class="rec-screen-v">
+                                <input type="text" id="pacienteDocumento" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Apellido</div>
+                            <div class="rec-screen-v">
+                                <input type="text" id="pacienteApellido" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Nombre</div>
+                            <div class="rec-screen-v">
+                                <input type="text" id="pacienteNombre" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Edad</div>
+                            <div class="rec-screen-v">
+                                <input type="number" id="pacienteEdad" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Obra Social</div>
+                            <div class="rec-screen-v">
+                                <input type="text" id="pacienteObraSocial" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="rec-screen-kv">
+                            <div class="rec-screen-k">Eliminar</div>
+                            <div class="rec-screen-v">
+                                <input type="checkbox" id="pacienteEliminar" class="form-check-input" />
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="rec-screen-actions" style="margin-top: 12px;">
+                        <button type="button" class="btn btn-primary px-4" id="btnGuardarPaciente">
+                            Guardar
+                        </button>
+
+                        <button type="button" class="btn btn-secondary px-4" id="btnCerrarModalPaciente" data-bs-dismiss="modal">
+                            Cerrar
+                        </button>
+                    </div>
+
                 </div>
 
-                <!-- DATOS DEL MATERIAL -->
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-md-4">
-                            <label class="form-label w-100 border px-2 py-1 bg-white">Código de reuso</label>
-                        </div>
-                        <div class="col-md-8">
-                            <input type="text"
-                                   id="pacienteCodigoReuso"
-                                   class="form-control-plaintext border-bottom px-2"
-                                   readonly
-                                   tabindex="-1"
-                                   data-reu-id="0" />
-                        </div>
-                    </div>
-
-                    <div class="row mb-2">
-                        <div class="col-md-4">
-                            <label class="form-label w-100 border px-2 py-1 bg-white">Denominación</label>
-                        </div>
-                        <div class="col-md-8">
-                            <input type="text"
-                                   id="pacienteDenominacion"
-                                   class="form-control-plaintext border-bottom px-2"
-                                   readonly
-                                   tabindex="-1" />
-                        </div>
-                    </div>
-
-                    <div class="row mb-2">
-                        <div class="col-md-4">
-                            <label class="form-label w-100 border px-2 py-1 bg-white">Recepción</label>
-                        </div>
-                        <div class="col-md-8">
-                            <input type="text"
-                                   id="pacienteRecepcion"
-                                   class="form-control-plaintext border-bottom px-2"
-                                   readonly
-                                   tabindex="-1" />
-                        </div>
-                    </div>
-
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <label class="form-label w-100 border px-2 py-1 bg-white">Fecha</label>
-                        </div>
-                        <div class="col-md-8">
-                            <input type="text"
-                                   id="pacienteFecha"
-                                   class="form-control-plaintext border-bottom px-2"
-                                   readonly
-                                   tabindex="-1" />
-                        </div>
-                    </div>
-
-                    <!-- DATOS DEL PACIENTE -->
-                    <div class="row mb-2">
-                        <div class="col-md-4">
-                            <label for="pacienteHistoriaClinica" class="form-label w-100 border px-2 py-1 bg-white">Historia Clínica</label>
-                        </div>
-                        <div class="col-md-8">
-                            <input type="text" id="pacienteHistoriaClinica" class="form-control" />
-                        </div>
-                    </div>
-
-                    <div class="row mb-2">
-                        <div class="col-md-4">
-                            <label for="pacienteDocumento" class="form-label w-100 border px-2 py-1 bg-white">Documento de paciente</label>
-                        </div>
-                        <div class="col-md-8">
-                            <input type="text" id="pacienteDocumento" class="form-control" />
-                        </div>
-                    </div>
-
-                    <div class="row mb-2">
-                        <div class="col-md-4">
-                            <label for="pacienteApellido" class="form-label w-100 border px-2 py-1 bg-white">Apellido</label>
-                        </div>
-                        <div class="col-md-8">
-                            <input type="text" id="pacienteApellido" class="form-control" />
-                        </div>
-                    </div>
-
-                    <div class="row mb-2">
-                        <div class="col-md-4">
-                            <label for="pacienteNombre" class="form-label w-100 border px-2 py-1 bg-white">Nombre</label>
-                        </div>
-                        <div class="col-md-8">
-                            <input type="text" id="pacienteNombre" class="form-control" />
-                        </div>
-                    </div>
-
-                    <div class="row mb-2">
-                        <div class="col-md-4">
-                            <label for="pacienteEdad" class="form-label w-100 border px-2 py-1 bg-white">Edad</label>
-                        </div>
-                        <div class="col-md-8">
-                            <input type="number" id="pacienteEdad" class="form-control" />
-                        </div>
-                    </div>
-
-                    <div class="row mb-2">
-                        <div class="col-md-4">
-                            <label for="pacienteObraSocial" class="form-label w-100 border px-2 py-1 bg-white">Obra Social</label>
-                        </div>
-                        <div class="col-md-8">
-                            <input type="text" id="pacienteObraSocial" class="form-control" />
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <label for="pacienteEliminar" class="form-label w-100 border px-2 py-1 bg-white">Eliminar</label>
-                        </div>
-                        <div class="col-md-8 d-flex align-items-center">
-                            <input type="checkbox" id="pacienteEliminar" class="form-check-input ms-2" />
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            <div class="modal-footer" style="background: #f4f4f4;">
-                <button type="button" class="btn btn-success px-4" id="btnGuardarPaciente">
-                    Guardar
-                </button>
-                <button type="button" class="btn btn-primary px-4" id="btnCerrarModalPaciente" data-bs-dismiss="modal">
-                    Cerrar
-                </button>
-            </div>
         </div>
+
     </div>
-</div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -262,6 +253,14 @@
                 }
             });
         }
+
+        //foco a HISTORIA_CLINICA clinica
+         modalEl.addEventListener("shown.bs.modal", function () {
+                setTimeout(() => {
+                    inputHistoria?.focus();
+                    inputHistoria?.select?.();
+                }, 100);
+            });
 
         if (modalEl) {
             modalEl.addEventListener("hidden.bs.modal", function () {

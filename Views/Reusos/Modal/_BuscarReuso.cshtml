@@ -1,37 +1,63 @@
-﻿<div id="modalBuscarReuso"
+﻿
+<link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
+
+<div id="modalBuscarReuso"
      style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:5000; align-items:center; justify-content:center;">
 
-    <div class="reu-screen-panel"
-         style="width:360px; padding:0; box-shadow:0 10px 30px rgba(0,0,0,.25); margin:auto; margin-top:10%;">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:480px;">
 
-        <div class="reu-screen-table-title">
-            Buscar código de reuso
-        </div>
+        <div class="modal-content" style="border-radius:8px; overflow:hidden;">
 
-        <div style="padding:0.75rem;">
+            <div class="rec-screen">
 
-            <div class="reu-screen-kv">
-                <div class="reu-screen-k">Código</div>
-                <div class="reu-screen-v">
-                    <input type="text"
-                           id="txtBuscarCodigoReuso"
-                           class="form-control"
-                           autocomplete="off" />
+                <div class="rec-screen-banner">
+                    Asignación de código de reuso
                 </div>
-            </div>
 
-            <div id="msgBuscarReuso" class="reu-screen-error" style="display:none;"></div>
+                <div class="rec-screen-panel">
 
-            <div class="reu-screen-actions" style="margin-top:0.75rem;">
-                <button type="button" class="btn btn-secondary" id="btnCerrarModalReuso">
-                    Cerrar
-                </button>
+                    <div style="padding:10px;">
+                        Ingrese el código de reuso que desea asignar.
+                    </div>
 
-                <button type="button" class="btn btn-primary" id="btnBuscarCodigoReuso">
-                    Buscar
-                </button>
+                    <div class="rec-screen-kv">
+                        <div class="rec-screen-k">Código de reuso</div>
+                        <div class="rec-screen-v">
+                            <input type="text"
+                                   id="txtBuscarCodigoReuso"
+                                   class="form-control"
+                                   autocomplete="off" />
+                        </div>
+                    </div>
+
+                    <div id="msgBuscarReuso"
+                         class="text-danger"
+                         style="display:none; margin-top:10px;">
+                    </div>
+
+                </div>
+
+                <div class="rec-screen-actions" style="margin-top:12px;">
+
+                    <button type="button"
+                            class="btn btn-primary"
+                            id="btnBuscarCodigoReuso">
+                        Abrir
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            id="btnCerrarModalReuso">
+                        Cerrar
+                    </button>
+
+                </div>
+
             </div>
 
         </div>
+
     </div>
+
 </div>

@@ -1,0 +1,495 @@
+﻿@model ConexionSql.Models.SP_Busquedas.SP_BusRecDetDisp.BusRecDetDispRequest
+
+@{
+    ViewData["Title"] = "";
+}
+
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="~/css/busquedas-custom.css" />
+
+<style>
+    /* Anula el margen del contenedor padre de ASP.NET */
+    .container, main, .pb-3 {
+        max-width: 100% !important;
+        padding-left: 0 !important;
+        margin-left: 20 !important;
+    }
+
+    .campo-detalle {
+        height: 26px;
+        padding: 2px 8px;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        color: #333;
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+        .campo-detalle:focus {
+            border-color: #34495e;
+            outline: none;
+        }
+
+    .campo-activo {
+        border: 1px solid #34495e !important;
+        background-color: #f8fbfd;
+    }
+
+    .label-detalle {
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: #666;
+        margin-bottom: 3px;
+        display: block;
+    }
+
+    .ui-autocomplete {
+        z-index: 999999 !important;
+        background-color: #ffffff !important;
+        border: 1px solid #ccc !important;
+        border-radius: 4px;
+        max-height: 200px;
+        overflow-y: auto;
+        font-size: 0.75rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .ui-menu-item {
+        padding: 6px 10px;
+        border-bottom: 1px solid #f1f1f1;
+        color: #333;
+        cursor: pointer;
+    }
+
+    .ui-state-active {
+        background-color: #34495e !important;
+        color: white !important;
+        border: none !important;
+        margin: 0 !important;
+    }
+
+    .menu-operaciones-vertical {
+        background-color: #34495e;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        /* LE SACAMOS EL OVERFLOW: HIDDEN PARA QUE NO CORTE LOS BOTONES FLOTANTES */
+        width: 220px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .btn-menu-vertical {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        color: white;
+        height: 45px;
+        padding: 0 15px;
+        text-align: left;
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .btn-menu-vertical:last-child {
+            border-bottom: none;
+        }
+
+        .btn-menu-vertical:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+    /* MAGIA DEL SUBMENÚ FLOTANTE */
+    .grupo-reporte {
+        position: relative; /* Define el punto de anclaje */
+    }
+
+    .sub-menu-hover {
+        display: none;
+        flex-direction: column;
+        position: absolute; /* Flota SOBRE los otros elementos */
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #2c3e50;
+        z-index: 100; /* Lo empuja hacia el frente */
+        border-radius: 4px;
+        box-shadow: -2px 4px 8px rgba(0,0,0,0.3);
+    }
+
+    .grupo-reporte:hover .sub-menu-hover {
+        display: flex; /* Se muestra al hacer hover en el contenedor */
+    }
+
+    .btn-submenu {
+        height: 45px; /* Mismo alto para que cubra perfecto */
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    #zonaResultados table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        min-width: 1200px;
+        table-layout: auto;
+        text-align: center;
+    }
+
+    #zonaResultados th {
+        position: sticky;
+        top: 0;
+        background-color: #34495e;
+        color: white;
+        padding: 10px;
+        font-weight: 500;
+        font-size: 0.75rem;
+        z-index: 10;
+        border-bottom: none;
+        border-right: 1px solid #576d82;
+    }
+
+        #zonaResultados th:last-child {
+            border-right: none;
+        }
+
+    #zonaResultados td {
+        border-bottom: 1px solid #eee;
+        padding: 10px;
+        font-size: 0.75rem;
+        color: #444;
+        white-space: nowrap;
+    }
+
+    #zonaResultados tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    #zonaResultados tbody tr:hover {
+        background-color: #f0f0f0 !important;
+    }
+
+    #loader {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        z-index: 9999;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #34495e;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* ... (MANTENÉ TODO TU CSS ORIGINAL AQUÍ) ... */
+
+    /* AGREGÁ ESTO AL FINAL DE TU STYLE PARA QUE EL PDF SALGA LIMPIO */
+    @@media print {
+        .contenedor-titulo, .menu-operaciones-vertical, .sub-menu-hover, #btnBuscar, #btnReporte, #contador
+
+    {
+        display: none !important;
+    }
+
+    #zonaResultados-wrapper {
+        overflow: visible !important;
+        width: 100% !important;
+        padding: 0 !important;
+    }
+
+    #zonaResultados table {
+        min-width: 100% !important;
+        width: 50% !important;
+    }
+
+    }
+
+    /* FIX PARA EL SCROLL (para que no pise los títulos) */
+    #zonaResultados-wrapper {
+        position: relative;
+        flex-grow: 1;
+        overflow-y: auto;
+        padding-right: 15px;
+        box-sizing: border-box;
+    }
+
+
+</style>
+
+<div style="height: calc(100vh - 80px); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; padding: 0 10px;">
+
+    <div class="contenedor-titulo" style="flex-shrink: 0; padding-bottom: 5px; margin-bottom: 10px; text-align: right;">
+        <h1 class="titulo-derecha" style="margin: 0; font-size: 1.5rem; color: #34495e; font-weight: 400;">@ViewBag.TituloBusqueda</h1>
+    </div>
+
+    <div style="flex-shrink: 0; display: flex; gap: 15px; padding: 15px 20px; background: white; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 15px; flex-wrap: wrap;">
+
+        <div style="width: 140px; display: flex; flex-direction: column; gap: 10px; flex-shrink: 0;">
+            <div>
+                <label class="label-detalle">Fecha Desde</label>
+                <input type="date" id="BUS_FEC_INI" class="campo-detalle" value="@ViewBag.FecIni" />
+            </div>
+            <div>
+                <label class="label-detalle">Fecha Hasta</label>
+                <input type="date" id="BUS_FEC_FIN" class="campo-detalle" value="@ViewBag.FecFin" />
+            </div>
+        </div>
+
+        <div style="flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 10px;">
+            <div>
+                <label class="label-detalle">Código etiqueta</label>
+                <input type="text" id="BUS_CET" class="campo-detalle" />
+            </div>
+            <div>
+                <label class="label-detalle">Denominación</label>
+                <input type="text" id="BUS_DENO" class="campo-detalle autocompletar" data-tabla="IB_MAT" data-campo="IB_MAT_DEN" autocomplete="off" />
+            </div>
+            <div>
+                <label class="label-detalle">Código Reúso</label>
+                <input type="text" id="BUS_REU_ID" class="campo-detalle autocompletar" data-tabla="TB_REU" data-campo="TB_REU_ID_FORM" autocomplete="off" />
+            </div>
+        </div>
+
+        <div style="flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 10px;">
+            <div>
+                <label class="label-detalle">Sector Origen</label>
+                <input type="text" id="BUS_SEC_ORI" class="campo-detalle autocompletar" data-tabla="IB_SEC" data-campo="IB_SEC_DEN" autocomplete="off" />
+            </div>
+            <div>
+                <label class="label-detalle">Sector Destino</label>
+                <input type="text" id="BUS_SEC_DES" class="campo-detalle autocompletar" data-tabla="IB_SEC" data-campo="IB_SEC_DEN" autocomplete="off" />
+            </div>
+        </div>
+
+        <div style="flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 10px;">
+            <div>
+                <label class="label-detalle">Etapa</label>
+                <select id="BUS_ETAPA" class="campo-detalle">
+                    <option value="">Todas</option>
+                    <option value="LAV">Lavado</option>
+                    <option value="DEC">Desinfección</option>
+                    <option value="TRA">Traslado</option>
+                    <option value="EMP">Acondicionado</option>
+                    <option value="PRO">Esterilizado</option>
+                    <option value="ENT">Entrega</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="flex: 1; min-width: 150px; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; gap: 10px; padding-bottom: 2px;">
+            <span id="contador" style="background-color: #34495e; color: white; padding: 6px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; display: none;">
+                Resultados: 0
+            </span>
+        </div>
+
+        <div style="width: 220px; display: flex; flex-direction: column; flex-shrink: 0;">
+            <div class="menu-operaciones-vertical">
+                <button type="button" id="btnBuscar" class="btn-menu-vertical" onclick="Buscar()">
+                    <span class="material-icons" style="font-size: 1.1rem;">search</span>
+                    Buscar
+                </button>
+
+                <div class="grupo-reporte">
+                    <button type="button" id="btnReporte" class="btn-menu-vertical">
+                        <span class="material-icons" style="font-size: 1.1rem;">description</span>
+                        Reporte
+                        <span class="material-icons" style="margin-left: auto; font-size: 1.1rem;">arrow_drop_down</span>
+                    </button>
+                    <div class="sub-menu-hover">
+                        <button type="button" class="btn-menu-vertical btn-submenu" onclick="ExportarExcel()">
+                            <span class="material-icons" style="font-size: 1.1rem; color: #2ecc71;">table_view</span>
+                            <span style="color: #2ecc71;">Excel</span>
+                        </button>
+                        @* <button type="button" class="btn-menu-vertical btn-submenu" onclick="ExportarPDF()">
+                            <span class="material-icons" style="font-size: 1.1rem; color: #e74c3c;">picture_as_pdf</span>
+                            <span style="color: #e74c3c;">PDF</span>
+                        </button> *@
+                    </div>
+                </div>
+
+                <button type="button" class="btn-menu-vertical" onclick="Limpiar()">
+                    <span class="material-icons" style="font-size: 1.1rem;">cleaning_services</span>
+                    Limpiar
+                </button>
+                <button type="button" class="btn-menu-vertical" onclick="window.history.back()">
+                    <span class="material-icons" style="font-size: 1.1rem;">logout</span>
+                    Cerrar
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="zonaResultados-wrapper" style="position:relative; flex-grow: 1; overflow-y: auto; padding-right: 10px;">
+        <div id="loader">
+            <span style="margin-bottom: 10px; font-weight: normal; color: #2c3e50; font-size: 1.2em;">Baxen® Trazabilidad</span>
+            <div class="spinner"></div>
+            <span style="margin-top: 20px; color: #555; font-style: italic;">Procesando solicitud...</span>
+        </div>
+        <div id="zonaResultados">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código Etiqueta</th>
+                        <th>Denominación</th>
+                        <th>Origen</th>
+                        <th>Destino</th>
+                        <th class="text-center">Recibidos</th>
+                        <th class="text-center">Lavado</th>
+                        <th class="text-center">Desinfección</th>
+                        <th class="text-center">Traslado</th>
+                        <th class="text-center">Acondicionado</th>
+                        <th class="text-center">Esterilizado</th>
+                        <th class="text-center">Entrega</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(document).on('input change', '.campo-detalle', function() {
+                $(this).val() ? $(this).addClass('campo-activo') : $(this).removeClass('campo-activo');
+            }).trigger('change');
+
+            $(".autocompletar").each(function() {
+                var $el = $(this);
+                $el.autocomplete({
+                    source: function (request, response) {
+                        $.getJSON('@Url.Action("GetSugerencias", "RecDetBusqueda")', {
+                            term: request.term,
+                            campo: $el.data('campo'),
+                            tabla: $el.data('tabla')
+                        }, response);
+                    },
+                    minLength: 2
+                });
+            });
+        });
+
+        function ObtenerFiltros() {
+            return {
+                BusFecIni: $('#BUS_FEC_INI').val() || null,
+                BusFecFin: $('#BUS_FEC_FIN').val() || null,
+                BusSecOriDen: $.trim($('#BUS_SEC_ORI').val()) || null,
+                BusSecDesDen: $.trim($('#BUS_SEC_DES').val()) || null,
+                BusCet: $.trim($('#BUS_CET').val()) || null,
+                BusDeno: $.trim($('#BUS_DENO').val()) || null,
+                BusEtapa: $('#BUS_ETAPA').val() || null,
+                BusMatMtiId: @(ViewBag.FiltroMtiId ?? "null") // <-- Filtro dinámico atajado
+            };
+        }
+
+        async function Buscar() {
+            var datos = ObtenerFiltros();
+            $('#loader').css('display', 'flex');
+
+            try {
+                const response = await fetch('@Url.Action("Buscar", "Bus_RecDetDisp")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+
+                if(response.ok) {
+                    const data = await response.json();
+                    const body = $('#tablaBody').empty();
+
+                    data.forEach(item => {
+                        body.append(`<tr>
+                            <td>${item.codigoEtiqueta || ''}</td>
+                            <td>${item.denominacion || ''}</td>
+                            <td>${item.sectorOrigen || ''}</td>
+                            <td>${item.sectorDestino || ''}</td>
+                            <td class="text-center">${item.recibidos || 0}</td>
+                            <td class="text-center">${item.lavado || 0}</td>
+                            <td class="text-center">${item.desinfeccion || 0}</td>
+                            <td class="text-center">${item.traslado || 0}</td>
+                            <td class="text-center">${item.acondicionado || 0}</td>
+                            <td class="text-center">${item.esterilizado || 0}</td>
+                            <td class="text-center">${item.entrega || 0}</td>
+                        </tr>`);
+                    });
+
+                    $('#contador').html("Resultados: " + data.length).css('display', 'inline-block');
+
+                } else {
+                    console.error("Error HTTP:", response.status);
+                }
+            } catch(error) {
+                console.error("Error:", error);
+            } finally {
+                $('#loader').hide();
+            }
+        }
+
+         function ExportarExcel() {
+            var datos = ObtenerFiltros();
+            // Limpiamos los nulos para que la URL sea limpia
+            var queryString = Object.keys(datos)
+                .filter(key => datos[key] !== null && datos[key] !== "")
+                .map(key => key + '=' + encodeURIComponent(datos[key]))
+                .join('&');
+
+            window.open('@Url.Action("ExportarExcel", "Bus_RecDetDisp")?' + queryString, '_blank');
+        }
+
+        function ExportarPDF() {
+            var datos = ObtenerFiltros();
+            var queryString = Object.keys(datos)
+                .filter(key => datos[key] !== null && datos[key] !== "")
+                .map(key => key + '=' + encodeURIComponent(datos[key]))
+                .join('&');
+
+            window.print();
+        }
+
+        function Limpiar() {
+            $('.campo-detalle').not('input[type="date"]').val('').removeClass('campo-activo');
+
+            var esProduccion = @(ViewBag.FiltroMtiId == 8 ? "true" : "false");
+            if (esProduccion) {
+                $('#BUS_FEC_INI').val('').removeClass('campo-activo');
+                $('#BUS_FEC_FIN').val('').removeClass('campo-activo');
+            } else {
+                $('#BUS_FEC_INI').val('@DateTime.Today.ToString("yyyy-MM-dd")').addClass('campo-activo');
+                $('#BUS_FEC_FIN').val('@DateTime.Today.ToString("yyyy-MM-dd")').addClass('campo-activo');
+            }
+
+            $('#contador').hide();
+            $('#tablaBody').empty();
+            Buscar(); // Ejecuta la búsqueda limpia automáticamente
+        }
+    </script>
+}

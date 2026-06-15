@@ -148,6 +148,7 @@
                             <th>En proceso</th>
                             <th>Sin procesar</th>
                             <th>Cantidad</th>
+                            <th>Eliminar</th>
                         </tr>
                     </thead>
 
@@ -498,6 +499,54 @@
                         })
                         .catch(() => mostrarError("❌ Error inesperado."));
                 }
+
+                //eliminar detalle
+
+                document.addEventListener('click', async function (event) {
+
+                const btnEliminar = event.target.closest('.js-lav-eliminar-detalle');
+
+                if (!btnEliminar) return;
+
+                const idDetalle = parseInt(btnEliminar.dataset.lavDetId);
+
+                if (!idDetalle || idDetalle <= 0) return;
+
+                if (!confirm('¿Eliminar el material?')) return;
+
+                const response = await fetch('/TbProLavDet/EliminarDetalle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(idDetalle)
+                });
+
+                const json = await response.json();
+
+                if (!json.success) {
+                    alert(json.mensaje);
+                    return;
+                }
+
+                const fila = document.getElementById(`fila-lav-det-${idDetalle}`);
+
+                if (fila) {
+                    fila.style.opacity = '0.5';
+
+                    const boton = fila.querySelector('.js-lav-eliminar-detalle');
+
+                    if (boton) {
+                        boton.disabled = true;
+                        boton.style.pointerEvents = 'none';
+                    }
+                }
+
+                const totalCell = document.getElementById("cantidadTotal");
+                if (totalCell) {
+                    totalCell.innerText = json.total ?? 0;
+                }
+            });
 
                 // =========================
                 // CARGAR CONTROLES LAVADO

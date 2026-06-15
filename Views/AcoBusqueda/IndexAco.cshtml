@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<ConexionSql.Models.SP_Busquedas.BusAcoDto>
 @{
-    ViewData["Title"] = "Búsqueda de Acondicionado - Baxen";
+
 }
 
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -8,9 +8,17 @@
 <link rel="stylesheet" href="~/css/busquedas-custom.css" />
 
 <style>
+    /* Configuración del título */
+    .titulo-derecha {
+        font-size: 1.5rem; /* Puedes cambiar a 1rem, 2rem, 24px, etc. */
+        font-weight: normal; /* Puedes usar 'bold', 'normal', '600', 'lighter', etc. */
+        color: #34495e;
+        margin: 0 0 15px 0;
+    }
+
     /* =========================================
-               ESTILOS CLONADOS DE LISTADO DE EQUIPOS
-               ========================================= */
+                       ESTILOS CLONADOS DE LISTADO DE EQUIPOS
+                       ========================================= */
     .campo-detalle {
         height: 26px;
         padding: 2px 8px;
@@ -68,8 +76,8 @@
     }
 
     /* =========================================
-               ESTILOS DEL MENÚ VERTICAL
-               ========================================= */
+                       ESTILOS DEL MENÚ VERTICAL
+                       ========================================= */
     .menu-operaciones-vertical {
         background-color: #34495e;
         border-radius: 4px;
@@ -105,9 +113,8 @@
         }
 
     /* =========================================
-               CORRECCIÓN DEL SCROLL Y TÍTULOS (TABLA)
-               ========================================= */
-    /* Apagamos el scroll interno de Bootstrap para que lo maneje el contenedor general */
+                       CORRECCIÓN DEL SCROLL Y TÍTULOS (TABLA)
+                       ========================================= */
     #divResultadosAco,
     #divResultadosAco .table-responsive {
         overflow: visible !important;
@@ -192,8 +199,8 @@
 
 <div style="height: calc(100vh - 80px); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; padding: 0 10px;">
 
-    <div class="contenedor-titulo">
-        <h1 class="titulo-derecha">Búsqueda de Acondicionado</h1>
+    <div class="contenedor-titulo" style="flex-shrink: 0; padding-bottom: 5px; margin-bottom: 10px;">
+        <h1 class="titulo-derecha" style="margin: 0; font-size: 1.5rem; color: #34495e; font-weight: 400;">Búsqueda de acondicionado</h1>
     </div>
 
     <form id="formBusquedaAco" style="flex-shrink: 0; display: flex; gap: 20px; padding: 15px 20px; background: white; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 15px;">
@@ -219,7 +226,7 @@
         <div style="flex: 1.2; min-width: 240px; display: flex; flex-direction: column; gap: 12px;">
             <div style="display: flex; gap: 10px; width: 85%;">
                 <div style="flex: 1;"><label class="label-detalle">Sector Destino</label><input type="text" name="BUS_CET" class="campo-detalle" autocomplete="off" /></div>
-                <div style="flex: 1;"><label class="label-detalle">ID Sector</label><input type="text" name="BUS_SEC" class="campo-detalle" autocomplete="off" /></div>
+                <div style="flex: 1;"><label class="label-detalle">Sector</label><input type="text" name="BUS_SEC" class="campo-detalle" autocomplete="off" /></div>
             </div>
         </div>
 

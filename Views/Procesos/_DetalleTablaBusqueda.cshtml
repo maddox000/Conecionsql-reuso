@@ -22,7 +22,11 @@
             foreach (var item in Model)
             {
                 <tr>
-                    <td>@item.TB_PRO_DET_REC_DET_ID</td>
+                    @* <td>@item.TB_PRO_DET_REC_DET_ID</td> *@
+                    <td ondblclick="window.location.href='/Traza/TrazaRecDetID/@item.TB_PRO_DET_REC_DET_ID'"
+                        style="cursor:pointer;">
+                        @item.TB_PRO_DET_REC_DET_ID
+                    </td>
                     <td>@item.TB_PRO_DET_REC_DET_MAT_DEN</td>
                     <td>@item.TB_REC_SEC_DES_DEN</td>
                     <td>@item.TB_PRO_DET_REC_DET_REU_ID</td>

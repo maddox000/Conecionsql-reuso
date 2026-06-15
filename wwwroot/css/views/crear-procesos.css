@@ -177,6 +177,13 @@
         display: block;
     }
 
+
+.controles-is-active {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
 .proceso-materiales-wrap {
     border: 1px solid #d8dee2;
     border-radius: 0 6px 6px 6px;

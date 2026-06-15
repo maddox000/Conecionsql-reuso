@@ -14,19 +14,24 @@
     var hor = Model?.TbRecHorIni?.ToString("HH:mm") ?? DateTime.Now.ToString("HH:mm");
     var fechaHora = $"{fec} {hor}";
 
-    var usuarioLogueadoApe = ViewBag.UsuarioApe ?? "DA COSTA MARQUEZ";
-    var usuarioLogueadoNom = ViewBag.UsuarioNom ?? "HERNAN";
-    var usuarioCompleto = $"{usuarioLogueadoApe}, {usuarioLogueadoNom}";
-    var cargoUsuario = ViewBag.UsuarioCargo ?? "ENFERMERO/A";
+    var usuarioCompleto = Model?.TbRecId > 0
+    ? Model.TbRecPerNom
+    : ViewBag.UsuarioLogueado ?? "";
 
-    var personalSector = ViewBag.PersonalSector ?? "SIN ASIGNAR";
+    var cargoUsuario = Model?.TbRecId > 0
+    ? Model.TbRecPerCarDen
+    : ViewBag.CargoUsuario ?? "";
+
+    var personalSector = !string.IsNullOrWhiteSpace(Model?.TbRecSecPer)
+    ? Model.TbRecSecPer
+    : "SIN ASIGNAR";
     var proveedor = ViewBag.ProveedorOrt ?? "SIN PROVEEDOR";
 
     var totalRecibido = (Model?.TbRecCantTot ?? 0).ToString() + " unidades";
     var observaciones = Model?.TbRecObs ?? "";
 
     var sectorOrigenTexto = listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecOriId)?.IbSecDen ?? "";
-    var sectorDestinoTexto = listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecDesId)?.IbSecDen ?? "";
+    var sectorDestinoTexto = listaSectores?.FirstOrDefault(x => x.IbSecId == Model?.TbRecSecDesId)?.IbSecDesDen ?? "";
 }
 
 <link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
@@ -36,10 +41,10 @@
     :root {
         --ancho-mitad-izquierda: 40%;
         --ancho-campos-sectores: 400px;
-        --ancho-recuadro-imagen: 80%;
-        --margen-superior-grilla: -50px;
-        --gap-entre-filas: 12px;
-        --alto-campo: 28px;
+        --ancho-recuadro-imagen: 60%;
+        --margen-superior-grilla: -55px; /* Mueve el subform Materiales */
+        --gap-entre-filas: 8px;
+        --alto-campo: 24px;
         --color-borde: #dcdcdc;
         --color-fondo-blanco: #ffffff;
         --color-texto-valor: #333333;
@@ -95,7 +100,7 @@
         font-weight: 600;
         font-size: 0.75rem;
         color: var(--color-texto-label);
-        margin-bottom: 4px;
+        margin-bottom: 0px;
         display: block;
     }
 
@@ -109,45 +114,227 @@
         overflow-y: auto;
         box-shadow: 0 4px 6px rgba(0,0,0,0.15);
     }
+
+    /* --- ESTILOS NUEVA BARRA DE BOTONES --- */
+    .barra-botones {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        justify-content: flex-end;
+    }
+
+    .btn-baxen {
+        padding: 6px 16px;
+        background-color: var(--color-titulo);
+        color: #ffffff;
+        border: 1px solid var(--color-titulo);
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .btn-baxen:hover {
+            background-color: #2c3e50;
+        }
+
+    .btn-baxen-outline {
+        background-color: transparent;
+        color: var(--color-titulo);
+    }
+
+        .btn-baxen-outline:hover {
+            background-color: var(--color-titulo);
+            color: #ffffff;
+        }
+
+    /* --- EFECTO HOVER IMPRIMIR SUPERPUESTO --- */
+    .dropdown-imprimir {
+        position: relative;
+        display: inline-block;
+        width: 100px;
+    }
+
+    #btnImprimirPrincipal {
+        width: 100%;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--color-titulo);
+        border-radius: 4px;
+        z-index: 1000;
+        overflow: hidden;
+    }
+
+    .dropdown-imprimir:hover .dropdown-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .dropdown-content button {
+        width: 100%;
+        text-align: center;
+        padding: 6px 0;
+        border: none;
+        background: transparent;
+        font-size: 0.85rem;
+        color: #ffffff;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+        .dropdown-content button:hover {
+            background-color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .dropdown-content button:first-child {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+    /* 🔥 ESTILOS PARA IMPRESIÓN 🔥 */
+    #encabezado-impresion, #pie-impresion {
+        display: none;
+    }
+
+    @@media print {
+        @@page {
+            margin: 10mm; /* Elimina la URL y fecha automática del navegador */
+        }
+
+        body * {
+            visibility: hidden; /* Oculta barras laterales y menú del sistema */
+        }
+
+        .rec-screen, .rec-screen * {
+            visibility: visible;
+        }
+
+        .rec-screen {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        /* Mostrar encabezados y pie personalizados */
+        #encabezado-impresion {
+            display: flex !important;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--color-titulo);
+            padding-bottom: 10px;
+        }
+
+        #pie-impresion {
+            display: flex !important;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+            font-size: 12px;
+            color: #555;
+            background: white;
+        }
+
+            #pie-impresion img {
+                max-height: 40px;
+            }
+
+        #encabezado-impresion img {
+            max-height: 60px;
+        }
+        /* Ocultar cosas molestas para el papel */
+        #titulo-pantalla,
+        #caja-imagen-impresion,
+        .barra-botones,
+        form#formEliminarDetalle,
+        #formDetalle {
+            display: none !important;
+        }
+        /* Dejar la tabla y quitarle el margen negativo para que no se superponga */
+        #zona-grilla {
+            margin-top: 10px !important;
+            overflow: visible !important;
+            height: auto !important;
+            max-height: none !important;
+        }
+
+        #contenedor-subformulario {
+            display: block !important;
+        }
+
+        .baxen-panel {
+            box-shadow: none !important;
+            border: 1px solid #ccc !important;
+        }
+
+        .rec-screen-table-title,
+        .rec-screen-table thead,
+        .rec-screen-table thead tr {
+            background-color: #f2f2f2 !important;
+            color: #000 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .rec-screen-table th {
+            color: #000 !important;
+        }
+    }
 </style>
 
-<div class="rec-screen" style="padding: 0 10px; display: flex; flex-direction: column;">
+<div class="rec-screen" style="max-width: 1300px; margin: 0 auto; padding: 0 10px; display: flex; flex-direction: column;">
 
-    <div style="display: flex; justify-content: flex-end; padding-bottom: 5px; margin-bottom: 10px; flex-shrink: 0;">
+    <div id="encabezado-impresion">
+        <img src="~/img/LogoCliente.png" alt="Logo Cliente" />
+        <h2 style="margin:0; font-size:1.5rem; color:var(--color-titulo);">Recepción de materiales</h2>
+    </div>
+
+    <div id="titulo-pantalla" style="display: flex; justify-content: flex-end; padding-bottom: 5px; margin-bottom: 0px; flex-shrink: 0;">
         <h1 style="margin: 0; font-size: 1.5rem; color: var(--color-titulo); font-weight: 400;">Recepción de materiales</h1>
     </div>
 
-    <form asp-action="CrearRecepcion" method="post" style="margin-bottom: 0; flex: 0 0 auto;">
+    <form id="formCrearRecepcion" asp-action="CrearRecepcion" method="post" style="margin-bottom: 0; flex: 0 0 auto;">
         @Html.AntiForgeryToken()
 
         <div class="baxen-panel" style="display: flex; margin-bottom: 8px; align-items: stretch;">
 
             <div style="flex: 0 0 calc(var(--ancho-mitad-izquierda) - 10px); display: flex; flex-direction: column; gap: var(--gap-entre-filas); padding-right: 20px;">
-                <div style="display: flex; gap: 15px;">
-                    <div style="width: 140px;">
-                        <label class="label-detalle">Número de recepción</label>
-                        <div class="campo-detalle campo-centrado" style="width: 100%;">@numeroRecepcion</div>
-                    </div>
-                    <div style="width: 140px;">
-                        <label class="label-detalle">Fecha / Hora</label>
-                        <div class="campo-detalle campo-centrado" style="width: 100%;">@fechaHora</div>
-                    </div>
+
+                <div style="display: flex; align-items: center; width: 100%; gap: 10px;">
+                    <label class="label-detalle" style="width: 115px; flex-shrink: 0; text-align: right;">Número recepción</label>
+                    <div class="campo-detalle campo-centrado" style="width: 80px;">@numeroRecepcion</div>
+
+                    <label class="label-detalle" style="flex-shrink: 0;">Fecha / Hora</label>
+                    <div class="campo-detalle campo-centrado" style="flex: 1;">@fechaHora</div>
                 </div>
 
-                <div style="width: 295px;">
-                    <label class="label-detalle">Usuario</label>
-                    <div class="campo-detalle" style="width: 100%;" title="@usuarioCompleto">@usuarioCompleto</div>
-                </div>
-
-                <div style="width: 295px;">
-                    <div class="campo-detalle" style="font-weight: 500; width: 100%;" title="@cargoUsuario">
-                        @cargoUsuario
+                <div style="display: flex; align-items: flex-start; width: 100%; gap: 10px;">
+                    <label class="label-detalle" style="width: 115px; flex-shrink: 0; text-align: right; margin-top: 4px;">Usuario</label>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+                        <div class="campo-detalle" style="width: 100%;" title="@usuarioCompleto">@usuarioCompleto</div>
+                        <div class="campo-detalle" style="font-weight: 500; width: 100%;" title="@cargoUsuario">
+                            @cargoUsuario
+                        </div>
                     </div>
                 </div>
 
-                <div style="width: 295px; margin-top: auto; padding-top: 5px;">
-                    <label class="label-detalle">Total recibido</label>
-                    <div class="campo-detalle campo-centrado" style="font-weight: bold; background-color: #f8f9fa; border-color: #dcdcdc; width: 100%;">
+                <div style="display: flex; align-items: center; width: 100%; margin-top: auto; padding-top: 5px; gap: 10px;">
+                    <label class="label-detalle" style="width: 115px; flex-shrink: 0; text-align: right;">Total recibido</label>
+                    <div class="campo-detalle campo-centrado" style="width: 100px; font-weight: bold; background-color: #f8f9fa; border-color: #dcdcdc;">
                         @totalRecibido
                     </div>
                 </div>
@@ -156,51 +343,58 @@
             <div style="flex: 1; display: flex; gap: 20px; border-left: 1px solid #eeeeee; padding-left: 20px;">
 
                 <div style="width: var(--ancho-campos-sectores); display: flex; flex-direction: column; gap: var(--gap-entre-filas); flex-shrink: 0;">
-                    <div style="position: relative;">
-                        <label class="label-detalle">Sector Origen</label>
-                        <input type="text"
-                               id="TbRecSecOriBusqueda"
-                               class="campo-detalle"
-                               style="width: 100%; outline: none;"
-                               autocomplete="off"
-                               readonly="@cabeceraCreada"
-                               value="@sectorOrigenTexto" />
-                        <div id="listaSectoresOrigen" class="list-group list-group-flotante mt-1" style="display: none;"></div>
-                        <input type="hidden" asp-for="TbRecSecOriId" id="TbRecSecOriId" />
+                    <div style="display: flex; align-items: center; position: relative;">
+                        <label class="label-detalle" style="width: 110px; flex-shrink: 0;">Sector Origen</label>
+                        <div style="flex: 1; position: relative;">
+                            <input type="text"
+                                   id="TbRecSecOriBusqueda"
+                                   class="campo-detalle"
+                                   style="width: 100%; outline: none;"
+                                   autocomplete="off"
+                                   readonly="@cabeceraCreada"
+                                   value="@sectorOrigenTexto" />
+                            <div id="listaSectoresOrigen" class="list-group list-group-flotante mt-1" style="display: none;"></div>
+                            <input type="hidden" asp-for="TbRecSecOriId" id="TbRecSecOriId" />
+                        </div>
                     </div>
 
-                    <div style="position: relative;">
-                        <label class="label-detalle">Sector Destino</label>
-                        <input type="text"
-                               id="TbRecSecDesBusqueda"
-                               class="campo-detalle"
-                               style="width: 100%; outline: none;"
-                               autocomplete="off"
-                               readonly="@cabeceraCreada"
-                               value="@sectorDestinoTexto" />
-                        <div id="listaSectoresDestino" class="list-group list-group-flotante mt-1" style="display: none;"></div>
-                        <input type="hidden" asp-for="TbRecSecDesId" id="TbRecSecDesId" />
+                    <div style="display: flex; align-items: center; position: relative;">
+                        <label class="label-detalle" style="width: 110px; flex-shrink: 0;">Sector Destino</label>
+                        <div style="flex: 1; position: relative;">
+                            <input type="text"
+                                   id="TbRecSecDesBusqueda"
+                                   class="campo-detalle"
+                                   style="width: 100%; outline: none;"
+                                   autocomplete="off"
+                                   readonly="@cabeceraCreada"
+                                   value="@sectorDestinoTexto" />
+                            <div id="listaSectoresDestino" class="list-group list-group-flotante mt-1" style="display: none;"></div>
+                            <input type="hidden" asp-for="TbRecSecDesId" id="TbRecSecDesId" />
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="label-detalle">Personal del sector</label>
-                        <input type="text"
-                               id="PersonalSectorBusqueda"
-                               name="PersonalSectorBusqueda"
-                               class="campo-detalle"
-                               style="width: 100%; outline: none;"
-                               autocomplete="off"
-                               value="@personalSector" />
+                    <div style="display: flex; align-items: center;">
+                        <label class="label-detalle" style="width: 110px; flex-shrink: 0;">Personal sector</label>
+                        <div style="flex: 1;">
+                            <input type="text"
+                                   id="PersonalSectorBusqueda"
+                                   name="TbRecSecPer"
+                                   class="campo-detalle"
+                                   style="width: 100%; outline: none;"
+                                   autocomplete="off"
+                                   readonly="@cabeceraCreada"
+                                   value="@personalSector" />
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="label-detalle">Proveedor</label>
-                        <div class="campo-detalle" style="width: 100%;" title="@proveedor">@proveedor</div>
+                    <div style="display: flex; align-items: center;">
+                        <label class="label-detalle" style="width: 110px; flex-shrink: 0;">Proveedor</label>
+                        <div class="campo-detalle" style="flex: 1; width: 100%;" title="@proveedor">@proveedor</div>
                     </div>
                 </div>
 
-                <div style="flex: 1; display: flex; align-items: stretch; justify-content: flex-end;">
-                    <div style="width: var(--ancho-recuadro-imagen); background: white; border: 1px solid #ccc; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; min-height: 180px;">
+                <div id="caja-imagen-impresion" style="flex: 1; display: flex; align-items: stretch; justify-content: flex-end;">
+                    <div style="width: var(--ancho-recuadro-imagen); background: white; border: 1px solid #ccc; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; min-height: 150px;">
                         <div id="productoImagenContainer" style="text-align: center;">
                             <div style="color: #d8d8d8; font-size: 1.5rem; font-weight: bold; line-height: 1.1; letter-spacing: -1px; text-transform: lowercase;">imagen<br>no<br>disponible</div>
                         </div>
@@ -210,8 +404,8 @@
             </div>
         </div>
 
-        <div class="baxen-panel" style="margin-bottom: 0; padding: 12px 20px;">
-            <label class="label-detalle">Observaciones</label>
+        <div class="baxen-panel" style="margin-bottom: 0; padding: 4px 20px;">
+            <label class="label-detalle" style="margin-bottom: 4px;">Observaciones</label>
             <input type="text"
                    id="TbRecObs"
                    name="TbRecObs"
@@ -223,9 +417,8 @@
 
         <button type="submit" id="btnGuardarRecepcionOculto" style="display:none;">Guardar</button>
     </form>
-    <div style="flex: 1; overflow-y: auto; margin-top: var(--margen-superior-grilla);">
-    @* detalle *@
-        
+
+    <div id="zona-grilla" style="flex: 1; overflow-y: auto; margin-top: var(--margen-superior-grilla);">
         @if (Model == null || Model.TbRecId <= 0)
         {
             <div class="rec-screen-table-wrap" style="margin-top: 0;">
@@ -236,144 +429,177 @@
 
                 <table class="rec-screen-table"
                        style="width: 100%; border: 1px solid var(--color-borde); border-top: none; border-collapse: collapse;">
-                    <thead style="background: #f1f1f1; border-bottom: 1px solid var(--color-borde);">
-                    <tr>
-                            <th style="width: 33.3%; padding: 8px; font-size: 0.8rem; color: #555; font-weight: 600; text-align: left;">Codigo etiqueta</th>
-                            <th style="padding: 8px; font-size: 0.8rem; color: #555; font-weight: 600; text-align: left;">Denominacion</th>
-                            <th style="padding: 8px; font-size: 0.8rem; color: #555; font-weight: 600; text-align: left;">Estado</th>
-                            <th style="padding: 8px; font-size: 0.8rem; color: #555; font-weight: 600; text-align: left;">Cantidad</th>
+                    <thead style="background: var(--color-titulo); border-bottom: 1px solid var(--color-borde);">
+                        <tr>
+                            <th style="width: 33.3%; padding: 8px; font-size: 0.8rem; color: white; font-weight: 600; text-align: left;">Codigo etiqueta</th>
+                            <th style="padding: 8px; font-size: 0.8rem; color: white; font-weight: 600; text-align: left;">Denominacion</th>
+                            <th style="padding: 8px; font-size: 0.8rem; color: white; font-weight: 600; text-align: left;">Estado</th>
+                            <th style="padding: 8px; font-size: 0.8rem; color: white; font-weight: 600; text-align: left;">Cantidad</th>
                             <th style="width:72px;"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
                             <td colspan="5"
                                 style="text-align: center; padding: 20px; color: #999; font-size: 0.85rem;">
                                 No hay detalles cargados.
                             </td>
-                    </tr>
-                    <tr style="height:150px;">
-                        <td colspan="5"></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="rec-screen-table-wrap rec-wrap-detalle" style="margin-top:10px;">
-                <div style="padding: 10px; background: white; border: 1px solid var(--color-borde); border-radius: 4px;">
-            <div class="p-3">
-                 <table style="width: 100%; border-collapse: collapse;">
-                            <thead>
-                                <tr>
-                                    <th style="width: 33.3%; font-size: 0.75rem; color: #666; padding-bottom: 5px; text-align: left;">Codigo Producto</th>
-                                    <th style="font-size: 0.75rem; color: #666; padding-bottom: 5px; text-align: left;">Material</th>
-                                    <th style="font-size: 0.75rem; color: #666; padding-bottom: 5px; text-align: left;">Codigo Reuso</th>
-                                    <th style="font-size: 0.75rem; color: #666; padding-bottom: 5px; text-align: left;">Revision</th>
-                                    <th style="font-size: 0.75rem; color: #666; padding-bottom: 5px; text-align: left;">Estado</th>
-                                    <th style="font-size: 0.75rem; color: #666; padding-bottom: 5px; text-align: left;">Cantidad</th>
-                                    <th style="width:110px; display:none;">Accion</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><input class="campo-detalle" style="width: 95%;" disabled /></td>
-                                    <td><input class="campo-detalle" style="width: 95%;" disabled /></td>
-                                    <td><input class="campo-detalle" style="width: 95%;" disabled /></td>
-                                    <td><input class="campo-detalle" style="width: 95%;" disabled /></td>
-                                    <td><input class="campo-detalle" style="width: 95%;" disabled /></td>
-                                    <td><input class="campo-detalle" style="width: 100%;" disabled /></td>
-                                    <td style="display:none;"></td>
-                                </tr>
-                            </tbody>
+                        </tr>
+                        <tr style="height:150px;">
+                            <td colspan="5"></td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
+        }
+
+        <form id="formEliminarDetalle" asp-action="EliminarDetalleMaterial" asp-controller="Recepcion" method="post" style="display:none;">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="elimDetId" name="tbRecDetId" />
+            <input type="hidden" name="tbRecId" value="@(Model != null && Model.TbRecId > 0 ? Model.TbRecId : 0)" />
+        </form>
+    </div>
+
+    @if (Model != null && Model.TbRecId > 0 && subFormModel != null)
+    {
+        subFormModel.Detalle ??= new TbRecDetDto();
+        subFormModel.Detalle.TB_REC_ID = Model.TbRecId;
+
+        <div id="contenedor-subformulario" class="mt-4">
+            @await Html.PartialAsync("_SubFormRecDet.cshtml", subFormModel)
         </div>
-       </div>
     }
 
-    <form id="formEliminarDetalle" asp-action="EliminarDetalleMaterial" asp-controller="Recepcion" method="post" style="display:none;">
-        @Html.AntiForgeryToken()
-        <input type="hidden" id="elimDetId" name="tbRecDetId" />
-        <input type="hidden" name="tbRecId" value="@(Model != null && Model.TbRecId > 0 ? Model.TbRecId : 0)" />
-    </form>
+    <div id="pie-impresion">
+        <img src="~/img/Baxen_Trazabilidad.png" alt="Baxen Trazabilidad" />
+        <span>Fecha: @DateTime.Now.ToString("dd/MM/yyyy HH:mm") | Página 1</span>
+    </div>
+
+    <div class="barra-botones">
+        <button type="button" class="btn-baxen btn-baxen-outline" id="btnNuevo">Nuevo</button>
+        <button type="button" class="btn-baxen btn-baxen-outline" id="btnEditar">Editar</button>
+
+        <div class="dropdown-imprimir">
+            <button type="button" class="btn-baxen" id="btnImprimirPrincipal">Imprimir</button>
+            <div class="dropdown-content">
+                <button type="button" id="btnImprimirRecepcion">Recepción</button>
+                <button type="button" id="btnImprimirEtiqueta">Etiqueta</button>
+            </div>
+        </div>
+
+        <button type="button" class="btn-baxen" id="btnCerrarModulo">Cerrar</button>
+    </div>
+
+    <div id="contenedorModalOrtopedia"></div>
+
 </div>
 
-    
-@* Botones viejos removidos. Se usan los botones del footer desde _BotonesInfoBasica.cshtml *@
-@* <div class="rec-screen-actions rec-screen-actions-bottom mt-3">
-        <button type="button" class="btn btn-secondary btn-sm" onclick="window.history.back()">Cerrar</button>
-
-        <button type="button"
-                class="btn btn-outline-danger btn-sm"
-                onclick="descargarRecepcionPdf(@(Model?.TbRecId ?? 0))"
-            @((Model == null || Model.TbRecId <= 0) ? "disabled" : "")
-                title="Descargar PDF">
-            <i class="bi bi-file-earmark-pdf-fill"></i>
-        </button>
-
-        <button type="button"
-                class="btn btn-outline-primary btn-sm"
-                onclick="imprimirEnImpresora()"
-            @((Model == null || Model.TbRecId <= 0) ? "disabled" : "")
-                title="Imprimir">
-            <i class="bi bi-printer-fill"></i>
-        </button>
-    </div>
-</div> *@
-
-@if (Model != null && Model.TbRecId > 0 && subFormModel != null)
-{
-    subFormModel.Detalle ??= new TbRecDetDto();
-    subFormModel.Detalle.TB_REC_ID = Model.TbRecId;
-
-    <div class="mt-4">
-        @await Html.PartialAsync("_SubFormRecDet.cshtml", subFormModel)
-    </div>
-}
-
-@await Html.PartialAsync("~/Views/Shared/_BotonesInfoBasica.cshtml")
-
-<div id="contenedorModalOrtopedia"></div>
-
 @section Scripts {
-
-    
-
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
 
-     document.addEventListener("DOMContentLoaded", function () {
+            // --- FUNCIONALIDAD BOTONES ---
+            const btnImprimirRecepcion = document.getElementById("btnImprimirRecepcion");
+            const btnImprimirEtiqueta = document.getElementById("btnImprimirEtiqueta");
+
+            // Resolvemos el valor con comillas para evitar el error de sintaxis en Visual Studio
+            const recId = parseInt('@(Model != null && Model.TbRecId > 0 ? Model.TbRecId : 0)') || 0;
+
+            const btnEditar = document.getElementById("btnEditar");
+            const btnNuevo = document.getElementById("btnNuevo");
+            const btnCerrar = document.getElementById("btnCerrarModulo");
+
+            if (btnEditar) {
+                btnEditar.addEventListener("click", function () {
+                    if (recId > 0) {
+                        window.location.href = `/Recepcion/SubFormulario/${recId}`;
+                    } else {
+                        alert("No hay ninguna recepción cargada para editar.");
+                    }
+                });
+            }
+
+            if (btnNuevo) {
+                btnNuevo.addEventListener("click", function () {
+                    window.location.href = '/Recepcion/CrearRecepcion';
+                });
+            }
+
+            if (btnCerrar) {
+                btnCerrar.addEventListener("click", async function (e) {
+                    e.preventDefault();
+
+                    if (recId <= 0) {
+                        window.location.href = '/Home/Index';
+                        return;
+                    }
+
+                    await fetch('/TbRecDet/CerrarRecepcion', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(recId)
+                    });
+
+                    window.location.href = '/Home/Index';
+                });
+            }
+
+                    // IMPRESIÓN RECEPCIÓN
+                    if (btnImprimirRecepcion) {
+                        btnImprimirRecepcion.addEventListener("click", function () {
+                            if (recId > 0) {
+                                window.open(`/Recepcion/ImprimirRecepcion/${recId}`, '_blank');
+                            } else {
+                                alert("Primero debe guardar la recepción.");
+                            }
+                        });
+                    }
+
+            if (btnImprimirEtiqueta) {
+                btnImprimirEtiqueta.addEventListener("click", function () {
+                    if (recId > 0) {
+                        // Dejé un window.open provisional por si Etiquetas abre en otra solapa,
+                        // si querés imprimir esta misma pantalla, cambialo por window.print()
+                        window.open(`/Recepcion/ImprimirEtiqueta?id=${recId}`, '_blank');
+                    } else {
+                        alert("Primero debe guardar la recepción.");
+                    }
+                });
+            }
+
+            const formCrearRecepcion = document.getElementById("formCrearRecepcion");
+            const cabeceraCreada = ('@(cabeceraCreada.ToString().ToLower())' === 'true');
+
+            if (formCrearRecepcion && cabeceraCreada) {
+                formCrearRecepcion.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    return false;
+                });
+            }
+
             const inputsAutoSave = document.querySelectorAll('.auto-save');
             const btnOculto = document.getElementById('btnGuardarRecepcionOculto');
 
             inputsAutoSave.forEach(input => {
-            input.addEventListener('change', function () {
-            if (btnOculto) btnOculto.click();
-         });
-       });
-     });
+                input.addEventListener('change', function () {
+                    if (btnOculto) btnOculto.click();
+                });
+            });
+
+        });
+
         document.addEventListener("DOMContentLoaded", function () {
-
-            // setTimeout(function () {
-
-            //         const campoOrtopedia =
-            //             document.getElementById("TB_REC_ORT_ORT_ID");
-
-            //         if (campoOrtopedia) {
-            //             campoOrtopedia.focus();
-            //         }
-
-            //     }, 150);
 
         const sectores = [
             @if (listaSectores != null)
             {
-                            for (int i = 0; i < listaSectores.Count; i++)
-                            {
-                                            var s = listaSectores[i];
-                                            // @:{ id: @s.IbSecId, den: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(s.IbSecDen ?? ""))" }@(i < listaSectores.Count - 1 ? "," : "")
-                                            @:{ id: @s.IbSecId, den: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(s.IbSecDen ?? ""))", desId: @s.IbSecDesId, desDen: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(s.IbSecDesDen ?? ""))" }@(i < listaSectores.Count - 1 ? "," : "")
-                                }
-                
+                    for (int i = 0; i < listaSectores.Count; i++)
+                    {
+                            var s = listaSectores[i];
+                            @:{ id: @s.IbSecId, den: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(s.IbSecDen ?? ""))", desId: @s.IbSecDesId, desDen: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(s.IbSecDesDen ?? ""))" }@(i < listaSectores.Count - 1 ? "," : "")
+                    }
             }
         ];
 
@@ -385,6 +611,25 @@
             const hiddenSectorOrigen = document.getElementById("TbRecSecOriId");
             const listaSectoresOrigen = document.getElementById("listaSectoresOrigen");
 
+            const inputPersonalSector = document.getElementById("PersonalSectorBusqueda");
+
+                if (inputPersonalSector) {
+                    inputPersonalSector.addEventListener("keydown", function (e) {
+
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+
+                            const cabeceraFlag = ('@(cabeceraCreada.ToString().ToLower())' === 'true');
+                            if (cabeceraFlag) {
+                                return;
+                            }
+
+                            formCrearRecepcion.submit();
+                        }
+
+                    });
+                }
+
             if (inputSectorOrigen) {
             inputSectorOrigen.focus();
             inputSectorOrigen.select();
@@ -395,8 +640,6 @@
 
             let sectoresOrigenFiltrados = [];
             let indiceOrigen = -1;
-
-            // ================= DESTINO =================
 
             function renderDestino(items) {
                 sectoresDestinoFiltrados = items || [];
@@ -419,6 +662,7 @@
                         inputSectorDestino.value = sec.den;
                         hiddenSectorDestino.value = sec.id;
                         listaSectoresDestino.style.display = "none";
+
                         hiddenSectorDestino.form.submit();
                     };
 
@@ -436,11 +680,6 @@
                     indiceDestino = -1;
                     renderDestino(sectores);
                 });
-
-                // inputSectorDestino.addEventListener("click", () => {
-                //     indiceDestino = -1;
-                //     renderDestino(sectores);
-                // });
 
                 inputSectorDestino.addEventListener("input", function () {
                     indiceDestino = -1;
@@ -471,15 +710,18 @@
                 e.preventDefault();
 
                 const textoActual = (inputSectorDestino.value || "").trim();
+                const cabeceraFlag = ('@(cabeceraCreada.ToString().ToLower())' === 'true');
 
-                // 🔥 1. si ya viene de ORIGEN (o ya tiene valor válido) → guardar directo
                 if (hiddenSectorDestino.value && textoActual !== "") {
                     listaSectoresDestino.style.display = "none";
-                    hiddenSectorDestino.form.submit();
+                if (cabeceraFlag) {
+                            return;
+                        }
+                    document.getElementById("PersonalSectorBusqueda")?.focus();
+                    document.getElementById("PersonalSectorBusqueda")?.select();
                     return;
                 }
 
-                // 🔥 2. si usó flechas
                 if (indiceDestino >= 0 && sectoresDestinoFiltrados.length > 0) {
                     const sel = sectoresDestinoFiltrados[indiceDestino];
                     hiddenSectorDestino.value = sel.id;
@@ -489,7 +731,6 @@
                     return;
                 }
 
-                // 🔥 3. si escribió exacto
                 const exacto = sectores.find(x =>
                     x.den.toLowerCase() === textoActual.toLowerCase()
                 );
@@ -503,8 +744,6 @@
             }
                 });
             }
-
-            // ================= ORIGEN =================
 
             function renderOrigen(items) {
                 sectoresOrigenFiltrados = items || [];
@@ -535,7 +774,6 @@
                 inputSectorOrigen.value = sec.den;
                 hiddenSectorOrigen.value = sec.id;
 
-                // copiar a destino
                 inputSectorDestino.value = sec.desDen;
                 hiddenSectorDestino.value = sec.desId;
 
@@ -560,13 +798,6 @@
                     indiceOrigen = -1;
                     renderOrigen(sectores);
                 });
-
-                // inputSectorOrigen.addEventListener("focus", () => {
-                //     indiceOrigen = -1;
-                //     renderOrigen(sectores);
-                // });
-
-                // inputSectorOrigen.addEventListener("click", () => { indiceOrigen = -1; renderOrigen(sectores); });
 
                 inputSectorOrigen.addEventListener("input", function () {
                     indiceOrigen = -1;
@@ -603,7 +834,6 @@
                 });
             }
 
-            // cerrar listas
             document.addEventListener("click", function (e) {
                 if (!inputSectorDestino.contains(e.target) && !listaSectoresDestino.contains(e.target)) {
                     listaSectoresDestino.style.display = "none";
@@ -639,8 +869,6 @@
         window.addEventListener("beforeunload", function () {
             localStorage.removeItem("modulo_23_abierto");
         });
-
-
     </script>
 
     @if (ViewBag.AbrirModalOrtopedia == true)
@@ -648,7 +876,7 @@
         <script>
             document.addEventListener("DOMContentLoaded", function () {
 
-                fetch("/TbRecOrt/AbrirModalOrtopedias?tbRecId=@ViewBag.TbRecIdOrtopedia")
+                fetch(/TbRecOrt/AbrirModalOrtopedias?tbRecId=@ViewBag.TbRecIdOrtopedia)
                     .then(response => response.text())
                     .then(html => {
 
@@ -670,8 +898,6 @@
                                 modal.style.display = "flex";
                             }
 
-                            console.log("MODAL CARGADO");
-
                         });
 
             });
@@ -683,7 +909,7 @@
         <script>
             document.addEventListener("DOMContentLoaded", function () {
 
-                fetch("/TbRecProfesional/AbrirModalProfesional?tbRecId=@ViewBag.TbRecIdProfesional")
+                fetch(/TbRecProfesional/AbrirModalProfesional?tbRecId=@ViewBag.TbRecIdProfesional)
                     .then(response => response.text())
                     .then(html => {
 
@@ -705,13 +931,9 @@
                             modal.style.display = "flex";
                         }
 
-                        console.log("MODAL PROFESIONAL CARGADO");
-
                     });
 
             });
         </script>
     }
-    
-
 }

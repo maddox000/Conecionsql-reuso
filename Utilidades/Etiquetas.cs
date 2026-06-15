@@ -42,11 +42,6 @@ namespace ConexionSql.Utilidades
 
                 "^LH20,0\n" +                // 🔹 ORIGEN (0,0)- esta linea mueve todo
 
-                //"^FO10,10^GB460,340,2^FS\n" +
-                // 🔹 BORDE GENERAL
-                // 10,10 = posición
-                // 460 ancho / 340 alto
-                // 2 = grosor línea
 
                 // =============================
                 // 🟦 RECEPCIÓN + NÚMERO + FECHA
@@ -75,7 +70,7 @@ namespace ConexionSql.Utilidades
                 // =============================
                 "^CF0,24\n" +              // 🔹 Un poco más grande
 
-                $"^FO20,90^FD{material}^FS\n" +
+                $"^FO20,90^FB430,2,0,L^FD{material}^FS\n" +
                 // 🔹 Nombre del material
 
                 // 👉 SI se corta el texto → subir tamaño o mover Y
@@ -85,7 +80,7 @@ namespace ConexionSql.Utilidades
                 // =============================
                 "^CF0,24\n" +
 
-                $"^FO20,120^FD{tipoMaterial}^FS\n" +
+                $"^FO20,145^FD{tipoMaterial}^FS\n" +
                 // 🔹 Texto fijo
                 lineaReuso +
 
@@ -131,388 +126,449 @@ namespace ConexionSql.Utilidades
                 "^XZ";                     // 🔹 FIN ETIQUETA
         }
 
-        public static string RecepcionDetalleCompleto(
-        string sector,
-        string material,
-        DateTime fechaRecepcion,
-        int nroRecepcion,
-        int idDetalle,
-        int cantidad)
-        {
-            return
-                "^XA\n" +
+        //etiqueta reuso
 
-                "^CI28\n" +
-                "^PW480\n" +
-                "^LL360\n" +
-
-                "^LH20,0\n" +
-
-                // =============================
-                // 🟦 CABECERA
-                // =============================
-                "^CF0,22\n" +
-
-                "^FO20,30^FDRecepcion^FS\n" +
-                $"^FO150,30^FD{nroRecepcion}^FS\n" +
-                $"^FO320,30^FD{fechaRecepcion:dd/MM/yyyy}^FS\n" +
-
-                // =============================
-                // 🟦 SECTOR
-                // =============================
-                "^CF0,22\n" +
-                $"^FO20,60^FDSector {sector}^FS\n" +
-
-                // =============================
-                // 🟦 MATERIAL
-                // =============================
-                "^CF0,24\n" +
-                $"^FO20,90^FD{material}^FS\n" +
-
-                // =============================
-                // 🟦 UNIDADES
-                // =============================
-                "^CF0,22\n" +
-                $"^FO20,120^FDUnidades contenidas: {cantidad} Unid^FS\n" +
-
-                // =============================
-                // 🟦 RECUADRO COMPLETO (CORREGIDO)
-                // =============================
-                "^FO20,150^GB440,40,40^FS\n" +   // 🔹 fondo negro (relleno)
-                "^CF0,26\n" +
-                "^FO30,158^FR^FDCOMPLETO^FS\n" +  // 🔹 texto blanco
-
-                // =============================
-                // 🟦 ID
-                // =============================
-                "^CF0,20\n" +
-                $"^FO190,300^FD{idDetalle}^FS\n" +
-
-                // =============================
-                // 🟦 BARCODE
-                // =============================
-                "^BY3,2,55\n" +
-                $"^FO60,320^BCN,45,N,N,N^FD{idDetalle}^FS\n" +
-
-                "^XZ";
-        }
-
-        public static string RecepcionDetalleIncompleto(
-        string sector,
-        string material,
-        DateTime fechaRecepcion,
-        int nroRecepcion,
-        int idDetalle,
-        int cantidad,
-        string detalleFaltante)
-        {
-            return
-                "^XA\n" +
-
-                "^CI28\n" +
-                "^PW480\n" +
-                "^LL360\n" +
-
-                "^LH20,0\n" +
-
-                // =============================
-                // 🟦 CABECERA
-                // =============================
-                "^CF0,22\n" +
-
-                "^FO20,30^FDRecepcion^FS\n" +
-                $"^FO150,30^FD{nroRecepcion}^FS\n" +
-                $"^FO320,30^FD{fechaRecepcion:dd/MM/yyyy}^FS\n" +
-
-                // =============================
-                // 🟦 SECTOR
-                // =============================
-                "^CF0,22\n" +
-                $"^FO20,60^FDSector {sector}^FS\n" +
-
-                // =============================
-                // 🟦 MATERIAL
-                // =============================
-                "^CF0,24\n" +
-                $"^FO20,90^FD{material}^FS\n" +
-
-                // =============================
-                // 🟦 COD ETIQUETA
-                // =============================
-                "^CF0,22\n" +
-                $"^FO20,120^FDCod etiquet {idDetalle}^FS\n" +
-
-                // =============================
-                // 🟦 CONTENIDO
-                // =============================
-                $"^FO20,140^FDContenido {cantidad} Unid^FS\n" +
-
-                // =============================
-                // 🟦 FRANJA NEGRA (TÍTULO)
-                // =============================
-                "^FO20,170^GB460,28,28^FS\n" +
-                "^CF0,24\n" +
-                "^FO25,173^FR^FDElementos faltantes:^FS\n" +
-
-                // =============================
-                // 🟦 DETALLE FALTANTE (MEM_1)
-                // =============================
-                "^CF0,20\n" +
-                $"^FO20,205^FD{detalleFaltante}^FS\n" +
-
-                // =============================
-                // 🟦 ID
-                // =============================
-                "^CF0,20\n" +
-                $"^FO190,300^FD{idDetalle}^FS\n" +
-
-                // =============================
-                // 🟦 BARCODE
-                // =============================
-                "^BY3,2,55\n" +
-                $"^FO60,320^BCN,45,N,N,N^FD{idDetalle}^FS\n" +
-
-                "^XZ";
-        }
-
-
-        public static string RecepcionDetallePrioridadProceso(
-        string sector,
-        string material,
-        DateTime fechaRecepcion,
-        int nroRecepcion,
-        int idDetalle)
-        {
-            return
-                "^XA\n" +
-
-                "^CI28\n" +
-                "^PW480\n" +
-                "^LL360\n" +
-
-                "^LH20,0\n" +
-
-                // =============================
-                // 🟦 CABECERA
-                // =============================
-                "^CF0,22\n" +
-
-                "^FO20,30^FDRecepcion^FS\n" +
-                $"^FO150,30^FD{nroRecepcion}^FS\n" +
-                $"^FO320,30^FD{fechaRecepcion:dd/MM/yyyy}^FS\n" +
-
-                // =============================
-                // 🟦 SECTOR
-                // =============================
-                "^CF0,22\n" +
-                $"^FO20,60^FDSector {sector}^FS\n" +
-
-                // =============================
-                // 🟦 MATERIAL
-                // =============================
-                "^CF0,24\n" +
-                $"^FO20,90^FD{material}^FS\n" +
-
-                // =============================
-                // 🟦 FRANJA NEGRA PRIORIDAD
-                // =============================
-                "^FO20,150^GB410,80,80^FS\n" +     // 🔴 relleno completo (alto=grosor)
-                "^CF0,40\n" +                      // 🔴 texto más grande
-                "^FO20,180^FB410,1,0,C^FR^FDPRIORIDAD DE PROCESO^FS\n" +
-
-                // =============================
-                // 🟦 ID
-                // =============================
-                "^CF0,20\n" +
-                $"^FO190,300^FD{idDetalle}^FS\n" +
-
-                // =============================
-                // 🟦 BARCODE
-                // =============================
-                "^BY3,2,55\n" +
-                $"^FO60,320^BCN,45,N,N,N^FD{idDetalle}^FS\n" +
-
-                "^XZ";
-        }
-
-        public static string RecepcionDetalleReprocesadoSinUso(
-        string sector,
-        string material,
-        DateTime fechaRecepcion,
-        int nroRecepcion,
-        int idDetalle)
-        {
-            return
-                "^XA\n" +
-
-                "^CI28\n" +
-                "^PW480\n" +
-                "^LL360\n" +
-
-                "^LH20,0\n" +
-
-                // =============================
-                // 🟦 CABECERA
-                // =============================
-                "^CF0,22\n" +
-
-                "^FO20,30^FDRecepcion^FS\n" +
-                $"^FO150,30^FD{nroRecepcion}^FS\n" +
-                $"^FO320,30^FD{fechaRecepcion:dd/MM/yyyy}^FS\n" +
-
-                // =============================
-                // 🟦 SECTOR
-                // =============================
-                "^CF0,22\n" +
-                $"^FO20,60^FDSector {sector}^FS\n" +
-
-                // =============================
-                // 🟦 MATERIAL
-                // =============================
-                "^CF0,24\n" +
-                $"^FO20,90^FD{material}^FS\n" +
-
-                // =============================
-                // 🟦 FRANJA NEGRA (DOBLE TEXTO)
-                // =============================
-                "^FO20,150^GB410,80,80^FS\n" +   // 🔴 fondo negro grande
-
-                "^CF0,35\n" +
-                "^FO20,160^FB410,1,0,C^FR^FDMATERIAL^FS\n" +  // 🔴 línea 1
-
-                "^CF0,35\n" +
-                "^FO25,195^FB410,1,0,C^FR^FDREPROCESADO SIN USO^FS\n" +  // 🔴 línea 2
-
-                // =============================
-                // 🟦 ID
-                // =============================
-                "^CF0,20\n" +
-                $"^FO190,300^FD{idDetalle}^FS\n" +
-
-                // =============================
-                // 🟦 BARCODE
-                // =============================
-                "^BY3,2,55\n" +
-                $"^FO60,320^BCN,45,N,N,N^FD{idDetalle}^FS\n" +
-
-                "^XZ";
-        }
-
-
-        //etiqueta de ortopedia
-
-        public static string RecepcionDetalleOrtopedia(
-        string sector,
-        string material,
-        DateTime fechaRecepcion,
-        int nroRecepcion,
-        int idDetalle,
-        string profesional,
-        string paciente,
-        string remito,
-        string ortopedia,
-        DateTime? fechaProc,
-        DateTime? horaProc)
-                {
-                    return
-                        "^XA\n" +
-
-                        "^CI28\n" +
-                        "^PW480\n" +
-                        "^LL360\n" +
-
-                        "^LH20,0\n" +
-
-                        "^A0N,26,26\n" +
-                        "^FO20,30^FDRecepcion^FS\n" +
-                        $"^FO150,30^FD{nroRecepcion}^FS\n" +
-                        $"^FO320,30^FD{fechaRecepcion:dd/MM/yyyy}^FS\n" +
-
-                        "^A0N,26,26\n" +
-                        $"^FO20,65^FDSector {sector}^FS\n" +
-
-                        "^A0N,30,30\n" +
-                        $"^FO20,100^FD{material}^FS\n" +
-
-                        "^A0N,24,24\n" +
-                        $"^FO20,140^FDProfesional {profesional}^FS\n" +
-
-                        "^A0N,24,24\n" +
-                        $"^FO20,175^FDPaciente {paciente}^FS\n" +
-
-                        "^A0N,24,24\n" +
-                        $"^FO20,210^FDRemito {remito}^FS\n" +
-                        $"^FO250,210^FD{ortopedia}^FS\n" +
-
-                        "^A0N,24,24\n" +
-                        $"^FO20,245^FDFecha pro {fechaProc:dd/MM/yyyy}^FS\n" +
-                        $"^FO250,245^FD{horaProc:HH:mm}^FS\n" +
-
-                        "^A0N,24,24\n" +
-                        $"^FO190,295^FD{idDetalle}^FS\n" +
-
-                        "^BY3,2,45\n" +
-                        $"^FO60,315^BCN,40,N,N,N^FD{idDetalle}^FS\n" +
-
-                        "^XZ";
-        }
-
-        //etiqueta profesional
-
-        public static string RecepcionDetalleProfesional(
+        public static string RecepcionDetalleReuso(
         string sector,
         string material,
         DateTime fechaRecepcion,
         DateTime vencimiento,
         int nroRecepcion,
         int idDetalle,
-        string profesional,
-        DateTime? fechaProc,
-        DateTime? horaProc,
-        int cantidad)
-                {
-                    return
-                        "^XA\n" +
+        string codigoReuso,
+        string tipoMaterial,
+        int reusoCant)
+            {
+                string lineaReuso = (!string.IsNullOrWhiteSpace(codigoReuso) && codigoReuso != "1")
+                    ? $"^FO20,170^FDCod reuso {codigoReuso}^FS\n"
+                    : "";
 
-                        "^CI28\n" +
-                        "^PW480\n" +
-                        "^LL360\n" +
+                string recuadroReuso =
+                    "^FO390,130^GB55,55,55^FS\n" +
+                    "^CF0,34\n" +
+                    $"^FO390,135^FB55,1,0,C^FR^FD{reusoCant}^FS\n";
 
-                        "^LH20,0\n" +
+            return
+                    "^XA\n" +
+                    "^CI28\n" +
+                    "^PW480\n" +
+                    "^LL360\n" +
+                    "^LH20,0\n" +
 
-                        "^A0N,26,26\n" +
-                        "^FO20,30^FDRecepcion^FS\n" +
-                        $"^FO150,30^FD{nroRecepcion}^FS\n" +
-                        $"^FO320,30^FD{fechaRecepcion:dd/MM/yyyy}^FS\n" +
+                    "^CF0,22\n" +
+                    "^FO20,30^FDRecepcion^FS\n" +
+                    $"^FO150,30^FD{nroRecepcion}^FS\n" +
+                    $"^FO320,30^FD{fechaRecepcion:dd/MM/yyyy}^FS\n" +
 
-                        "^A0N,26,26\n" +
-                        $"^FO20,65^FDSector {sector}^FS\n" +
+                    "^CF0,22\n" +
+                    $"^FO20,60^FDSector {sector}^FS\n" +
 
-                        "^A0N,30,30\n" +
-                        $"^FO20,100^FD{material}^FS\n" +
+                    "^CF0,24\n" +
+                    $"^FO20,90^FB360,2,0,L^FD{material}^FS\n" +
 
-                        "^A0N,24,24\n" +
-                        $"^FO20,145^FDProfesional {profesional}^FS\n" +
+                    "^CF0,24\n" +
+                    $"^FO20,145^FD{tipoMaterial}^FS\n" +
+                    lineaReuso +
+                    recuadroReuso +
 
-                        "^A0N,24,24\n" +
-                        $"^FO20,180^FDFecha proc {fechaProc:dd/MM/yyyy}^FS\n" +
-                        $"^FO250,180^FD{horaProc:HH:mm}^FS\n" +
+                    "^FO20,220^GB440,28,28^FS\n" +
+                    "^CF0,22\n" +
+                    "^FO25,223^FR^FDVencimiento^FS\n" +
+                    $"^FO300,223^FR^FD{vencimiento:dd/MM/yyyy}^FS\n" +  
 
-                        "^A0N,24,24\n" +
-                        $"^FO20,215^FDCant Piezas {cantidad}^FS\n" +
+                    "^CF0,20\n" +
+                    $"^FO190,300^FD{idDetalle}^FS\n" +
 
-                        "^FO20,250^GB420,28,28^FS\n" +
-                        "^CF0,24\n" +
-                        $"^FO30,252^FR^FDVencimiento {vencimiento:dd/MM/yyyy}^FS\n" +
+                    "^BY3,2,55\n" +
+                    "^FO60,320^BCN,45,N,N,N^FD" + idDetalle + "^FS\n" +
 
-                        "^A0N,24,24\n" +
-                        $"^FO190,295^FD{idDetalle}^FS\n" +
+                    "^XZ";
+            }
 
-                        "^BY3,2,45\n" +
-                        $"^FO60,315^BCN,40,N,N,N^FD{idDetalle}^FS\n" +
 
-                        "^XZ";
-        }
+            //etiqueta completo
+            public static string RecepcionDetalleCompleto(
+            string sector,
+            string material,
+            DateTime fechaRecepcion,
+            int nroRecepcion,
+            int idDetalle,
+            int cantidad)
+            {
+                return
+                    "^XA\n" +
+
+                    "^CI28\n" +
+                    "^PW480\n" +
+                    "^LL360\n" +
+
+                    "^LH20,0\n" +
+
+                    // =============================
+                    // 🟦 CABECERA
+                    // =============================
+                    "^CF0,22\n" +
+
+                    "^FO20,30^FDRecepcion^FS\n" +
+                    $"^FO150,30^FD{nroRecepcion}^FS\n" +
+                    $"^FO320,30^FD{fechaRecepcion:dd/MM/yyyy}^FS\n" +
+
+                    // =============================
+                    // 🟦 SECTOR
+                    // =============================
+                    "^CF0,22\n" +
+                    $"^FO20,60^FDSector {sector}^FS\n" +
+
+                    // =============================
+                    // 🟦 MATERIAL
+                    // =============================
+                    "^CF0,24\n" +
+                    $"^FO20,90^FB430,2,0,L^FD{material}^FS\n" +
+
+                    // =============================
+                    // 🟦 UNIDADES
+                    // =============================
+                    "^CF0,22\n" +
+                    $"^FO20,120^FDUnidades contenidas: {cantidad} Unid^FS\n" +
+
+                    // =============================
+                    // 🟦 RECUADRO COMPLETO (CORREGIDO)
+                    // =============================
+                    "^FO20,150^GB440,40,40^FS\n" +   // 🔹 fondo negro (relleno)
+                    "^CF0,26\n" +
+                    "^FO30,158^FR^FDCOMPLETO^FS\n" +  // 🔹 texto blanco
+
+                    // =============================
+                    // 🟦 ID
+                    // =============================
+                    "^CF0,20\n" +
+                    $"^FO190,300^FD{idDetalle}^FS\n" +
+
+                    // =============================
+                    // 🟦 BARCODE
+                    // =============================
+                    "^BY3,2,55\n" +
+                    $"^FO60,320^BCN,45,N,N,N^FD{idDetalle}^FS\n" +
+
+                    "^XZ";
+            }
+
+            public static string RecepcionDetalleIncompleto(
+            string sector,
+            string material,
+            DateTime fechaRecepcion,
+            int nroRecepcion,
+            int idDetalle,
+            int cantidad,
+            string detalleFaltante)
+            {
+                return
+                    "^XA\n" +
+
+                    "^CI28\n" +
+                    "^PW480\n" +
+                    "^LL360\n" +
+
+                    "^LH20,0\n" +
+
+                    // =============================
+                    // 🟦 CABECERA
+                    // =============================
+                    "^CF0,22\n" +
+
+                    "^FO20,30^FDRecepcion^FS\n" +
+                    $"^FO150,30^FD{nroRecepcion}^FS\n" +
+                    $"^FO320,30^FD{fechaRecepcion:dd/MM/yyyy}^FS\n" +
+
+                    // =============================
+                    // 🟦 SECTOR
+                    // =============================
+                    "^CF0,22\n" +
+                    $"^FO20,60^FDSector {sector}^FS\n" +
+
+                    // =============================
+                    // 🟦 MATERIAL
+                    // =============================
+                    "^CF0,24\n" +
+                    $"^FO20,90^FB430,2,0,L^FD{material}^FS\n" +
+
+                    // =============================
+                    // 🟦 COD ETIQUETA
+                    // =============================
+                    "^CF0,22\n" +
+                    $"^FO20,120^FDCod etiquet {idDetalle}^FS\n" +
+
+                    // =============================
+                    // 🟦 CONTENIDO
+                    // =============================
+                    $"^FO20,140^FDContenido {cantidad} Unid^FS\n" +
+
+                    // =============================
+                    // 🟦 FRANJA NEGRA (TÍTULO)
+                    // =============================
+                    "^FO20,170^GB460,28,28^FS\n" +
+                    "^CF0,24\n" +
+                    "^FO25,173^FR^FDElementos faltantes:^FS\n" +
+
+                    // =============================
+                    // 🟦 DETALLE FALTANTE (MEM_1)
+                    // =============================
+                    "^CF0,20\n" +
+                    $"^FO20,205^FD{detalleFaltante}^FS\n" +
+
+                    // =============================
+                    // 🟦 ID
+                    // =============================
+                    "^CF0,20\n" +
+                    $"^FO190,300^FD{idDetalle}^FS\n" +
+
+                    // =============================
+                    // 🟦 BARCODE
+                    // =============================
+                    "^BY3,2,55\n" +
+                    $"^FO60,320^BCN,45,N,N,N^FD{idDetalle}^FS\n" +
+
+                    "^XZ";
+            }
+
+
+            public static string RecepcionDetallePrioridadProceso(
+            string sector,
+            string material,
+            DateTime fechaRecepcion,
+            int nroRecepcion,
+            int idDetalle)
+            {
+                return
+                    "^XA\n" +
+
+                    "^CI28\n" +
+                    "^PW480\n" +
+                    "^LL360\n" +
+
+                    "^LH20,0\n" +
+
+                    // =============================
+                    // 🟦 CABECERA
+                    // =============================
+                    "^CF0,22\n" +
+
+                    "^FO20,30^FDRecepcion^FS\n" +
+                    $"^FO150,30^FD{nroRecepcion}^FS\n" +
+                    $"^FO320,30^FD{fechaRecepcion:dd/MM/yyyy}^FS\n" +
+
+                    // =============================
+                    // 🟦 SECTOR
+                    // =============================
+                    "^CF0,22\n" +
+                    $"^FO20,60^FDSector {sector}^FS\n" +
+
+                    // =============================
+                    // 🟦 MATERIAL
+                    // =============================
+                    "^CF0,24\n" +
+                    $"^FO20,90^FB430,2,0,L^FD{material}^FS\n" +
+
+                    // =============================
+                    // 🟦 FRANJA NEGRA PRIORIDAD
+                    // =============================
+                    "^FO20,150^GB410,80,80^FS\n" +     // 🔴 relleno completo (alto=grosor)
+                    "^CF0,40\n" +                      // 🔴 texto más grande
+                    "^FO20,180^FB410,1,0,C^FR^FDPRIORIDAD DE PROCESO^FS\n" +
+
+                    // =============================
+                    // 🟦 ID
+                    // =============================
+                    "^CF0,20\n" +
+                    $"^FO190,300^FD{idDetalle}^FS\n" +
+
+                    // =============================
+                    // 🟦 BARCODE
+                    // =============================
+                    "^BY3,2,55\n" +
+                    $"^FO60,320^BCN,45,N,N,N^FD{idDetalle}^FS\n" +
+
+                    "^XZ";
+            }
+
+            public static string RecepcionDetalleReprocesadoSinUso(
+            string sector,
+            string material,
+            DateTime fechaRecepcion,
+            int nroRecepcion,
+            int idDetalle)
+            {
+                return
+                    "^XA\n" +
+
+                    "^CI28\n" +
+                    "^PW480\n" +
+                    "^LL360\n" +
+
+                    "^LH20,0\n" +
+
+                    // =============================
+                    // 🟦 CABECERA
+                    // =============================
+                    "^CF0,22\n" +
+
+                    "^FO20,30^FDRecepcion^FS\n" +
+                    $"^FO150,30^FD{nroRecepcion}^FS\n" +
+                    $"^FO320,30^FD{fechaRecepcion:dd/MM/yyyy}^FS\n" +
+
+                    // =============================
+                    // 🟦 SECTOR
+                    // =============================
+                    "^CF0,22\n" +
+                    $"^FO20,60^FDSector {sector}^FS\n" +
+
+                    // =============================
+                    // 🟦 MATERIAL
+                    // =============================
+                    "^CF0,24\n" +
+                    $"^FO20,90^FB430,2,0,L^FD{material}^FS\n" +
+
+                    // =============================
+                    // 🟦 FRANJA NEGRA (DOBLE TEXTO)
+                    // =============================
+                    "^FO20,150^GB410,80,80^FS\n" +   // 🔴 fondo negro grande
+
+                    "^CF0,35\n" +
+                    "^FO20,160^FB410,1,0,C^FR^FDMATERIAL^FS\n" +  // 🔴 línea 1
+
+                    "^CF0,35\n" +
+                    "^FO25,195^FB410,1,0,C^FR^FDREPROCESADO SIN USO^FS\n" +  // 🔴 línea 2
+
+                    // =============================
+                    // 🟦 ID
+                    // =============================
+                    "^CF0,20\n" +
+                    $"^FO190,300^FD{idDetalle}^FS\n" +
+
+                    // =============================
+                    // 🟦 BARCODE
+                    // =============================
+                    "^BY3,2,55\n" +
+                    $"^FO60,320^BCN,45,N,N,N^FD{idDetalle}^FS\n" +
+
+                    "^XZ";
+            }
+
+
+            //etiqueta de ortopedia
+
+            public static string RecepcionDetalleOrtopedia(
+            string sector,
+            string material,
+            DateTime fechaRecepcion,
+            int nroRecepcion,
+            int idDetalle,
+            string profesional,
+            string paciente,
+            string remito,
+            string ortopedia,
+            DateTime? fechaProc,
+            DateTime? horaProc)
+                    {
+                        return
+                            "^XA\n" +
+
+                            "^CI28\n" +
+                            "^PW480\n" +
+                            "^LL360\n" +
+
+                            "^LH20,0\n" +
+
+                            "^A0N,26,26\n" +
+                            "^FO20,30^FDRecepcion^FS\n" +
+                            $"^FO150,30^FD{nroRecepcion}^FS\n" +
+                            $"^FO320,30^FD{fechaRecepcion:dd/MM/yyyy}^FS\n" +
+
+                            "^A0N,26,26\n" +
+                            $"^FO20,65^FDSector {sector}^FS\n" +
+
+                            "^A0N,30,30\n" +
+                            $"^FO20,100^FB430,2,0,L^FD{material}^FS\n" +
+
+                            "^A0N,24,24\n" +
+                            $"^FO20,140^FDProfesional {profesional}^FS\n" +
+
+                            "^A0N,24,24\n" +
+                            $"^FO20,175^FDPaciente {paciente}^FS\n" +
+
+                            "^A0N,24,24\n" +
+                            $"^FO20,210^FDRemito {remito}^FS\n" +
+                            $"^FO250,210^FD{ortopedia}^FS\n" +
+
+                            "^A0N,24,24\n" +
+                            $"^FO20,245^FDFecha pro {fechaProc:dd/MM/yyyy}^FS\n" +
+                            $"^FO250,245^FD{horaProc:HH:mm}^FS\n" +
+
+                            "^A0N,24,24\n" +
+                            $"^FO190,295^FD{idDetalle}^FS\n" +
+
+                            "^BY3,2,45\n" +
+                            $"^FO60,315^BCN,40,N,N,N^FD{idDetalle}^FS\n" +
+
+                            "^XZ";
+            }
+
+            //etiqueta profesional
+
+            public static string RecepcionDetalleProfesional(
+            string sector,
+            string material,
+            DateTime fechaRecepcion,
+            DateTime vencimiento,
+            int nroRecepcion,
+            int idDetalle,
+            string profesional,
+            DateTime? fechaProc,
+            DateTime? horaProc,
+            int cantidad)
+                    {
+                        return
+                            "^XA\n" +
+
+                            "^CI28\n" +
+                            "^PW480\n" +
+                            "^LL360\n" +
+
+                            "^LH20,0\n" +
+
+                            "^A0N,26,26\n" +
+                            "^FO20,30^FDRecepcion^FS\n" +
+                            $"^FO150,30^FD{nroRecepcion}^FS\n" +
+                            $"^FO320,30^FD{fechaRecepcion:dd/MM/yyyy}^FS\n" +
+
+                            "^A0N,26,26\n" +
+                            $"^FO20,65^FDSector {sector}^FS\n" +
+
+                            "^A0N,30,30\n" +
+                            $"^FO20,100^FB430,2,0,L^FD{material}^FS\n" +
+
+                            "^A0N,24,24\n" +
+                            $"^FO20,145^FDProfesional {profesional}^FS\n" +
+
+                            "^A0N,24,24\n" +
+                            $"^FO20,180^FDFecha proc {fechaProc:dd/MM/yyyy}^FS\n" +
+                            $"^FO250,180^FD{horaProc:HH:mm}^FS\n" +
+
+                            "^A0N,24,24\n" +
+                            $"^FO20,215^FDCant Piezas {cantidad}^FS\n" +
+
+                            "^FO20,250^GB420,28,28^FS\n" +
+                            "^CF0,24\n" +
+                            $"^FO30,252^FR^FDVencimiento {vencimiento:dd/MM/yyyy}^FS\n" +
+
+                            "^A0N,24,24\n" +
+                            $"^FO190,295^FD{idDetalle}^FS\n" +
+
+                            "^BY3,2,45\n" +
+                            $"^FO60,315^BCN,40,N,N,N^FD{idDetalle}^FS\n" +
+
+                            "^XZ";
+            }
     }
 
 

@@ -49,6 +49,22 @@ namespace ConexionSql.Controllers
             // 🔸 Tipos de Ciclo dinámicos
             model.TiposCiclo = new List<SelectListItem>();
 
+            // 👤 Usuario logueado
+            var usuarioIdSesion = HttpContext.Session.GetString("UsuarioId");
+
+            if (!string.IsNullOrEmpty(usuarioIdSesion) && int.TryParse(usuarioIdSesion, out int usuarioId))
+            {
+                var usuario = await _context.IbPers
+                    .FirstOrDefaultAsync(p => p.IbPerId == usuarioId);
+
+                if (usuario != null)
+                {
+                    ViewBag.UsuarioId = usuario.IbPerId;
+                    ViewBag.UsuarioLogueado = $"{usuario.IbPerApe}, {usuario.IbPerNom}";
+                    ViewBag.CargoUsuario = usuario.IbPerCarDen;
+                }
+            }
+
             return View("~/Views/Procesos/CrearProcesos.cshtml", model);
         }
 
@@ -154,7 +170,7 @@ namespace ConexionSql.Controllers
                     // Personal logueado
                     TbProPerId = personal.IbPerId,
                     TbProPerNom = $"{personal.IbPerApe} {personal.IbPerNom}".Trim(),
-                    TbProPerApe = "",
+                    TbProPerApe = personal.IbPerApe,
                     TbProPerCarId = personal.IbPerCarId,
                     TbProPerCarDen = personal.IbPerCarDen,
 

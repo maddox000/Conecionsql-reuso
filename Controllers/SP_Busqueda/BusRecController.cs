@@ -19,7 +19,7 @@ namespace ConexionSql.Controllers.SP_Busqueda
         public IActionResult Index()
         {
             // Fecha Inicio: 1800 días atrás | Fecha Fin: Hoy
-            ViewBag.FEC_INI = DateTime.Now.AddDays(-1800).ToString("yyyy-MM-dd");
+            ViewBag.FEC_INI = DateTime.Now.AddDays(-30).ToString("yyyy-MM-dd");
             ViewBag.FEC_FIN = DateTime.Now.ToString("yyyy-MM-dd");
 
             // CORRECCIÓN: Apuntamos a la carpeta RecBusqueda

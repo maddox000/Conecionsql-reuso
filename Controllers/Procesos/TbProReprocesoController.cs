@@ -364,6 +364,8 @@ namespace ConexionSql.Controllers.Procesos
                         });
                     }
 
+                    Console.WriteLine("MotivoId recibido en DTO: " + dto.MotivoId);
+
                     ReprocesoParcialStock(
                         detalleRecepcion,
                         dto.MotivoId,

@@ -13,6 +13,7 @@
 
     var usuarioId = ViewBag.UsuarioId;
     var usuarioLogueado = ViewBag.UsuarioLogueado as string;
+
 }
 
 <link rel="stylesheet" href="~/css/views/crear-entrega.css" asp-append-version="true" />
@@ -43,7 +44,7 @@
 
                 <div class="entrega-kv">
                     <div class="k">Cargo</div>
-                    <div class="v">-</div>
+                    <div class="v">@ViewBag.CargoUsuario</div>
                 </div>
 
                 <div class="entrega-kv entrega-kv-total">

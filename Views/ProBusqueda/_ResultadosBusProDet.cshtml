@@ -2,63 +2,53 @@
 
 @if (Model != null && Model.Any())
 {
-    <table class="table-baxen-resultados">
-        <thead>
-            <tr>
-                <th>ID Rec.</th>
-                <th>Material / Denominación</th>
-                <th style="text-align: center;">Cant.</th>
-                <th>Sector Destino</th>
-                <th>Equipo / Proceso</th>
-                <th>Fecha / Inicio</th>
-                <th style="text-align: center;">Acción</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
+    <div id="zonaResultados" style="max-height: 350px; overflow: auto; width: 100%; border: 1px solid #dee2e6; border-radius: 8px; background: #fff;">
+        <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+            <thead>
                 <tr>
-                    <td style="font-weight: bold; color: #2c3e50; cursor:pointer;"
-                        ondblclick="window.location.href='/Traza/TrazaRecDetID/@item.TB_PRO_DET_REC_DET_ID'">
-                        @item.TB_PRO_DET_REC_DET_ID
-                    </td>
-                    <td>
-                        <div style="font-weight: 600;">@item.TB_PRO_DET_REC_DET_MAT_DEN</div>
-                        <small class="text-muted">Mat. ID: @item.TB_PRO_DET_REC_DET_MAT_ID</small>
-                    </td>
-                    <td style="text-align: center;">
-                        <span class="badge" style="background-color: #ebedef; color: #2c3e50; font-size: 0.9rem; border: 1px solid #d5dbdb;">
-                            @(item.TB_PRO_DET_CANT_MULT ?? item.TB_PRO_DET_CANT)
-                        </span>
-                    </td>
-                    <td>
-                        <i class="material-icons" style="font-size: 14px; vertical-align: middle; color: #7f8c8d;">room</i>
-                        @item.TB_REC_SEC_DES_DEN
-                    </td>
-                    <td>
-                        <div style="color: #2980b9; font-weight: 600;">@item.EQUIPO</div>
-                        <small class="text-muted">Proc. ID: @item.TB_PRO_ID</small>
-                    </td>
-                    <td>
-                        <div style="font-weight: 500;">
-                            @(item.TB_PRO_FEC.HasValue? item.TB_PRO_FEC.Value.ToString("dd/MM/yyyy") : "-")
-                        </div>
-                        <small class="text-muted">@item.TB_PRO_HOR_INI hs</small>
-                    </td>
-                    <td style="text-align: center;">
-                        <button class="btn-ver-detalle" onclick="verTrazabilidad(@item.TB_PRO_DET_REC_DET_ID)" title="Ver Trazabilidad Completa">
-                            <span class="material-icons">account_tree</span>
-                        </button>
-                    </td>
+                    <th style="position: sticky; top: 0; background-color: #2c3e50; color: #ffffff; z-index: 10; padding: 12px; white-space: nowrap; border-bottom: 2px solid #1a252f;">
+                        Código etiqueta
+                    </th>
+                    <th style="position: sticky; top: 0; background-color: #2c3e50; color: #ffffff; z-index: 10; padding: 12px; white-space: nowrap; border-bottom: 2px solid #1a252f;">
+                        Denominación
+                    </th>
+                    <th style="position: sticky; top: 0; background-color: #2c3e50; color: #ffffff; z-index: 10; padding: 12px; white-space: nowrap; border-bottom: 2px solid #1a252f;">
+                        Cantidad
+                    </th>
+                    <th style="position: sticky; top: 0; background-color: #2c3e50; color: #ffffff; z-index: 10; padding: 12px; white-space: nowrap; border-bottom: 2px solid #1a252f;">
+                        Sector Destino
+                    </th>
+                    <th style="position: sticky; top: 0; background-color: #2c3e50; color: #ffffff; z-index: 10; padding: 12px; white-space: nowrap; border-bottom: 2px solid #1a252f;">
+                        Equipo / Proceso
+                    </th>
+                    <th style="position: sticky; top: 0; background-color: #2c3e50; color: #ffffff; z-index: 10; padding: 12px; white-space: nowrap; border-bottom: 2px solid #1a252f;">
+                        Fecha / Hora
+                    </th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td ondblclick="window.location.href='/Traza/TrazaRecDetID/@item.TB_PRO_DET_REC_DET_ID'" style="cursor: pointer; white-space: nowrap; font-weight: normal; color: #1a252f;">
+                            @item.TB_PRO_DET_REC_DET_ID
+                        </td>
+                        <td style="white-space: nowrap;">@item.TB_PRO_DET_REC_DET_MAT_DEN</td>
+                        <td style="white-space: nowrap;">@item.TB_PRO_DET_CANT</td>
+                        <td style="white-space: nowrap;">@item.TB_REC_SEC_DES_DEN</td>
+                        <td style="white-space: nowrap;">@item.EQUIPO</td>
+                        <td style="white-space: nowrap;">@item.TB_PRO_HOR_INI hs</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 else
 {
-    <div class="alert alert-info" role="alert" style="margin-bottom: 0;">
-        <i class="material-icons" style="vertical-align: middle;">info</i>
+    <div style="padding: 25px; text-align: center; color: #7f8c8d; font-size: 0.85rem; background: #fff; border: 1px solid #dee2e6; border-radius: 8px;">
         No hay detalles de procesos activos que coincidan con los filtros seleccionados.
     </div>
 }
+
+ 

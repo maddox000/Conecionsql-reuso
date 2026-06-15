@@ -2,61 +2,42 @@
 
 @if (Model != null && Model.Any())
 {
-    <table class="table-baxen-resultados">
+    <table>
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Número</th>
+                <th>Proceso</th>
+                <th>Lote</th>
                 <th>Fecha / Hora</th>
-                <th>Equipo / Unidad</th>
-                <th>Programa (PTI)</th>
+                <th>Tipo de proceso</th>
+                <th>Equipo</th>
+                <th>Tipo de ciclo</th>
                 <th>Estado</th>
-                <th>Usuario</th>
-                <th style="text-align: center;">Acción</th>
+                @* <th>Usuario</th>
+                <th>Acción</th> *@
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model)
             {
                 <tr>
-                    <td ondblclick="verDetalleProceso(@item.TB_PRO_ID)"
-                        style="font-weight: bold; color: #2c3e50; cursor:pointer;">
+                    @* <td>@item.TB_PRO_ID</td> *@
+                    <td ondblclick="window.location.href='/TbProBusqueda/VerProceso?tbProId=@item.TB_PRO_ID'"
+                        style="cursor:pointer;">
                         @item.TB_PRO_ID
                     </td>
                     <td>@item.TB_PRO_NUM_1</td>
-                    <td>
-                        <div style="font-weight: 600;">
-                            @(item.TB_PRO_FEC.HasValue ? item.TB_PRO_FEC.Value.ToString("dd/MM/yyyy") : "-")
-                        </div>
-                        <small class="text-muted">@item.TB_PRO_HOR_INI hs</small>
-                    </td>
-                    <td>
-                        <div style="font-weight: 600; color: #2980b9;">@item.EQUIPO</div>
-                        <small class="text-muted">Ciclo: @item.TB_PRO_TCI_DEN</small>
-                    </td>
-                    <td>
-                        <span style="font-weight: 500;">@item.TB_PRO_PTI_DEN</span>
-                        <br /><small class="text-muted">ID: @item.TB_PRO_PTI_ID</small>
-                    </td>
-                    <td>
-                        @{
-                            // Lógica de colores según el ID de estado
-                            string colorEstado = item.IB_PRO_EST_ID == 1 ? "#27ae60" : "#7f8c8d";
-                        }
-                        <span class="badge" style="background-color: @colorEstado; color: white; padding: 5px 10px;">
-                            @item.IB_PRO_EST_DEN
-                        </span>
-                    </td>
-                    <td>
-                        <span style="font-size: 0.85rem;">
-                            <i class="fas fa-user"></i> @item.TB_PRO_UPRO
-                        </span>
-                    </td>
-                    <td style="text-align: center;">
-                        <button class="btn-ver-detalle" onclick="verDetalleProceso(@item.TB_PRO_ID)" title="Ver Gráfica/Detalle">
-                            <span class="material-icons">analytics</span>
+                    @* <td>@item.TB_PRO_FEC</td> *@
+                    <td>@item.TB_PRO_HOR_INI</td>
+                    <td>@item.TB_PRO_PTI_DEN</td>
+                    <td>@item.EQUIPO</td>
+                    <td>@item.TB_PRO_TCI_DEN</td>
+                    <td>@item.IB_PRO_EST_DEN</td>
+                    @* <td>@item.TB_PRO_UPRO</td> *@
+                    @* <td>
+                        <button onclick="verDetalleProceso(@item.TB_PRO_ID)">
+                            Ver Detalle
                         </button>
-                    </td>
+                    </td> *@
                 </tr>
             }
         </tbody>
@@ -64,14 +45,14 @@
 }
 else
 {
-    <div class="alert alert-info" role="alert" style="margin-bottom: 0;">
-        <i class="fas fa-info-circle"></i> No se encontraron procesos que coincidan con los filtros aplicados.
+    <div>
+        No se encontraron procesos que coincidan con los filtros aplicados.
     </div>
 }
-
 
 <script>
     function verDetalleProceso(tbProId) {
         window.location.href = '/TbProBusqueda/VerProceso?tbProId=' + tbProId;
     }
 </script>
+

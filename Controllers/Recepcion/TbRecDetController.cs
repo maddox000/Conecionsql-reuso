@@ -259,11 +259,12 @@ namespace ConexionSql.Controllers
         //valida q rama va dependiendo de sector
         private ResultadoValidacionReuso ValidarReuso(TbRecDetDto detalle, TbRec tbRec, TbReu reuso, IbMat material)
         {
-            var sectorRecepcion = (tbRec?.TbRecSecDesDen ?? "").Trim().ToUpper();
-            var sectorReuso = (reuso?.TbReuSecDen ?? "").Trim().ToUpper();
+            var sectorRecepcionId = tbRec?.TbRecSecDesId ?? 0;
+            var sectorReusoId = reuso?.TbReuSecId ?? 0;
+            var sectorRecepcionCodigo = (tbRec?.TbRecSecDesDen ?? "").Trim().ToUpper();
             var estadoId = detalle.TbRecDetEstId ?? 0;
 
-            if (string.IsNullOrWhiteSpace(sectorRecepcion))
+            if (sectorRecepcionId <= 0)
             {
                 return new ResultadoValidacionReuso
                 {
@@ -272,7 +273,7 @@ namespace ConexionSql.Controllers
                 };
             }
 
-            if (string.IsNullOrWhiteSpace(sectorReuso))
+            if (sectorReusoId <= 0)
             {
                 return new ResultadoValidacionReuso
                 {
@@ -281,7 +282,7 @@ namespace ConexionSql.Controllers
                 };
             }
 
-            if (sectorRecepcion != sectorReuso)
+            if (sectorRecepcionId != sectorReusoId)
             {
                 return new ResultadoValidacionReuso
                 {
@@ -290,7 +291,7 @@ namespace ConexionSql.Controllers
                 };
             }
 
-            if (sectorRecepcion == "CQ")
+            if (sectorRecepcionCodigo == "CQ")
             {
                 if ((material.IB_MAT_CES_SEC ?? 0) <= 0)
                 {
@@ -302,7 +303,7 @@ namespace ConexionSql.Controllers
                 }
             }
 
-            if (sectorRecepcion == "COB")
+            if (sectorRecepcionCodigo == "COB")
             {
                 if ((material.IB_MAT_CES_PARTOS ?? 0) <= 0)
                 {
@@ -314,7 +315,7 @@ namespace ConexionSql.Controllers
                 }
             }
 
-            if (sectorRecepcion == "HMD" || sectorRecepcion == "CCV" || sectorRecepcion == "FPM")
+            if (sectorRecepcionCodigo == "HMD" || sectorRecepcionCodigo == "CCV" || sectorRecepcionCodigo == "FPM")
             {
                 if (estadoId != 12)
                 {
@@ -405,6 +406,27 @@ namespace ConexionSql.Controllers
             try
             {
                 var codigoReuso = (detalle.TB_REC_DET_REU_ID ?? "").Trim();
+
+                // =========================================================
+                // VALIDAR REUSO DUPLICADO EN LA MISMA RECEPCIÓN
+                // =========================================================
+                if (detalle.TB_REC_ID > 0 && codigoReuso != "1")
+                {
+                    bool reusoYaRegistrado = await _context.TbRecDet
+                        .AnyAsync(x =>
+                            x.TbRecId == detalle.TB_REC_ID &&
+                            x.TbRecDetReuId == codigoReuso
+                        );
+
+                    if (reusoYaRegistrado)
+                    {
+                        return Json(new
+                        {
+                            ok = false,
+                            mensaje = "❌ Este código de reuso ya fue registrado en esta recepción."
+                        });
+                    }
+                }
 
                 // 1️⃣ Validación básica
                 if (string.IsNullOrWhiteSpace(codigoReuso))
@@ -497,6 +519,34 @@ namespace ConexionSql.Controllers
                     });
                 }
 
+                // 8️⃣ VALIDACIÓN DE ETAPA DE REUSO PARA RECEPCIÓN
+
+                int sectorReusoId = reuso.TbReuSecId ?? 0;
+                int estadoActualReusoId = reuso.TbReuEstIngId ?? 0;
+
+                if (sectorReusoId == 905)
+                {
+                    if (estadoActualReusoId != 5)
+                    {
+                        return Json(new
+                        {
+                            ok = false,
+                            mensaje = $"El código de reuso se encuentra en etapa {reuso.TbReuEstIngDen}. No corresponde a Recepción."
+                        });
+                    }
+                }
+                else if (sectorReusoId == 929 || sectorReusoId == 936)
+                {
+                    if (estadoActualReusoId != 16)
+                    {
+                        return Json(new
+                        {
+                            ok = false,
+                            mensaje = $"El código de reuso se encuentra en etapa {reuso.TbReuEstIngDen}. No corresponde a Recepción."
+                        });
+                    }
+                }
+
                 // =========================================================
                 // ✔ TODO OK → DEVUELVE DATOS
                 // =========================================================
@@ -543,7 +593,8 @@ namespace ConexionSql.Controllers
         )
         {
             // 🔢 Máximo permitido
-            int reuMat = material.IB_MAT_REU_OPC_CANT ?? 0;
+            //int reuMat = material.IB_MAT_REU_OPC_CANT ?? 0;
+            int reuMat = reuso.TbReuMatOpcCant;
 
             // 🔢 Reuso actual
             int reuIni = reuso.TbReuMatOpcReg ?? 1;
@@ -693,7 +744,11 @@ namespace ConexionSql.Controllers
                 //    por IB_MAT_ID
                 // =========================================================
                 int codigoNumerico = 0;
-                int.TryParse(codigo, out codigoNumerico);
+                //int.TryParse(codigo, out codigoNumerico);
+                if (!codigo.StartsWith("0"))
+                {
+                    int.TryParse(codigo, out codigoNumerico);
+                }
 
                 if (codigoNumerico > 0)
                 {
@@ -757,8 +812,12 @@ namespace ConexionSql.Controllers
                 // 4) SI NO ESTÁ EN IB_MAT, BUSCAR EN TB_REU
                 //    Acá el código ingresado puede ser un código de reuso
                 // =========================================================
+                //var reuso = _context.TbReu.FirstOrDefault(r =>
+                //    r.TbReuId.ToString() == codigo);
+
                 var reuso = _context.TbReu.FirstOrDefault(r =>
-                    r.TbReuId.ToString() == codigo);
+                    r.TbReuIdForm != null &&
+                    r.TbReuIdForm.Trim() == codigo);
 
                 if (reuso != null)
                 {
@@ -777,8 +836,12 @@ namespace ConexionSql.Controllers
                     // =====================================================
                     // 6) BUSCAR EL MATERIAL RELACIONADO AL REUSO
                     // =====================================================
+                    //var materialDesdeReuso = _context.IbMat.FirstOrDefault(m =>
+                    //    m.IB_MAT_ID == reuso.TbReuMatId.Value);
+
                     var materialDesdeReuso = _context.IbMat.FirstOrDefault(m =>
-                        m.IB_MAT_ID == reuso.TbReuMatId.Value);
+                        m.IB_MAT_ID == reuso.TbReuMatId.Value &&
+                        m.IB_MAT_OCU != true);
 
                     if (materialDesdeReuso != null)
                     {
@@ -788,6 +851,7 @@ namespace ConexionSql.Controllers
 
                             // ID del material
                             ibMatId = materialDesdeReuso.IB_MAT_ID,
+                            denominacion = materialDesdeReuso.IB_MAT_DEN,
 
                             // Tipo de material
                             ibMatMtiId = materialDesdeReuso.IB_MAT_MTI_ID,
@@ -1084,12 +1148,12 @@ namespace ConexionSql.Controllers
                     TbRecDetObs = detalle.TbRecDetObs,
                     TbRecDetMde = registro?.TbRecDetMde ?? false,
                     TbRecDetMort = 1,
-                    TbRecDetCantMult = 1,
+                    TbRecDetCantMult = detalle.TB_REC_DET_CANT_MULT ?? 1,
                     TbRecDetFentStock = 0,
                     TbRecDetFentTot = 0,
                     TbRecDetFrecStock = 0,
                     TbRecDetFrecTot = 0,
-                    TbRecDetCantElim = 1,
+                    TbRecDetCantElim = 0,
 
                     // STOCKS DE RECEPCIÓN
                     TbRecDetRecCant = 0,
@@ -1181,6 +1245,36 @@ namespace ConexionSql.Controllers
 
                 _context.TbRecDet.Add(entidad);
                 await _context.SaveChangesAsync();
+
+                //actualiza estado de tb_reu
+
+                if (!string.IsNullOrWhiteSpace(detalle.TB_REC_DET_REU_ID) && detalle.TB_REC_DET_REU_ID != "1")
+                {
+                    var reusoActualizar = await _context.TbReu
+                        .FirstOrDefaultAsync(x => x.TbReuIdForm == detalle.TB_REC_DET_REU_ID);
+
+                    if (reusoActualizar != null)
+                    {
+                        // HMD
+                        if (reusoActualizar.TbReuSecId == 905)
+                        {
+                            reusoActualizar.TbReuEstIngId = 12;
+                            reusoActualizar.TbReuEstIngDen = "CE - Recepcionado.";
+                            reusoActualizar.TbReuEstIngFec = DateTime.Now;
+                        }
+
+                        // CCV / Farmacia
+                        if (reusoActualizar.TbReuSecId == 929 || reusoActualizar.TbReuSecId == 936)
+                        {
+                            reusoActualizar.TbReuEstIngId = 17;
+                            reusoActualizar.TbReuEstIngDen = "CE - Recepción esterilización";
+                            reusoActualizar.TbReuEstIngFec = DateTime.Now;
+                        }
+
+                        _context.TbReu.Update(reusoActualizar);
+                        await _context.SaveChangesAsync();
+                    }
+                }
 
                 //para imprimir etiqueta completo
                 bool esCompleto = entidad.TbRecDetRepId == 2;
@@ -1288,6 +1382,21 @@ namespace ConexionSql.Controllers
                         );
                     }
                 }
+
+                if (entidad.TbRecDetReuOpc == true)
+                {
+                    zpl = Etiquetas.RecepcionDetalleReuso(
+                        sector: tbRec.TbRecSecDesDen,
+                        material: nombreMaterial,
+                        fechaRecepcion: tbRec.TbRecFec ?? DateTime.Now,
+                        vencimiento: DateTime.Now.AddMonths(6),
+                        nroRecepcion: tbRec.TbRecId,
+                        idDetalle: entidad.TbRecDetId,
+                        codigoReuso: entidad.TbRecDetReuId,
+                        tipoMaterial: entidad.TbRecDetMatMtiDen,
+                        reusoCant: entidad.TbRecDetReuCant ?? 0
+                    );
+                }
                 else
                 {
                     string zplNormal = Etiquetas.RecepcionDetalle(
@@ -1303,22 +1412,13 @@ namespace ConexionSql.Controllers
 
                     zpl = zplNormal;
                 }
-                //string zpl = Etiquetas.RecepcionDetalle(
-                //    sector: tbRec.TbRecSecOriDen,
-                //    material: nombreMaterial,
-                //    fechaRecepcion: tbRec.TbRecFec ?? DateTime.Now,
-                //    vencimiento: DateTime.Now.AddMonths(6),
-                //    nroRecepcion: tbRec.TbRecId,
-                //    idDetalle: entidad.TbRecDetId,
-                //    codigoReuso: entidad.TbRecDetReuId,
-                //    tipoMaterial: entidad.TbRecDetMatMtiDen
+  
 
-                //);
 
                 var cfgImpresion = await _context.APanOpc
                          .FirstOrDefaultAsync(x => x.IdDenominacion == "A_PAN_IMP_ETI_EN" && x.Valor == true);
 
-                if (cfgImpresion?.ValorTxt == "RECEPCION")
+                if (cfgImpresion?.ValorId == 1)
                 {
                     for (int i = 0; i < detalle.TB_REC_DET_CANT; i++)
                     {
@@ -1358,6 +1458,7 @@ namespace ConexionSql.Controllers
                         TB_REC_ID = d.TbRecId,
                         IB_MAT_ID = d.TbRecDetMatId,
                         TbRecDetMatDen = d.TbRecDetMatDen,
+                        TB_REC_DET_REU_ID = d.TbRecDetReuId,
                         IB_EST_ID = d.TbRecDetEstId,
                         IB_EST_DEN = d.TbRecDetEstDen,
                         TB_REC_DET_CANT = d.TbRecDetCant,
@@ -1647,7 +1748,10 @@ namespace ConexionSql.Controllers
 
                 int reuIni = reu.TbReuMatOpcReg ?? 0;
                 int reuMax = reu.TbReuMatOpcCant;
-                int reuFin = reuIni + (detalle.TB_REC_DET_REP_ID == 10 ? 0 : 1);
+                //int reuFin = reuIni + (detalle.TB_REC_DET_REP_ID == 10 ? 0 : 1);
+                int reuFin = detalle.IB_EST_ID == 12
+                    ? reuIni
+                    : reuIni + (detalle.TB_REC_DET_REP_ID == 10 ? 0 : 1);
 
                 // 🔥 CORRECCIÓN CLAVE
                 if (reuFin > reuMax && !detalle.ConfirmarReusoExcedido)

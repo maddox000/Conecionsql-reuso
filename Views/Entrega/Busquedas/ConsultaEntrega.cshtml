@@ -1,0 +1,76 @@
+﻿@model ConexionSql.Models.Entrega.TbEntDetFormDto
+
+
+
+<link rel="stylesheet" href="~/css/views/crear-entrega.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
+
+<div class="bx-card entrega-demo">
+    <div class="entrega-banner">Consulta Entrega</div>
+
+    <div class="entrega-grid">
+
+        <div class="entrega-panel">
+            <div class="entrega-kv">
+                <div class="k">Numero de entrega</div>
+                <div class="v">@Model.Cabecera.TbEntId</div>
+            </div>
+
+            <div class="entrega-kv">
+                <div class="k">Usuario</div>
+                <div class="v">@Model.Cabecera.TbEntPerNom</div>
+            </div>
+
+            <div class="entrega-kv">
+                <div class="k">Cargo</div>
+                <div class="v">-</div>
+            </div>
+
+            <div class="entrega-kv entrega-kv-total">
+                <div class="k">Total entregado</div>
+                <div class="v">@(Model.Cabecera.TbEntCantTot ?? 0) Unidades</div>
+            </div>
+        </div>
+
+        <div class="entrega-panel">
+            <div class="entrega-kv">
+                <div class="k">Fecha</div>
+                <div class="v">
+                    @Model.Cabecera.TbEntFec?.ToString("yyyy-MM-dd")
+                </div>
+            </div>
+
+            <div class="entrega-kv">
+                <div class="k">Hora</div>
+                <div class="v">
+                    @Model.Cabecera.TbEntHorIni?.ToString("HH:mm")
+                </div>
+            </div>
+
+            <div class="entrega-kv">
+                <div class="k">Sector de entrega</div>
+                <div class="v">@Model.Cabecera.TbEntSecDen</div>
+            </div>
+
+            <div class="entrega-kv">
+                <div class="k">Personal del sector</div>
+                <div class="v">@Model.Cabecera.TbEntSecPer</div>
+            </div>
+        </div>
+
+    </div>
+
+    <textarea class="entrega-observ"
+              readonly>@(Model.Cabecera.TbEntObs ?? "")</textarea>
+
+    @await Html.PartialAsync(
+        "~/Views/Entrega/_DetalleTabla.cshtml",
+        Model.Detalles
+    )
+
+    <div class="entrega-actions d-flex gap-2 align-items-center justify-content-end">
+        <a href="@Url.Action("Index", "Home")" class="btn-baxen">
+            Cerrar
+        </a>
+    </div>
+</div>

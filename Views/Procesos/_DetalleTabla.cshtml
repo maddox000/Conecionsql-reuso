@@ -14,77 +14,69 @@
             <th>Cantidad</th>
             <th hidden>Cant. reproceso</th>
             <th hidden>Seleccionar</th>
-            <th>Imprimir</th>
+            <th>Eliminar</th>
         </tr>
     </thead>
     <tbody>
-        @if (Model != null && Model.Any())
-        {
-            foreach (var item in Model)
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                <tr id="fila-pro-det-@item.TB_PRO_DET_ID"
+                    style="@(item.TB_PRO_DET_EST_DEN == "ELIMINADO" ? "opacity:0.5;" : "")">
+                        <td>@item.TB_PRO_DET_REC_DET_ID</td>
+                        <td>@item.TB_PRO_DET_REC_DET_MAT_DEN</td>
+                        <td>@item.TB_REC_SEC_DES_DEN</td>
+                        <td>@item.TB_PRO_DET_REC_DET_REU_ID</td>
+                        <td>@item.TB_PRO_DET_REC_DET_CANT</td>
+                        <td>@item.TB_PRO_DET_REC_DET_PRO_TOT</td>
+                        <td>@item.TB_PRO_DET_REC_DET_PRO_STOCK</td>
+
+                        <td>
+                            @(item.TB_PRO_DET_EST_DEN ?? "NO REGISTRA")
+                        </td>
+
+                        <td>@item.TB_PRO_DET_CANT</td>
+
+                        <td hidden style="text-align:center;">
+                            <input type="number"
+                                   class="cantReprocesoParcial"
+                                   value="@item.TB_PRO_DET_CANT"
+                                   min="1"
+                                   max="@item.TB_PRO_DET_CANT"
+                                   data-det-id="@item.TB_PRO_DET_ID"
+                                   disabled
+                                   style="width:70px;" />
+                        </td>
+
+                        <td hidden style="text-align:center;">
+                            <input type="checkbox"
+                                   class="chkReprocesoParcial"
+                                   value="@item.TB_PRO_DET_ID"
+                                   data-rec-det-id="@item.TB_PRO_DET_REC_DET_ID"
+                                   disabled />
+                        </td>
+
+                        <td style="text-align:center;">
+                            <button type="button"
+                                    class="btn btn-link text-danger p-0 js-pro-eliminar-detalle"
+                                    data-pro-det-id="@item.TB_PRO_DET_ID"
+                                    data-pro-id="@item.TB_PRO_ID"
+                                    title="Eliminar"
+                                    @(item.TB_PRO_DET_EST_DEN == "ELIMINADO" ? "disabled" : "")>
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-                    <td>@item.TB_PRO_DET_REC_DET_ID</td>
-                    <td>@item.TB_PRO_DET_REC_DET_MAT_DEN</td>
-                    <td>@item.TB_REC_SEC_DES_DEN</td>
-                    <td>@item.TB_PRO_DET_REC_DET_REU_ID</td>
-                    <td>@item.TB_PRO_DET_REC_DET_CANT</td>
-                    <td>@item.TB_PRO_DET_REC_DET_PRO_TOT</td>
-                    <td>@item.TB_PRO_DET_REC_DET_PRO_STOCK</td>
-
-                    <td>
-                        @(item.TB_PRO_DET_EST_DEN ?? "NO REGISTRA")
-                    </td>
-
-                    <td>@item.TB_PRO_DET_CANT</td>
-
-                    <td hidden style="text-align:center;">
-                        <input type="number"
-                               class="cantReprocesoParcial"
-                               value="@item.TB_PRO_DET_CANT"
-                               min="1"
-                               max="@item.TB_PRO_DET_CANT"
-                               data-det-id="@item.TB_PRO_DET_ID"
-                               disabled
-                               style="width:70px;" />
-                    </td>
-
-                    <td hidden style="text-align:center;">
-                        <input type="checkbox"
-                               class="chkReprocesoParcial"
-                               value="@item.TB_PRO_DET_ID"
-                               data-rec-det-id="@item.TB_PRO_DET_REC_DET_ID"
-                               disabled />
-                    </td>
-
-                    <td>
-                        <div class="proceso-print-actions" role="group" aria-label="Acciones de impresion por etiqueta">
-                            <button type="button"
-                                    class="btn btn-outline-primary proceso-row-icon-btn js-pro-row-print-pdf"
-                                    data-etiqueta="@item.TB_PRO_DET_REC_DET_ID"
-                                    title="Imprimir etiqueta @item.TB_PRO_DET_REC_DET_ID en PDF"
-                                    aria-label="Imprimir etiqueta @item.TB_PRO_DET_REC_DET_ID en PDF">
-                                <i class="bi bi-file-earmark-pdf-fill"></i>
-                            </button>
-
-                            <button type="button"
-                                    class="btn btn-outline-primary proceso-row-icon-btn js-pro-row-print-printer"
-                                    data-etiqueta="@item.TB_PRO_DET_REC_DET_ID"
-                                    title="Opciones de impresora para @item.TB_PRO_DET_REC_DET_ID"
-                                    aria-label="Opciones de impresora para @item.TB_PRO_DET_REC_DET_ID">
-                                <i class="bi bi-printer-fill"></i>
-                            </button>
-                        </div>
+                    <td colspan="12" class="proceso-table-empty-note">
+                        Sin materiales cargados
                     </td>
                 </tr>
             }
-        }
-        else
-        {
-            <tr>
-                <td colspan="12" class="proceso-table-empty-note">
-                    Sin materiales cargados
-                </td>
-            </tr>
-        }
     </tbody>
 </table>

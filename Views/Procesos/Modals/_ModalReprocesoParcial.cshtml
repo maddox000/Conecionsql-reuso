@@ -118,35 +118,47 @@
         });
     });
 
-    async function ejecutarReprocesoParcial(tbProId, motivoId) {
-        try {
-            const response = await fetch('/TbProReproceso/EjecutarReprocesoParcial', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
+
+    //reproceso parcial motivo
+
+        async function ejecutarReprocesoParcial(tbProId, motivoId, detalles) {
+            try {
+                const response = await fetch('/TbProReproceso/EjecutarReprocesoParcial', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        tbProId: parseInt(tbProId),
+                        motivoId: parseInt(motivoId),
+                        detalles: detalles
+                    })
+                });
+
+                const json = await response.json();
+
+                console.log("ENVIANDO:", {
                     tbProId: parseInt(tbProId),
-                    motivoId: parseInt(motivoId)
-                })
-            });
+                    motivoId: parseInt(motivoId),
+                    detalles: detalles
+                });
 
-            const json = await response.json();
+                console.log("RESPUESTA REPROCESO PARCIAL:", json);
 
-            console.log("RESPUESTA REPROCESO PARCIAL:", json);
+                if (json.success) {
+                    cerrarModalReprocesoParcial();
+                    alert(json.mensaje);
+                    location.reload();
+                } else {
+                    alert(json.mensaje);
+                }
 
-            if (json.success) {
-                cerrarModalReprocesoParcial();
-                alert(json.mensaje);
-                location.reload();
-            } else {
-                alert(json.mensaje);
+            } catch (error) {
+                console.error("ERROR EJECUTAR REPROCESO PARCIAL:", error);
             }
-
-        } catch (error) {
-            console.error("ERROR EJECUTAR REPROCESO PARCIAL:", error);
         }
-    }
+
+    
 
     function cerrarModalReprocesoParcial() {
         const modal = document.getElementById("modalReprocesoParcial");

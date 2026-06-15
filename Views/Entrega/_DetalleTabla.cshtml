@@ -13,7 +13,7 @@
                 <th>Pendientes</th>
                 <th>Entregados</th>
                 <th>Cantidad</th>
-                <th>Imprimir</th>
+                <th>Eliminar</th>
             </tr>
         </thead>
 
@@ -22,19 +22,28 @@
             {
                 foreach (var item in Model)
                 {
-                    <tr>
-                        <td>@item.TB_ENT_DET_REC_DET_ID</td>
+                    var estiloFila = item.TB_ENT_DET_DAT == "ELIMINADO"
+                        ? "opacity:0.5;"
+                        : "";
+
+                    <tr id="fila-ent-det-@item.TB_ENT_DET_ID" style="@estiloFila">
+                        <td ondblclick="window.location.href='/Traza/TrazaRecDetID/@item.TB_ENT_DET_REC_DET_ID'"
+                            style="cursor:pointer;">
+                            @item.TB_ENT_DET_REC_DET_ID
+                        </td>
                         <td>@item.TbEntDetRecDetMatDen</td>
                         <td>@item.CodigoReuso</td>
                         <td>@item.Recibidos</td>
                         <td>@item.Pendientes</td>
                         <td>@item.Entregados</td>
                         <td>@item.TB_ENT_DET_CANT</td>
-                        <td>
+                        <td class="text-center">
                             <button type="button"
-                                    class="btn btn-danger btn-sm"
-                                    onclick="eliminarDetalle(@item.TB_ENT_DET_ID)">
-                                Eliminar
+                                    class="btn btn-link text-danger p-0 js-ent-eliminar-detalle"
+                                    data-ent-det-id="@item.TB_ENT_DET_ID"
+                                    title="Eliminar"
+                                @(item.TB_ENT_DET_DAT == "ELIMINADO" ? "disabled" : "")>
+                                <i class="bi bi-trash-fill"></i>
                             </button>
                         </td>
                     </tr>

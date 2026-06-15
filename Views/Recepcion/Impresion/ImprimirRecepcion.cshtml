@@ -1,0 +1,344 @@
+﻿@model ConexionSql.Models.Recepciones.TbRec
+@using ConexionSql.Models.Recepciones
+
+@{
+    Layout = null;
+    var detalles = ViewBag.Detalles as List<TbRecDetDto> ?? new List<TbRecDetDto>();
+}
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8" />
+    <title>Recepción @Model.TbRecId</title>
+
+    <link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
+
+    <style>
+            :root {
+                --ancho-mitad-izquierda: 40%;
+                --ancho-campos-sectores: 400px;
+                --gap-entre-filas: 8px;
+                --alto-campo: 24px;
+                --color-borde: #dcdcdc;
+                --color-fondo-blanco: #ffffff;
+                --color-texto-valor: #333333;
+                --color-texto-label: #666666;
+                --color-titulo: #34495e;
+            }
+
+            body {
+                background: #ffffff;
+                color: var(--color-texto-valor);
+                font-family: 'Segoe UI', Roboto, sans-serif;
+                font-size: 14px;
+                margin: 0;
+                padding: 0;
+            }
+
+            .rec-screen {
+                width: 100%;
+                max-width: 1300px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .rec-screen {
+                width: 100%;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .baxen-panel {
+                background: var(--color-fondo-blanco);
+                border: 1px solid var(--color-borde);
+                border-radius: 6px;
+                box-shadow: none;
+                padding: 15px 20px;
+            }
+
+            .campo-detalle {
+                height: var(--alto-campo);
+                padding: 2px 8px;
+                background: white;
+                border: 1px solid var(--color-borde);
+                border-radius: 4px;
+                font-size: 0.8rem;
+                display: flex;
+                align-items: center;
+                color: var(--color-texto-valor);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                box-sizing: border-box;
+            }
+
+            .campo-centrado {
+                justify-content: center !important;
+                text-align: center;
+            }
+
+            .label-detalle {
+                font-weight: 600;
+                font-size: 0.75rem;
+                color: var(--color-texto-label);
+                margin-bottom: 0;
+                display: block;
+            }
+
+            .titulo-pantalla {
+                display: flex;
+                justify-content: flex-end;
+                padding-bottom: 5px;
+                margin-bottom: 0;
+            }
+
+                .titulo-pantalla h1 {
+                    margin: 0;
+                    font-size: 1.5rem;
+                    color: var(--color-titulo);
+                    font-weight: 400;
+                }
+
+            .rec-screen-table-wrap {
+                margin-top: 12px;
+                width: 100%;
+            }
+
+            .rec-screen-table-title {
+                background: var(--color-titulo);
+                color: white;
+                padding: 6px 12px;
+                border-radius: 4px 4px 0 0;
+                font-size: 0.85rem;
+                font-weight: 500;
+            }
+
+            .rec-screen-table {
+                width: 100%;
+                border: 1px solid var(--color-borde);
+                border-top: none;
+                border-collapse: collapse;
+            }
+
+                .rec-screen-table thead {
+                    background: var(--color-titulo);
+                }
+
+                .rec-screen-table th {
+                    padding: 8px;
+                    font-size: 0.8rem;
+                    color: white;
+                    font-weight: 600;
+                    text-align: left;
+                    border-right: 1px solid rgba(255,255,255,0.25);
+                }
+
+                .rec-screen-table td {
+                    padding: 7px 8px;
+                    font-size: 0.8rem;
+                    border-bottom: 1px solid var(--color-borde);
+                }
+
+            @@page {
+                size: A4 portrait;
+                margin: 8mm;
+            }
+
+            @@media print {
+                body {
+                    padding: 0;
+                    padding-bottom: 18mm;
+                }
+
+                .baxen-panel {
+                    box-shadow: none !important;
+                }
+
+                .rec-screen-table {
+                    page-break-inside: auto;
+                }
+
+                    .rec-screen-table tr {
+                        page-break-inside: avoid;
+                        page-break-after: auto;
+                    }
+
+                    .rec-screen-table thead {
+                        display: table-header-group;
+                    }
+            }
+
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .rec-screen-table-title,
+            .rec-screen-table thead,
+            .rec-screen-table thead tr,
+            .rec-screen-table th {
+                background-color: #34495e !important;
+                color: #ffffff !important;
+            }
+
+
+    </style>
+
+    <script>
+            window.onload = function () {
+                setTimeout(function () {
+                    window.print();
+                }, 300);
+            };
+
+            window.onafterprint = function () {
+                window.close();
+            };
+    </script>
+</head>
+
+<body>
+
+    <div class="rec-screen">
+
+        <div style="display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            margin-bottom:12px;">
+
+            <img src="/img/Cliente - Logo.png"
+                 alt="Logo Cliente"
+                 style="max-height:55px;" />
+
+            <div style="min-width:130px;"></div>
+        </div>
+
+        <div class="baxen-panel" style="display: flex; margin-bottom: 8px; align-items: stretch;">
+
+            <div style="flex: 0 0 calc(var(--ancho-mitad-izquierda) - 10px); display: flex; flex-direction: column; gap: var(--gap-entre-filas); padding-right: 20px;">
+
+                <div style="display: flex; align-items: center; width: 100%; gap: 10px;">
+                    <label class="label-detalle" style="width: 115px; flex-shrink: 0; text-align: right;">Número recepción</label>
+                    <div class="campo-detalle campo-centrado" style="width: 80px;">@Model.TbRecId</div>
+
+                    <label class="label-detalle" style="width: 70px; flex-shrink: 0;">Fecha / Hora</label>
+                    <div class="campo-detalle campo-centrado" style="width: 150px; flex-shrink: 0;">
+                        @Model.TbRecFec?.ToString("dd/MM/yyyy") @Model.TbRecHorIni?.ToString("HH:mm")
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: flex-start; width: 100%; gap: 10px;">
+                    <label class="label-detalle" style="width: 115px; flex-shrink: 0; text-align: right; margin-top: 4px;">Usuario</label>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+                        <div class="campo-detalle" style="width: 100%;" title="@Model.TbRecPerNom">
+                            @Model.TbRecPerNom
+                        </div>
+                        <div class="campo-detalle" style="font-weight: 500; width: 100%;" title="@Model.TbRecPerCarDen">
+                            @Model.TbRecPerCarDen
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; width: 100%; margin-top: auto; padding-top: 5px; gap: 10px;">
+                    <label class="label-detalle" style="width: 115px; flex-shrink: 0; text-align: right;">Total recibido</label>
+                    <div class="campo-detalle campo-centrado" style="width: 100px; font-weight: bold; background-color: #f8f9fa; border-color: #dcdcdc;">
+                        @Model.TbRecCantTot unidades
+                    </div>
+                </div>
+            </div>
+
+            <div style="flex: 1; display: flex; gap: 20px; border-left: 1px solid #eeeeee; padding-left: 20px;">
+
+                <div style="width: var(--ancho-campos-sectores); display: flex; flex-direction: column; gap: var(--gap-entre-filas); flex-shrink: 0;">
+
+                    <div style="display: flex; align-items: center;">
+                        <label class="label-detalle" style="width: 110px; flex-shrink: 0;">Sector Origen</label>
+                        <div class="campo-detalle" style="flex: 1;">@Model.TbRecSecOriDen</div>
+                    </div>
+
+                    <div style="display: flex; align-items: center;">
+                        <label class="label-detalle" style="width: 110px; flex-shrink: 0;">Sector Destino</label>
+                        <div class="campo-detalle" style="flex: 1;">@Model.TbRecSecDesDen</div>
+                    </div>
+
+                    <div style="display: flex; align-items: center;">
+                        <label class="label-detalle" style="width: 110px; flex-shrink: 0;">Personal sector</label>
+                        <div class="campo-detalle" style="flex: 1;">@Model.TbRecSecPer</div>
+                    </div>
+
+                    <div style="display: flex; align-items: center;">
+                        <label class="label-detalle" style="width: 110px; flex-shrink: 0;">Proveedor</label>
+                        <div class="campo-detalle" style="flex: 1;">@Model.TbRecOrtDen</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="baxen-panel" style="margin-bottom: 0; padding: 4px 20px;">
+            <label class="label-detalle" style="margin-bottom: 4px;">Observaciones</label>
+            <div class="campo-detalle" style="width: 100%;">
+                @(string.IsNullOrWhiteSpace(Model.TbRecObs) ? "SIN OBSERVACIONES" : Model.TbRecObs)
+            </div>
+        </div>
+
+
+            <table class="rec-screen-table">
+                <thead>
+                    <tr>
+                        <th>Código etiqueta</th>
+                        <th>Denominación</th>
+                        <th>Cód Reuso</th>
+                        <th>Estado</th>
+                        <th>Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in detalles)
+                    {
+                        <tr>
+                            <td>@item.TB_REC_DET_ID</td>
+                            <td>@item.TbRecDetMatDen</td>
+                            <td>@item.TB_REC_DET_REU_ID</td>
+                            <td>@item.IB_EST_DEN</td>
+                            <td>@item.TB_REC_DET_CANT</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+
+   
+
+        <div style="position:fixed;
+            bottom:0;
+            left:0;
+            right:0;
+            padding:0 8mm 4mm 8mm;
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-end;
+            background:white;">
+
+            <img src="/img/BAXEN_Trazabilidad.png"
+                 alt="Baxen"
+                 style="max-height:65px;" />
+
+            <div style="font-size:0.7rem;
+                color:#666;
+                white-space:nowrap;
+                text-align:right;">
+                <div>Impreso: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</div>
+                <div>Hoja 1</div>
+            </div>
+        </div>
+
+</body>
+</html>

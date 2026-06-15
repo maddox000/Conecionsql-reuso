@@ -96,5 +96,7 @@ namespace ConexionSql.Models.Entrega
 
         public int? TbEntDetTranspOpcId { get; set; }
         public string? TbEntDetTranspOpcDen { get; set; }
+        public int? TB_ENT_DET_CANT_ELIM { get; set; }
+        public string? TB_ENT_DET_DAT { get; set; }
     }
 }

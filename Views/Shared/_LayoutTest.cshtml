@@ -1,5 +1,5 @@
-﻿﻿@{
-Layout = null;
+﻿@{
+    Layout = null;
 }
 
 
@@ -20,275 +20,461 @@ Layout = null;
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
     <style>
-            /* --- ANCHO DEL MENÚ --- */
-            .menu-lateral {
-                min-width: 270px !important;
-                width: 270px !important;
+            /* ==========================================================================
+                                                                           1. VARIABLES GLOBALES (Modificá toda la estructura base desde aquí)
+                                                                           NOTA: ¡NO pongas !important en estos valores!
+                                                                           ========================================================================== */
+            :root {
+                /* --- FUENTES Y TAMAÑOS --- */
+                --tamanio-fuente-general: 0.75rem;
+                --tamanio-iconos-principales: 0.75rem;
+                --tamanio-iconos-guion: 0.75rem;
+                /* --- MÁRGENES Y ALINEACIONES HORIZONTALES --- */
+                --margen-nivel-1: 0px;
+                --margen-nivel-2: 0px;
+                --margen-nivel-3: 0px;
+                /* --- ESPACIADOS Y TAMAÑOS DE BOTONES (ALINEACIÓN VERTICAL) --- */
+                --espaciado-vertical-items: 5px;
+                --interlineado-texto: 1.5;
+                /* --- COLORES Y ESTILOS VISUALES --- */
+                --color-texto-menu: #ffffff;
+                --color-fondo-hover: rgba(255, 255, 255, 0.08);
+                --color-fondo-activo: rgba(255, 255, 255, 0.15);
+                --radio-bordes: 4px;
+                /* --- ANIMACIONES --- */
+                --velocidad-animacion: 0.3s;
             }
 
-            /* Alineación uniforme */
+            /* ==========================================================================
+                                                                           2. CONTENEDOR PRINCIPAL DEL MENÚ LATERAL
+                                                                           ========================================================================== */
+            .menu-lateral {
+                min-width: 200px !important;
+                width: 220px !important;
+                font-size: var(--tamanio-fuente-general) !important;
+            }
+
+                /* ==========================================================================
+                                                                           3. LIMPIEZA DE VIÑETAS Y LISTAS
+                                                                           ========================================================================== */
+                .menu-lateral ul,
+                .menu-lateral li {
+                    list-style: none !important;
+                    list-style-type: none !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                }
+
+            /* ==========================================================================
+                                                                           4. ESTILOS BASE DE TODOS LOS BOTONES Y ENLACES
+                                                                           ========================================================================== */
             .menu-lista .menu-item button,
             .menu-lista .menu-item a {
-                padding-left: 18px !important;
+                padding-left: var(--margen-nivel-1) !important;
+                padding-top: var(--espaciado-vertical-items) !important;
+                padding-bottom: var(--espaciado-vertical-items) !important;
+                text-align: left !important;
+                display: block !important;
+                width: 100% !important;
+                color: inherit !important;
+                text-decoration: none !important;
+                border: none !important;
+                background: transparent !important;
+                cursor: pointer !important;
+                transition: background-color 0.2s ease !important;
+                font-size: var(--tamanio-fuente-general) !important;
             }
 
-            /* Submenú adicional */
-            .submenu-extra {
-                display: none;
-                flex-direction: column;
-                margin-left: 22px;
-                opacity: 0;
-                transform: translateX(-10px);
-                transition: all 0.25s ease;
+            .menu-titulo {
+                display: flex !important;
+                align-items: center !important;
             }
 
-                .submenu-extra.visible {
-                    display: flex;
-                    opacity: 1;
-                    transform: translateX(0);
+                .menu-titulo i {
+                    font-size: var(--tamanio-iconos-principales) !important;
+                    margin-right: 10px !important;
                 }
 
-                /* CUADRADO ▪ más grande y centrado */
-                .submenu-extra a {
-                    display: block !important;
-                    position: relative;
-                    padding-left: 24px !important;
-                    line-height: 1.7;
-                    color: inherit !important;
-                }
+            .menu-lista .menu-item button:hover,
+            .menu-lista .menu-item a:hover {
+                background-color: var(--color-fondo-hover) !important;
+                border-radius: var(--radio-bordes) !important;
+            }
 
-                    .submenu-extra a::before {
-                        content: "▪";
-                        position: absolute;
-                        left: 0;
-                        top: 1px;
-                        font-size: 25px;
-                        color: inherit;
-                    }
-
-                    /* Ítem activo dentro del submenú */
-                    .submenu a.active,
-                    .submenu-extra a.active {
-                        background-color: rgba(255,255,255,0.12);
-                        border-radius: 4px;
-                    }
-
-            /* Animación del submenú principal */
+            /* ==========================================================================
+                                                                           5. SUBMENÚ PRINCIPAL (Nivel 2)
+                                                                           ========================================================================== */
             .submenu {
-                overflow: hidden;
+                overflow: hidden !important;
                 max-height: 0;
-                transition: max-height 0.3s ease;
+                transition: max-height var(--velocidad-animacion) ease !important;
+                padding-left: var(--margen-nivel-2) !important;
             }
 
                 .submenu.visible {
-                    max-height: 800px;
+                    max-height: 800px !important;
                 }
 
-            .icon-guion {
-                font-size: 1.2rem;
-                margin-right: 6px;
-                vertical-align: middle;
+            /* ==========================================================================
+                                                                           6. SUBMENÚ EXTRA (Nivel 3)
+                                                                           ========================================================================== */
+            .submenu-extra {
+                display: none !important;
+                flex-direction: column !important;
+                margin-left: var(--margen-nivel-3) !important;
+                opacity: 0;
+                transform: translateX(-10px);
+                transition: all 0.25s ease !important;
             }
 
-            .icon-cuadro {
-                font-size: 0.55rem;
-                margin-right: 8px;
-                vertical-align: middle;
+                .submenu-extra.visible {
+                    display: flex !important;
+                    opacity: 1 !important;
+                    transform: translateX(0) !important;
+                }
+
+                .submenu-extra a {
+                    display: block !important;
+                    position: relative !important;
+                    padding-left: 10px !important;
+                    line-height: var(--interlineado-texto) !important;
+                    color: inherit !important;
+                }
+
+                    /* ==========================================================================
+                                                                                   7. ESTADOS ACTIVOS
+                                                                                   ========================================================================== */
+                    .submenu a.active,
+                    .submenu-extra a.active {
+                        background-color: var(--color-fondo-activo) !important;
+                        border-radius: var(--radio-bordes) !important;
+                        font-weight: 500 !important;
+                    }
+
+            /* ==========================================================================
+                                                                           8. ÍCONO GUIÓN
+                                                                           ========================================================================== */
+            .icon-guion {
+                font-size: var(--tamanio-iconos-guion) !important;
+                margin-right: 6px !important;
+                vertical-align: middle !important;
             }
+
+            /* ==========================================================================
+                                                                           9. LOGO BAXEN
+                                                                           ========================================================================== */
+            .menu-logo {
+                text-align: center !important;
+                padding: 20px 10px !important;
+            }
+
+                .menu-logo img {
+                    width: 80px !important;
+                    max-width: 100% !important;
+                    height: auto !important;
+                }
+
+            /* ==========================================================================
+                                                                           10. ANULAR ÍCONOS/CUADRADOS GLOBALES SOLO EN ESTE MENÚ
+                                                                           ========================================================================== */
+            #menuLateral .submenu-extra a::before {
+                display: none !important;
+                content: "" !important;
+            }
+
+            /* ==========================================================================
+                                                           FORZAR INDENTACIÓN DE NIVELES (Prioridad Máxima con ID)
+                                                       ========================================================================== */
+
+            /* NIVEL 1 (Ej: Información básica, Tareas) */
+            #menuLateral .menu-lista > .menu-item > .menu-titulo,
+            #menuLateral .menu-lista > .menu-item > a {
+                padding-left: 10px !important;
+            }
+
+            /* NIVEL 2 (Ej: Recepción, Proceso materiales, Entregas...) */
+            #menuLateral .submenu > li > .menu-titulo,
+            #menuLateral .submenu > li > .submenu-btn,
+            #menuLateral .submenu > li > a {
+                padding-left: 15px !important;
+            }
+
+            /* NIVEL 3 (Ej: Proceso de lavado, Control de instrumental...) */
+            #menuLateral .submenu > li.submenu-extra > a {
+                padding-left: 35px !important;
+            }
+
+            /* ==========================================================================
+                                               NIVEL 4: COMPORTAMIENTO Y SANGRÍA (Lavado, Esterilización, etc.)
+                                            ========================================================================== */
+
+            /* 1. Ocultar la lista por defecto */
+            #menuLateral .submenu > li.submenu-extra > ul {
+                display: none !important;
+                flex-direction: column !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+                /* 2. Mostrar la lista cuando hacemos clic (se agrega la clase desde JS) */
+                #menuLateral .submenu > li.submenu-extra > ul.visible {
+                    display: flex !important;
+                }
+
+                /* 3. Empujar los textos a la derecha (El famoso requerimiento original) */
+                #menuLateral .submenu > li.submenu-extra > ul > li > a {
+                    padding-left: 55px !important; /* Ajustá este valor si los querés más o menos a la derecha */
+                }
+
+                /* Clase para mostrar el Nivel 4 cuando se hace clic */
+                #menuLateral .submenu > li.submenu-extra > ul.visible {
+                    display: flex !important;
+                }
     </style>
 </head>
 
 <body>
 
     <script>
-            document.addEventListener("DOMContentLoaded", function () {
+                document.addEventListener("DOMContentLoaded", function () {
 
-            /* --- BÚSQUEDAS EN NUEVA PESTAÑA --- */
-            document.querySelectorAll(".link-busqueda").forEach(link => {
-                link.addEventListener("click", function (e) {
-                    e.preventDefault();
+                /* --- BÚSQUEDAS EN NUEVA PESTAÑA --- */
+                document.querySelectorAll(".link-busqueda").forEach(link => {
+                    link.addEventListener("click", function (e) {
+                        e.preventDefault();
 
-                    const url = this.getAttribute("href");
+                        const url = this.getAttribute("href");
 
-                    if (url && url !== "#") {
-                        window.open(url, "_blank");
-                    }
-                });
-            });
-
-                /* --- SUBMENÚS PRINCIPALES --- */
-                const botones = document.querySelectorAll(".toggle-submenu");
-                const submenus = document.querySelectorAll(".submenu");
-
-                botones.forEach(boton => {
-                    boton.addEventListener("click", function () {
-                        const submenu = this.nextElementSibling;
-
-                        submenus.forEach(sm => {
-                            if (sm !== submenu) sm.classList.remove("visible");
-                        });
-
-                        submenu.classList.toggle("visible");
-
-                        /* Marcar título activo */
-                        document.querySelectorAll(".menu-item").forEach(mi => mi.classList.remove("active"));
-                        this.closest(".menu-item").classList.add("active");
-
-                        /* Quitar active de ítems internos */
-                        document.querySelectorAll(".submenu a, .submenu-extra a")
-                            .forEach(l => l.classList.remove("active"));
+                        if (url && url !== "#") {
+                            window.open(url, "_blank");
+                        }
                     });
                 });
 
-                /* --- SUBMENÚS EXTENDIDOS (solo uno abierto a la vez) --- */
-                function activarSubmenuExtendido(selector) {
-                    document.querySelectorAll(selector).forEach(link => {
-                        link.addEventListener("click", function (e) {
-                            e.preventDefault();
+                    /* --- SUBMENÚS PRINCIPALES --- */
+                    const botones = document.querySelectorAll(".toggle-submenu");
+                    const submenus = document.querySelectorAll(".submenu");
 
-                            const extra = this.parentElement.nextElementSibling;
+                    botones.forEach(boton => {
+                        boton.addEventListener("click", function () {
+                            const submenu = this.nextElementSibling;
 
-                            if (!extra || !extra.classList.contains("submenu-extra")) return;
-
-                            document.querySelectorAll(".submenu-extra.visible").forEach(open => {
-                                if (open !== extra) open.classList.remove("visible");
+                            // 1. Cerramos los otros menús principales y reseteamos su interior
+                            submenus.forEach(sm => {
+                                if (sm !== submenu) {
+                                    sm.classList.remove("visible");
+                                    // Limpiamos cualquier subnivel (Nivel 3 y 4) que haya quedado abierto
+                                    sm.querySelectorAll(".visible").forEach(hijoVisible => {
+                                        hijoVisible.classList.remove("visible");
+                                    });
+                                }
                             });
 
-                            extra.classList.toggle("visible");
+                            // 2. Abrimos/Cerramos el menú principal actual
+                            submenu.classList.toggle("visible");
+
+                            // 3. Si el usuario está colapsando el menú actual, reseteamos su interior también
+                            if (!submenu.classList.contains("visible")) {
+                                submenu.querySelectorAll(".visible").forEach(hijoVisible => {
+                                    hijoVisible.classList.remove("visible");
+                                });
+                            }
+
+                            // 4. Limpieza de sombreados activos
+                            document.querySelectorAll(".menu-item").forEach(mi => mi.classList.remove("active"));
+                            this.closest(".menu-item").classList.add("active");
+
+                            document.querySelectorAll(".submenu a, .submenu-extra a, .submenu-extra > ul > li > a")
+                                .forEach(l => l.classList.remove("active"));
                         });
                     });
-                }
 
-                activarSubmenuExtendido(".submenu a[href='/ProcesoMateriales']");
-                activarSubmenuExtendido(".submenu a[href='/Entregas']");
-                activarSubmenuExtendido("#btnIdentificar");
-                activarSubmenuExtendido("#btnBusquedaRecepciones");
-                activarSubmenuExtendido("#btnProcesoEsterilizacion");
-                activarSubmenuExtendido("#btnBusquedaLavado");
-                activarSubmenuExtendido("#btnProcesoEsterilizacion");
-                activarSubmenuExtendido("#btnBusquedaProcesoMateriales");
+                    
 
-                /* --- RESALTAR ÍTEMS INTERNOS --- */
-                const menuLinks = document.querySelectorAll(".submenu a, .submenu-extra a");
+                    /* --- SUBMENÚS EXTENDIDOS (solo uno abierto a la vez) --- */
+                            /* --- SUBMENÚS EXTENDIDOS --- */
 
-                menuLinks.forEach(link => {
-                    link.addEventListener("click", function () {
+                            function activarSubmenuExtendido(selector) {
+                                document.querySelectorAll(selector).forEach(link => {
+                                    link.addEventListener("click", function (e) {
+                                        e.preventDefault();
 
-                        /* Quitar active de todos los enlaces */
-                        menuLinks.forEach(l => l.classList.remove("active"));
+                                        const extra = this.parentElement.nextElementSibling;
 
-                        /* Agregar active al clickeado */
-                        this.classList.add("active");
+                                        if (!extra || !extra.classList.contains("submenu-extra")) return;
 
-                        /* Quitar active de los títulos principales */
-                        document.querySelectorAll(".menu-item").forEach(mi => mi.classList.remove("active"));
-                    });
-                });
-
-                /* --- SALIR DEL SISTEMA --- */
-                const btnSalir = document.getElementById("btnSalir");
-                if (btnSalir) btnSalir.addEventListener("click", () => window.close());
-
-                            const btnReusosAsignar = document.getElementById("btnReusosAsignar");
-            // llama a modal debugger reuso
-
-                if (btnReusosAsignar) {
-                btnReusosAsignar.addEventListener("click", function (e) {
-                    e.preventDefault();
-
-                    fetch("/Reusos/ModalBuscarReuso")
-                        .then(response => response.text())
-                        .then(html => {
-                            const contenedor = document.getElementById("contenedorModalReuso");
-                            contenedor.innerHTML = html;
-
-                            const modal = document.getElementById("modalBuscarReuso");
-                            modal.style.display = "flex";
-
-                         // 🔥 FOCO AUTOMÁTICO
-                            setTimeout(() => {
-                                const input = document.getElementById("txtBuscarCodigoReuso");
-                                if (input) {
-                                    input.focus();
-                                    input.select();
-                                }
-                            }, 100);
-
-                            const btnCerrar = document.getElementById("btnCerrarModalReuso");
-
-                            if (btnCerrar) {
-                                btnCerrar.addEventListener("click", function () {
-                                    modal.style.display = "none";
-                                });
-                            }
-
-                            // para ingresar codigo reuso
-
-                            const btnBuscar = document.getElementById("btnBuscarCodigoReuso");
-                            const txtCodigo = document.getElementById("txtBuscarCodigoReuso");
-                            const msg = document.getElementById("msgBuscarReuso");
-
-                            if (txtCodigo && btnBuscar) {
-                                        txtCodigo.addEventListener("keydown", function (e) {
-                                            if (e.key === "Enter") {
-                                                e.preventDefault();
-                                                btnBuscar.click();
-                                            }
+                                        document.querySelectorAll(".submenu-extra.visible").forEach(open => {
+                                            if (open !== extra) open.classList.remove("visible");
                                         });
-                                    }
 
-                            if (btnBuscar) {
-                                btnBuscar.addEventListener("click", function () {
-                                    const codigo = txtCodigo.value.trim();
-
-                                    msg.style.display = "none";
-                                    msg.textContent = "";
-
-                                    if (!codigo) {
-                                        msg.textContent = "Ingrese un código.";
-                                        msg.style.display = "block";
-                                        txtCodigo.focus();
-                                        return;
-                                    }
-
-                                fetch(`/Reusos/ValidarCodigoReusoDisponible?codigo=${encodeURIComponent(codigo)}`)
-                                            .then(response => response.json())
-                                            .then(data => {
-                                                if (!data.success || !data.disponible) {
-                                                    msg.textContent = data.mensaje || "Código no disponible.";
-                                                    msg.style.display = "block";
-                                                    txtCodigo.focus();
-                                                    return;
-                                                }
-
-                                                modal.style.display = "none";
-
-                                                // guardamos el código de reuso
-                                                localStorage.setItem("codigoReuso", data.codigo);
-
-                                                // seteamos destino como hacen los otros módulos
-                                                localStorage.setItem(
-                                                            "loginDestino",
-                                                            `/Reusos/CrearReusos?codigo=${encodeURIComponent(data.codigo)}`
-                                                        );
-
-                                                // abrimos el login REAL de tu sistema
-                                                const modalLogin = new bootstrap.Modal(document.getElementById('loginTareasModal'));
-                                                modalLogin.show();
-                                            })
-                                            .catch(() => {
-                                                msg.textContent = "Error al validar el código.";
-                                                msg.style.display = "block";
-                                            });
+                                        extra.classList.toggle("visible");
+                                    });
                                 });
                             }
+                    
+
+            // Inicialización
+            // 1. Agrupamos los selectores
+                const selectoresToggle = [
+                    ".submenu a[href='/ProcesoMateriales']",
+                    ".submenu a[href='/Entregas']",
+                    "#btnIdentificar",
+                    "#btnBusquedaRecepciones",
+                    "#btnBusquedaProcesoMateriales",
+                    "#btnEstProcesosMateriales",
+                    "#btnBusquedaEntregas",
+                    "#btnBusquedaTransito",
+                    "#btnBusquedaStock"
+                ];
+
+                /* --- GATILLO PARA ABRIR/CERRAR NIVEL 4 --- */
+                    document.querySelectorAll(".submenu-extra > a").forEach(link => {
+                        link.addEventListener("click", function (e) {
+                            const ulNivel4 = this.nextElementSibling;
+
+                            // Si el enlace tiene una lista abajo (Nivel 4), lo desplegamos
+                            if (ulNivel4 && ulNivel4.tagName === "UL") {
+                                e.preventDefault();
+                                ulNivel4.classList.toggle("visible");
+                            }
+                        });
+                    });
+
+            // Activamos la función para cada uno
+            selectoresToggle.forEach(selector => activarSubmenuExtendido(selector));
+
+                    /* --- RESALTAR ÍTEMS INTERNOS Y AUTO-CERRAR MENÚ --- */
+                    // Sumamos los enlaces del Nivel 4 para que se puedan resaltar (.submenu-extra > ul > li > a)
+                    const menuLinks = document.querySelectorAll(".submenu a, .submenu-extra a, .submenu-extra > ul > li > a");
+
+                    menuLinks.forEach(link => {
+                        link.addEventListener("click", function () {
+
+                            /* 1. Comportamiento de resaltado activo */
+                            menuLinks.forEach(l => l.classList.remove("active"));
+                            this.classList.add("active");
+                            document.querySelectorAll(".menu-item").forEach(mi => mi.classList.remove("active"));
+
+                            /* 2. Comportamiento de Auto-Cierre */
+                            // Detectamos si es un botón abridor O si tiene un Nivel 4 colgando al lado
+                            const esAbridorDeMenu = selectoresToggle.some(selector => this.matches(selector)) ||
+                                                    (this.nextElementSibling && this.nextElementSibling.tagName === "UL");
+
+                            if (!esAbridorDeMenu) {
+                                // Cerramos todos los niveles abiertos si es un enlace final
+                                document.querySelectorAll(".submenu.visible, .submenu-extra.visible, .submenu-extra > ul.visible").forEach(menuAbierto => {
+                                    menuAbierto.classList.remove("visible");
+                                });
+                                document.querySelectorAll(".menu-item.active").forEach(mi => mi.classList.remove("active"));
+                            }
+                        });
+                    });
+
+
+                    /* --- SALIR DEL SISTEMA --- */
+                    const btnSalir = document.getElementById("btnSalir");
+                    if (btnSalir) btnSalir.addEventListener("click", () => window.close());
+
+                                const btnReusosAsignar = document.getElementById("btnReusosAsignar");
+                // llama a modal debugger reuso
+
+                    if (btnReusosAsignar) {
+                    btnReusosAsignar.addEventListener("click", function (e) {
+                        e.preventDefault();
+
+                        fetch("/Reusos/ModalBuscarReuso")
+                            .then(response => response.text())
+                            .then(html => {
+                                const contenedor = document.getElementById("contenedorModalReuso");
+                                contenedor.innerHTML = html;
+
+                                const modal = document.getElementById("modalBuscarReuso");
+                                modal.style.display = "flex";
+
+                             // 🔥 FOCO AUTOMÁTICO
+                                setTimeout(() => {
+                                    const input = document.getElementById("txtBuscarCodigoReuso");
+                                    if (input) {
+                                        input.focus();
+                                        input.select();
+                                    }
+                                }, 100);
+
+                                const btnCerrar = document.getElementById("btnCerrarModalReuso");
+
+                                if (btnCerrar) {
+                                    btnCerrar.addEventListener("click", function () {
+                                        modal.style.display = "none";
+                                    });
+                                }
+
+                                // para ingresar codigo reuso
+
+                                const btnBuscar = document.getElementById("btnBuscarCodigoReuso");
+                                const txtCodigo = document.getElementById("txtBuscarCodigoReuso");
+                                const msg = document.getElementById("msgBuscarReuso");
+
+                                if (txtCodigo && btnBuscar) {
+                                            txtCodigo.addEventListener("keydown", function (e) {
+                                                if (e.key === "Enter") {
+                                                    e.preventDefault();
+                                                    btnBuscar.click();
+                                                }
+                                            });
+                                        }
+
+                                if (btnBuscar) {
+                                    btnBuscar.addEventListener("click", function () {
+                                        const codigo = txtCodigo.value.trim();
+
+                                        msg.style.display = "none";
+                                        msg.textContent = "";
+
+                                        if (!codigo) {
+                                            msg.textContent = "Ingrese un código.";
+                                            msg.style.display = "block";
+                                            txtCodigo.focus();
+                                            return;
+                                        }
+
+                                    fetch(`/Reusos/ValidarCodigoReusoDisponible?codigo=${encodeURIComponent(codigo)}`)
+                                                .then(response => response.json())
+                                                .then(data => {
+                                                    if (!data.success || !data.disponible) {
+                                                        msg.textContent = data.mensaje || "Código no disponible.";
+                                                        msg.style.display = "block";
+                                                        txtCodigo.focus();
+                                                        return;
+                                                    }
+
+                                                    modal.style.display = "none";
+
+                                                    // guardamos el código de reuso
+                                                    localStorage.setItem("codigoReuso", data.codigo);
+
+                                                    // seteamos destino como hacen los otros módulos
+                                                    localStorage.setItem(
+                                                                "loginDestino",
+                                                                `/Reusos/CrearReusos?codigo=${encodeURIComponent(data.codigo)}`
+                                                            );
+
+                                                    // abrimos el login REAL de tu sistema
+                                                    const modalLogin = new bootstrap.Modal(document.getElementById('loginTareasModal'));
+                                                    modalLogin.show();
+                                                })
+                                                .catch(() => {
+                                                    msg.textContent = "Error al validar el código.";
+                                                    msg.style.display = "block";
+                                                });
+                                    });
+                                }
 
                            
 
-                        });
+                            });
+                    });
+                }
                 });
-            }
-            });
     </script>
 
     <aside class="menu-lateral" id="menuLateral">
@@ -356,53 +542,64 @@ Layout = null;
                     <i class="bi bi-search"></i> Búsqueda de datos
                 </button>
                 <ul class="submenu">
-                    
-                    
                     <li><a href="#" id="btnBusquedaRecepciones"><i class="bi bi-dash icon-guion"></i> Recepciones</a></li>
 
                     <li class="submenu-extra">
-                        <a href="/BusRec/Index" class="link-busqueda">Búsqueda recepciones</a>
-                        <a href="/RecDetBusqueda/Index" class="link-busqueda">Búsqueda materiales recibidos</a>
+                        <a href="/BusRec/Index">Búsqueda recepciones</a>
+                        <a href="/RecDetBusqueda/Index">Materiales recibidos</a>
                     </li>
-                    
-                    <li><a href="#" id="btnBusquedaProcesoMateriales"><i class="bi bi-dash icon-guion"></i> Proceso de materiales</a></li>
+
+                    <li><a href="#" id="btnBusquedaProcesoMateriales"><i class="bi bi-dash icon-guion"></i> Proceso materiales</a></li>
 
                     <li class="submenu-extra">
                         <a href="#" id="btnBusquedaLavado">Lavado</a>
 
                         <ul>
                             <li>
-                                <a href="/BusLavado/IndexLav" class="link-busqueda">Búsqueda lavado</a>
+                                <a href="/BusLavado/IndexLav">Búsqueda lavado</a>
                             </li>
 
                             <li>
-                                <a href="/BusLavadoDet/IndexLavDet" class="link-busqueda">Búsqueda materiales lavados</a>
+                                <a href="/BusLavadoDet/IndexLavDet">Materiales lavados</a>
                             </li>
                         </ul>
 
-                        <a href="/BusAco/IndexAcondicionado" class="link-busqueda">Acondicionado</a>
-
-                        <a href="#">Control de instrumental</a>
+                        <a href="/BusAco/IndexAcondicionado">Acondicionado</a>
 
                         <a href="#" id="btnProcesoEsterilizacion">Proceso esterilización</a>
 
                         <ul>
                             <li>
-                                <a href="/BusPro/IndexProcesos" class="link-busqueda">Búsqueda procesos</a>
+                                <a href="/BusPro/IndexProcesos">Búsqueda procesos</a>
                             </li>
 
                             <li>
-                                <a href="/BusProDet/IndexProDet" class="link-busqueda">Búsqueda materiales procesados</a>
+                                <a href="/BusProDet/IndexProDet">Materiales procesados</a>
                             </li>
                         </ul>
-
-                        <a href="#">Registro desinfección</a>
                     </li>
-                    <li><a href="/Entregas"><i class="bi bi-dash icon-guion"></i> Entregas</a></li>
-                    <li><a href="/ControlPM"><i class="bi bi-dash icon-guion"></i> Control productos médicos</a></li>
-                    <li><a href="/Transito"><i class="bi bi-dash icon-guion"></i> Instrumental en tránsito</a></li>
-                    <li><a href="/Stock"><i class="bi bi-dash icon-guion"></i> Stock</a></li>
-                    <li><a href="/Clientes"><i class="bi bi-dash icon-guion"></i> Búsqueda de datos cliente</a></li>
+                    <li><a href="#" id="btnBusquedaEntregas"><i class="bi bi-dash icon-guion"></i> Entregas</a></li>
+                    <li class="submenu-extra">
+                        <a href="@Url.Action("Index", "Bus_EntDet")">Entregas</a>
+                        <a href="@Url.Action("Index", "Bus_EntDet")">Materiales entregados</a>
+                    </li>
+
+                    <li><a href="/ControlPM"><i class="bi bi-dash icon-guion"></i> Control de reúso</a></li>
+
+                    <li><a href="#" id="btnBusquedaTransito"><i class="bi bi-dash icon-guion"></i> Instrumental en tránsito</a></li>
+                    <li class="submenu-extra">
+                        <a href="#">Proveedores</a>
+                        <a href="#">Profesionales</a>
+                    </li>
+
+                    <li><a href="#" id="btnBusquedaStock"><i class="bi bi-dash icon-guion"></i> Stock</a></li>
+                    <li class="submenu-extra">
+                        <a asp-controller="Bus_RecDetDisp" asp-action="Index" asp-route-titulo="Búsqueda - Disponibles por Etapa">Disponibles stock</a>
+
+                        <a asp-controller="Bus_RecDetDisp" asp-action="Index" asp-route-mti_id="8" asp-route-titulo="Búsqueda - Stock producción">Producción</a>
+                    </li>
+
+                    <li><a href="/Clientes"><i class="bi bi-dash icon-guion"></i> Búsqueda datos cliente</a></li>
                 </ul>
             </li>
 
@@ -411,7 +608,8 @@ Layout = null;
                     <i class="bi bi-qr-code"></i> Trazabilidad
                 </button>
                 <ul class="submenu">
-                    <li><a href="#">(Opciones futuras)</a></li>
+                    <li><a href="#"><i class="bi bi-dash icon-guion"></i> Código de etiqueta</a></li>
+                    <li><a href="#"><i class="bi bi-dash icon-guion"></i> Código reúso</a></li>
                 </ul>
             </li>
 
@@ -420,7 +618,17 @@ Layout = null;
                     <i class="bi bi-bar-chart"></i> Estadísticas
                 </button>
                 <ul class="submenu">
-                    <li><a href="#">(Opciones futuras)</a></li>
+                    <li><a href="#" id="btnEstProcesosMateriales"><i class="bi bi-dash icon-guion"></i> Procesos materiales</a></li>
+                    <li class="submenu-extra">
+                        <a href="https://localhost:7069/EstLavados">Proceso lavado</a>
+                        <a href="https://localhost:7069/EstLavadoDet">Materiales lavados</a>
+                        <a href="https://localhost:7069/EstProcesos">Procesos esterilización</a>
+                        <a href="https://localhost:7069/Procesos/Estadisticas/EstProcesosDet">Materiales procesados</a>
+                    </li>
+
+                    <li><a href="#"><i class="bi bi-dash icon-guion"></i>Consumos sectores</a></li>
+
+                    <li><a href="#"><i class="bi bi-dash icon-guion"></i> Estadísticas de cliente</a></li>
                 </ul>
             </li>
 
@@ -429,7 +637,7 @@ Layout = null;
                     <i class="bi bi-gear"></i> Área de sistemas
                 </button>
                 <ul class="submenu">
-                    <li><a href="#">(Opciones futuras)</a></li>
+                    <li><a href="#"><i class="bi bi-dash icon-guion"></i> (Opciones futuras)</a></li>
                 </ul>
             </li>
 

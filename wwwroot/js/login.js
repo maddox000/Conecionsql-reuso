@@ -50,6 +50,7 @@ document.getElementById('btnEditarProceso')?.addEventListener('click', function 
     }
 
     sessionStorage.setItem("editarProceso", "2");
+    sessionStorage.setItem("editarProcesoTbProId", tbProId);
 
     const modal = new bootstrap.Modal(document.getElementById('loginTareasModal'));
     modal.show();

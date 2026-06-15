@@ -33,5 +33,11 @@ namespace ConexionSql.Models.Entrega
 
         // 🔢 Cantidad total entregada
         public int TB_ENT_CANT_TOT { get; set; }
+        // 🧾 Cabecera cargada al volver desde SubFormulario
+        public int TbEntId { get; set; }
+
+        public string? TbEntPerNomCab { get; set; }
+
+        public string? TbEntPerCarDenCab { get; set; }
     }
 }

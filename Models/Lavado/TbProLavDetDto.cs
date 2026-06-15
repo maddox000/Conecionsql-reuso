@@ -36,6 +36,9 @@ namespace ConexionSql.Models.Lavado
 
         // 📦 Cantidad a procesar (puede diferir del recibido)
         public int? TB_PRO_LAV_DET_CANT { get; set; }
+        // 🗑️ Eliminación lógica
+        public int? TB_PRO_LAV_DET_CANT_ELIM { get; set; }
+        public string? TB_PRO_LAV_DET_DAT { get; set; }
 
         public int? TB_PRO_LAV_DET_EST_ID { get; set; }
         public string? TB_PRO_LAV_DET_EST_DEN { get; set; }

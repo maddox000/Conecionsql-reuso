@@ -24,7 +24,7 @@
 
                 <div class="entrega-kv">
                     <div class="k">Cargo</div>
-                    <div class="v">-</div>
+                    <div class="v">@Model.Cabecera.TbEntPerCarDen</div>
                 </div>
 
                 <div class="entrega-kv entrega-kv-total">
@@ -349,6 +349,53 @@
                 })
                 .catch(() => mostrarError("❌ Error inesperado."));
         }
+
+        //eliminar detalle
+
+            document.addEventListener('click', async function (event) {
+
+            const btnEliminar = event.target.closest('.js-ent-eliminar-detalle');
+
+            if (!btnEliminar) return;
+
+            const idDetalle = parseInt(btnEliminar.dataset.entDetId);
+
+            if (!idDetalle || idDetalle <= 0) return;
+
+            if (!confirm('¿Eliminar el material?')) return;
+
+            const response = await fetch('/TbEntDet/EliminarDetalle', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(idDetalle)
+            });
+
+            const json = await response.json();
+
+            if (!json.success) {
+                alert(json.mensaje);
+                return;
+            }
+
+            const fila = document.getElementById(`fila-ent-det-${idDetalle}`);
+
+            if (fila) {
+                fila.style.opacity = '0.5';
+
+                const boton = fila.querySelector('.js-ent-eliminar-detalle');
+
+                if (boton) {
+                    boton.disabled = true;
+                    boton.style.pointerEvents = 'none';
+                }
+            }
+
+            if (cabeceraCantidad) {
+                cabeceraCantidad.innerText = `${json.total ?? 0} Unidades`;
+            }
+        });
 
         function mostrarOk(texto) {
             msgOk.innerText = texto;

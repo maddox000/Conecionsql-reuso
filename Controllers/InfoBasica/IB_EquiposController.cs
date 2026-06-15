@@ -234,5 +234,11 @@ namespace ConexionSql.Controllers.InfoBasica
         {
             return Content("Ruta encontrada. Aquí implementarás la generación del PDF.");
         }
+
+        [HttpGet]
+        public IActionResult Cancelar()
+        {
+            return RedirectToAction(nameof(IB_Equipos));
+        }
     }
 }

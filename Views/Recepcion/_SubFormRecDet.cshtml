@@ -14,91 +14,133 @@
 
 <link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
 
+<style>
+    /* =======================================================
+               MODO DIOS: FORZAR ANCHOS AL 100% SIN MÁRGENES NEGATIVOS
+               ======================================================= */
+    .rec-screen,
+    .subform-recepcion,
+    #contenedor-detalles,
+    #formDetalle {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    /* =======================================================
+               MODO DIOS: PINTAR TODAS LAS CABECERAS DE AZUL MARINO
+               ======================================================= */
+    .rec-screen-table-title,
+    .rec-screen-table thead,
+    .rec-screen-table thead tr,
+    .rec-screen-table thead th,
+    .table thead th {
+        background-color: #34495e !important; /* El HEX exacto de tu var(--color-titulo) */
+        color: #ffffff !important;
+        border-bottom: none !important;
+    }
+</style>
+
 <div class="rec-screen">
-<div class="subform-recepcion">
+    <div class="subform-recepcion">
 
-    <div id="contenedor-detalles" class="mt-4" style="height: 250px; overflow-y: auto;">
-    @await Html.PartialAsync("_DetalleTabla", ViewBag.Detalles as List<ConexionSql.Models.Recepciones.TbRecDetDto>)
-    </div>
+        <div id="contenedor-detalles" style="height: 250px; width: 100%; overflow-y: auto; margin-top: 10px;">
+            @* SUBE / BAJA Contenedor Materiales ingresados *@
+            @await Html.PartialAsync("_DetalleTabla", ViewBag.Detalles as List<ConexionSql.Models.Recepciones.TbRecDetDto>)
+        </div>
 
+        <form id="formDetalle" class="rec-det-form" style="margin-top: 10px; width: 100%;">
 
-    <form id="formDetalle" class="rec-det-form mt-5">
-        <div class="rec-screen-table-wrap rec-wrap-detalle" style="margin-top: 10px;">
+            <div class="rec-screen-table-wrap rec-wrap-detalle" style="margin-top: 5px;">
 
-            
+                <div class="p-3">
+                    <table class="rec-screen-table rec-screen-table-entry mb-3">
+                        <thead style="background: var(--color-titulo); border-bottom: 1px solid #dcdcdc;">
+                            <tr>
+                                <th style="color: white;">Codigo Producto</th>
+                                <th style="color: white;">Material</th>
+                                <th style="color: white;">Codigo Reuso</th>
+                                <th style="color: white;">Revision</th>
+                                <th style="color: white;">Estado</th>
+                                <th style="color: white;">Contenido</th>
+                                <th style="color: white;">Cantidad</th>
+                                <th style="display:none; color: white;">Accion</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                @* <td style="width:180px;"> *@
+                                <td>
+                                    <input asp-for="Detalle.TB_REC_DET_MAT_PR"
+                                           id="TB_REC_DET_MAT_PR"
+                                           class="form-control form-control-sm" />
+                                </td>
 
-            <div class="p-3">
-                <table class="rec-screen-table rec-screen-table-entry mb-3">
-                    <thead>
-                        <tr>
-                            <th>Codigo Producto</th>
-                            <th>Material</th>
-                            <th>Codigo Reuso</th>
-                            <th>Revision</th>
-                            <th>Estado</th>
-                            <th>Cantidad</th>
-                                <th style="width:110px; display:none;">Accion</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <input asp-for="Detalle.TB_REC_DET_MAT_PR"
-                                       id="TB_REC_DET_MAT_PR"
-                                       class="form-control form-control-sm" />
-                            </td>
+                                @* <td style="width:320px;"> *@
+                                <td>
+                                    <input type="text"
+                                           id="materialBusqueda"
+                                           class="form-control form-control-sm"
+                                           autocomplete="off" />
 
-                            <td>
-                                <input type="text"
-                                       id="materialBusqueda"
-                                       class="form-control form-control-sm"
-                                       autocomplete="off" />
+                                    <div id="listaMateriales" class="list-group mt-2"></div>
 
-                                <div id="listaMateriales" class="list-group mt-2"></div>
+                                    <input type="hidden" id="IB_MAT_ID" name="Detalle.IB_MAT_ID" />
+                                </td>
 
-                                <input type="hidden" id="IB_MAT_ID" name="Detalle.IB_MAT_ID" />
-                            </td>
+                                @* <td style="width:120px;"> *@
+                                <td>
+                                    <input id="TB_REC_DET_REU_ID_VISIBLE"
+                                           class="form-control form-control-sm" />
+                                </td>
 
-                            <td>
-                                <input id="TB_REC_DET_REU_ID_VISIBLE"
-                                       class="form-control form-control-sm" />
-                            </td>
+                                <td>
+                                    <input type="text"
+                                           id="revisionBusqueda"
+                                           class="form-control form-control-sm"
+                                           autocomplete="off"
+                                           value="NO REGISTRA" />
 
-                            <td>
-                                <input type="text"
-                                       id="revisionBusqueda"
-                                       class="form-control form-control-sm"
-                                       autocomplete="off"
-                                       value="NO REGISTRA" />
+                                    <div id="listaRevisiones" class="list-group mt-2"></div>
 
-                                <div id="listaRevisiones" class="list-group mt-2"></div>
+                                    <input asp-for="Detalle.TB_REC_DET_REP_ID"
+                                           type="hidden"
+                                           id="TB_REC_DET_REP_ID" />
+                                </td>
 
-                                <input asp-for="Detalle.TB_REC_DET_REP_ID"
-                                       type="hidden"
-                                       id="TB_REC_DET_REP_ID" />
-                            </td>
+                                <td>
+                                    <input type="text"
+                                           id="estadoBusqueda"
+                                           class="form-control form-control-sm"
+                                           autocomplete="off" />
 
-                            <td>
-                                <input type="text"
-                                       id="estadoBusqueda"
-                                       class="form-control form-control-sm"
-                                       autocomplete="off" />
+                                    <div id="listaEstados" class="list-group mt-2"></div>
 
-                                <div id="listaEstados" class="list-group mt-2"></div>
+                                    <input asp-for="Detalle.IB_EST_ID"
+                                           type="hidden"
+                                           id="IB_EST_ID" />
+                                </td>
+                                @* <td style="width:80px;"> *@
+                                <td>
+                                    <input asp-for="Detalle.TB_REC_DET_CANT_MULT"
+                                           id="TB_REC_DET_CANT_MULT"
+                                           class="form-control form-control-sm"
+                                           min="1"
+                                           type="text"
+                                           value="1" />
+                                </td>
 
-                                <input asp-for="Detalle.IB_EST_ID"
-                                       type="hidden"
-                                       id="IB_EST_ID" />
-                            </td>
-
-                            <td>
-                                <input asp-for="Detalle.TB_REC_DET_CANT"
-                                       id="TB_REC_DET_CANT"
-                                       class="form-control form-control-sm"
-                                       min="1"
-                                       type="text"
-                                       value="" />
-                            </td>
+                                @* <td style="width:80px;"> *@
+                                <td>
+                                    <input asp-for="Detalle.TB_REC_DET_CANT"
+                                           id="TB_REC_DET_CANT"
+                                           class="form-control form-control-sm"
+                                           min="1"
+                                           type="text"
+                                           value="" />
+                                </td>
 
                                 <td style="display:none;">
                                     <button type="button"
@@ -108,40 +150,40 @@
                                         Guardar
                                     </button>
                                 </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
-        <div class="rec-det-campo" style="display:none !important;">
-            <label for="TB_REC_DET_VOL">Volumen</label>
-            <input asp-for="Detalle.TB_REC_DET_VOL"
-                   id="TB_REC_DET_VOL"
-                   class="form-control"
-                   readonly />
-        </div>
+            <div class="rec-det-campo" style="display:none !important;">
+                <label for="TB_REC_DET_VOL">Volumen</label>
+                <input asp-for="Detalle.TB_REC_DET_VOL"
+                       id="TB_REC_DET_VOL"
+                       class="form-control"
+                       readonly />
+            </div>
 
-        <input asp-for="Detalle.TB_REC_ID" type="hidden" />
+            <input asp-for="Detalle.TB_REC_ID" type="hidden" />
 
-        <input asp-for="Detalle.TB_REC_DET_EMP_STOCK" id="TB_REC_DET_EMP_STOCK" type="hidden" />
-        <input asp-for="Detalle.TB_REC_DET_PRO_STOCK" id="TB_REC_DET_PRO_STOCK" type="hidden" />
-        <input asp-for="Detalle.TB_REC_DET_LAV_STOCK" id="TB_REC_DET_LAV_STOCK" type="hidden" />
-        <input asp-for="Detalle.TB_REC_DET_ENT_STOCK" id="TB_REC_DET_ENT_STOCK" type="hidden" />
-        <input asp-for="Detalle.TB_REC_DET_DEC_STOCK" id="TB_REC_DET_DEC_STOCK" type="hidden" />
-        <input asp-for="Detalle.TB_REC_DET_ENT_CANT" id="TB_REC_DET_ENT_CANT" type="hidden" />
+            <input asp-for="Detalle.TB_REC_DET_EMP_STOCK" id="TB_REC_DET_EMP_STOCK" type="hidden" />
+            <input asp-for="Detalle.TB_REC_DET_PRO_STOCK" id="TB_REC_DET_PRO_STOCK" type="hidden" />
+            <input asp-for="Detalle.TB_REC_DET_LAV_STOCK" id="TB_REC_DET_LAV_STOCK" type="hidden" />
+            <input asp-for="Detalle.TB_REC_DET_ENT_STOCK" id="TB_REC_DET_ENT_STOCK" type="hidden" />
+            <input asp-for="Detalle.TB_REC_DET_DEC_STOCK" id="TB_REC_DET_DEC_STOCK" type="hidden" />
+            <input asp-for="Detalle.TB_REC_DET_ENT_CANT" id="TB_REC_DET_ENT_CANT" type="hidden" />
 
-        <input asp-for="Detalle.TB_REC_DET_NUM_2" id="TB_REC_DET_NUM_2" type="hidden" />
-        <input asp-for="Detalle.TB_REC_DET_NUM_3" id="TB_REC_DET_NUM_3" type="hidden" />
-        <input asp-for="Detalle.TB_REC_DET_TXT_3" id="TB_REC_DET_TXT_3" type="hidden" />
-        <input asp-for="Detalle.TB_REC_DET_DTI_1" id="TB_REC_DET_DTI_1" type="hidden" />
-        <input asp-for="Detalle.TB_REC_DET_MEM_1" id="TB_REC_DET_MEM_1" type="hidden" />
+            <input asp-for="Detalle.TB_REC_DET_NUM_2" id="TB_REC_DET_NUM_2" type="hidden" />
+            <input asp-for="Detalle.TB_REC_DET_NUM_3" id="TB_REC_DET_NUM_3" type="hidden" />
+            <input asp-for="Detalle.TB_REC_DET_TXT_3" id="TB_REC_DET_TXT_3" type="hidden" />
+            <input asp-for="Detalle.TB_REC_DET_DTI_1" id="TB_REC_DET_DTI_1" type="hidden" />
+            <input asp-for="Detalle.TB_REC_DET_MEM_1" id="TB_REC_DET_MEM_1" type="hidden" />
 
-        <input asp-for="Detalle.TbRecDetMatId" id="TB_REC_DET_MAT_ID" type="hidden" />
-        <input asp-for="Detalle.TB_REC_DET_REU_ID" id="TB_REC_DET_REU_ID" type="hidden" />
-    </form>
+            <input asp-for="Detalle.TbRecDetMatId" id="TB_REC_DET_MAT_ID" type="hidden" />
+            <input asp-for="Detalle.TB_REC_DET_REU_ID" id="TB_REC_DET_REU_ID" type="hidden" />
+        </form>
 
-    <div id="mensaje" class="mt-3 text-success"></div>
+        <div id="mensaje" class="mt-3 text-success"></div>
     </div>
 </div>
 
@@ -153,6 +195,7 @@
 @await Html.PartialAsync("Modals/_modalControlReuso")
 @await Html.PartialAsync("Modals/_modalConfirmarReuso")
 @await Html.PartialAsync("Modals/_modalPacienteMaterial")
+@await Html.PartialAsync("Modals/_modalAvisoPaciente")
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -161,13 +204,25 @@
 
         const estadoBusqueda = document.getElementById("estadoBusqueda");
         const estadoSelect = document.getElementById("IB_EST_ID");
+        const contenidoInput = document.getElementById("TB_REC_DET_CANT_MULT");
         const cantidadInput = document.getElementById("TB_REC_DET_CANT");
         const revisionSelect = document.getElementById("TB_REC_DET_REP_ID");
         const revisionBusqueda = document.getElementById("revisionBusqueda");
         const btnGuardar = document.getElementById("btnGuardar");
+        const tbRecIdActual = @(Model.Detalle?.TB_REC_ID ?? 0);
 
+        if (contenidoInput) {
+        contenidoInput.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
 
-
+                if (cantidadInput) {
+                    cantidadInput.focus();
+                    cantidadInput.select?.();
+                }
+            }
+        });
+    }
        
 
     if (cantidadInput) {
@@ -228,10 +283,6 @@
             }
     ];
 
-    //         if (revisionSelect && !revisionSelect.value) {
-    //     revisionSelect.value = "1";
-    //     revisionSelect.dispatchEvent(new Event("change", { bubbles: true }));
-    // }
 
     if (revisionSelect && revisionBusqueda) {
         revisionSelect.value = "1";
@@ -355,7 +406,7 @@
             }
 
             if (document.getElementById("pacienteRecepcion")) {
-                document.getElementById("pacienteRecepcion").value = data.reuepcion || "";
+                document.getElementById("pacienteRecepcion").value = data.recepcion || "";
             }
 
             if (document.getElementById("pacienteFecha")) {
@@ -514,6 +565,7 @@
             est = estadosOriginales.find(x => x.id == estadoDefaultId);
         }
 
+
         if (!est) return;
 
         estadoBusqueda.value = est.denominacion;
@@ -523,10 +575,13 @@
         estadosBusqueda = [];
         indiceEstado = -1;
 
-        if (cantidadInput) {
-            cantidadInput.focus();
-            cantidadInput.select?.();
-        }
+            console.log("FOCO DESDE seleccionarEstado");
+
+             if (cantidadInput) {
+                    cantidadInput.focus();
+                    cantidadInput.select?.();
+                        console.log("ACTIVO:", document.activeElement?.id);
+                }
     }
 
     // carga el estado desp de ingresar materiales
@@ -573,19 +628,7 @@
 
             if (estadoBusqueda && listaEstados) {
 
-        // estadoBusqueda.addEventListener("click", function () {
 
-        //     const texto = this.value.trim().toLowerCase();
-        //     estadosBusqueda = estadosOriginales.filter(e =>
-        //         (e.denominacion || "").toLowerCase().includes(texto)
-        //     );
-
-        //     indiceEstado = -1;
-
-        //     renderizarListaEstados();
-
-        //     listaEstados.style.display = "block"; // 🔥 clave
-        // });
         estadoBusqueda.addEventListener("click", function () {
 
                 estadosBusqueda = [...estadosOriginales];
@@ -666,9 +709,17 @@
                 listaEstados.innerHTML = "";
                 listaEstados.style.display = "none"; // 🔥 clave
 
-                if (cantidadInput) {
-                    cantidadInput.focus();
-                }
+                    console.log("FOCO DESDE estadoBusqueda ENTER");
+                        
+
+                // if (cantidadInput) {
+                //     cantidadInput.focus();
+                //     console.log("ACTIVO:", document.activeElement?.id);
+                // }
+                    if (contenidoInput) {
+                        contenidoInput.focus();
+                        contenidoInput.select?.();
+                    }
             }
         });
     }
@@ -691,6 +742,7 @@
                 return;
             }
 
+
             const ok = await buscarMaterialPorCodigo();
 
             if (ok && materialBusqueda) {
@@ -699,28 +751,11 @@
             }
         }
     });
-        // codigoProductoInput.addEventListener("keydown", async function (e) {
-        //     if (e.key === "Enter") {
-        //         e.preventDefault();
 
-        //         const valor = (this.value || "").trim();
-
-        //         if (valor === "") {
-        //             materialBusqueda.focus();
-        //             materialBusqueda.select?.();
-        //             return;
-        //         }
-
-        //         await buscarMaterialPorCodigo();
-        //     }
-        // });
-
-        // BLUR
         codigoProductoInput.addEventListener("blur", async function () {
             const valor = (this.value || "").trim();
 
-                // console.log("BLUR CODIGO PRODUCTO, valor:", valor);
-                //  // debugger;
+
 
                 if (valor === "") {
 
@@ -741,10 +776,6 @@
 
         return;
     }
-
-           // if (valor === "") {
-           //              return;
-           //          }
 
             await buscarMaterialPorCodigo();
         });
@@ -829,25 +860,6 @@
                     });
             });
 
-        // materialBusqueda.addEventListener("click", function () {
-
-        //     // solo abrir lista si el campo está vacío
-        //     if ((this.value || "").trim() !== "") return;
-
-        //     fetch(`/TbRecDet/BuscarMaterial?texto=1`)
-        //         .then(res => res.json())
-        //         .then(data => {
-        //             if (!data || data.length === 0) return;
-
-        //             materialesBusqueda = data;
-        //             indiceMaterial = -1;
-
-        //             renderizarListaMateriales();
-        //         })
-        //         .catch(error => {
-        //             console.error("Error al desplegar materiales:", error);
-        //         });
-        // });
 
             materialBusqueda.addEventListener("blur", function () {
         setTimeout(() => {
@@ -878,7 +890,7 @@
 
             if (texto.length < 1) return;
 
-            // console.log("buscando texto:", texto);
+            
 
             fetch(`/TbRecDet/BuscarMaterial?texto=${encodeURIComponent(texto)}`)
                 .then(res => res.json())
@@ -1062,43 +1074,58 @@
                     mostrarOk(result.mensaje || "Reuso encontrado correctamente.");
                         // console.log("Respuesta reuso:", result);
 
-                        if (requiereRegistroPaciente) {
-                            if (document.getElementById("pacienteCodigoReuso")) {
-                                const inputPacReuso = document.getElementById("pacienteCodigoReuso");
-                                inputPacReuso.value = codigo || "";
-                                inputPacReuso.dataset.reuId = result.tbReuId || 0;
-                            }
+                if (requiereRegistroPaciente) {
+                if (document.getElementById("pacienteCodigoReuso")) {
+                    const inputPacReuso = document.getElementById("pacienteCodigoReuso");
+                    inputPacReuso.value = codigo || "";
+                    inputPacReuso.dataset.reuId = result.tbReuId || 0;
+                }
 
-                            if (document.getElementById("pacienteDenominacion")) {
-                                document.getElementById("pacienteDenominacion").value =
-                                    materialBusqueda?.value || result.ibMatDen || "";
-                            }
+                if (document.getElementById("pacienteDenominacion")) {
+                    document.getElementById("pacienteDenominacion").value =
+                        materialBusqueda?.value || result.ibMatDen || "";
+                }
 
-                            if (document.getElementById("pacienteRecepcion")) {
-                                document.getElementById("pacienteRecepcion").value =
-                                    document.getElementById("Detalle_TB_REC_ID")?.value || "";
-                            }
+                if (document.getElementById("pacienteRecepcion")) {
+                    document.getElementById("pacienteRecepcion").value =
+                        document.getElementById("Detalle_TB_REC_ID")?.value || "";
+                }
 
-                            if (document.getElementById("pacienteFecha")) {
-                                const hoy = new Date();
-                                const yyyy = hoy.getFullYear();
-                                const mm = String(hoy.getMonth() + 1).padStart(2, "0");
-                                const dd = String(hoy.getDate()).padStart(2, "0");
-                                document.getElementById("pacienteFecha").value = `${yyyy}-${mm}-${dd}`;
-                            }
+                if (document.getElementById("pacienteFecha")) {
+                    const hoy = new Date();
+                    const yyyy = hoy.getFullYear();
+                    const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+                    const dd = String(hoy.getDate()).padStart(2, "0");
+                    document.getElementById("pacienteFecha").value = `${yyyy}-${mm}-${dd}`;
+                }
 
-                            const modalPacienteMaterialElement = document.getElementById("modalPacienteMaterial");
-                            const modalPacienteMaterial = modalPacienteMaterialElement
-                                ? bootstrap.Modal.getOrCreateInstance(modalPacienteMaterialElement)
-                                : null;
+                const modalPacienteMaterialElement = document.getElementById("modalPacienteMaterial");
+                const modalPacienteMaterial = modalPacienteMaterialElement
+                    ? bootstrap.Modal.getOrCreateInstance(modalPacienteMaterialElement)
+                    : null;
 
-                            if (modalPacienteMaterial) {
-                                //modalPacienteMaterial.show();
-                            }
+                const modalAvisoPacienteElement = document.getElementById("modalAvisoPaciente");
+                const modalAvisoPaciente = modalAvisoPacienteElement
+                    ? bootstrap.Modal.getOrCreateInstance(modalAvisoPacienteElement)
+                    : null;
 
-                            requiereRegistroPaciente = false;
-                            return;
+                const btnAceptarAvisoPaciente = document.getElementById("btnAceptarAvisoPaciente");
+
+                if (modalAvisoPaciente && btnAceptarAvisoPaciente) {
+                    btnAceptarAvisoPaciente.onclick = function () {
+                        modalAvisoPaciente.hide();
+
+                        if (modalPacienteMaterial) {
+                            modalPacienteMaterial.show();
                         }
+                    };
+
+                    modalAvisoPaciente.show();
+                }
+
+                requiereRegistroPaciente = false;
+                return;
+            }
 
                 } catch (error) {
                     console.error("Error al validar reuso:", error);
@@ -1378,14 +1405,38 @@
 
                     const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
 
-                    const alCerrar = function () {
+                    // const alCerrar = function () {
+                    //     modalElement.removeEventListener("hidden.bs.modal", alCerrar);
+
+                    //     const input = document.getElementById("TB_REC_DET_REU_ID_VISIBLE");
+                    //     if (input) {
+                    //         input.removeAttribute("readonly");
+                    //         input.removeAttribute("disabled");
+                    //         input.focus();
+                    //     }
+                    // };
+                    //abrir modal reusoPendiente y Paciente
+
+                const alCerrar = function () {
                         modalElement.removeEventListener("hidden.bs.modal", alCerrar);
 
                         const input = document.getElementById("TB_REC_DET_REU_ID_VISIBLE");
+
+                        if (requiereRegistroPaciente) {
+                            const modalAvisoPacienteElement = document.getElementById("modalAvisoPaciente");
+                            const modalAvisoPaciente = modalAvisoPacienteElement
+                                ? bootstrap.Modal.getOrCreateInstance(modalAvisoPacienteElement)
+                                : null;
+                        }
+
                         if (input) {
                             input.removeAttribute("readonly");
                             input.removeAttribute("disabled");
-                            input.focus();
+
+                            setTimeout(() => {
+                                input.focus();
+                                input.select?.();
+                            }, 150);
                         }
                     };
 
@@ -1404,6 +1455,106 @@
                 alert("Error en control de reuso");
             }
         }
+
+        //si es reuso inserta el codigo directo
+
+                    async function validarReusoEInsertarDirecto(codigo, ibMatId) {
+                    const response = await fetch("/TbRecDet/ValidarCodigoReuso", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            TB_REC_ID: tbRecIdActual,
+                            IB_MAT_ID: parseInt(ibMatId) || 0,
+                            TB_REC_DET_REU_ID: codigo,
+                            IB_EST_ID: parseInt(estadoSelect?.value) || 0,
+                            TB_REC_DET_REP_ID: parseInt(revisionSelect?.value) || 0,
+                            ConfirmarReusoExcedido: false
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (!result.ok) {
+                        if (result.requiereConfirmacion) {
+                            confirmarReusoExcedido = false;
+
+                            const modalConfirmar = bootstrap.Modal.getOrCreateInstance(
+                                document.getElementById("modalConfirmarReuso")
+                            );
+
+                            window.reusoPendiente = { codigo: codigo };
+
+                            modalConfirmar.show();
+                            return;
+                        }
+
+                        mostrarError(result.mensaje || "Error al validar reuso");
+                        return;
+                    }
+
+                    if (requiereRegistroPaciente) {
+                        if (document.getElementById("pacienteCodigoReuso")) {
+                            const inputPacReuso = document.getElementById("pacienteCodigoReuso");
+                            inputPacReuso.value = codigo || "";
+                            inputPacReuso.dataset.reuId = result.tbReuId || 0;
+                        }
+
+                        if (document.getElementById("pacienteDenominacion")) {
+                            document.getElementById("pacienteDenominacion").value =
+                                materialBusqueda?.value || result.ibMatDen || "";
+                        }
+
+                        if (document.getElementById("pacienteRecepcion")) {
+                            document.getElementById("pacienteRecepcion").value =
+                                document.getElementById("Detalle_TB_REC_ID")?.value || "";
+                        }
+
+                        if (document.getElementById("pacienteFecha")) {
+                            const hoy = new Date();
+                            const yyyy = hoy.getFullYear();
+                            const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+                            const dd = String(hoy.getDate()).padStart(2, "0");
+                            document.getElementById("pacienteFecha").value = `${yyyy}-${mm}-${dd}`;
+                        }
+
+                        const modalPacienteMaterialElement = document.getElementById("modalPacienteMaterial");
+                        const modalPacienteMaterial = modalPacienteMaterialElement
+                            ? bootstrap.Modal.getOrCreateInstance(modalPacienteMaterialElement)
+                            : null;
+
+                        const modalAvisoPacienteElement = document.getElementById("modalAvisoPaciente");
+                        const modalAvisoPaciente = modalAvisoPacienteElement
+                            ? bootstrap.Modal.getOrCreateInstance(modalAvisoPacienteElement)
+                            : null;
+
+                        const btnAceptarAvisoPaciente = document.getElementById("btnAceptarAvisoPaciente");
+
+                        if (modalAvisoPaciente && btnAceptarAvisoPaciente) {
+                            btnAceptarAvisoPaciente.onclick = function () {
+                                modalAvisoPaciente.hide();
+
+                                if (modalPacienteMaterial) {
+                                    modalPacienteMaterial.show();
+                                }
+                            };
+
+                            modalAvisoPaciente.show();
+                        }
+                        else if (modalPacienteMaterial) {
+                            modalPacienteMaterial.show();
+                        }
+
+                        requiereRegistroPaciente = false;
+                        return;
+                    }
+
+                    await ejecutarBotAutEInsertar();
+                }
+                
+
+        //termina ingreso de reuso
 
         async function buscarMaterialPorCodigo() {
         const codigoOriginal = (codigoProductoInput?.value || "").trim();
@@ -1462,6 +1613,29 @@
                 materialBusqueda.value = result.denominacion ?? "";
             }
 
+            // ingreso de reuso automatico
+
+                if (result.origen === "TB_REU") {
+                    if (hiddenReuId) hiddenReuId.value = codigoOriginal;
+                    if (inputReuVisible) inputReuVisible.value = codigoOriginal;
+
+                    if (cantidadInput) {
+                        cantidadInput.value = "1";
+                    }
+
+                    vieneDeReuso = true;
+
+                        if (parseInt(result.ibMatMtiId) === 14) {
+                            requiereRegistroPaciente = true;
+                        }
+
+                        await validarReusoEInsertarDirecto(codigoOriginal, result.ibMatId);
+
+                        return false;
+                }
+
+            //fin reuso automatico
+
             if (inputVol) {
                 inputVol.value = result.volumen ?? 0;
             }
@@ -1469,6 +1643,9 @@
             if (result.ibMatId && parseInt(result.ibMatId) > 0) {
                 await controlarReusoMaterial(parseInt(result.ibMatId));
             }
+            // if (result.origen !== "TB_REU" && result.ibMatId && parseInt(result.ibMatId) > 0) {
+            //         await controlarReusoMaterial(parseInt(result.ibMatId));
+            //     }
 
             const tienePrioridad =
                 result.ibMatPriOpc === true ||
@@ -1491,15 +1668,7 @@
                 mensajePrioridadMostrado = true;
             }
 
-            if (result.origen === "TB_REU") {
-                if (hiddenReuId) hiddenReuId.value = codigoOriginal;
-                if (inputReuVisible) inputReuVisible.value = codigoOriginal;
-                vieneDeReuso = true;
-            } else {
-                if (hiddenReuId) hiddenReuId.value = "";
-                if (inputReuVisible) inputReuVisible.value = "";
-                vieneDeReuso = false;
-            }
+            
 
             if (parseInt(result.ibMatMtiId) === 16) {
                 requiereControlAdicional = true;
@@ -1516,14 +1685,31 @@
                     modalRegistroControlArmado.show();
                 }
             }
-            else if (parseInt(result.ibMatMtiId) === 14) {
-                requiereControlAdicional = false;
-                modalControlCompleto = false;
-                datosControlAdicional = null;
-                requiereRegistroPaciente = true;
 
-                // mostrarError("⚠️ Este material requiere registro de paciente. Primero valide el reuso.");
-            }
+                else if (parseInt(result.ibMatMtiId) === 14) {
+                    requiereControlAdicional = false;
+                    modalControlCompleto = false;
+                    datosControlAdicional = null;
+                    requiereRegistroPaciente = true;
+                }
+                        // else if (parseInt(result.ibMatMtiId) === 14) {
+            //     requiereControlAdicional = false;
+            //     modalControlCompleto = false;
+            //     datosControlAdicional = null;
+            //     requiereRegistroPaciente = true;
+
+            //     // mostrarError("⚠️ Este material requiere registro de paciente. Primero valide el reuso.");
+            //         const modalPacienteMaterialElement = document.getElementById("modalPacienteMaterial");
+            //         const modalPacienteMaterial = modalPacienteMaterialElement
+            //             ? bootstrap.Modal.getOrCreateInstance(modalPacienteMaterialElement)
+            //             : null;
+
+            //         if (modalPacienteMaterial) {
+            //             modalPacienteMaterial.show();
+            //         }
+
+            //         return;
+            // }
             else {
                 requiereControlAdicional = false;
                 modalControlCompleto = false;
@@ -1591,6 +1777,7 @@
                 const data = {
                     TB_REC_ID: parseInt(formData.get("Detalle.TB_REC_ID")) || 0,
                     IB_MAT_ID: parseInt(formData.get("Detalle.IB_MAT_ID")) || 0,
+                        TB_REC_DET_CANT_MULT: parseInt(formData.get("Detalle.TB_REC_DET_CANT_MULT")) || 1,
                     TB_REC_DET_CANT: parseInt(formData.get("Detalle.TB_REC_DET_CANT")) || 0,
                     IB_EST_ID: parseInt(formData.get("Detalle.IB_EST_ID")) || 0,
 
@@ -1676,6 +1863,10 @@
                     if (totalInput) {
                         totalInput.value = resultInsertar.totalRecibido ?? 0;
                     }
+                setTimeout(() => {
+                        console.log("FOCO FINAL:", document.activeElement?.id || "(sin id)");
+                    }, 300);
+                
                 } else {
                     mostrarError("❌ " + resultInsertar.mensaje);
                 }
@@ -1724,6 +1915,7 @@
         }
 
         window.reusoPendiente = null;
+
 
         // 🔥 LIMPIAMOS EL MENSAJE VIEJO
         limpiarMensaje();

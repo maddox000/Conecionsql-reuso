@@ -63,12 +63,12 @@
                         <th>Denominación</th>
                         <th>Sector</th>
                         <th>Código reuso</th>
-                        <th>Tipo de envoltorio</th>
-                        
+                        <th>Tipo de envoltorio</th>                     
                         <th>Recibidos</th>
                         <th>En proceso</th>
                         <th>Sin procesar</th>
                         <th>Cantidad</th>
+                            <th>Eliminar</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -542,6 +542,52 @@
 
                 window.location.href = "/";
             });
+
+
+            //para eliminar del detalle
+
+            document.addEventListener('click', async function (event) {
+
+                    const btnEliminar = event.target.closest('.js-aco-eliminar-detalle');
+
+                    if (!btnEliminar) {
+                        return;
+                    }
+
+                    const tbProAcoDetId = parseInt(btnEliminar.dataset.acoDetId);
+
+                    if (!confirm('¿Eliminar el material del acondicionado?')) {
+                        return;
+                    }
+
+                    const response = await fetch('/TbProAcoDet/EliminarDetalle', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(tbProAcoDetId)
+                    });
+
+                    const json = await response.json();
+
+                    if (!json.success) {
+                        alert(json.mensaje);
+                        return;
+                    }
+
+                    const fila = document.getElementById(`fila-aco-det-${tbProAcoDetId}`);
+
+                    if (fila) {
+                        fila.style.opacity = "0.5";
+
+                        const boton = fila.querySelector(".js-aco-eliminar-detalle");
+
+                        if (boton) {
+                            boton.disabled = true;
+                            boton.style.pointerEvents = "none";
+                        }
+                    }
+                });
 
     </script>
 

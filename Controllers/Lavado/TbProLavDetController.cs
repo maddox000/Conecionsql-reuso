@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ConexionSql.Data;
+﻿using ConexionSql.Data;
 using ConexionSql.Models.Lavado;
+using ConexionSql.Models.Reuso;
 using ConexionSql.Utilidades;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -43,8 +44,9 @@ namespace ConexionSql.Controllers.Lavado
                         TB_PRO_LAV_ID = d.TB_PRO_LAV_DET_PRO_LAV_ID,
                         TB_PRO_LAV_DET_REC_DET_ID = d.TB_PRO_LAV_DET_REC_DET_ID ?? 0,
                         TB_PRO_LAV_DET_REC_DET_MAT_DEN = d.TB_PRO_LAV_DET_IB_MAT_DEN,
-
                         TB_PRO_LAV_DET_CANT = d.TB_PRO_LAV_DET_CANT,
+                        TB_PRO_LAV_DET_CANT_ELIM = d.TB_PRO_LAV_DET_CANT_ELIM,
+                        TB_PRO_LAV_DET_DAT = d.TB_PRO_LAV_DET_DAT,
                         TB_PRO_LAV_DET_PC_USR = d.TB_PRO_LAV_DET_PC_USR,
                         TB_PRO_LAV_FEC = d.TB_PRO_LAV_DET_PRO_LAV_FEC
                     })
@@ -79,6 +81,9 @@ namespace ConexionSql.Controllers.Lavado
             {
                 return Json(new { success = false, mensaje = $"❌ Stock insuficiente. Disponible: {stock}" });
             }
+
+            
+
 
             // ✅ Descontar y acumular stock
             recDet.TbRecDetLavStock = stock - cantidad;
@@ -155,6 +160,65 @@ namespace ConexionSql.Controllers.Lavado
             _context.TbProLavDet.Add(nuevo);
             await _context.SaveChangesAsync();
 
+            // =========================================================
+            // VALIDAR Y PREPARAR ESTADO TB_REU PARA LAVADO
+            // =========================================================
+            TbReu? reusoActualizar = null;
+
+            if (!string.IsNullOrWhiteSpace(recDet.TbRecDetReuId) && recDet.TbRecDetReuId != "1")
+            {
+                reusoActualizar = await _context.TbReu
+                    .FirstOrDefaultAsync(x => x.TbReuIdForm == recDet.TbRecDetReuId);
+
+                if (reusoActualizar == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        mensaje = "❌ No se encontró el código de reuso asociado a la etiqueta."
+                    });
+                }
+
+                int sectorReusoId = reusoActualizar.TbReuSecId ?? 0;
+                int estadoActualReusoId = reusoActualizar.TbReuEstIngId ?? 0;
+
+                // HMD
+                if (sectorReusoId == 905)
+                {
+                    if (estadoActualReusoId != 12)
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            mensaje = $"El código de reuso se encuentra en etapa {reusoActualizar.TbReuEstIngDen}. No corresponde a Lavado."
+                        });
+                    }
+
+                    reusoActualizar.TbReuEstIngId = 23;
+                    reusoActualizar.TbReuEstIngDen = "CE PROCESO LAVADO";
+                    reusoActualizar.TbReuEstIngFec = DateTime.Now;
+                }
+
+                // CCV / Farmacia
+                else if (sectorReusoId == 929 || sectorReusoId == 936)
+                {
+                    if (estadoActualReusoId != 17)
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            mensaje = $"El código de reuso se encuentra en etapa {reusoActualizar.TbReuEstIngDen}. No corresponde a Lavado."
+                        });
+                    }
+
+                    reusoActualizar.TbReuEstIngId = 18;
+                    reusoActualizar.TbReuEstIngDen = "CE - Proceso de lavado";
+                    reusoActualizar.TbReuEstIngFec = DateTime.Now;
+                }
+            }
+
+            //termina estado de reuso
+
             var cabecera = await _context.TbProLav
             .FirstOrDefaultAsync(x => x.TbProLavId == dto.TB_PRO_LAV_ID);
 
@@ -185,7 +249,9 @@ namespace ConexionSql.Controllers.Lavado
                     TB_PRO_LAV_DET_EST_ID = d.TB_PRO_LAV_DET_EST_ID,
                     TB_PRO_LAV_DET_EST_DEN = d.TB_PRO_LAV_DET_EST_DEN,
 
-                    TB_PRO_LAV_DET_CANT = d.TB_PRO_LAV_DET_CANT
+                    TB_PRO_LAV_DET_CANT = d.TB_PRO_LAV_DET_CANT,
+                    TB_PRO_LAV_DET_CANT_ELIM = d.TB_PRO_LAV_DET_CANT_ELIM,
+                    TB_PRO_LAV_DET_DAT = d.TB_PRO_LAV_DET_DAT
                 })
                 .ToListAsync();
 
@@ -205,6 +271,74 @@ namespace ConexionSql.Controllers.Lavado
             });
         }
 
+        //eliminar del detalle
+
+        [HttpPost]
+        public async Task<IActionResult> EliminarDetalle([FromBody] int idDetalle)
+        {
+            try
+            {
+                var detalle = await _context.TbProLavDet
+                    .FirstOrDefaultAsync(x => x.TB_PRO_LAV_DET_ID == idDetalle);
+
+                if (detalle == null)
+                    return Json(new { success = false, mensaje = "❌ No se encontró el detalle." });
+
+                if (detalle.TB_PRO_LAV_DET_DAT == "ELIMINADO" || (detalle.TB_PRO_LAV_DET_CANT_ELIM ?? 0) > 0)
+                    return Json(new { success = false, mensaje = "❌ El detalle ya fue eliminado." });
+
+                var recDet = await _context.TbRecDet
+                    .FirstOrDefaultAsync(x => x.TbRecDetId == detalle.TB_PRO_LAV_DET_REC_DET_ID);
+
+                if (recDet == null)
+                    return Json(new { success = false, mensaje = "❌ No se encontró el detalle de recepción." });
+
+                int cantidad = detalle.TB_PRO_LAV_DET_CANT ?? 0;
+
+                if (cantidad <= 0)
+                    return Json(new { success = false, mensaje = "❌ Cantidad inválida." });
+
+                int empStockActual = recDet.TbRecDetEmpStock ?? 0;
+
+                if (empStockActual < cantidad)
+                    return Json(new { success = false, mensaje = "❌ No se puede revertir: stock de acondicionado insuficiente." });
+
+                // Inversa exacta del Insertar Lavado
+                recDet.TbRecDetLavStock = (recDet.TbRecDetLavStock ?? 0) + cantidad;
+                recDet.TbRecDetLavTot = (recDet.TbRecDetLavTot ?? 0) - cantidad;
+                recDet.TbRecDetEmpStock = empStockActual - cantidad;
+
+                var cabecera = await _context.TbProLav
+                    .FirstOrDefaultAsync(x => x.TbProLavId == detalle.TB_PRO_LAV_DET_PRO_LAV_ID);
+
+                if (cabecera != null)
+                {
+                    cabecera.TbProLavUpro = (cabecera.TbProLavUpro ?? 0) - cantidad;
+                }
+
+                // Baja lógica
+                detalle.TB_PRO_LAV_DET_CANT_ELIM = cantidad;
+                detalle.TB_PRO_LAV_DET_DAT = "ELIMINADO";
+
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true,
+                    mensaje = "✅ Detalle eliminado correctamente.",
+                    total = cabecera?.TbProLavUpro ?? 0
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    mensaje = "❌ Error al eliminar detalle: " + ex.Message
+                });
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> ObtenerMaterial(int tbRecDetId)
         {
@@ -217,6 +351,17 @@ namespace ConexionSql.Controllers.Lavado
                     return Json(new { success = false, mensaje = "Etiqueta no encontrada." });
 
                 int sinProcesar = recDet.TbRecDetLavStock ?? 0;
+
+                if (sinProcesar <= 0)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        mensaje = "❌ No hay stock disponible para Lavado.",
+                        autoInsertar = false,
+                        cantidadAuto = 0
+                    });
+                }
 
                 return Json(new
                 {

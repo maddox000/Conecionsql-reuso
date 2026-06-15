@@ -80,6 +80,30 @@
         display: block;
         margin: 0 auto;
     }
+
+    /* EFECTO AZUL AL HACER CLIC EN EL INPUT NOMBRE */
+    #loginNombre:focus {
+        border-color: #0d6efd !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+        outline: 0;
+    }
+
+    /* CLASE PARA QUE LA LISTA FLOTE */
+    .list-group-flotante {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1050;
+        width: 100%;
+        max-height: 250px;
+        overflow-y: auto;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        background-color: white;
+        border: 1px solid rgba(0,0,0,.125);
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+        margin-top: 0;
+    }
 </style>
 
 <div class="modal fade"
@@ -91,14 +115,16 @@
         <div class="modal-content login-modal-content">
             <div class="modal-body p-0 text-center">
 
-                <img src="~/img/LogoCliente.png" alt="Logo Cliente" class="logo-top" />
+                <img src="~/img/Cliente - Logo.png" alt="Logo Cliente" class="logo-top" />
 
                 <h5 class="titulo-login" id="lblTituloLogin">Ingrese su PIN de identificación:</h5>
 
                 <div id="contenedorUsuario" class="mb-3 text-start d-none">
                     <label class="fw-bold mb-1">Nombre</label>
-                    <input type="text" class="form-control" id="loginNombre" autocomplete="off" />
-                    <div id="listaUsuarios" class="list-group mt-2"></div>
+                    <div style="position: relative;">
+                        <input type="text" class="form-control" id="loginNombre" autocomplete="off" />
+                        <div id="listaUsuarios" class="list-group mt-2 list-group-flotante"></div>
+                    </div>
                     <input type="hidden" id="loginUsuarioId" />
                 </div>
 
@@ -130,6 +156,7 @@
         </div>
     </div>
 </div>
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

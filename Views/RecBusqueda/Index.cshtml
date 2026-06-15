@@ -1,338 +1,565 @@
 ﻿@model List<ConexionSql.Models.SP_Busquedas.BusRecDto>
 
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<link rel="stylesheet" href="~/css/busquedas-custom.css" />
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="~/css/busquedas-custom.css" />
 
 <style>
-    /* body {
-        font-size: 110%;
-    }
-
-    .form-control, label {
-        font-size: 1.15em;
-    } */
-
-    /* .panel-filtros {
-        height: 330px !important;
-        padding: 20px 25px !important;
-    }  */
-
-    .panel-filtros {
-        height: 270px !important;
-        padding: 15px 25px !important;
-        margin-bottom: 10px !important;
-        background: #fff;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-    }
-
-    .form-group input {
-        width: 100%;
+    /* Estilos base de componentes internos sincronizados con RecDet */
+    .campo-detalle {
+        height: 26px; /* Ajustado de 25px a 26px para evitar el colapso de inputs de fecha */
+        padding: 2px 8px;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        color: #333;
         box-sizing: border-box;
-    }
-
-    /* Anchos específicos
-    #BUS_DEN, #BUS_PR, #BUS_REU_ID, #BUS_SEC_ORI, #BUS_SEC_DES {
-        width: 300px !important;
-        display: inline-block;
-    }
-
-    /* #BUS_PAC, #BUS_PRO, #BUS_ORT_DEN {
-        width: 460px !important;
-        display: inline-block;
-    } */
-
-    #BUS_REM, #BUS_FEN {
-        width: 220px !important;
-        display: inline-block;
-    }
-
-    /* ESTILO DEL CONTADOR */
-    .badge-contador-grande {
-        font-size: 1.2em;
-        padding: 6px 14px;
-        width: 270px !important;
-        height: 45px;
-        text-align: center;
-        background-color: #2c3e50;
-        color: white;
-        border-radius: 20px;
-        display: inline-block;
-        margin-top: 35px; /* Ajustado para que no se pegue */
-    }
-
-    .menu-operaciones {
-        background-color: #2c3e50;
-        border-radius: 6px;
-        padding: 5px;
-        display: flex;
-        flex-direction: column;
-        width: 300px;
-        border: 1px solid #1a252f;
-    }
-
-    .col-operaciones-container {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        margin-left: auto;
-    }
-
-    .btn-menu {
-        background: transparent;
-        border: none;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        color: #ecf0f1;
-        padding: 18px 20px;
-        text-align: left;
-        font-size: 1.1em !important;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
         width: 100%;
     }
 
-        .btn-menu .material-icons {
-            margin-right: 15px;
-            font-size: 22px;
+        .campo-detalle:focus {
+            border-color: #34495e;
+            outline: none;
         }
-
-    /* .col-operaciones-container {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        margin-left: auto;
-    }
-
-    .menu-operaciones {
-        background-color: #2c3e50;
-        border-radius: 6px;
-        padding: 5px;
-        display: flex;
-        flex-direction: column;
-        width: 300px;
-        border: 1px solid #1a252f;
-    }
-
-    .btn-menu {
-        background: transparent;
-        border: none;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        color: #ecf0f1;
-        padding: 18px 20px;
-        text-align: left;
-        font-size: 1.1em !important;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        width: 100%;
-    } */
-
-        .btn-menu:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
-    /*     .btn-menu .material-icons {
-            margin-right: 15px;
-            font-size: 22px;
-            color: inherit;
-        } */
 
     .campo-activo {
-        border: 2px solid #007bff !important;
+        border: 1px solid #34495e !important;
+        background-color: #f8fbfd;
     }
 
-    /* Autocomplete y Loader */
+    .label-detalle {
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: #666;
+        margin-bottom: 3px;
+        display: block;
+    }
+
+    /* Autocomplete */
     .ui-autocomplete {
         z-index: 999999 !important;
         background-color: #ffffff !important;
-        border: 1px solid #2c3e50 !important;
-        max-height: 250px;
+        border: 1px solid #ccc !important;
+        border-radius: 4px;
+        max-height: 200px;
         overflow-y: auto;
+        font-size: 0.75rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
     .ui-menu-item {
-        padding: 8px 12px;
-        border-bottom: 1px solid #eee;
+        padding: 6px 10px;
+        border-bottom: 1px solid #f1f1f1;
         color: #333;
         cursor: pointer;
     }
 
     .ui-state-active {
-        background-color: #007bff !important;
+        background-color: #34495e !important;
         color: white !important;
+        border: none !important;
+        margin: 0 !important;
     }
 
-    #loader {
-        display: none;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(255, 255, 255, 0.9);
-        z-index: 9999;
+    /* Menú Vertical - Ancho unificado estable de la botonera Baxen */
+    .menu-operaciones-vertical {
+        background-color: #34495e;
+        border-radius: 4px;
+        display: flex;
         flex-direction: column;
-        justify-content: center;
+        overflow: hidden; /* Cambiado de visible a hidden según tu referencia exitosa */
+        width: 220px; /* Fijado a 220px estrictos para evitar desbordes fuera de la caja */
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .btn-menu-vertical {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        color: white;
+        height: 45px;
+        padding: 0 15px;
+        text-align: left;
+        font-size: 0.75rem;
+        display: flex;
         align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+        width: 100%;
     }
 
-    .spinner {
-        width: 60px;
-        height: 60px;
-        border: 6px solid #f3f3f3;
-        border-top: 6px solid #007bff;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @@keyframes spin {
-        0% {
-            transform: rotate(0deg);
+        .btn-menu-vertical:last-child {
+            border-bottom: none;
         }
 
-        100% {
-            transform: rotate(360deg);
+        .btn-menu-vertical:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+    /* Contenedor Dropdown Reporte */
+    .dropdown-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .dropdown-menu-content {
+        display: none;
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        width: 100%;
+        background-color: #34495e;
+        box-shadow: 0 -4px 10px rgba(0,0,0,0.25);
+        z-index: 1000;
+        border-radius: 4px 4px 0 0;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-bottom: none;
+    }
+
+    .dropdown-wrapper:hover .dropdown-menu-content {
+        display: block;
+    }
+
+    .btn-submenu {
+        width: 100%;
+        text-align: left;
+        padding: 12px 15px;
+        border: none;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        transition: background 0.2s, padding-left 0.2s;
+    }
+
+        .btn-submenu.excel-btn {
+            background: #1b4d3e;
+        }
+
+            .btn-submenu.excel-btn .material-icons {
+                color: #2ecc71 !important;
+            }
+
+            .btn-submenu.excel-btn:hover {
+                background: #23614e;
+                padding-left: 18px;
+            }
+
+        .btn-submenu.pdf-btn {
+            background: #5c2523;
+        }
+
+            .btn-submenu.pdf-btn .material-icons {
+                color: #e74c3c !important;
+            }
+
+            .btn-submenu.pdf-btn:hover {
+                background: #732f2c;
+                padding-left: 18px;
+            }
+
+        .btn-submenu:last-child {
+            border-bottom: none;
+        }
+
+    .encabezado-impresion-baxen {
+        display: none;
+    }
+
+    /* =========================================================================
+               HOJA DE ESTILOS DE IMPRESIÓN (MANTIENE DISEÑO EXCLUSIVO CAPTURA 2)
+               ========================================================================= */
+    @@media print {
+        @@page {
+            size: A4 landscape;
+            margin: 10mm;
+        }
+
+        .sidebar, .menu-lateral, nav, header, .navbar,
+        .menu-operaciones-vertical, .contenedor-titulo,
+        style + div[style*="flex-shrink: 0"], #loader, button {
+            display: none !important;
+        }
+
+        body, main, .contenido, #zonaResultados-wrapper, #zonaResultados {
+            background: white !important;
+            color: #333 !important;
+            overflow: visible !important;
+            height: auto !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .encabezado-impresion-baxen {
+            display: block !important;
+            width: 100% !important;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .imp-panel-superior {
+            border: 1px solid #dcdde1;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background-color: #fcfcfc;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .imp-bloque-izq {
+            display: flex;
+            flex-direction: column;
+            width: 45%;
+        }
+
+        .imp-cabecera-logos {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 2px;
+        }
+
+        .imp-linea-verde {
+            width: 4px;
+            height: 20px;
+            background-color: #1abc9c;
+            display: inline-block;
+        }
+
+        .imp-logo-cliente {
+            max-height: 25px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .imp-sub-logo {
+            font-size: 0.65rem;
+            color: #7f8c8d;
+            padding-left: 12px;
+            margin-bottom: 25px;
+        }
+
+        .imp-titulo-busqueda {
+            font-size: 1.5rem;
+            color: #34495e;
+            font-weight: 500;
+            margin: 0;
+            padding-left: 12px;
+        }
+
+        .imp-bloque-der-filtros {
+            display: flex;
+            gap: 15px;
+            width: 55%;
+            justify-content: flex-end;
+        }
+
+        .imp-col-filtros-apilados {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 32%;
+        }
+
+        .imp-campo-caja {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .imp-label {
+            font-size: 0.62rem;
+            color: #7f8c8d;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .imp-valor-input {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            height: 24px;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            color: #333;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .table-baxen-resultados {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            margin-top: 5px;
+        }
+
+            .table-baxen-resultados thead th {
+                background-color: #2c3e50 !important;
+                color: #ffffff !important;
+                font-size: 0.68rem !important;
+                font-weight: 700 !important;
+                text-transform: uppercase !important;
+                padding: 8px 10px !important;
+                border: 1px solid #2c3e50 !important;
+                text-align: left;
+            }
+
+            .table-baxen-resultados tbody tr td {
+                font-size: 0.68rem !important;
+                padding: 8px 10px !important;
+                border-bottom: 1px solid #e2e8f0 !important;
+                color: #444 !important;
+            }
+
+        .pie-pagina-baxen-reporte {
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            display: flex !important;
+            justify-content: space-between;
+            align-items: flex-end;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.62rem;
+            color: #7f8c8d;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 6px;
+            background: white;
+        }
+
+        .pie-logo-baxen {
+            max-height: 28px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .pie-info-derecha {
+            text-align: right;
+            line-height: 1.4;
+        }
+
+        .conteo-dinamico-paginas::after {
+            content: "Página " counter(page) " de " counter(pages);
         }
     }
 </style>
 
-<div class="contenedor-titulo"><h1 class="titulo-derecha">Búsqueda de recepciones realizadas</h1></div>
+<div style="height: calc(100vh - 80px); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; padding: 0 20px;">
 
-<div class="panel-filtros">
-    <div class="row" style="display: flex; flex-wrap: wrap;">
-        @* Bloque 1 *@
-        <div class="col-md-2">
-            <div class="form-group"><label>Fecha Inicio</label><input type="date" id="BUS_FEC_INI" class="form-control" value="@ViewBag.FEC_INI" /></div>
-            <div class="form-group"><label>Fecha Fin</label><input type="date" id="BUS_FEC_FIN" class="form-control" value="@ViewBag.FEC_FIN" /></div>
-
-            @* EL CONTADOR AQUÍ *@
-            <div class="text-left">
-                <span id="contador" class="badge-contador-grande" style="display:none;"></span>
+    <div class="encabezado-impresion-baxen">
+        <div class="imp-panel-superior">
+            <div class="imp-bloque-izq">
+                <div class="imp-cabecera-logos">
+                    <span class="imp-linea-verde"></span>
+                    <img src="@Url.Content("~/img/Cliente - Logo.png")" alt="Logo Cliente" class="imp-logo-cliente" />
+                </div>
+                <div class="imp-sub-logo">Búsqueda de Recepciones</div>
+                <h2 class="imp-titulo-busqueda">Titulo de la búsqueda</h2>
             </div>
-        </div>
 
-        @* Bloque 2 *@
-        <div class="col-auto">
-            <div class="form-group"><label>Denominación</label><input type="text" id="BUS_DEN" class="form-control autocompletar" data-tabla="IB_MAT" data-campo="IB_MAT_DEN" autocomplete="off" /></div>
-            <div class="form-group"><label>Código Producto</label><input type="text" id="BUS_PR" class="form-control autocompletar" data-tabla="IB_MAT" data-campo="IB_MAT_PR" autocomplete="off" /></div>
-            <div class="form-group"><label>Código Reúso</label><input type="text" id="BUS_REU_ID" class="form-control autocompletar" data-tabla="TB_REU" data-campo="TB_REU_ID_FORM" autocomplete="off" /></div>
-        </div>
-
-        @* Bloque 3 *@
-        <div class="col-auto">
-            <div class="form-group"><label>Sector Origen</label><input type="text" id="BUS_SEC_ORI" class="form-control autocompletar" data-tabla="IB_SEC" data-campo="IB_SEC_DEN" autocomplete="off" /></div>
-            <div class="form-group"><label>Sector Destino</label><input type="text" id="BUS_SEC_DES" class="form-control autocompletar" data-tabla="IB_SEC" data-campo="IB_SEC_DEN" autocomplete="off" /></div>
-        </div>
-
-        @* Bloque 4 *@
-        <div class="col-auto">
-            <div class="form-group"><label>Paciente</label><input type="text" id="BUS_PAC" class="form-control autocompletar" data-tabla="TB_REC_DET" data-campo="TB_REC_DET_PAC" autocomplete="off" /></div>
-            <div class="form-group"><label>Profesional</label><input type="text" id="BUS_PRO" class="form-control autocompletar" data-tabla="IB_PRO" data-campo="IB_PRO_APE" autocomplete="off" /></div>
-            <div class="form-group"><label>Proveedor</label><input type="text" id="BUS_ORT_DEN" class="form-control autocompletar" data-tabla="IB_ORT" data-campo="IB_ORT_DEN" autocomplete="off" /></div>
-            <div class="row">
-                <div class="col-md-6"><label>Remito</label><input type="text" id="BUS_REM" class="form-control autocompletar" data-tabla="TB_REC_DET" data-campo="TB_REC_DET_REM" autocomplete="off" /></div>
-                <div class="col-md-6"><label>Fecha Procedimiento</label><input type="date" id="BUS_FEN" class="form-control" /></div>
-            </div>
-        </div>
-
-        @* Bloque 5 *@
-        <div class="col-md-2 col-operaciones-container">
-            <div class="menu-operaciones">
-                <button id="btnBuscar" class="btn-menu" onclick="Buscar()"><span class="material-icons">search</span> Buscar</button>
-                <button id="btnReporte" class="btn-menu" onclick="Reporte()"><span class="material-icons">description</span> Reporte</button>
-                <button class="btn-menu" onclick="Limpiar()"><span class="material-icons">cleaning_services</span> Limpiar</button>
-                <button class="btn-menu" onclick="location.href='@Url.Action("Index", "Home")'"><span class="material-icons">logout</span> Cerrar</button>
+            <div class="imp-bloque-der-filtros">
+                <div class="imp-col-filtros-apilados">
+                    <div class="imp-campo-caja">
+                        <span class="imp-label">Fecha Inicio</span>
+                        <div class="imp-valor-input" id="lbl_fec_ini">-</div>
+                    </div>
+                    <div class="imp-campo-caja">
+                        <span class="imp-label">Fecha Fin</span>
+                        <div class="imp-valor-input" id="lbl_fec_fin">-</div>
+                    </div>
+                </div>
+                <div class="imp-col-filtros-apilados">
+                    <div class="imp-campo-caja">
+                        <span class="imp-label">Denominación</span>
+                        <div class="imp-valor-input" id="lbl_den">&nbsp;</div>
+                    </div>
+                    <div class="imp-campo-caja">
+                        <span class="imp-label">Código Producto</span>
+                        <div class="imp-valor-input" id="lbl_pr">&nbsp;</div>
+                    </div>
+                </div>
+                <div class="imp-col-filtros-apilados">
+                    <div class="imp-campo-caja">
+                        <span class="imp-label">Código Reúso</span>
+                        <div class="imp-valor-input" id="lbl_reu">&nbsp;</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div id="zonaResultados-wrapper" style="position:relative;">
-    <div id="loader">
-        <span style="margin-bottom: 20px; font-weight: normal; color: #2c3e50; font-size: 1.2em;">Baxen® Trazabilidad</span>
-        <div class="spinner"></div>
-        <span style="margin-top: 20px; color: #555; font-style: italic;">Buscando información solicitada...</span>
+    <div class="encabezado-impresion-baxen">
+        <div class="pie-pagina-baxen-reporte">
+            <div>
+                <img src="@Url.Content("~/img/Baxen_Trazabilidad.png")" alt="Baxen® Trazabilidad" class="pie-logo-baxen" />
+            </div>
+            <div class="pie-info-derecha">
+                <div><strong>Impreso:</strong> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</div>
+                <div class="conteo-dinamico-paginas" style="font-weight: 500;"></div>
+                <div>Registros: <span id="lbl_total_regs">0</span></div>
+            </div>
+        </div>
     </div>
-    <div id="zonaResultados">@Html.Partial("~/Views/RecBusqueda/_ResultadosBusRec.cshtml", Model)</div>
+
+    <div class="contenedor-titulo" style="flex-shrink: 0; padding-bottom: 5px; margin-bottom: 10px;">
+        <h1 class="titulo-derecha" style="margin: 0; font-size: 1.5rem; color: #34495e; font-weight: 400;">Búsqueda de recepciones</h1>
+    </div>
+
+    <div style="flex-shrink: 0; display: flex; gap: 15px; padding: 15px 20px; background: white; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 15px; flex-wrap: wrap; align-items: stretch;">
+        <div style="width: 140px; display: flex; flex-direction: column; gap: 10px; flex-shrink: 0;">
+            <div> <label class="label-detalle">Fecha Inicio</label> <input type="date" id="BUS_FEC_INI" class="campo-detalle" value="@ViewBag.FEC_INI" /> </div>
+            <div> <label class="label-detalle">Fecha Fin</label> <input type="date" id="BUS_FEC_FIN" class="campo-detalle" value="@ViewBag.FEC_FIN" /> </div>
+            <div style="margin-top: auto; padding-top: 5px;"> <span id="contador" style="background-color: #34495e; color: white; padding: 6px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; display: none;">Registros: 0</span> </div>
+        </div>
+
+        <div style="flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 10px;">
+            <div> <label class="label-detalle">Denominación</label> <input type="text" id="BUS_DEN" class="campo-detalle autocompletar" data-tabla="IB_MAT" data-campo="IB_MAT_DEN" autocomplete="off" /> </div>
+            <div> <label class="label-detalle">Código Producto</label> <input type="text" id="BUS_PR" class="campo-detalle autocompletar" data-tabla="IB_MAT" data-campo="IB_MAT_PR" autocomplete="off" /> </div>
+            <div> <label class="label-detalle">Código Reúso</label> <input type="text" id="BUS_REU_ID" class="campo-detalle autocompletar" data-tabla="TB_REU" data-campo="TB_REU_ID_FORM" autocomplete="off" /> </div>
+        </div>
+
+        <div style="flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 10px;">
+            <div> <label class="label-detalle">Sector Origen</label> <input type="text" id="BUS_SEC_ORI" class="campo-detalle autocompletar" data-tabla="IB_SEC" data-campo="IB_SEC_DEN" autocomplete="off" /> </div>
+            <div> <label class="label-detalle">Sector Destino</label> <input type="text" id="BUS_SEC_DES" class="campo-detalle autocompletar" data-tabla="IB_SEC" data-campo="IB_SEC_DEN" autocomplete="off" /> </div>
+        </div>
+
+        <div style="flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 10px;">
+            <div> <label class="label-detalle">Paciente</label> <input type="text" id="BUS_PAC" class="campo-detalle autocompletar" data-tabla="TB_REC_DET" data-campo="TB_REC_DET_PAC" autocomplete="off" /> </div>
+            <div> <label class="label-detalle">Profesional</label> <input type="text" id="BUS_PRO" class="campo-detalle autocompletar" data-tabla="IB_PRO" data-campo="IB_PRO_APE" autocomplete="off" /> </div>
+            <div> <label class="label-detalle">Proveedor</label> <input type="text" id="BUS_ORT_DEN" class="campo-detalle autocompletar" data-tabla="IB_ORT" data-campo="IB_ORT_DEN" autocomplete="off" /> </div>
+        </div>
+
+        <div style="flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 10px;">
+            <div> <label class="label-detalle">Remito</label> <input type="text" id="BUS_REM" class="campo-detalle autocompletar" data-tabla="TB_REC_DET" data-campo="TB_REC_DET_REM" autocomplete="off" style="width: 50%;" /> </div>
+            <div> <label class="label-detalle">Fecha Procedim</label> <input type="date" id="BUS_FEN" class="campo-detalle" style="width: 50%;" /> </div>
+        </div>
+
+        <div style="width: 160px; display: flex; flex-direction: column; flex-shrink: 0; justify-content: flex-start; margin-left: 50px;">
+            <div class="menu-operaciones-vertical">
+                <button id="btnBuscar" class="btn-menu-vertical" onclick="Buscar()">
+                    <span class="material-icons" style="font-size: 1.1rem;">search</span> Buscar
+                </button>
+
+                <div class="dropdown-wrapper">
+                    <div class="dropdown-menu-content">
+                        <button type="button" class="btn-submenu excel-btn" onclick="ExportarExcel()">
+                            <span class="material-icons" style="font-size: 1.1rem;">table_chart</span> Excel
+                        </button>
+                        <button type="button" class="btn-submenu pdf-btn" onclick="PrepararEImprimir()">
+                            <span class="material-icons" style="font-size: 1.1rem;">picture_as_pdf</span> PDF
+                        </button>
+                    </div>
+                    <button type="button" class="btn-menu-vertical">
+                        <span class="material-icons" style="font-size: 1.1rem;">description</span> Reporte
+                    </button>
+                </div>
+
+                <button id="btnLimpiar" class="btn-menu-vertical" onclick="Limpiar()">
+                    <span class="material-icons" style="font-size: 1.1rem;">cleaning_services</span> Limpiar
+                </button>
+                <button id="btnCerrar" class="btn-menu-vertical" onclick="location.href='@Url.Action("Index", "Home")'">
+                    <span class="material-icons" style="font-size: 1.1rem;">logout</span> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="zonaResultados-wrapper">
+        <div id="loader">
+            <span style="margin-bottom: 10px; font-weight: normal; color: #2c3e50; font-size: 1.2em;">Baxen® Trazabilidad</span>
+            <div class="spinner"></div>
+            <span style="margin-top: 20px; color: #555; font-style: italic;">Buscando información solicitada...</span>
+        </div>
+        <div id="zonaResultados">@Html.Partial("~/Views/RecBusqueda/_ResultadosBusRec.cshtml", Model)</div>
+    </div>
 </div>
 
 @section Scripts {
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
         $(document).ready(function () {
-            $(document).on('input change', '.form-control', function() {
-                $(this).val() ? $(this).addClass('campo-activo') : $(this).removeClass('campo-activo');
-            }).trigger('change');
+        $(document).on('input change', '.campo-detalle', function() {
+        $(this).val() ? $(this).addClass('campo-activo') : $(this).removeClass('campo-activo');
+        }).trigger('change');
 
-            $(".autocompletar").each(function() {
-                var $el = $(this);
-                $el.autocomplete({
-                    source: function (request, response) {
-                        $.getJSON('@Url.Action("GetSugerencias", "BusRec")', {
-                            term: request.term,
-                            campo: $el.data('campo'),
-                            tabla: $el.data('tabla')
-                        }, response);
-                    },
-                    minLength: 2
-                });
-            });
-            Buscar(); // Llamada inicial
+        $(".autocompletar").each(function() {
+        var $el = $(this);
+        $el.autocomplete({
+        source: function (request, response) {
+        $.getJSON('@Url.Action("GetSugerencias", "BusRec")', { term: request.term, campo: $el.data('campo'), tabla: $el.data('tabla') }, response);
+        },
+        minLength: 2
+        });
+        });
+        Buscar();
         });
 
         function Buscar() {
-            var datos = {
-                FEC_INI: $('#BUS_FEC_INI').val(),
-                FEC_FIN: $('#BUS_FEC_FIN').val(),
-                BUS_SEC_ORI: $.trim($('#BUS_SEC_ORI').val()),
-                BUS_SEC_DES: $.trim($('#BUS_SEC_DES').val()),
-                BUS_ORT_DEN: $.trim($('#BUS_ORT_DEN').val()),
-                BUS_DEN: $.trim($('#BUS_DEN').val()),
-                BUS_PR: $.trim($('#BUS_PR').val()),
-                BUS_REU_ID: $.trim($('#BUS_REU_ID').val()),
-                BUS_PAC: $.trim($('#BUS_PAC').val()),
-                BUS_PRO: $.trim($('#BUS_PRO').val()),
-                BUS_REM: $.trim($('#BUS_REM').val()),
-                BUS_FEN: $('#BUS_FEN').val()
-            };
-
-            $.ajax({
-                url: '@Url.Action("Buscar", "BusRec")',
-                type: 'POST',
-                data: datos,
-                timeout: 30000,
-                beforeSend: function() { $('#loader').css('display', 'flex'); },
-                success: function (html) {
-                    $('#zonaResultados').html(html);
-
-                    // Lógica para contar filas ignorando el mensaje de "No se encontraron resultados"
-                    var filas = $('#zonaResultados tbody tr');
-                    var count = filas.length;
-
-                    // Si hay una sola fila y dice "No se encontraron", el contador es 0
-                    if (count === 1 && filas.text().indexOf("No se encontraron") > -1) {
-                        count = 0;
-                    }
-
-                    $('#contador').html("Registros: " + count).show();
-                },
-                error: function (xmlhttprequest, textstatus, message) {
-                    if (textstatus === "timeout") alert("Tiempo de espera agotado.");
-                },
-                complete: function() { $('#loader').hide(); }
-            });
+        var datos = { FEC_INI: $('#BUS_FEC_INI').val(), FEC_FIN: $('#BUS_FEC_FIN').val(), BUS_SEC_ORI: $.trim($('#BUS_SEC_ORI').val()), BUS_SEC_DES: $.trim($('#BUS_SEC_DES').val()), BUS_ORT_DEN: $.trim($('#BUS_ORT_DEN').val()), BUS_DEN: $.trim($('#BUS_DEN').val()), BUS_PR: $.trim($('#BUS_PR').val()), BUS_REU_ID: $.trim($('#BUS_REU_ID').val()), BUS_PAC: $.trim($('#BUS_PAC').val()), BUS_PRO: $.trim($('#BUS_PRO').val()), BUS_REM: $.trim($('#BUS_REM').val()), BUS_FEN: $('#BUS_FEN').val() };
+        $.ajax({
+        url: '@Url.Action("Buscar", "BusRec")', type: 'POST', data: datos, timeout: 30000,
+        beforeSend: function() { $('#loader').css('display', 'flex'); },
+        success: function (html) {
+        $('#zonaResultados').html(html);
+        var num = $('#zonaResultados tbody tr').length;
+        if (num === 1 && $('#zonaResultados tbody tr').text().indexOf("No se encontraron") > -1) num = 0;
+        $('#contador').html("Registros: " + num).css('display', 'inline-block');
+        },
+        complete: function() { $('#loader').hide(); }
+        });
         }
 
-        function Reporte() { alert("Generando reporte..."); }
+        function PrepararEImprimir() {
+        var fIni = $('#BUS_FEC_INI').val() ? $('#BUS_FEC_INI').val().split('-').reverse().join('/') : '-';
+        var fFin = $('#BUS_FEC_FIN').val() ? $('#BUS_FEC_FIN').val().split('-').reverse().join('/') : '-';
+        $('#lbl_fec_ini').text(fIni);
+        $('#lbl_fec_fin').text(fFin);
+
+        $('#lbl_den').html($.trim($('#BUS_DEN').val()) || '&nbsp;');
+        $('#lbl_pr').html($.trim($('#BUS_PR').val()) || '&nbsp;');
+        $('#lbl_reu').html($.trim($('#BUS_REU_ID').val()) || '&nbsp;');
+
+        var totalRegs = $('#zonaResultados tbody tr').length;
+        if (totalRegs === 1 && $('#zonaResultados tbody tr').text().indexOf("No se encontraron") > -1) totalRegs = 0;
+        $('#lbl_total_regs').text(totalRegs);
+
+        window.print();
+        }
+
+        function ExportarExcel() {
+        var url = '@Url.Action("GenerarExcel", "BusRec")' +
+        '?FEC_INI=' + encodeURIComponent($('#BUS_FEC_INI').val()) +
+        '&FEC_FIN=' + encodeURIComponent($('#BUS_FEC_FIN').val()) +
+        '&BUS_SEC_ORI=' + encodeURIComponent($.trim($('#BUS_SEC_ORI').val())) +
+        '&BUS_SEC_DES=' + encodeURIComponent($.trim($('#BUS_SEC_DES').val())) +
+        '&BUS_ORT_DEN=' + encodeURIComponent($.trim($('#BUS_ORT_DEN').val())) +
+        '&BUS_DEN=' + encodeURIComponent($.trim($('#BUS_DEN').val())) +
+        '&BUS_PR=' + encodeURIComponent($.trim($('#BUS_PR').val())) +
+        '&BUS_REU_ID=' + encodeURIComponent($.trim($('#BUS_REU_ID').val())) +
+        '&BUS_PAC=' + encodeURIComponent($.trim($('#BUS_PAC').val())) +
+        '&BUS_PRO=' + encodeURIComponent($.trim($('#BUS_PRO').val())) +
+        '&BUS_REM=' + encodeURIComponent($.trim($('#BUS_REM').val())) +
+        '&BUS_FEN=' + encodeURIComponent($('#BUS_FEN').val());
+
+        window.location.href = url;
+        }
 
         function Limpiar() {
-            $('.form-control').val('').removeClass('campo-activo');
-            $('#BUS_FEC_INI').val('@ViewBag.FEC_INI');
-            $('#BUS_FEC_FIN').val('@ViewBag.FEC_FIN');
-            $('#contador').hide();
-            Buscar();
+        $('.campo-detalle').not('input[type="date"]').val('').removeClass('campo-activo');
+        $('#BUS_FEC_INI').val('@ViewBag.FEC_INI').addClass('campo-activo');
+        $('#BUS_FEC_FIN').val('@ViewBag.FEC_FIN').addClass('campo-activo');
+        $('#contador').hide();
+        Buscar();
         }
     </script>
 }

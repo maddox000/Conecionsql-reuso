@@ -1,0 +1,76 @@
+﻿<link rel="stylesheet" href="~/css/views/crear-recepcion.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
+
+<div class="modal fade"
+     id="modalAvisoPaciente"
+     tabindex="-1"
+     aria-hidden="true"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false">
+
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+
+        <div class="modal-content" style="border-radius: 8px; overflow: hidden;">
+
+            <div class="rec-screen">
+
+                <div class="rec-screen-banner">
+                    Registro de paciente
+                </div>
+
+                <div class="rec-screen-panel">
+
+                    <div style="padding:10px; text-align:center; font-size:0.9rem;">
+                        El material se encuentra configurado para el registro de pacientes,
+                        debe ingresar los datos del paciente.
+                    </div>
+
+                </div>
+
+                <div class="rec-screen-actions" style="margin-top:12px;">
+
+                    <button type="button"
+                            class="btn btn-primary px-4"
+                            id="btnAceptarAvisoPaciente"
+                            data-bs-dismiss="modal">
+                        Aceptar
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-secondary px-4"
+                            data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modalAvisoPacienteElement = document.getElementById("modalAvisoPaciente");
+
+        if (!modalAvisoPacienteElement) return;
+
+        modalAvisoPacienteElement.addEventListener("shown.bs.modal", function () {
+            const btnAceptarAvisoPaciente = document.getElementById("btnAceptarAvisoPaciente");
+
+            if (btnAceptarAvisoPaciente) {
+                btnAceptarAvisoPaciente.focus();
+            }
+        });
+
+        modalAvisoPacienteElement.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                document.getElementById("btnAceptarAvisoPaciente")?.click();
+            }
+        });
+    });
+</script>

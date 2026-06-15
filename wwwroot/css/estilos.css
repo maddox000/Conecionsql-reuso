@@ -45,7 +45,7 @@ body {
     background-color: #2F3E46;
     color: #ddd;
     height: 100vh;
-    padding: 25px;
+    padding: 5px; /*Margen Izquierdo del menú lateral*/
     position: fixed;
     left: 0;
     top: 0;
@@ -216,7 +216,7 @@ body {
 .submenu-extra {
     display: none;
     flex-direction: column;
-    margin-left: 22px;
+    /*margin-left: 22px;*/
     opacity: 0;
     transform: translateX(-10px);
     transition: all 0.25s ease;
@@ -231,7 +231,7 @@ body {
     .submenu-extra a {
         display: block !important;
         position: relative;
-        padding-left: 24px !important;
+        /*padding-left: 24px !important;*/
         line-height: 1.7;
         color: inherit !important;
         text-decoration: none;
@@ -393,6 +393,7 @@ body {
     margin-left: 260px;
     padding: 30px;
     transition: margin-left 0.3s ease;
+    box-sizing: border-box !important;
 }
 
 .menu-lateral.colapsado ~ .contenido {
@@ -404,4 +405,53 @@ body {
 ============================================ */
 .btn-modo-oscuro {
     display: none !important;
+}
+
+/* Ajustes específicos para 1366x768 */
+/* ==========================================================
+   AJUSTES PARA NOTEBOOK (1366x768) - SOLUCIÓN DE ALTURAS
+   ========================================================== */
+@media (max-width: 1400px) {
+
+    /* 1. Achicamos drásticamente el alto del panel superior */
+    .panel-filtros {
+        height: auto !important;
+        padding: 15px !important; /* Menos espacio de relleno */
+    }
+
+    /* 2. Este era un asesino silencioso: bajaba los elementos 105px! */
+    .badge-contador {
+        margin-top: 15px !important;
+    }
+
+    /* 3. Acortamos la tabla para que no genere scroll en la página entera */
+    #zonaResultados {
+        height: 300px !important;
+    }
+
+    /* 4. Mantenemos el truco del zoom pero más suave (80%) para que las columnas fijas entren bien */
+    .navbar-principal {
+        zoom: 0.8;
+        left: 325px !important; /* 260px / 0.8 = 325px */
+    }
+
+    .contenido {
+        zoom: 0.8;
+        margin-left: 325px !important;
+        padding-top: 15px !important; /* Acortamos el espacio arriba del título */
+    }
+}
+
+/* ==========================================================
+       DOMAR A LOS GRÁFICOS REBELDES
+       ========================================================== */
+canvas,
+svg,
+.chart-container,
+[id*="chart"],
+[class*="chart"] {
+    max-width: 100% !important;
+    /* Bajamos un poco la altura máxima para que no queden estirados */
+    max-height: 250px !important;
+    object-fit: contain; /* Evita que el canvas se deforme feo */
 }

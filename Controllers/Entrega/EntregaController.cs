@@ -68,6 +68,7 @@ namespace ConexionSql.Controllers
                 {
                     ViewBag.UsuarioId = usuario.IbPerId;
                     ViewBag.UsuarioLogueado = $"{usuario.IbPerApe}, {usuario.IbPerNom}";
+                    ViewBag.CargoUsuario = usuario.IbPerCarDen;
                 }
             }
 
@@ -115,7 +116,7 @@ namespace ConexionSql.Controllers
 
                     // 👤 PERSONAL
                     TbEntPerId = usuario.IbPerId,
-                    TbEntPerNom = usuario.IbPerNom,
+                    TbEntPerNom = $"{usuario.IbPerApe}, {usuario.IbPerNom}",
                     TbEntPerApe = usuario.IbPerApe,
                     TbEntPerCarId = usuario.IbPerCarId,
                     TbEntPerCarDen = usuario.IbPerCarDen,

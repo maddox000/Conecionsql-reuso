@@ -60,6 +60,7 @@ namespace ConexionSql.Controllers.reuepcion
                 {
                     ViewBag.UsuarioId = usuario.IbPerId;
                     ViewBag.UsuarioLogueado = $"{usuario.IbPerApe}, {usuario.IbPerNom}";
+                    ViewBag.CargoUsuario = usuario.IbPerCarDen;
                 }
             }
 
@@ -105,6 +106,7 @@ namespace ConexionSql.Controllers.reuepcion
                 {
                     ViewBag.UsuarioId = usuario.IbPerId;
                     ViewBag.UsuarioLogueado = $"{usuario.IbPerApe}, {usuario.IbPerNom}";
+                    ViewBag.CargoUsuario = usuario.IbPerCarDen;
                 }
             }
 
@@ -135,6 +137,7 @@ namespace ConexionSql.Controllers.reuepcion
                 {
                     ViewBag.UsuarioId = usuario.IbPerId;
                     ViewBag.UsuarioLogueado = $"{usuario.IbPerApe}, {usuario.IbPerNom}";
+                    ViewBag.UserCargo = usuario.IbPerCarDen;
                 }
             }
 
@@ -189,6 +192,41 @@ namespace ConexionSql.Controllers.reuepcion
             ViewBag.Detalles = new List<TbRecDetDto>();
 
             return View("~/Views/Recepcion/CrearRecepcion.cshtml", recepcion);
+        }
+
+
+        //impresion de recepcion
+
+        [HttpGet]
+        public IActionResult ImprimirRecepcion(int id)
+        {
+            var recepcion = _context.TbRec.FirstOrDefault(x => x.TbRecId == id);
+
+            if (recepcion == null)
+                return RedirectToAction("CrearRecepcion");
+
+            var detalles = _context.TbRecDet
+                .Where(x => x.TbRecId == id)
+                .Select(x => new TbRecDetDto
+                {
+                    TB_REC_DET_ID = x.TbRecDetId,
+                    TB_REC_ID = x.TbRecId,
+
+                    TB_REC_DET_MAT_PR = x.TbRecDetMatPr,
+                    TbRecDetMatDen = x.TbRecDetMatDen,
+
+                    TB_REC_DET_REU_ID = x.TbRecDetReuId,
+
+                    IB_EST_ID = x.TbRecDetEstId,
+                    IB_EST_DEN = x.TbRecDetEstDen,
+
+                    TB_REC_DET_CANT = x.TbRecDetCant
+                })
+                .ToList();
+
+            ViewBag.Detalles = detalles;
+
+            return View("~/Views/Recepcion/Impresion/ImprimirRecepcion.cshtml", recepcion);
         }
 
         // 💾 POST: Guardar nueva recepción
@@ -267,7 +305,10 @@ namespace ConexionSql.Controllers.reuepcion
                 nuevaRecepcion.TbRecOrtId = 1;
                 nuevaRecepcion.TbRecOrtDen = "NO REGISTRA";
 
-                nuevaRecepcion.TbRecSecPer = "NO REGISTRADO";
+                //nuevaRecepcion.TbRecSecPer = "NO REGISTRADO";
+                nuevaRecepcion.TbRecSecPer = string.IsNullOrWhiteSpace(nuevaRecepcion.TbRecSecPer)
+                ? "NO REGISTRADO"
+                : nuevaRecepcion.TbRecSecPer.Trim().ToUpper();
 
                 if (string.IsNullOrEmpty(nuevaRecepcion.TbRecObs))
                     nuevaRecepcion.TbRecObs = "";
@@ -406,12 +447,13 @@ namespace ConexionSql.Controllers.reuepcion
                     {
                         ViewBag.UsuarioId = usuario.IbPerId;
                         ViewBag.UsuarioLogueado = $"{usuario.IbPerApe}, {usuario.IbPerNom}";
+                        ViewBag.UserCargo = usuario.IbPerCarDen;
                     }
                 }
             }
 
-            //return View("~/Views/Recepcion/CrearRecepcion.cshtml", nuevaRecepcion);
-            return RedirectToAction("SubFormulario", new { id = nuevaRecepcion.TbRecId });
+            return View("~/Views/Recepcion/CrearRecepcion.cshtml", nuevaRecepcion);
+            //return RedirectToAction("SubFormulario", new { id = nuevaRecepcion.TbRecId });
         }
 
         

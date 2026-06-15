@@ -1,0 +1,99 @@
+﻿@model ConexionSql.Models.Acondicionado.TbProAcoDetFormDto
+
+
+<link rel="stylesheet" href="~/css/views/crear-acondicionado.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/views/info-basica.css" asp-append-version="true" />
+
+<div class="aco-demo">
+
+    <div class="aco-banner">Consulta Acondicionado</div>
+
+    <div class="aco-grid">
+
+        <div class="aco-panel">
+
+            <div class="aco-kv">
+                <div class="aco-k">Número de proceso</div>
+                <div class="aco-v">@Model.Cabecera.TbProAcoId</div>
+            </div>
+
+            <div class="aco-kv">
+                <div class="aco-k">Usuario</div>
+                <div class="aco-v">@Model.Cabecera.TbProAcoPerNom</div>
+            </div>
+
+            <div class="aco-kv">
+                <div class="aco-k">Cargo</div>
+                <div class="aco-v">@Model.Cabecera.TbProAcoPerCarDen</div>
+            </div>
+
+            <div class="aco-kv">
+                <div class="aco-k">Total unidades</div>
+                <div class="aco-v">@(Model.Cabecera.TbProAcoCant ?? 0)</div>
+            </div>
+
+        </div>
+
+        <div class="aco-panel">
+
+            <div class="aco-kv">
+                <div class="aco-k">Fecha</div>
+                <div class="aco-v">
+                    @Model.Cabecera.TbProAcoFec?.ToString("dd/MM/yyyy")
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="aco-observ">
+        <div class="aco-k">Observaciones</div>
+        <textarea readonly></textarea>
+    </div>
+
+    <div class="aco-tabbar">
+        <div class="aco-tab">Materiales acondicionados</div>
+    </div>
+
+    <div class="aco-table-wrap">
+
+        <div class="aco-table-head-title">
+            Materiales acondicionados
+        </div>
+
+        <table class="aco-table">
+
+            <thead>
+                <tr>
+                    <th>Codigo etiqueta</th>
+                    <th>Denominacion</th>
+                    <th>Sector</th>
+                    <th>Codigo reuso</th>
+                    <th>Tipo de envoltorio</th>
+                    <th>Recibidos</th>
+                    <th>En proceso</th>
+                    <th>Sin procesar</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @await Html.PartialAsync(
+                    "~/Views/Acondicionado/_DetalleTablaAco.cshtml",
+                    Model.Detalles
+                )
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <div class="aco-actions">
+        <a href="@Url.Action("IndexAcondicionado", "BusAco")"
+           class="btn-baxen">
+            Cerrar
+        </a>
+    </div>
+
+</div>

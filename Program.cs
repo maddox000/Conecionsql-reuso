@@ -44,6 +44,7 @@ builder.Services.AddScoped<IBusRecService, BusRecService>();
 builder.Services.AddScoped<IBusLavadoService, BusLavadoService>();
 builder.Services.AddScoped<IBusAcoService, BusAcoService>();
 builder.Services.AddScoped<IBusAcondicionadoService, BusAcondicionadoService>();
+builder.Services.AddScoped<IBus_EntDetService, Bus_EntDetService>();
 
 var app = builder.Build();
 

@@ -72,12 +72,14 @@
 
             <div class="proceso-kv">
                 <div class="k">Usuario</div>
-                <div class="v" id="panelUsuario">-</div>
+                @* <div class="v" id="panelUsuario">-</div> *@
+                <div class="v" id="panelUsuario">@ViewBag.UsuarioLogueado</div>
             </div>
 
             <div class="proceso-kv">
                 <div class="k">Cargo</div>
-                <div class="v" id="panelCargo">-</div>
+                @* <div class="v" id="panelCargo">-</div> *@
+                <div class="v" id="panelCargo">@((string?)ViewBag.CargoUsuario ?? "-")</div>
             </div>
 
             <div class="proceso-title">Datos del proceso</div>
@@ -526,14 +528,14 @@
 
 
         function sincronizarResumenProceso() {
-            const usuarioNom = localStorage.getItem("usuarioNom") || "";
-            const usuarioApe = localStorage.getItem("usuarioApe") || "";
-            const usuarioCarDen = localStorage.getItem("usuarioCarDen") || "-";
+            // const usuarioNom = localStorage.getItem("usuarioNom") || "";
+            // const usuarioApe = localStorage.getItem("usuarioApe") || "";
+            // const usuarioCarDen = localStorage.getItem("usuarioCarDen") || "-";
 
-            const nombreCompleto = `${usuarioApe}${usuarioApe && usuarioNom ? ", " : ""}${usuarioNom}`.trim() || "-";
+            // const nombreCompleto = `${usuarioApe}${usuarioApe && usuarioNom ? ", " : ""}${usuarioNom}`.trim() || "-";
 
-            setText("panelUsuario", nombreCompleto);
-            setText("panelCargo", usuarioCarDen);
+            // setText("panelUsuario", nombreCompleto);
+            // setText("panelCargo", usuarioCarDen);
             setText("panelTipoProceso", textoSeleccionado("TipoProcesoId"));
             setText("panelTipoCiclo", textoSeleccionado("TipoCicloId"));
             setText("panelNumeroEquipo", valorSeleccionado("EquipoId"));

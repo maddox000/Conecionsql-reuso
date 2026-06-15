@@ -81,12 +81,12 @@ namespace ConexionSql.Controllers.Materiales
             // 3) Tomar la primera imagen válida
             var imagenes = new[]
             {
-        material.IB_MAT_IMG_1,
-        material.IB_MAT_IMG_2,
-        material.IB_MAT_IMG_3,
-        material.IB_MAT_IMG_4,
-        material.IB_MAT_IMG_5
-    };
+                    material.IB_MAT_IMG_1,
+                    material.IB_MAT_IMG_2,
+                    material.IB_MAT_IMG_3,
+                    material.IB_MAT_IMG_4,
+                    material.IB_MAT_IMG_5
+                };
 
             var nombreImagen = imagenes
                 .FirstOrDefault(x =>

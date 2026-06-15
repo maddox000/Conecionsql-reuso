@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <Folder Include="Controllers\Traza\" />
+    <Folder Include="Views\Lavado\Imprimir\" />
     <Folder Include="Views\Traza\" />
     <Folder Include="wwwroot\img\" />
   </ItemGroup>

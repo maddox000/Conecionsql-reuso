@@ -23,7 +23,7 @@
 
                 <div class="proceso-kv">
                     <div class="k">Cargo</div>
-                    <div class="v">-</div>
+                    <div class="v">@Model.Cabecera.TbProPerCarDen</div>
                 </div>
 
                 <div class="proceso-title">Datos del proceso</div>
@@ -713,6 +713,59 @@
                 }
             });
         });
+
+        //boton eliminar materiales
+
+            document.addEventListener('click', async function (event) {
+
+                const btnEliminar = event.target.closest('.js-pro-eliminar-detalle');
+
+                if (!btnEliminar) {
+                    return;
+                }
+
+                const tbProDetId = parseInt(btnEliminar.dataset.proDetId);
+
+                if (!confirm('¿Eliminar el material del proceso?')) {
+                    return;
+                }
+
+                const response = await fetch('/TbProDet/EliminarDetalle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(tbProDetId)
+                });
+
+                const json = await response.json();
+
+                if (!json.success) {
+                    alert(json.mensaje);
+                    return;
+                }
+
+                const fila = document.getElementById(`fila-pro-det-${tbProDetId}`);
+
+                        if (fila) {
+                            fila.style.opacity = "0.5";
+
+                            const celdaEstado = fila.children[7];
+
+                            if (celdaEstado) {
+                                celdaEstado.innerText = "ELIMINADO";
+                            }
+
+                            const boton = fila.querySelector(".js-pro-eliminar-detalle");
+
+                            if (boton) {
+                                boton.disabled = true;
+                                boton.style.pointerEvents = "none";
+                                boton.style.opacity = "0.3";
+                                boton.title = "Material eliminado";
+                            }
+                        }
+            });
 
         document.addEventListener('click', function (event) {
             const btnPdfRow = event.target.closest('.js-pro-row-print-pdf');

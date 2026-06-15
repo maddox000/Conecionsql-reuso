@@ -902,7 +902,8 @@
 
                     htmlHistorial += `<tr>
                         <td style="font-weight: 600; text-align: left; color: #2c3e50;">${h.EtapaDen}</td>
-                        <td style="text-align: center; font-family: monospace; font-size: 0.85rem;">${nroProcedimientoLimpio}</td>
+                        
+                        <td style="text-align: center; font-family: monospace; font-size: 0.85rem; cursor:pointer;" ondblclick="abrirProcedimiento('${h.EtapaDen}','${nroProcedimientoLimpio}')">${nroProcedimientoLimpio}</td>
                         <td style="text-align: center;">${datetimeConcat}</td>
                         <td style="text-align: left;">${h.Operador || '-'}</td>
                     </tr>`;
@@ -916,4 +917,39 @@
             alert("Error de red al intentar conectar la base de datos.");
         });
     }
+
+    //doble click para procedimientos
+    function abrirProcedimiento(etapa, id) {
+
+        etapa = (etapa || '').toUpperCase().trim();
+        id = (id || '').trim();
+
+        if (!id || id === '-') return;
+
+        switch (etapa) {
+
+        case 'RECEPCIÓN':
+        case 'RECEPCION':
+        window.location.href = '/Busquedas/ConsultaRecepcion/' + id;
+        break;
+
+        case 'LAVADO':
+        window.location.href = '/TbProLavBusqueda/ConsultaLavado?tbProLavId=' + id;
+        break;
+
+        case 'ACONDICIONADO':
+        window.location.href = '/AcoBusqueda/ConsultaAcondicionado?tbProAcoId=' + id;
+        break;
+
+        case 'PROCESO':
+        window.location.href = '/TbProBusqueda/VerProceso?tbProId=' + id;
+        break;
+
+        case 'ENTREGA':
+        window.location.href = '/EntBusqueda/ConsultaEntrega?tbEntId=' + id;
+        break;
+        }
+
+    }
+
 </script>

@@ -1,13 +1,14 @@
 ﻿using ConexionSql.Data;
 using ConexionSql.Models.Entrega;
+using ConexionSql.Models.Lavado;
 using ConexionSql.Models.Procesos;
+using ConexionSql.Models.Reuso;
 using ConexionSql.Utilidades;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using ConexionSql.Models.Lavado;
 
 namespace ConexionSql.Controllers.Entrega
 {
@@ -44,6 +45,8 @@ namespace ConexionSql.Controllers.Entrega
                     TB_ENT_DET_ID = d.TbEntDetId,
                     TB_ENT_ID = d.TbEntId,
                     TB_ENT_DET_CANT = d.TbEntDetCant,
+                    TB_ENT_DET_CANT_ELIM = d.TbEntDetCantElim,
+                    TB_ENT_DET_DAT = d.TbEntDetDat,
                     TbEntDetRecDetMatDen = d.TbEntDetRecDetMatDen
                 })
                 .ToListAsync();
@@ -82,6 +85,65 @@ namespace ConexionSql.Controllers.Entrega
 
                 if (cantidad > stockDisponible)
                     return Json(new { success = false, mensaje = $"❌ Stock insuficiente. Disponible: {stockDisponible}" });
+
+                // =========================================================
+                // VALIDAR Y PREPARAR ESTADO TB_REU PARA ENTREGA
+                // =========================================================
+                TbReu? reusoActualizar = null;
+
+                if (!string.IsNullOrWhiteSpace(recDet.TbRecDetReuId) && recDet.TbRecDetReuId != "1")
+                {
+                    reusoActualizar = await _context.TbReu
+                        .FirstOrDefaultAsync(x => x.TbReuIdForm == recDet.TbRecDetReuId);
+
+                    if (reusoActualizar == null)
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            mensaje = "❌ No se encontró el código de reuso asociado a la etiqueta."
+                        });
+                    }
+
+                    int sectorReusoId = reusoActualizar.TbReuSecId ?? 0;
+                    int estadoActualReusoId = reusoActualizar.TbReuEstIngId ?? 0;
+
+                    // HMD
+                    if (sectorReusoId == 905)
+                    {
+                        if (estadoActualReusoId != 24)
+                        {
+                            return Json(new
+                            {
+                                success = false,
+                                mensaje = $"El código de reuso se encuentra en etapa {reusoActualizar.TbReuEstIngDen}. No corresponde a Entrega."
+                            });
+                        }
+
+                        reusoActualizar.TbReuEstIngId = 14;
+                        reusoActualizar.TbReuEstIngDen = "Pendiente recepción stock";
+                        reusoActualizar.TbReuEstIngFec = DateTime.Now;
+                    }
+
+                    // CCV / Farmacia
+                    else if (sectorReusoId == 929 || sectorReusoId == 936)
+                    {
+                        if (estadoActualReusoId != 20)
+                        {
+                            return Json(new
+                            {
+                                success = false,
+                                mensaje = $"El código de reuso se encuentra en etapa {reusoActualizar.TbReuEstIngDen}. No corresponde a Entrega."
+                            });
+                        }
+
+                        reusoActualizar.TbReuEstIngId = 22;
+                        reusoActualizar.TbReuEstIngDen = "CE - Entrega";
+                        reusoActualizar.TbReuEstIngFec = DateTime.Now;
+                    }
+                }
+
+
 
                 // ✅ Descontar stock
                 recDet.TbRecDetEntStock = (recDet.TbRecDetEntStock ?? 0) - cantidad;
@@ -221,7 +283,9 @@ namespace ConexionSql.Controllers.Entrega
                         TbEntDetRecDetEntTot = d.TbEntDetRecDetEntTot,
 
                         TB_ENT_DET_CANT = d.TbEntDetCant,
-                        TbEntDetCant = d.TbEntDetCant
+                        TbEntDetCant = d.TbEntDetCant,
+                        TB_ENT_DET_CANT_ELIM = d.TbEntDetCantElim,
+                        TB_ENT_DET_DAT = d.TbEntDetDat,
                     })
                     .ToListAsync();
 
@@ -246,6 +310,61 @@ namespace ConexionSql.Controllers.Entrega
             }
         }
 
+
+        //eliminar detalle
+
+        [HttpPost]
+        public async Task<IActionResult> EliminarDetalle([FromBody] int idDetalle)
+        {
+            var detalle = await _context.TbEntDet
+                .FirstOrDefaultAsync(x => x.TbEntDetId == idDetalle);
+
+            if (detalle == null)
+                return Json(new { success = false, mensaje = "❌ No se encontró el detalle." });
+
+            if (detalle.TbEntDetDat == "ELIMINADO" || (detalle.TbEntDetCantElim ?? 0) > 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    mensaje = "❌ El detalle ya fue eliminado."
+                });
+            }
+
+            var recDet = await _context.TbRecDet
+                .FirstOrDefaultAsync(x => x.TbRecDetId == detalle.TbEntDetRecDetId);
+
+            if (recDet == null)
+                return Json(new { success = false, mensaje = "❌ No se encontró la etiqueta original." });
+
+            int cantidad = detalle.TbEntDetCant ?? 0;
+
+            if (cantidad <= 0)
+                return Json(new { success = false, mensaje = "❌ Cantidad inválida." });
+
+            recDet.TbRecDetEntStock = (recDet.TbRecDetEntStock ?? 0) + cantidad;
+            recDet.TbRecDetEntTot = (recDet.TbRecDetEntTot ?? 0) - cantidad;
+
+            var cabecera = await _context.TbEnt
+                .FirstOrDefaultAsync(x => x.TbEntId == detalle.TbEntId);
+
+            if (cabecera != null)
+            {
+                cabecera.TbEntCantTot = (cabecera.TbEntCantTot ?? 0) - cantidad;
+            }
+
+            detalle.TbEntDetCantElim = cantidad;
+            detalle.TbEntDetDat = "ELIMINADO";
+
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                success = true,
+                total = cabecera?.TbEntCantTot ?? 0
+            });
+        }
+
         [HttpGet]
         public async Task<IActionResult> BuscarPorId(int id)
         {
@@ -254,6 +373,17 @@ namespace ConexionSql.Controllers.Entrega
                 return Json(new { success = false, mensaje = "No se encontró la etiqueta." });
 
             int stockDisponible = recDet.TbRecDetEntStock ?? 0;
+
+            if (stockDisponible <= 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    mensaje = "❌ No hay stock disponible para Entrega.",
+                    autoInsertar = false,
+                    cantidadAuto = 0
+                });
+            }
 
             return Json(new
             {

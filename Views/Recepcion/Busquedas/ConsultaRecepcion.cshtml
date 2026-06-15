@@ -93,10 +93,11 @@
                     <th>Estado</th>
                     <th>Revisión</th>
                     <th>Cantidad</th>
-                    <th>Stock lavado</th>
-                    <th>Stock acondicionado</th>
-                    <th>Stock proceso</th>
-                    <th>Stock entrega</th>
+                    <th>Lavado</th>
+                    <th>Acondicionado</th>
+                    <th>Proceso</th>
+                    <th>Entrega</th>
+                    <th><span style="font-size:22px;">🖨</span></th>
                 </tr>
             </thead>
 
@@ -106,7 +107,11 @@
                     foreach (var item in detalles)
                     {
                         <tr>
-                            <td>@item.TB_REC_DET_ID</td>
+                            @* <td>@item.TB_REC_DET_ID</td> *@
+                            <td ondblclick="window.location.href='/Traza/TrazaRecDetID/@item.TB_REC_DET_ID'"
+                                style="cursor:pointer;">
+                                @item.TB_REC_DET_ID
+                            </td>
                             <td>@item.TB_REC_DET_MAT_PR</td>
                             <td>@(string.IsNullOrWhiteSpace(item.TbRecDetMatDen) ? "SIN MATERIAL" : item.TbRecDetMatDen)</td>
                             <td>@(string.IsNullOrWhiteSpace(item.TB_REC_DET_REU_ID) ? "-" : item.TB_REC_DET_REU_ID)</td>
@@ -117,13 +122,22 @@
                             <td>@item.TB_REC_DET_EMP_STOCK</td>
                             <td>@item.TB_REC_DET_PRO_STOCK</td>
                             <td>@item.TB_REC_DET_ENT_STOCK</td>
+                            <td class="text-center">
+                                <button type="button"
+                                        class="btn-reimprimir-etiqueta"
+                                        data-id="@item.TB_REC_DET_ID"
+                                        title="Reimprimir etiqueta"
+                                        style="border:none;background:none;cursor:pointer;font-size:22px;">
+                                    🖨
+                                </button>
+                            </td>
                         </tr>
                     }
                 }
                 else
                 {
                     <tr>
-                        <td colspan="11" style="text-align:center;">
+                        <td colspan="12" style="text-align:center;">
                             No hay materiales cargados para esta recepción.
                         </td>
                     </tr>
@@ -137,5 +151,35 @@
             Cerrar
         </a>
     </div>
-
 </div>
+
+
+<script>
+    document.addEventListener("click", function (e) {
+
+        const btn = e.target.closest(".btn-reimprimir-etiqueta");
+        if (!btn) return;
+
+        const tbRecDetId = btn.dataset.id;
+
+        fetch(`/Busquedas/ReimprimirEtiqueta?tbRecDetId=${tbRecDetId}`, {
+            method: "POST"
+        })
+        .then(r => r.json())
+        .then(data => {
+
+            if (!data.success) {
+                alert(data.mensaje);
+                return;
+            }
+
+           
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Error al reimprimir.");
+        });
+    });
+</script>
+
+

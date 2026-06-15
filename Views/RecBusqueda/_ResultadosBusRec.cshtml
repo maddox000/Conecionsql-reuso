@@ -2,52 +2,60 @@
 
 @if (Model != null && Model.Any())
 {
-    <table class="table-baxen-resultados">
-        <thead>
-            <tr>
-                <th>ID REC</th>
-                <th>Fecha</th>
-                <th>Hora Inicio</th>
-                <th>Hora Fin</th>
-                <th>Sector Origen</th>
-                <th>Sector Destino</th>
-                <th>Orden / Denominación</th>
-                <th style="text-align: center;">Acción</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
+    <div class="tabla-scroll-contenedor">
+        <table class="table-baxen-resultados">
+            <thead>
                 <tr>
-                    <td ondblclick="window.location.href='/Busquedas/ConsultaRecepcion/@item.TB_REC_ID'"
-                        style="font-weight: bold; color: #2c3e50; cursor:pointer;">
-                        @item.TB_REC_ID
-                    </td>
-                    <td>
-                        @(item.TB_REC_FEC.HasValue? item.TB_REC_FEC.Value.ToString("dd/MM/yyyy") : "-")
-                    </td>
-                    <td>@item.TB_REC_HOR_INI</td>
-                    <td>@item.TB_REC_HOR_FIN</td>
-                    <td>@item.TB_REC_SEC_ORI_DEN</td>
-                    <td>@item.TB_REC_SEC_DES_DEN</td>
-                    <td>
-                        <div style="font-weight: 600;">@item.TB_REC_ORT_DEN</div>
-                        @if (!string.IsNullOrEmpty(item.TB_REC_OBS))
-                        {
-                            <small class="text-muted" title="@item.TB_REC_OBS">
-                                Obs: @(item.TB_REC_OBS.Length > 20 ? item.TB_REC_OBS.Substring(0, 20) + "..." : item.TB_REC_OBS)
-                            </small>
-                        }
-                    </td>
-                    <td style="text-align: center;">
-                        <button class="btn-ver-detalle" onclick="verDetalleRecepcion(@item.TB_REC_ID)" title="Ver Detalle Completo">
-                            <span class="material-icons">visibility</span>
-                        </button>
-                    </td>
+                    <th style="width: 8%;">Recepción</th>
+                    <th style="width: 10%;">Fecha</th>
+                    <th style="width: 8%;">Hora</th>
+                    <th>Sector Origen</th>
+                    <th>Sector Destino</th>
+                    <th>Proveedor</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td ondblclick="window.location.href='/Busquedas/ConsultaRecepcion/@item.TB_REC_ID'"
+                            style="font-weight: normal; color: #2c3e50; cursor:pointer; width: 8%;">
+                            @item.TB_REC_ID
+                        </td>
+                        <td style="width: 10%;">
+                            @(item.TB_REC_FEC.HasValue ? item.TB_REC_FEC.Value.ToString("dd/MM/yyyy") : "-")
+                        </td>
+                        <td style="width: 8%;">
+                            @{
+                                string horaCorta = "-";
+                                if (item.TB_REC_HOR_INI != null)
+                                {
+                                    var hStr = item.TB_REC_HOR_INI.ToString();
+                                    if (System.TimeSpan.TryParse(hStr, out System.TimeSpan ts))
+                                    {
+                                        // EL ARREGLO ESTÁ ACÁ: Sacamos el @ y usamos doble barra \\ para escapar
+                                        horaCorta = ts.ToString("hh\\:mm");
+                                    }
+                                    else if (System.DateTime.TryParse(hStr, out System.DateTime dt))
+                                    {
+                                        horaCorta = dt.ToString("HH:mm");
+                                    }
+                                    else if (hStr.Length >= 5)
+                                    {
+                                        horaCorta = hStr.Substring(0, 5);
+                                    }
+                                }
+                            }
+                            @horaCorta
+                        </td>
+                        <td>@item.TB_REC_SEC_ORI_DEN</td>
+                        <td>@item.TB_REC_SEC_DES_DEN</td>
+                        <td>@item.TB_REC_ORT_DEN</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 
     <script>
         var contador = document.getElementById('contador');
@@ -70,5 +78,3 @@ else
         }
     </script>
 }
-
-

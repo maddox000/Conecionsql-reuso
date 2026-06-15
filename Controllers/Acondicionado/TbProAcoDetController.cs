@@ -2,6 +2,7 @@
 using ConexionSql.Models.Acondicionado;
 using ConexionSql.Models.Procesos;
 using ConexionSql.Models.Recepciones;
+using ConexionSql.Models.Reuso;
 using ConexionSql.Utilidades;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
@@ -47,6 +48,64 @@ namespace ConexionSql.Controllers
 
                 if (cantidad > stockDisponible)
                     return Json(new { success = false, mensaje = $"❌ Stock insuficiente. Disponible: {stockDisponible}" });
+
+
+                // =========================================================
+                // VALIDAR Y PREPARAR ESTADO TB_REU PARA ACONDICIONADO
+                // =========================================================
+                TbReu? reusoActualizar = null;
+
+                if (!string.IsNullOrWhiteSpace(recDet.TbRecDetReuId) && recDet.TbRecDetReuId != "1")
+                {
+                    reusoActualizar = await _context.TbReu
+                        .FirstOrDefaultAsync(x => x.TbReuIdForm == recDet.TbRecDetReuId);
+
+                    if (reusoActualizar == null)
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            mensaje = "❌ No se encontró el código de reuso asociado a la etiqueta."
+                        });
+                    }
+
+                    int sectorReusoId = reusoActualizar.TbReuSecId ?? 0;
+                    int estadoActualReusoId = reusoActualizar.TbReuEstIngId ?? 0;
+
+                    // HMD
+                    if (sectorReusoId == 905)
+                    {
+                        if (estadoActualReusoId != 23)
+                        {
+                            return Json(new
+                            {
+                                success = false,
+                                mensaje = $"El código de reuso se encuentra en etapa {reusoActualizar.TbReuEstIngDen}. No corresponde a Acondicionado."
+                            });
+                        }
+
+                        reusoActualizar.TbReuEstIngId = 133;
+                        reusoActualizar.TbReuEstIngDen = "CE - Acondicionado";
+                        reusoActualizar.TbReuEstIngFec = DateTime.Now;
+                    }
+
+                    // CCV / Farmacia
+                    else if (sectorReusoId == 929 || sectorReusoId == 936)
+                    {
+                        if (estadoActualReusoId != 18)
+                        {
+                            return Json(new
+                            {
+                                success = false,
+                                mensaje = $"El código de reuso se encuentra en etapa {reusoActualizar.TbReuEstIngDen}. No corresponde a Acondicionado."
+                            });
+                        }
+
+                        reusoActualizar.TbReuEstIngId = 19;
+                        reusoActualizar.TbReuEstIngDen = "CE - Acondicionado";
+                        reusoActualizar.TbReuEstIngFec = DateTime.Now;
+                    }
+                }
 
                 // Actualizar stock en TB_REC_DET
                 recDet.TbRecDetEmpStock -= cantidad;
@@ -163,9 +222,11 @@ namespace ConexionSql.Controllers
                         TbProAcoDetEmpTot = d.TbProAcoDetEmpTot,
                         TbProAcoDetEmpStock = d.TbProAcoDetEmpStock,
                         TbProAcoDetCant = d.TbProAcoDetCant,
+                        TbProAcoDetCantElim = d.TbProAcoDetCantElim,
+                        TbProAcoDetDat = d.TbProAcoDetDat,
                         TbProAcoDetPcUsr = d.TbProAcoDetPcUsr,
                         TbProAcoDetPcLog = d.TbProAcoDetPcLog,
-                        TbProAcoDetHor = d.TbProAcoDetHor
+                        TbProAcoDetHor = d.TbProAcoDetHor,
                     })
                     .ToListAsync();
 
@@ -204,6 +265,8 @@ namespace ConexionSql.Controllers
                     TbProAcoDetMatId = d.TbProAcoDetMatId,
                     TbProAcoDetMatDen = d.TbProAcoDetMatDen,
                     TbProAcoDetCant = d.TbProAcoDetCant,
+                    TbProAcoDetCantElim = d.TbProAcoDetCantElim,
+                    TbProAcoDetDat = d.TbProAcoDetDat,
                     TbProAcoDetPcUsr = d.TbProAcoDetPcUsr,
                     TbProAcoDetPcLog = d.TbProAcoDetPcLog,
                     TbProAcoDetHor = d.TbProAcoDetHor
@@ -232,6 +295,17 @@ namespace ConexionSql.Controllers
                     return Json(new { success = false, mensaje = "Etiqueta no encontrada." });
 
                 int sinProcesar = recDet.TbRecDetEmpStock ?? 0;
+
+                if (sinProcesar <= 0)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        mensaje = "❌ No hay stock disponible para Acondicionado.",
+                        autoInsertar = false,
+                        cantidadAuto = 0
+                    });
+                }
 
                 return Json(new
                 {
@@ -604,6 +678,52 @@ namespace ConexionSql.Controllers
                 success = true,
                 requiereFinalizarLavado = false
             });
+        }
+
+        //elimiar de detalle
+
+        [HttpPost]
+        public async Task<IActionResult> EliminarDetalle([FromBody] int tbProAcoDetId)
+        {
+            var detalle = await _context.TbProAcoDet
+                .FirstOrDefaultAsync(x => x.TbProAcoDetId == tbProAcoDetId);
+
+            if (detalle == null)
+                return Json(new { success = false, mensaje = "Detalle no encontrado." });
+
+            if (detalle.TbProAcoDetDat == "ELIMINADO" || (detalle.TbProAcoDetCantElim ?? 0) > 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    mensaje = "Este material ya fue eliminado del acondicionado."
+                });
+            }
+
+            var recDet = await _context.TbRecDet
+                .FirstOrDefaultAsync(x => x.TbRecDetId == detalle.TbProAcoDetRecDetId);
+
+            if (recDet == null)
+                return Json(new { success = false, mensaje = "No se encontró la etiqueta original." });
+
+            int cantidad = detalle.TbProAcoDetCant ?? 0;
+
+            if (cantidad <= 0)
+                return Json(new { success = false, mensaje = "La cantidad del detalle no es válida." });
+
+            if ((recDet.TbRecDetProStock ?? 0) < cantidad)
+                return Json(new { success = false, mensaje = "No hay stock suficiente para revertir el acondicionado." });
+
+            recDet.TbRecDetEmpStock = (recDet.TbRecDetEmpStock ?? 0) + cantidad;
+            recDet.TbRecDetEmpTot = (recDet.TbRecDetEmpTot ?? 0) - cantidad;
+            recDet.TbRecDetProStock = (recDet.TbRecDetProStock ?? 0) - cantidad;
+
+            detalle.TbProAcoDetCantElim = cantidad;
+            detalle.TbProAcoDetDat = "ELIMINADO";
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true });
         }
 
 
